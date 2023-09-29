@@ -1,0 +1,214 @@
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<title>Pico</title>
+<link rel="icon" type="image/svg" href="icon.svg">
+<link rel="apple-touch-icon" href="icon.png" sizes="192x192">
+<link rel="manifest" href="manifest.json">
+<style>
+body {
+	font-family: Courier, monospace, sans-serif;
+	background-color: #fff;
+}
+a {
+	color: #ccc;
+	text-decoration: none;
+}
+#container {
+	width: 100%; height: 100%;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: flex-start; -webkit-justify-content: flex-start;
+	align-items: center; -webkit-align-items: center;
+}
+#header {
+	width: 95%; margin: 0px;
+	flex: 0 1 auto;
+	display: flex; display: -webkit-flex;
+	flex-direction: row; -webkit-flex-direction: row;
+	justify-content: space-between; -webkit-justify-content: space-between;
+	align-items: center; -webkit-align-items: center;
+}
+#contents {
+	position: relative;
+	width: 95%; height: 90%;
+	flex: 1 1 auto;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: center; -webkit-justify-content: center;
+	align-items: center; -webkit-align-items: center;
+	background-color: #eee;
+}
+#screen {
+	width: 100%;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: center; -webkit-justify-content: center;
+}
+#footer {
+	width: 95%; margin: 0px;
+	flex: 0 1 auto;
+	display: flex; display: -webkit-flex;
+	flex-direction: row; -webkit-flex-direction: row;
+	justify-content: flex-end; -webkit-justify-content: flex-end;
+	align-items: center; -webkit-align-items: center;
+	font-size: 12px;
+	color: #eee;
+}
+.logo {
+	width: 160px; height: 60px; margin: 0px 16px;
+	display: flex; display: -webkit-flex;
+	flex-direction: row; -webkit-flex-direction: row;
+	justify-content: flex-start; -webkit-justify-content: flex-start;
+	align-items: center; -webkit-align-items: center;
+}
+.logo #icon {
+	width: 40px; height: 40px; padding: 10px; margin-left: -28px;
+}
+.logo #title {
+	font-size: 24px;
+	color: #eee;
+}
+.menu {
+	height: 40px;
+	display: flex; display: -webkit-flex;
+	flex-direction: row; -webkit-flex-direction: row;
+	justify-content: space-between; -webkit-justify-content: space-between;
+	align-items: flex-end; -webkit-align-items: flex-end;
+}
+.menu .item {
+	width: 40px; height: 40px; margin: 0px;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: center; -webkit-justify-content: center;
+	align-items: center; -webkit-align-items: center;
+	font-size: 16px;
+}
+.menu .subitem {
+	width: 40px; height: 20px; margin-left: -40px;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: center; -webkit-justify-content: center;
+	align-items: center; -webkit-align-items: center;
+	font-size: 10px;
+}
+.menu .item.dark {
+	background-color: #eee;
+	color: #fff;
+}
+.menu .subitem.dark {
+	background-color: none;
+	color: #ccc;
+}
+.menu .light {;
+	background-color: #ccc;
+	color: #fff;
+}
+.menu .subitem.light {
+	background-color: none;
+	color: #fff;
+}
+.menu a {
+	transform: scale(1);
+	opacity: 1;
+}
+.menu a:hover {
+	transform: scale(1);
+	opacity: 0.6;
+}
+.menu a:active {
+	transform: scale(0.9);
+	opacity: 1;
+}
+@media (min-width: 600px) {
+	#contents {
+		flex-direction: row; -webkit-flex-direction: row;
+		justify-content: center; -webkit-justify-content: center;
+		align-items: center; -webkit-align-items: center;
+	}
+}
+</style>
+</head>
+<body>
+<div id="container">
+	<h1 id="header">
+		<div class="logo">
+			<!--img id="icon" src="icon.svg"/!-->
+			<a id="title" href="?">Pico</a>
+		</div>
+		<div class="menu">
+			<a class="item dark" id="item1" href="javascript:;"></a>
+		</div>
+	</h1>
+	<div id="contents">
+		<div id="screen">
+		</div>
+	</div>
+	<h6 id="footer">
+		<div id="author"></div>/
+		<div id="version"></div>
+	</h6>
+</div>
+<script>console.log = () => {};</script>
+<script src="daemon.js"></script>
+<script src="sound.js"></script>
+<script src="image.js"></script>
+<!--Main--><script>
+
+	// Rect for dice face.
+	const rect = [1,-4,-4,0,9,9, 2,-3,-3,0,7,7];
+
+	// 0:None, 1-9:Dot
+	const dots = [
+		[                                                                               ],
+		[1, 0, 0                                                                        ],
+		[         1,-2, 2, 1, 2,-2                                                      ],
+		[1, 0, 0, 1,-2, 2, 1, 2,-2                                                      ],
+		[         1,-2, 2, 1, 2,-2, 1,-2,-2, 1, 2, 2                                    ],
+		[1, 0, 0, 1,-2, 2, 1, 2,-2, 1,-2,-2, 1, 2, 2                                    ],
+		[         1,-2, 2, 1, 2,-2, 1,-2,-2, 1, 2, 2, 1,-2, 0, 1, 2, 0                  ],
+		[1, 0, 0, 1,-2, 2, 1, 2,-2, 1,-2,-2, 1, 2, 2, 1,-2, 0, 1, 2, 0                  ],
+		[         1,-2, 2, 1, 2,-2, 1,-2,-2, 1, 2, 2, 1,-2, 0, 1, 2, 0, 1, 0,-2, 1, 0, 2],
+		[1, 0, 0, 1,-2, 2, 1, 2,-2, 1,-2,-2, 1, 2, 2, 1,-2, 0, 1, 2, 0, 1, 0,-2, 1, 0, 2],
+	];
+
+	// 1:Do, 2:Re, 3:Mi,  4:Fa, 5:So, 6:La, 7:Ti
+	const tones = [-1.0,
+		-0.9,-0.7,-0.5, -0.4,-0.2, 0.0, 0.2,
+		 0.3, 0.5, 0.7,  0.8, 1.0, 1.2, 1.4,
+		 1.5, 1.7, 1.9,  2.0, 2.2];
+
+	// Draw icon.
+	let icon = new pico.Image("item1");
+	icon.draw(rect);
+	icon.draw(dots[6]);
+
+// On click event.
+document.addEventListener("click", async (evt) => {
+
+	const count = 5, maximum = 6;
+	let result = [];
+
+	// Draw dice.
+	for (let t = 30; t >= 0; t--) {
+		picoClear();
+		for (let i = 0; i < count; i++) {
+			result[i] = picoRandom(maximum) + 1;
+			let x = -40*(count-1)/2+40*i, y = 0, a = 10*t;
+			picoDraw(rect, x, y, a);
+			picoDraw(dots[result[i]], x, y, a);
+		}
+		await picoFlip();
+	}
+
+	// Beep.
+	const timing = count <= 2 ? 0.2 : 0.5/count;
+	for (let i = 0; i < count; i++) {
+		picoBeep(tones[result[i]], timing/2, timing * i);
+	}
+
+});
+</script><!--/Main-->
+</body>
+</html>
