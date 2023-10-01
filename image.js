@@ -74,7 +74,7 @@ pico.Image = class {
 		return new Promise(r => setTimeout(r, t)).then(() => {
 			return navigator.locks.request(pico.Image.lock, async (lock) => {
 				return this._flip();
-			});
+			}); // end of lock.
 		});
 	}
 
@@ -82,14 +82,14 @@ pico.Image = class {
 	clear() {
 		return navigator.locks.request(pico.Image.lock, async (lock) => {
 			return this._clear();
-		});
+		}); // end of lock.
 	}
 
 	// Set color pallete.
 	color(colors=[0,0,0]) {
 		return navigator.locks.request(pico.Image.lock, async (lock) => {
 			this.colors = colors;
-		});
+		}); // end of lock.
 	}
 
 	// Draw rects to canvas.
@@ -106,7 +106,7 @@ pico.Image = class {
 			}).then(() => {
 				return this._drawRect(cells);
 			});
-		});
+		}); // end of lock.
 	}
 
 	//*----------------------------------------------------------*/
