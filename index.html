@@ -40,7 +40,7 @@ a {
 	align-items: center; -webkit-align-items: center;
 	background-color: #eee;
 }
-#screen {
+#picoImage {
 	width: 100%;
 	display: flex; display: -webkit-flex;
 	flex-direction: column; -webkit-flex-direction: column;
@@ -142,7 +142,7 @@ a {
 		</div>
 	</h1>
 	<div id="contents">
-		<div id="screen">
+		<div id="picoImage">
 		</div>
 	</div>
 	<h6 id="footer">
@@ -182,8 +182,8 @@ const tones = [-1.0,
 
 // Draw icon.
 let icon = new pico.Image("item1");
-icon.draw(rect);
-icon.draw(dots[6]);
+icon.drawRect(rect);
+icon.drawRect(dots[6]);
 
 // On click event.
 document.addEventListener("click", async (evt) => {
@@ -197,8 +197,8 @@ document.addEventListener("click", async (evt) => {
 		for (let i = 0; i < count; i++) {
 			result[i] = picoRandom(maximum) + 1;
 			let x = -40*(count-1)/2+40*i, y = 0, a = 10*t;
-			picoDraw(rect, x, y, a);
-			picoDraw(dots[result[i]], x, y, a);
+			picoRect(rect, x, y, a);
+			picoRect(dots[result[i]], x, y, a);
 		}
 		await picoFlip();
 	}

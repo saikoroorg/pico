@@ -5,7 +5,7 @@ function picoRandom(max) {
 	return pico.image.random(max);
 }
 
-// Wait and flip canvas.
+// Wait and flip image.
 async function picoFlip(t=10) {
 	try {
 		await pico.image.flip(t);
@@ -14,7 +14,7 @@ async function picoFlip(t=10) {
 	}
 }
 
-// Clear canvas.
+// Clear image.
 async function picoClear() {
 	try {
 		await pico.image.clear();
@@ -23,19 +23,28 @@ async function picoClear() {
 	}
 }
 
-// Set color pallete.
-async function picoColor(colors=[0,0,0]) {
+// Set image color.
+async function picoColor(palls=[0,0,0]) {
 	try {
-		pico.image.color(colors);
+		pico.image.color(palls);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
-// Draw rects.
-async function picoDraw(cells=[1,0,0], x=0, y=0, angle=0, scale=1) {
+// Draw pixel.
+async function picoPixel(index=0, x=0, y=0, w=1, h=1) {
 	try {
-		await pico.image.draw(cells, x, y, angle, scale);
+		await pico.image.pixel(index, x, y, w, h);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+// Draw rect cells.
+async function picoRect(cells=[1, 0,0, 1,1], x=0, y=0, angle=0, scale=1) {
+	try {
+		await pico.image.drawRect(cells, x, y, angle, scale);
 	} catch (error) {
 		console.error(error);
 	}
@@ -48,11 +57,10 @@ var pico = pico || {};
 
 // Image class.
 pico.Image = class {
-	static width = 200; // Canvas width.
-	static height = 200; // Canvas height.
+	static width = 200; // Image width.
+	static height = 200; // Image height.
 	static unit = 4; // Unit size. (Requires multiple of 2 for center pixel)
-	static lock = "picoImageLock"; // Lock object identifier.
-	static parent = "screen"; // Parent pane id.
+	static parent = "picoImage"; // Image class name.
 
 	// Get random count.
 	random(max) {
@@ -69,32 +77,43 @@ pico.Image = class {
 		// return Math.round(rand * max);
 	}
 
-	// Wait and flip canvas.
+	// Wait and flip image.
 	flip(t=10) {
 		return new Promise(r => setTimeout(r, t)).then(() => {
-			return navigator.locks.request(pico.Image.lock, async (lock) => {
+			return navigator.locks.request(this.lock, async (lock) => {
 				return this._flip();
 			}); // end of lock.
 		});
 	}
 
-	// Clear canvas.
+	// Clear image.
 	clear() {
-		return navigator.locks.request(pico.Image.lock, async (lock) => {
+		return navigator.locks.request(this.lock, async (lock) => {
 			return this._clear();
 		}); // end of lock.
 	}
 
-	// Set color pallete.
-	color(colors=[0,0,0]) {
-		return navigator.locks.request(pico.Image.lock, async (lock) => {
-			this.colors = colors;
+	// Set image color.
+	color(palls=[0,0,0]) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			this.palls = palls;
 		}); // end of lock.
 	}
 
-	// Draw rects to canvas.
-	draw(cells=[1,0,0], x=0, y=0, angle=0, scale=1) {
-		return navigator.locks.request(pico.Image.lock, async (lock) => {
+	// Draw pixel to image.
+	pixel(n=1, x=0, y=0, w=1, h=1) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			return this._ready().then(() => {
+				return this._reset();
+			}).then(() => {
+				return this._draw([n, x, y, 0, w, h]);
+			});
+		}); // end of lock.
+	}
+	
+	// Draw rect cells to image.
+	drawRect(cells=[1, 0,0, 1,1], x=0, y=0, angle=0, scale=1) {
+		return navigator.locks.request(this.lock, async (lock) => {
 			return this._ready().then(() => {
 				return this._reset();
 			}).then(() => {
@@ -104,7 +123,7 @@ pico.Image = class {
 			}).then(() => {
 				return this._scale(scale);
 			}).then(() => {
-				return this._drawRect(cells);
+				return this._draw(cells);
 			});
 		}); // end of lock.
 	}
@@ -113,10 +132,11 @@ pico.Image = class {
 
 	// constructor.
 	constructor(parent=null) {
-		this.canvas = []; // Canvas element.
-		this.primary = 0; // Primary index.
-		this.image = null; // Canvas 2d context.
-		this.colors = [0,0,0, 51,51,51, 255,255,255]; // Color pallete. 
+		this.lock = "picoImageLock" + Date.now(); // Lock object identifier.
+		this.canvas = []; // Double buffered canvas elements.
+		this.primary = 0; // Primary canvas index.
+		this.conext = null; // Canvas 2d context.
+		this.palls = [0,0,0, 51,51,51, 255,255,255]; // Master image color. 
 		this.seed = Date.now(); // Random seed.
 
 		// Setup now.
@@ -131,15 +151,16 @@ pico.Image = class {
 		}
 	}
 
-	// Setup image.
+	// Setup canvas.
 	_setup(parent=null) {
 		return new Promise((resolve) => {
 
-			// Create image.
-			if (this.image == null) {
-				console.log("Create image.");
+			// Create canvas.
+			if (this.conext == null) {
+				console.log("Create canvas.");
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i] = document.createElement("canvas");
+					this.canvas[i].setAttribute("class", pico.Image.className);
 					this.canvas[i].width = pico.Image.width;
 					this.canvas[i].height = pico.Image.height;
 					this.canvas[i].style.imageRendering = "pixelated";
@@ -150,13 +171,13 @@ pico.Image = class {
 						document.body.appendChild(this.canvas[i]);
 					}
 				}
-				this.image = this.canvas[this.primary].getContext("2d");
+				this.conext = this.canvas[this.primary].getContext("2d");
 			}
 			return Promise.resolve();
 		}); // end of new Promise.
 	}
 
-	// Flip canvas.
+	// Flip image.
 	_flip() {
 		return this._ready().then(() => {
 			console.log("Flip.");
@@ -165,35 +186,35 @@ pico.Image = class {
 					this.canvas[i].style.display = i == this.primary ? "flex" : "none";
 				}
 				this.primary = this.primary != 0 ? 0 : 1;
-				this.image = this.canvas[this.primary].getContext("2d");
+				this.conext = this.canvas[this.primary].getContext("2d");
 				resolve();
 			}); // end of new Promise.
 		});
 	}
 
-	// Clear canvas.
+	// Clear image.
 	_clear() {
 		return this._ready().then(() => {
 			console.log("Clear.");
 			return new Promise((resolve) => {
 
-				// Clear canvas.
-				this.image.setTransform(1, 0, 0, 1, 0, 0);
-				this.image.clearRect(0, 0, pico.Image.width, pico.Image.height);
+				// Clear image.
+				this.conext.setTransform(1, 0, 0, 1, 0, 0);
+				this.conext.clearRect(0, 0, pico.Image.width, pico.Image.height);
 
 				// Clip by canvas rect.
-				this.image.rect(0, 0, pico.Image.width, pico.Image.height);
-				this.image.clip();
+				this.conext.rect(0, 0, pico.Image.width, pico.Image.height);
+				this.conext.clip();
 
 				resolve();
 			}); // end of new Promise.
 		});
 	}
 
-	// Ready to start.
+	// Ready to draw.
 	_ready() {
-		if (this.image == null) {
-			console.log("No image.");
+		if (this.conext == null) {
+			console.log("No conext.");
 			return Promise.reject();
 		}
 		return Promise.resolve();
@@ -203,7 +224,7 @@ pico.Image = class {
 	_reset() {
 		console.log("Reset transform matrix.");
 		return new Promise((resolve) => {
-			this.image.setTransform(1, 0, 0, 1, 0, 0);
+			this.conext.setTransform(1, 0, 0, 1, 0, 0);
 			resolve();
 		}); // end of new Promise.
 	}
@@ -213,7 +234,7 @@ pico.Image = class {
 		console.log("Scale: " + scale);
 		return new Promise((resolve) => {
 			if (scale != 1) {
-				this.image.scale(scale, scale);
+				this.conext.scale(scale, scale);
 			}
 			resolve();
 		}); // end of new Promise.
@@ -224,9 +245,9 @@ pico.Image = class {
 		console.log("Rotate: " + angle);
 		return new Promise((resolve) => {
 			if (angle) {
-				this.image.translate(pico.Image.width / 2, pico.Image.height / 2);
-				this.image.rotate(angle * Math.PI / 180);
-				this.image.translate(-pico.Image.width / 2, -pico.Image.height / 2);
+				this.conext.translate(pico.Image.width / 2, pico.Image.height / 2);
+				this.conext.rotate(angle * Math.PI / 180);
+				this.conext.translate(-pico.Image.width / 2, -pico.Image.height / 2);
 			}
 			resolve();
 		}); // end of new Promise.
@@ -237,14 +258,14 @@ pico.Image = class {
 		console.log("Move: " + x + "," + y);
 		return new Promise((resolve) => {
 			if (x || y) {
-				this.image.translate(x, y);
+				this.conext.translate(x, y);
 			}
 			resolve();
 		}); // end of new Promise.
 	}
 
-	// Draw rects.
-	_drawRect(cells=[1,0,0]) {
+	// Draw image.
+	_draw(cells=[1, 0,0, 1,1]) {
 		console.log("Draw: " + cells + " x " + cells.length);
 		return new Promise((resolve) => {
 
@@ -253,9 +274,9 @@ pico.Image = class {
 			//console.log("Center: " + cx + "," + cy + " x " + ux + "," + uy);
 
 			for (let i = 0; i < cells.length; i += 3) {
-				let k = cells[i] >= 0 && cells[i] * 3 < this.colors.length ? cells[i] * 3 : 0;
-				let r = this.colors[k], g = this.colors[k+1], b = this.colors[k+2];
-				//console.log("Color: " + r + "," + g + "," + b);
+				let k = cells[i] >= 0 && cells[i] * 3 < this.palls.length ? cells[i] * 3 : 0;
+				let r = this.palls[k], g = this.palls[k+1], b = this.palls[k+2];
+				//console.log("Image: " + r + "," + g + "," + b);
 
 				let x = cells[i+1] ? cells[i+1] * ux + cx : cx;
 				let y = cells[i+2] ? cells[i+2] * uy + cy : cy;
@@ -267,8 +288,8 @@ pico.Image = class {
 					//console.log("Rect: " + x + "," + y + " x " + w + "," + h);
 				}
 
-				this.image.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
-				this.image.fillRect(x, y, w, h);
+				this.conext.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
+				this.conext.fillRect(x, y, w, h);
 			}
 			resolve();
 		}); // end of new Promise.
