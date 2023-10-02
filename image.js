@@ -23,7 +23,7 @@ async function picoClear() {
 	}
 }
 
-// Set image color.
+// Set image color pallete.
 async function picoColor(palls=[0,0,0]) {
 	try {
 		pico.image.color(palls);
@@ -93,7 +93,7 @@ pico.Image = class {
 		}); // end of lock.
 	}
 
-	// Set image color.
+	// Set image color pallete.
 	color(palls=[0,0,0]) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			this.palls = palls;
@@ -136,7 +136,11 @@ pico.Image = class {
 		this.canvas = []; // Double buffered canvas elements.
 		this.primary = 0; // Primary canvas index.
 		this.conext = null; // Canvas 2d context.
-		this.palls = [0,0,0, 51,51,51, 255,255,255]; // Master image color. 
+		this.palls = [0,0,0,
+			0,63,23, 167,0,0, 143,0,119,
+			0,147,59, 231,0,91, 0,115,239,
+			188,188,188, 255,219,171, 159,255,243, // 9 colors selected from 8bit original 52 colors.
+			51,51,51, 102,102,102, 232,232,232, 255,255,255]; // Master image color. 
 		this.seed = Date.now(); // Random seed.
 
 		// Setup now.
@@ -274,8 +278,8 @@ pico.Image = class {
 			//console.log("Center: " + cx + "," + cy + " x " + ux + "," + uy);
 
 			for (let i = 0; i < cells.length; i += 3) {
-				let k = cells[i] >= 0 && cells[i] * 3 < this.palls.length ? cells[i] * 3 : 0;
-				let r = this.palls[k], g = this.palls[k+1], b = this.palls[k+2];
+				let k = cells[i] < 0 ? this.palls.length/3 - 1 : cells[i] >= this.palls.length/3 ? 0 : cells[i];
+				let r = this.palls[k*3], g = this.palls[k*3+1], b = this.palls[k*3+2];
 				//console.log("Image: " + r + "," + g + "," + b);
 
 				let x = cells[i+1] ? cells[i+1] * ux + cx : cx;
