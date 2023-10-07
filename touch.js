@@ -116,13 +116,14 @@ pico.Touch = class {
 					}); // end of lock.
 				});
 				parent.addEventListener("touchmove", (evt) => {
+					evt.preventDefault(); // Lock scroll.
 					let rect = parent.getBoundingClientRect();
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.touches.length; ++i) {
 							this._eventTouchOn(evt.touches[i].identifier, evt.touches[i].pageX - rect.x, evt.touches[i].pageY - rect.y);
 						}
 					}); // end of lock.
-				});
+				}, {passive: false});
 				parent.addEventListener("touchend", (evt) => {
 					let rect = parent.getBoundingClientRect();
 					navigator.locks.request(this.lock, async (lock) => {
