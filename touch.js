@@ -41,12 +41,12 @@ pico.Touch = class {
 	}
 
 	// Check touch motion.
-	motion(x, y, r=0) {
+	motion(x=0, y=0, r=0) {
 		return this._motion(x, y, r);
 	}
 
 	// Check touch action.
-	action(x, y, r=0) {
+	action(x=0, y=0, r=0) {
 		return this._action(x, y, r);
 	}
 
