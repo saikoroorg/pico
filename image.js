@@ -366,8 +366,8 @@ pico.Image = class {
 				this.context.clearRect(0, 0, pico.Image.width, pico.Image.height);
 
 				// Clip by canvas rect.
-				this.context.rect(0, 0, pico.Image.width, pico.Image.height);
-				this.context.clip();
+				//this.context.rect(0, 0, pico.Image.width, pico.Image.height);
+				//this.context.clip();
 
 				resolve();
 			}); // end of new Promise.
