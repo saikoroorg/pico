@@ -165,13 +165,13 @@ a {
 
 (async () => {
 
-	picoColor([204,204,204, 221,221,221, 238,238,238, 255,255,255]);
+	picoColor([204,204,204, 0,0,0, 238,238,238, 255,255,255]);
 	let keyboard = ["1234567890", "QWERTYUIOP", "ASDFGHJKL<", "ZXCVBNM.>"];
 	let textarea = "";
 
 	for (;;) {
 		picoClear();
-		picoPixel(1, -25,-25,50,50);
+		picoPixel(0, -25,-25,50,50);
 
 		for (let j = 0; j < keyboard.length; j++) {
 			let y = j * 24 + 2;
@@ -180,21 +180,24 @@ a {
 				let char = keyboard[j].substr(i, 1);
 				if (picoAction(x, y, 10)) {
 					if (char == "<") {
+						picoBeep(-1.2, 0.1);
 						textarea = textarea.substr(0, textarea.length - 1);
 					} else if (char == ">") {
+						picoBeep(1.2, 0.1);
 						textarea = "";
 					} else {
+						picoBeep(0, 0.1);
 						textarea = textarea.substr(-10, 10) + char;
 					}
-					picoChar(char, 2, x, y, 0, 1.5);
+					picoChar(char, 1, x, y, 0, 1);
 				} else if (picoMotion(x, y, 8)) {
-					picoChar(char, 2, x, y, 0, 1.5);
+					picoChar(char, 1, x, y, 0, 1);
 				} else {
-					picoChar(char, 0, x, y, 0, 1);
+					picoChar(char, 3, x, y, 0, 1);
 				}
 			}
 		}
-		picoText(textarea, [-22,-16,44,16], 2);
+		picoText(textarea, [-22,-16,44,16], 1);
 
 		await picoFlip();
 		await picoRead();
