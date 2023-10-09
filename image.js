@@ -268,7 +268,7 @@ pico.Image = class {
 			my = (area[3] + 1) * u / uy;
 		}
 
-		console.log("Textarea: " + ox + "," + oy + " x " + mx + "," + my + " / " + ux + "," + uy);
+		//console.log("Textarea: " + ox + "," + oy + " x " + mx + "," + my + " / " + ux + "," + uy);
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
