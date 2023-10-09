@@ -92,15 +92,19 @@ pico.Touch = class {
 				// Add mouse/touch event listener.
 				parent.addEventListener("mousedown", (evt) => {
 					let rect = parent.getBoundingClientRect();
+					let x = (evt.pageX - rect.x) * pico.Touch.width / rect.width;
+					let y = (evt.pageY - rect.y) * pico.Touch.height / rect.height;
 					navigator.locks.request(this.lock, async (lock) => {
 						this._eventTouchCancel(-1);
-						this._eventTouchDown(-1, evt.pageX - rect.x, evt.pageY - rect.y);
+						this._eventTouchDown(-1, x, y);
 					}); // end of lock.
 				});
 				parent.addEventListener("mousemove", (evt) => {
 					let rect = parent.getBoundingClientRect();
+					let x = (evt.pageX - rect.x) * pico.Touch.width / rect.width;
+					let y = (evt.pageY - rect.y) * pico.Touch.height / rect.height;
 					navigator.locks.request(this.lock, async (lock) => {
-						this._eventTouchMove(-1, evt.pageX - rect.x, evt.pageY - rect.y);
+						this._eventTouchMove(-1, x, y);
 					}); // end of lock.
 				});
 				document.addEventListener("mouseup", () => {
@@ -112,7 +116,9 @@ pico.Touch = class {
 					let rect = parent.getBoundingClientRect();
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
-							this._eventTouchDown(evt.changedTouches[i].identifier, evt.changedTouches[i].pageX - rect.x, evt.changedTouches[i].pageY - rect.y);
+							let x = (evt.changedTouches[i].pageX - rect.x) * pico.Touch.width / rect.width;
+							let y = (evt.changedTouches[i].pageY - rect.y) * pico.Touch.height / rect.height;
+							this._eventTouchDown(evt.changedTouches[i].identifier, x, y);
 						}
 					}); // end of lock.
 				});
@@ -121,7 +127,9 @@ pico.Touch = class {
 					let rect = parent.getBoundingClientRect();
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
-							this._eventTouchMove(evt.changedTouches[i].identifier, evt.changedTouches[i].pageX - rect.x, evt.changedTouches[i].pageY - rect.y);
+							let x = (evt.changedTouches[i].pageX - rect.x) * pico.Touch.width / rect.width;
+							let y = (evt.changedTouches[i].pageY - rect.y) * pico.Touch.height / rect.height;
+							this._eventTouchMove(evt.changedTouches[i].identifier, x, y);
 						}
 					}); // end of lock.
 				}, {passive: false});
