@@ -29,7 +29,7 @@ pico.Touch = class {
 	static width = 200; // Touch width.
 	static height = 200; // Touch height.
 	static unit = 4; // Unit size. (Requires multiple of 2 for center pixel)
-	static parent = "picoTouch"; // Parent element id.
+	static parent = "picoTouch"; // Parent element class.
 
 	// Read touch event.
 	read(t=10) {
@@ -77,13 +77,16 @@ pico.Touch = class {
 
 			// Create touch panel.
 			if (this.panel == null) {
-				if (!parent || !document.getElementById(parent)) {
-					parent = document.body;
+				console.log("Select touch panel.");
+				if (parent && document.getElementsByClassName(parent)[0]) {
+					this.panel = document.getElementsByClassName(parent)[0];
+				} else {
+					this.panel = document.body;
 				}
 
 				// Add mouse/touch event listener.
-				parent.addEventListener("mousedown", (evt) => {
-					let rect = parent.getBoundingClientRect();
+				this.panel.addEventListener("mousedown", (evt) => {
+					let rect = this.panel.getBoundingClientRect();
 					let x = (evt.pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
 					let y = (evt.pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.height;
 					navigator.locks.request(this.lock, async (lock) => {
@@ -91,8 +94,8 @@ pico.Touch = class {
 						this._eventTouchDown(-1, x, y);
 					}); // end of lock.
 				});
-				parent.addEventListener("mousemove", (evt) => {
-					let rect = parent.getBoundingClientRect();
+				this.panel.addEventListener("mousemove", (evt) => {
+					let rect = this.panel.getBoundingClientRect();
 					let x = (evt.pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
 					let y = (evt.pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.height;
 					navigator.locks.request(this.lock, async (lock) => {
@@ -104,8 +107,8 @@ pico.Touch = class {
 						this._eventTouchUp(-1);
 					}); // end of lock.
 				});
-				parent.addEventListener("touchstart", (evt) => {
-					let rect = parent.getBoundingClientRect();
+				this.panel.addEventListener("touchstart", (evt) => {
+					let rect = this.panel.getBoundingClientRect();
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							let x = (evt.changedTouches[i].pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
@@ -114,9 +117,9 @@ pico.Touch = class {
 						}
 					}); // end of lock.
 				});
-				parent.addEventListener("touchmove", (evt) => {
+				this.panel.addEventListener("touchmove", (evt) => {
 					evt.preventDefault(); // Lock scroll.
-					let rect = parent.getBoundingClientRect();
+					let rect = this.panel.getBoundingClientRect();
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							let x = (evt.changedTouches[i].pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
@@ -125,16 +128,16 @@ pico.Touch = class {
 						}
 					}); // end of lock.
 				}, {passive: false});
-				parent.addEventListener("touchend", (evt) => {
-					let rect = parent.getBoundingClientRect();
+				this.panel.addEventListener("touchend", (evt) => {
+					let rect = this.panel.getBoundingClientRect();
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							this._eventTouchUp(evt.changedTouches[i].identifier);
 						}
 					}); // end of lock.
 				});
-				parent.addEventListener("touchcancel", (evt) => {
-					let rect = parent.getBoundingClientRect();
+				this.panel.addEventListener("touchcancel", (evt) => {
+					let rect = this.panel.getBoundingClientRect();
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							this._eventTouchCancel(evt.changedTouches[i].identifier);

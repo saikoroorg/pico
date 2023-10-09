@@ -326,10 +326,12 @@ pico.Image = class {
 					this.canvas[i] = document.createElement("canvas");
 					this.canvas[i].width = pico.Image.width;
 					this.canvas[i].height = pico.Image.height;
+					this.canvas[i].style.width = "100%";
+					this.canvas[i].style.height = "100%";
 					this.canvas[i].style.imageRendering = "pixelated";
 					this.canvas[i].style.display = i == this.primary ? "flex" : "none";
-					if (parent && document.getElementById(parent)) {
-						document.getElementById(parent).appendChild(this.canvas[i]);
+					if (parent && document.getElementsByClassName(parent)[0]) {
+						document.getElementsByClassName(parent)[0].appendChild(this.canvas[i]);
 					} else {
 						document.body.appendChild(this.canvas[i]);
 					}
