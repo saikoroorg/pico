@@ -1,8 +1,8 @@
-<html>
+<html style="overflow:hidden; user-select:none;">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
-<title>Pico</title>
+<title>*</title>
 <link rel="icon" type="image/svg" href="icon.svg">
 <link rel="apple-touch-icon" href="icon.png" sizes="192x192">
 <link rel="manifest" href="manifest.json">
@@ -139,7 +139,7 @@ a {
 <div id="container">
 	<h1 id="header">
 		<div class="logo">
-			<a id="title" href="?">Pico</a>
+			<a id="title" href="?">*</a>
 		</div>
 		<div class="menu">
 			<a class="item dark" id="icon" href="javascript:;"></a>
@@ -163,41 +163,63 @@ a {
 //let icon = new pico.Image("icon");
 //icon.drawChar(":)");
 
+let colors = [
+	0,63,23, 167,0,0, 143,0,119,
+	0,147,59, 231,0,91, 0,115,239,
+	188,188,188, 255,219,171, 159,255,243,
+	255,255,255, 221,221,221];
+let select = 9;
+const width = 16, height = 16, grid = 10;
+let pixels = [];
+for (let j = 0; j < height; j++) {
+	pixels[j] = [];
+	for (let i = 0; i < width; i++) {
+		pixels[j][i] = select;
+	}
+}
+
 (async () => {
 
-	picoColor([204,204,204, 0,0,0, 238,238,238, 255,255,255]);
-	let keyboard = ["1234567890", "QWERTYUIOP", "ASDFGHJKL<", "ZXCVBNM.>"];
+	picoColor(colors);
 	let textarea = "";
 
 	for (;;) {
 		picoClear();
-		picoPixel(0, -25,-25,50,50);
+		picoPixel(-1, -100,-100,200,200);
 
-		for (let j = 0; j < keyboard.length; j++) {
-			let y = j * 24 + 2;
-			for (let i = 0; i < keyboard[j].length; i++) {
-				let x = (i - keyboard[j].length / 2) * 16 + 8;
-				let char = keyboard[j].substr(i, 1);
-				if (picoAction(x, y, 10)) {
-					if (char == "<") {
-						picoBeep(-1.2, 0.1);
-						textarea = textarea.substr(0, textarea.length - 1);
-					} else if (char == ">") {
+		for (let j = 0; j < height; j++) {
+			let y = (j - height / 2) * grid + 0;
+			for (let i = 0; i < width; i++) {
+				let x = (i - width / 2) * grid + 8;
+				if (picoMotion(x, y, grid/2)) {
+					if (pixels[j][i] != select) {
+						pixels[j][i] = select;
 						picoBeep(1.2, 0.1);
-						textarea = "";
-					} else {
-						picoBeep(0, 0.1);
-						textarea = textarea.substr(-10, 10) + char;
 					}
-					picoChar(char, 1, x, y, 0, 1);
-				} else if (picoMotion(x, y, 8)) {
-					picoChar(char, 1, x, y, 0, 1);
+					picoPixel(pixels[j][i], x, y, 1, 1);
 				} else {
-					picoChar(char, 3, x, y, 0, 1);
+					picoPixel(pixels[j][i], x, y, 0.5, 0.5);
 				}
 			}
 		}
-		picoText(textarea, [-22,-16,44,16], 1);
+
+		for (let i = 0; i < colors.length/3 - 1; i++) {
+			let x = (i - colors.length/3 / 2) * 16 + 18;
+			let y = 88;
+			if (picoMotion(x, y, 8, 12)) {
+				if (select != i) {
+					select = i;
+					picoBeep(0, 0.1);
+				}
+			}
+			if (i == select) {
+				picoChar("+", i, x, y, 0, 1);
+			} else {
+				picoChar("-", i, x, y, 0, 1);
+			}
+		}
+
+		picoText(textarea, [-22,-16,44,16], 2);
 
 		await picoFlip();
 		await picoRead();

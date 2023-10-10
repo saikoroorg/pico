@@ -132,7 +132,7 @@ pico.Image = class {
 		[-1,-2,0,1, 0,0,0,2, 1,-2,0,1], // Y
 		[-1,-2,2,0, 1,-2,0,1, 0,0,0,0, -1,1,0,1, -1,2,2,0]]; // Z
 
-	static markChars = ".?!:-+=<>'()";
+	static markChars = ".?!:-+=<>()_";
 	static markShapes = [
 		[0,2,0,0], // .
 		[-1,-2,2,0, 1,-2,0,1, 0,0,0,0, 0,2,0,0], // ?
@@ -143,10 +143,9 @@ pico.Image = class {
 		[-1,-1,2,0, -1,1,2,0], // =
 		[-1,0,0,0, 0,-1,0,0, 0,1,0,0, 1,-2,0,0, 1,2,0,0], // <
 		[-1,-2,0,0, -1,2,0,0, 0,-1,0,0, 0,1,0,0, 1,0,0,0], // >
-		[-1,-2,0,0, 1,-2,0,0], // '
 		[0,-1,0,2, 1,-2,0,0, 1,2,0,0], // (
 		[-1,-2,0,0, -1,2,0,0, 0,-1,0,2], // )
-		[]];
+		[-1,2,2,0]]; // _
 
 	static colors = [0,0,0,
 		0,63,23, 167,0,0, 143,0,119,
@@ -197,8 +196,8 @@ pico.Image = class {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
-				await this._reset();
-				await this._draw(c, x, y, dx, dy);
+				await this._reset(x, y);
+				await this._draw(c, -dx, -dy, dx*2, dy*2);
 				resolve();
 			}); // end of new Promise.
 		}); // end of lock.
@@ -327,7 +326,7 @@ pico.Image = class {
 					this.canvas[i].width = pico.Image.width;
 					this.canvas[i].height = pico.Image.height;
 					this.canvas[i].style.width = "100%";
-					this.canvas[i].style.height = "100%";
+					// Fix to square canvas. // this.canvas[i].style.height = "100%";
 					this.canvas[i].style.imageRendering = "pixelated";
 					this.canvas[i].style.display = i == this.primary ? "flex" : "none";
 					if (parent && document.getElementsByClassName(parent)[0]) {

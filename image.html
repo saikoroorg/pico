@@ -13,7 +13,7 @@ html {
 
 //*/
 	picoColor([221,221,221, 238,238,238, 255,255,255]);
-	picoPixel(1, -25,-25,50,50);
+	picoPixel(1, -24,-24,48,48);
 	picoRect(
 		//[-22,-21,44,42], 0);
 		[-24,-24,48,48], 0);
@@ -21,11 +21,11 @@ html {
 		"0123456789ab\n" +
 		"cdefghijklmn\n" +
 		"opqrstuvwxyz\n" +
-		".?!:-+=<>'()\n" +
+		".?!:-+=<>()_\n" +
 		"0123456789ab\n" +
 		"cdefghijklmn\n" +
 		"opqrstuvwxyz\n" +
-		".?!:-+=<>'()\n",
+		".?!:-+=<>()_\n",
 		//[-22,-21,44,42], 1);
 		[-24,-24,48,48], 1);
 		//null, 1);
@@ -37,7 +37,7 @@ document.addEventListener("click", async (evt) => {
 //*/
 	for (let i = 0; i <= 360; i++) {
 		picoClear();
-		picoPixel(1, -25,-25,50,50);
+		picoPixel(1, -24,-24,48,48);
 		picoRect(
 			//[-22,-21,44,42], 0);
 			[-24,-24,48,48], 0);
@@ -45,11 +45,11 @@ document.addEventListener("click", async (evt) => {
 			"0123456789ab\n" +
 			"cdefghijklmn\n" +
 			"opqrstuvwxyz\n" +
-			".?!:-+=<>'()\n" +
+			".?!:-+=<>()_\n" +
 			"0123456789ab\n" +
 			"cdefghijklmn\n" +
 			"opqrstuvwxyz\n" +
-			".?!:-+=<>'()\n",
+			".?!:-+=<>()_\n",
 			//[-22,-21,44,42], 1);
 			[-24,-24,48,48], 1, 0,0, i, Math.cos(i/180 * Math.PI));
 
@@ -62,7 +62,7 @@ document.addEventListener("click", async (evt) => {
 //*/
 	for (let i = 0; i <= 180; i++) {
 		picoClear();
-		picoPixel(0, -25,-25,50,50);
+		picoPixel(0, -24,-24,48,48);
 
 		picoChar(":7       1:", 1, 0,0, i-60);
 		picoChar(":8       2:", 1, 0,0, i-30);

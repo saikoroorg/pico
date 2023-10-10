@@ -10,13 +10,13 @@ async function picoRead(t=10) {
 }
 
 // Check touch motion.
-function picoMotion(x, y, r=0) {
-	return pico.touch.motion(x, y, r);
+function picoMotion(x, y, r=0, h=0) {
+	return pico.touch.motion(x, y, r, h);
 }
 
 // Check touch action.
-function picoAction(x, y, r=0) {
-	return pico.touch.action(x, y, r);
+function picoAction(x, y, r=0, h=0) {
+	return pico.touch.action(x, y, r, h);
 }
 
 //************************************************************/
@@ -41,13 +41,13 @@ pico.Touch = class {
 	}
 
 	// Check touch motion.
-	motion(x=0, y=0, r=0) {
-		return this._motion(x, y, r);
+	motion(x=0, y=0, r=0, h=0) {
+		return this._motion(x, y, r, h);
 	}
 
 	// Check touch action.
-	action(x=0, y=0, r=0) {
-		return this._action(x, y, r);
+	action(x=0, y=0, r=0, h=0) {
+		return this._action(x, y, r, h);
 	}
 
 	//*----------------------------------------------------------*/
@@ -88,7 +88,7 @@ pico.Touch = class {
 				this.panel.addEventListener("mousedown", (evt) => {
 					let rect = this.panel.getBoundingClientRect();
 					let x = (evt.pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
-					let y = (evt.pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.height;
+					let y = (evt.pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.width; // Fix to square canvas. // height;
 					navigator.locks.request(this.lock, async (lock) => {
 						this._eventTouchCancel(-1);
 						this._eventTouchDown(-1, x, y);
@@ -97,7 +97,7 @@ pico.Touch = class {
 				this.panel.addEventListener("mousemove", (evt) => {
 					let rect = this.panel.getBoundingClientRect();
 					let x = (evt.pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
-					let y = (evt.pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.height;
+					let y = (evt.pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.width; // Fix to square canvas. // height;
 					navigator.locks.request(this.lock, async (lock) => {
 						this._eventTouchMove(-1, x, y);
 					}); // end of lock.
@@ -112,7 +112,7 @@ pico.Touch = class {
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							let x = (evt.changedTouches[i].pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
-							let y = (evt.changedTouches[i].pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.height;
+							let y = (evt.changedTouches[i].pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.width; // Fix to square canvas. // height;
 							this._eventTouchDown(evt.changedTouches[i].identifier, x, y);
 						}
 					}); // end of lock.
@@ -123,7 +123,7 @@ pico.Touch = class {
 					navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							let x = (evt.changedTouches[i].pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
-							let y = (evt.changedTouches[i].pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.height;
+							let y = (evt.changedTouches[i].pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.width; // Fix to square canvas. // height;
 							this._eventTouchMove(evt.changedTouches[i].identifier, x, y);
 						}
 					}); // end of lock.
@@ -160,6 +160,13 @@ pico.Touch = class {
 
 	// Touch down event handler.
 	_eventTouchDown(w, x, y) {
+		for (let i = 0; i < this.touching[0].length; i++) {
+			if (this.touching[0][i].w == w && this.touching[0][i].motion) {
+				this.touching[0][i] = {w:w, x:x, y:y, motion:1};
+				console.log("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				return;
+			}
+		}
 		let i = this.touching[0].length;
 		this.touching[0][i] = {w:w, x:x, y:y, motion:1};
 		console.log("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
@@ -183,7 +190,7 @@ pico.Touch = class {
 		for (let i = 0; i < this.touching[0].length; i++) {
 			if (this.touching[0][i].w == w) {
 				this.touching[0][i].motion = 0;
-				this.touching[0][i].action = 1;
+				this.touching[0][i].action = -1;
 				console.log("Touch up: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
@@ -201,7 +208,7 @@ pico.Touch = class {
 		}
 	}
 
-	// Read touch event.
+	// Read action event.
 	_read() {
 
 		// Update new touching state.
@@ -209,11 +216,11 @@ pico.Touch = class {
 		for (let i = 0; i < this.touching[0].length; i++) {
 
 			// Touch up trigger.
-			if (this.touching[0][i].action) {
+			if (this.touching[0][i].action < 0) {
 				for (let j = 0; j < this.touching[1].length; j++) {
 					if (this.touching[1][j].w == this.touching[0][i].w) {
 						console.log("Up: " + j + ":" + JSON.stringify(this.touching[0][i]));
-						touching1[touching1.length] = {w:this.touching[0][i].w, x:this.touching[0][i].x, y:this.touching[0][i].y, action:this.touching[0][i].action};
+						touching1[touching1.length] = {w:this.touching[0][i].w, x:this.touching[0][i].x, y:this.touching[0][i].y, action:1};
 						break;
 					}
 				}
@@ -248,35 +255,51 @@ pico.Touch = class {
 	}
 
 	// Check touch motion.
-	_motion(x, y, r=0) {
+	_motion(x, y, r=0, h=0) {
 		const cx = pico.Touch.width / 2, cy = pico.Touch.height / 2;
 		for (let i = 0; i < this.touching[this.primary].length; i++) {
-			if (r <= 0) {
-				return i + 1;
-			}
-			let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
-			let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-			//console.log("Motion: " + x2 + "," + y2 + "<=" + (r*r));
-			if (x2 + y2 <= r * r) {
-				return i + 1;
+			if (this.touching[this.primary][i].motion > 0) {
+				if (r <= 0) {
+					return i + 1;
+				} else if (h <= 0) {
+					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
+					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
+					//console.log("Motion: " + x2 + "," + y2 + "<=" + (r*r));
+					if (x2 + y2 <= r * r) {
+						return i + 1;
+					}
+				} else {
+					let x1 = cx + x - this.touching[this.primary][i].x;
+					let y1 = cy + y - this.touching[this.primary][i].y;
+					if (x1 >= -r && x1 <= r && y1 >= -h && y1 <= h) {
+						return i + 1;
+					}
+				}
 			}
 		}
 		return 0;
 	}
 
 	// Check touch action.
-	_action(x, y, r=0) {
+	_action(x, y, r=0, h=0) {
 		const cx = pico.Touch.width / 2, cy = pico.Touch.height / 2;
 		for (let i = 0; i < this.touching[this.primary].length; i++) {
-			if (this.touching[this.primary][i].action) {
+			if (this.touching[this.primary][i].action > 0) {
 				if (r <= 0) {
 					return i + 1;
-				}
-				let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
-				let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-				//console.log("Action: " + x2 + "," + y2 + "<=" + (r*r));
-				if (x2 + y2 <= r * r) {
-					return i + 1;
+				} else if (h <= 0) {
+					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
+					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
+					//console.log("Action: " + x2 + "," + y2 + "<=" + (r*r));
+					if (x2 + y2 <= r * r) {
+						return i + 1;
+					}
+				} else {
+					let x1 = cx + x - this.touching[this.primary][i].x;
+					let y1 = cy + y - this.touching[this.primary][i].y;
+					if (x1 >= -r && x1 <= r && y1 >= -h && y1 <= h) {
+						return i + 1;
+					}
 				}
 			}
 		}
