@@ -5,6 +5,24 @@ function picoRandom(max) {
 	return pico.image.random(max);
 }
 
+// Mod.
+function picoMod(a, b) {
+	if (a >= 0 && b >= 0 || a <= 0 && b <= 0) {
+		return Math.floor(a % b);
+	} else {
+		return Math.ceil(a % b);
+	}
+}
+
+// Div.
+function picoDiv(a, b) {
+	if (a >= 0 && b >= 0 || a <= 0 && b <= 0) {
+		return Math.floor(a / b);
+	} else {
+		return Math.ceil(a / b);
+	}
+}
+
 // Wait and flip image.
 async function picoFlip(t=10) {
 	try {
@@ -33,9 +51,9 @@ async function picoColor(palls=[0,0,0]) {
 }
 
 // Draw pixel.
-async function picoPixel(c=1, x=0, y=0, dx=0, dy=0) {
+async function picoPixel(c=1, x=0, y=0, dx=0, h=0) {
 	try {
-		await pico.image.pixel(c, x, y, dx, dy);
+		await pico.image.pixel(c, x, y, dx, h);
 	} catch (error) {
 		console.error(error);
 	}
@@ -192,12 +210,12 @@ pico.Image = class {
 	}
 
 	// Draw pixel to image.
-	pixel(c=1, x=0, y=0, dx=0, dy=0) {
+	pixel(c=1, x=0, y=0, w=0, h=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
 				await this._reset(x, y);
-				await this._draw(c, -dx, -dy, dx*2, dy*2);
+				await this._draw(c, -w/2, -h/2, w, h);
 				resolve();
 			}); // end of new Promise.
 		}); // end of lock.
@@ -434,8 +452,8 @@ pico.Image = class {
 	}
 
 	// Draw rect to image.
-	_draw(c=1, x=0, y=0, dx=0, dy=0) {
-		//console.log("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
+	_draw(c=1, x=0, y=0, w=0, h=0) {
+		//console.log("Draw: " + c + "," + x + "+" + w + "," + y + "+" + h);
 		const u = pico.Image.unit, cx = (pico.Image.width - u) / 2, cy = (pico.Image.height - u) / 2;
 		//console.log("Center: " + cx + "," + cy + " / " + u);
 		return new Promise((resolve) => {
@@ -443,7 +461,7 @@ pico.Image = class {
 			let r = this.palls[k*3], g = this.palls[k*3+1], b = this.palls[k*3+2];
 			//console.log("Color: " + r + "," + g + "," + b);
 			this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
-			this.context.fillRect(cx + u * x, cy + u * y, u * (dx + 1), u * (dy + 1));
+			this.context.fillRect(cx + u * x, cy + u * y, u * (w + 1), u * (h + 1));
 			resolve();
 		}); // end of new Promise.
 	}

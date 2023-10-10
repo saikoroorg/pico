@@ -169,7 +169,8 @@ let colors = [
 	188,188,188, 255,219,171, 159,255,243,
 	255,255,255, 221,221,221];
 let select = 9;
-const width = 16, height = 16, grid = 10;
+const width = 16, height = 16, thick = width<=9?2:1;
+const grid = 10 * thick;
 let pixels = [];
 for (let j = 0; j < height; j++) {
 	pixels[j] = [];
@@ -185,27 +186,30 @@ for (let j = 0; j < height; j++) {
 
 	for (;;) {
 		picoClear();
-		picoPixel(-1, -100,-100,200,200);
+		picoPixel(-1, 0,0,50,50);
+		//picoPixel(-1, -100,-100,50,50);
+		//picoPixel(-1, 100,100,50,50);
 
 		for (let j = 0; j < height; j++) {
-			let y = (j - height / 2) * grid + 0;
+			let y = (j - (height - 1) / 2) * grid - 8;
 			for (let i = 0; i < width; i++) {
-				let x = (i - width / 2) * grid + 8;
+				let x = (i - (width - 1) / 2) * grid;
 				if (picoMotion(x, y, grid/2)) {
 					if (pixels[j][i] != select) {
 						pixels[j][i] = select;
-						picoBeep(1.2, 0.1);
+						picoBeep(1.2, 0.1);	
 					}
-					picoPixel(pixels[j][i], x, y, 1, 1);
+					picoPixel(pixels[j][i], x, y, thick*1.5, thick*1.5);
 				} else {
-					picoPixel(pixels[j][i], x, y, 0.5, 0.5);
+					picoPixel(pixels[j][i], x, y, thick, thick);
 				}
 			}
 		}
 
-		for (let i = 0; i < colors.length/3 - 1; i++) {
-			let x = (i - colors.length/3 / 2) * 16 + 18;
-			let y = 88;
+		const length = colors.length / 3 - 1;
+		for (let i = 0; i < length; i++) {
+			let x = ((i + 0) - (length - 1) / 2) * 16;
+			let y = 90;
 			if (picoMotion(x, y, 8, 12)) {
 				if (select != i) {
 					select = i;
