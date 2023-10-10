@@ -51,7 +51,7 @@ async function picoColor(palls=[0,0,0]) {
 }
 
 // Draw pixel.
-async function picoPixel(c=1, x=0, y=0, dx=0, h=0) {
+async function picoPixel(c=0, x=0, y=0, dx=0, h=0) {
 	try {
 		await pico.image.pixel(c, x, y, dx, h);
 	} catch (error) {
@@ -60,7 +60,7 @@ async function picoPixel(c=1, x=0, y=0, dx=0, h=0) {
 }
 
 // Draw rect.
-async function picoRect(rects=[0,0,0,0], c=1, x=0, y=0, angle=0, scale=1) {
+async function picoRect(rects=[0,0,0,0], c=0, x=0, y=0, angle=0, scale=1) {
 	try {
 		await pico.image.drawRect(rects, c, x, y, angle, scale);
 	} catch (error) {
@@ -69,7 +69,7 @@ async function picoRect(rects=[0,0,0,0], c=1, x=0, y=0, angle=0, scale=1) {
 }
 
 // Draw char as string or number.
-async function picoChar(char, c=1, x=0, y=0, angle=0, scale=1) {
+async function picoChar(char, c=0, x=0, y=0, angle=0, scale=1) {
 	try {
 		await pico.image.drawChar("" + char, c, x, y, angle, scale);
 	} catch (error) {
@@ -78,7 +78,7 @@ async function picoChar(char, c=1, x=0, y=0, angle=0, scale=1) {
 }
 
 // Draw multiple lines of text.
-async function picoText(text, area=null, c=1, x=0, y=0, angle=0, scale=1) {
+async function picoText(text, area=null, c=0, x=0, y=0, angle=0, scale=1) {
 	try {
 		await pico.image.drawText("" + text, area, c, x, y, angle, scale);
 	} catch (error) {
@@ -210,7 +210,7 @@ pico.Image = class {
 	}
 
 	// Draw pixel to image.
-	pixel(c=1, x=0, y=0, w=0, h=0) {
+	pixel(c=0, x=0, y=0, w=0, h=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
@@ -222,7 +222,7 @@ pico.Image = class {
 	}
 	
 	// Draw rect to image.
-	drawRect(rects=[0,0,0,0], c=1, x=0, y=0, angle=0, scale=1) {
+	drawRect(rects=[0,0,0,0], c=0, x=0, y=0, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
@@ -253,7 +253,7 @@ pico.Image = class {
 	}
 
 	// Draw char as string or number to image.
-	drawChar(char, c=1, x=0, y=0, angle=0, scale=1) {
+	drawChar(char, c=0, x=0, y=0, angle=0, scale=1) {
 		const w = pico.Image.charWidth;
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
@@ -273,7 +273,7 @@ pico.Image = class {
 	}
 
 	// Draw multiple lines of text to image.
-	drawText(text, area=null, c=1, x=0, y=0, angle=0, scale=1) {
+	drawText(text, area=null, c=0, x=0, y=0, angle=0, scale=1) {
 		const u = pico.Image.unit, ux = pico.Image.charWidth, uy = pico.Image.charHeight;
 		let ox = -(pico.Image.width - ux) / 2, oy = -(pico.Image.height - uy) / 2;
 		let mx = pico.Image.width / ux, my = pico.Image.height / uy;
@@ -452,7 +452,7 @@ pico.Image = class {
 	}
 
 	// Draw rect to image.
-	_draw(c=1, x=0, y=0, w=0, h=0) {
+	_draw(c=0, x=0, y=0, w=0, h=0) {
 		//console.log("Draw: " + c + "," + x + "+" + w + "," + y + "+" + h);
 		const u = pico.Image.unit, cx = (pico.Image.width - u) / 2, cy = (pico.Image.height - u) / 2;
 		//console.log("Center: " + cx + "," + cy + " / " + u);

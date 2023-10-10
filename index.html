@@ -188,32 +188,26 @@ a {
 </script><!--/Menu-->
 <!--Main--><script>
 (async () => {
+	const colors = [255,255,255,
+		255,219,171, 159,255,243, 188,188,188,
+		231,0,91,    0,115,239,   0,147,59,
+		167,0,0,     143,0,119,   0,63,23];
+	const pallete = colors.length / 3;
+	picoColor(colors);
+
 	for (;;) {
 
-		let colors = [
-			0,63,23, 167,0,0, 143,0,119,
-			0,147,59, 231,0,91, 0,115,239,
-			188,188,188, 255,219,171, 159,255,243,
-			255,255,255, 221,221,221];
-		let select = 9;
+		let select = 0;
 		let width = count, height = count;
 		let thick = width<=9?2:1, grid = width<=9?16:10;
+
 		let pixels = [];
 		for (let j = 0; j < height; j++) {
 			pixels[j] = [];
-			for (let i = 0; i < width; i++) {
-				pixels[j][i] = select;
-			}
 		}
-
-		picoColor(colors);
-		let textarea = "";
 
 		for (playing = 1; playing > 0; playing++) {
 			picoClear();
-			//picoPixel(-1, 0,0,50,50);
-			//picoPixel(-1, -100,-100,50,50);
-			//picoPixel(-1, 100,100,50,50);
 
 			for (let j = 0; j < height; j++) {
 				let y = (j - (height - 1) / 2) * grid - 8;
@@ -230,9 +224,8 @@ a {
 				}
 			}
 
-			const length = colors.length / 3 - 1;
-			for (let i = 0; i < length; i++) {
-				let x = ((i + 0) - (length - 1) / 2) * 16;
+			for (let i = 0; i < pallete; i++) {
+				let x = (i - (pallete - 1) / 2) * 16;
 				let y = 90;
 				if (picoMotion(x, y, 8, 12)) {
 					if (select != i) {
@@ -246,8 +239,6 @@ a {
 					picoChar("-", i, x, y, 0, 1);
 				}
 			}
-
-			picoText(textarea, [-22,-16,44,16], 2);
 
 			await picoFlip();
 			await picoRead();
