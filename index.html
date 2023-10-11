@@ -120,6 +120,7 @@ a {
 	}
 	#screen {
 		height: 100%; aspect-ratio: 1;
+		background-color: #ccc;
 	}
 }
 @media (orientation: portrait) {
@@ -131,6 +132,7 @@ a {
 	}
 	#screen {
 		width: 100%; aspect-ratio: 1;
+		background-color: #ccc;
 	}
 }
 </style>
@@ -144,8 +146,8 @@ a {
 		<div class="menu">
 			<a class="item dark" id="item7" href="javascript:setCount(7);">x7</a>
 			<a class="item light" id="item8" href="javascript:setCount(8);">x8</a>
-			<a class="item light" id="item15" href="javascript:setCount(15);">x15</a>
 			<a class="item light" id="item16" href="javascript:setCount(16);">x16</a>
+			<a class="item light" id="item32" href="javascript:setCount(24);">x24</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -168,8 +170,8 @@ a {
 	// Set count.
 	function setCount(x) {
 		count = x;
-		playing = -1; // Replay.
-		let items = ["7","8","15","16"];
+		playing = -1; // Restart.
+		let items = [7,8,16,24];
 		for (let i = 0; i < items.length; i++) {
 			let item = "item" + items[i];
 			let e = document.getElementById(item);
@@ -199,7 +201,9 @@ a {
 
 		let select = 0;
 		let width = count, height = count;
-		let thick = width<=9?4:1, grid = width<=9?24:10;
+		let thick = width <= 8 ? 4 : width <= 16 ? 1 : 0.5;
+		let grid = width <= 8 ? 24 : width <= 16 ? 10 : 8;
+		let offset = width == 8 || width >= 20 ? 2 : 10;
 
 		let pixels = [];
 		for (let j = 0; j < height; j++) {
@@ -210,7 +214,7 @@ a {
 			picoClear();
 
 			for (let j = 0; j < height; j++) {
-				let y = (j - (height - 1) / 2) * grid - 6;
+				let y = (j - (height - 1) / 2) * grid - 4;
 				for (let i = 0; i < width; i++) {
 					let x = (i - (width - 1) / 2) * grid;
 					if (picoMotion(x, y, grid/2)) {
@@ -226,7 +230,7 @@ a {
 
 			for (let i = 0; i < pallete; i++) {
 				let x = (i - (pallete - 1) / 2) * 16;
-				let y = 98;
+				let y = 100 - offset;
 				if (picoMotion(x, y, 8, 12)) {
 					if (select != i) {
 						select = i;
