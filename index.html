@@ -23,7 +23,7 @@ a {
 	align-items: center; -webkit-align-items: center;
 }
 #header {
-	width: 95%; margin: 0px;
+	margin: 0px;
 	flex: 0 1 auto;
 	display: flex; display: -webkit-flex;
 	flex-direction: row; -webkit-flex-direction: row;
@@ -34,7 +34,14 @@ a {
 	position: relative;
 	width: 95%; height: 90%;
 	flex: 1 1 auto;
+	display: flex; display: -webkit-flex;
+	flex-direction: row; -webkit-flex-direction: row;
+	justify-content: center; -webkit-justify-content: center;
+	align-items: center; -webkit-align-items: center;
 	background-color: #ccc;
+}
+#screen {
+	aspect-ratio: 1;
 }
 #footer {
 	width: 95%; margin: 0px;
@@ -47,7 +54,7 @@ a {
 	color: #eee;
 }
 .logo {
-	width: 160px; height: 60px; margin: 0px 16px;
+	height: 60px; margin: 0px 16px;
 	display: flex; display: -webkit-flex;
 	flex-direction: row; -webkit-flex-direction: row;
 	justify-content: flex-start; -webkit-justify-content: flex-start;
@@ -61,7 +68,6 @@ a {
 	color: #888;
 }
 .menu {
-	height: 40px;
 	display: flex; display: -webkit-flex;
 	flex-direction: row; -webkit-flex-direction: row;
 	justify-content: space-between; -webkit-justify-content: space-between;
@@ -75,29 +81,12 @@ a {
 	align-items: center; -webkit-align-items: center;
 	font-size: 16px;
 }
-.menu .subitem {
-	width: 40px; height: 20px; margin-left: -40px;
-	display: flex; display: -webkit-flex;
-	flex-direction: column; -webkit-flex-direction: column;
-	justify-content: center; -webkit-justify-content: center;
-	align-items: center; -webkit-align-items: center;
-	font-size: 10px;
-}
 .menu .item.dark {
 	background-color: #888;
 	color: #fff;
 }
-.menu .subitem.dark {
-	background-color: none;
-	color: #ccc;
-}
 .menu .light {;
-	background-color: #eee;
 	color: #888;
-}
-.menu .subitem.light {
-	background-color: none;
-	color: #fff;
 }
 .menu a {
 	transform: scale(1);
@@ -111,16 +100,34 @@ a {
 	transform: scale(0.9);
 	opacity: 1;
 }
-@media (orientation: landscape) {
-	#contents {
+@media (max-height: 400px) {
+	#container {
 		display: flex; display: -webkit-flex;
 		flex-direction: row; -webkit-flex-direction: row;
+		justify-content: flex-start; -webkit-justify-content: flex-start;
+		align-items: center; -webkit-align-items: center;
+	}
+	#header {
+		order: 1;
+	}
+	.logo {
+		display: none;
+		width: 0%;
+	}
+	.menu {
+		flex-direction: column; -webkit-flex-direction: column;
 		justify-content: center; -webkit-justify-content: center;
 		align-items: center; -webkit-align-items: center;
 	}
+}
+@media (min-height: 400px) {
+	#header {
+		width: 95%;
+	}
+}
+@media (orientation: landscape) {
 	#screen {
-		height: 100%; aspect-ratio: 1;
-		background-color: #ccc;
+		height: 100%;
 	}
 }
 @media (orientation: portrait) {
@@ -131,8 +138,7 @@ a {
 		align-items: center; -webkit-align-items: center;
 	}
 	#screen {
-		width: 100%; aspect-ratio: 1;
-		background-color: #ccc;
+		width: 100%;
 	}
 }
 </style>
@@ -147,17 +153,17 @@ a {
 			<a class="item dark" id="item7" href="javascript:setCount(7);">x7</a>
 			<a class="item light" id="item8" href="javascript:setCount(8);">x8</a>
 			<a class="item light" id="item16" href="javascript:setCount(16);">x16</a>
-			<a class="item light" id="item32" href="javascript:setCount(24);">x24</a>
+			<a class="item light" id="item24" href="javascript:setCount(24);">x24</a>
 		</div>
 	</h1>
 	<div id="contents">
 		<div id="screen" class="picoImage picoTouch"></div>
 	</div>
-	<h6 id="footer">
-		<div id="author"></div>/
-		<div id="version"></div>
-	</h6>
 </div>
+<h6 id="footer">
+	<div id="author"></div>/
+	<div id="version"></div>
+</h6>
 <script>console.log = () => {};</script>
 <script src="daemon.js"></script>
 <script src="image.js"></script>
