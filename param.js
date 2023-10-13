@@ -1,8 +1,8 @@
 /* PICO Param module */
 
-// Flush params.
-async function picoFlush(share=false) {
-	await pico.param.flush(share);
+// Share params.
+async function picoShare(share=false, url=null) {
+	await pico.param.share(share, url);
 }
 
 // Get all params by one strings.
@@ -48,9 +48,9 @@ var pico = pico || {};
 // Param class.
 pico.Param = class {
 
-	// Flush param.
-	async flush(share=false) {
-		await this._flush(share);
+	// Share param.
+	async share(share=false, url=null) {
+		await this._share(share, url);
 	}
 
 	// Get all params by one strings.
@@ -119,20 +119,34 @@ pico.Param = class {
 		}); // end of new Promise.
 	}
 
-	// Flush param.
-	_flush(share=false) {
-		return new Promise((resolve) => {
+	// Share param.
+	_share(share=false, url=null) {
+		return new Promise(async (resolve) => {
 			let text = this._serialize();
 			if (text != null) {
 				let query = "?" + text;
-				console.log("Flush query: " + query);
-				window.history.replaceState(null, "", query);
-				// window.location.search = query;
-				if (share) {
-					let url = window.location.href.replace(/[\?\#].*$/, '') + query;
-					console.log("Share: " + url);
-					if (navigator.share) {
-						navigator.share({url: url});
+				if (url) {
+					url = url + query;
+					if (share) {
+						console.log("Share: " + url);
+						if (navigator.share) {
+							navigator.share({url: url});
+						}
+					} else {
+						console.log("Jump: " + url);
+						window.location.href = url;
+					}
+				} else {
+					console.log("Flush query: " + query);
+					window.history.replaceState(null, "", query);
+					if (share) {
+						url = window.location.href.replace(/[\?\#].*$/, '') + query;
+						console.log("Share: " + url);
+						if (navigator.share) {
+							await navigator.share({"title": "", "url": url});
+						}
+					} else {
+						window.location.search = query;
 					}
 				}
 			}

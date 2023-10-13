@@ -88,6 +88,10 @@ a {
 .menu .light {;
 	color: #888;
 }
+.menu .item.extra {
+	background-color: #ccc;
+	color: #fff;
+}
 .menu a {
 	transform: scale(1);
 	opacity: 1;
@@ -148,13 +152,16 @@ a {
 	<h1 id="header">
 		<div class="logo">
 			<a id="title" href="?">Pico</a>
-			<a id="bros" href="javascript:startBros();">+</a>
+			<a id="bros" href="javascript:startBros();">.</a>
 		</div>
 		<div class="menu">
 			<a class="item dark" id="item7" href="javascript:setSize(7);">x7</a>
 			<a class="item light" id="item8" href="javascript:setSize(8);">x8</a>
 			<a class="item light" id="item16" href="javascript:setSize(16);">x16</a>
 			<a class="item light" id="item24" href="javascript:setSize(24);">x24</a>
+		</div>
+		<div class="menu">
+			<a class="item light" id="share" href="javascript:share();">^</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -165,7 +172,7 @@ a {
 	<div id="author"></div>/
 	<div id="version"></div>
 </h6>
-<script>console.log = () => {};</script>
+<!--script>console.log = () => {};</script!-->
 <script src="daemon.js"></script>
 <script src="image.js"></script>
 <script src="param.js"></script>
@@ -202,30 +209,50 @@ if (picoStrings()) {
 	// Start bros.
 	function startBros() {
 		let numcode = [0, width, height];
-		for (let j = 0; j < height; j++) {
-			for (let i = 0; i < width; i++) {
-				if (pixels[j][i]) {
-					let k = numcode.length;
-					if (pixels[j][i] == 8) {
-						numcode[k] = 2;
-						numcode[k + 3] = 3;
-						numcode[k + 4] = i;
-						numcode[k + 5] = j;
-					} else if (pixels[j][i] == 4) {
-						numcode[k] = 2;
-					} else if (pixels[j][i] == 5) {
-						numcode[k] = 3;
-					} else {
-						numcode[k] = 1;
+		if (pixels) {
+			for (let j = 0; j < height; j++) {
+				for (let i = 0; i < width; i++) {
+					if (pixels[j][i]) {
+						let k = numcode.length;
+						if (pixels[j][i] == 8) {
+							numcode[k] = 2;
+							numcode[k + 3] = 3;
+							numcode[k + 4] = i;
+							numcode[k + 5] = j;
+						} else if (pixels[j][i] == 4) {
+							numcode[k] = 2;
+						} else if (pixels[j][i] == 5) {
+							numcode[k] = 3;
+						} else {
+							numcode[k] = 1;
+						}
+						numcode[k + 1] = i;
+						numcode[k + 2] = j;
 					}
-					numcode[k + 1] = i;
-					numcode[k + 2] = j;
 				}
 			}
 		}
 		picoSetNumcode(numcode);
-		let query = picoParams();
-		window.location.href = "bros.html?" + query;
+		picoShare(false, "bros.html");
+	}
+
+	// Share.
+	function share() {
+		let numcode = [0, width, height];
+		if (pixels) {
+			for (let j = 0; j < height; j++) {
+				for (let i = 0; i < width; i++) {
+					if (pixels[j][i]) {
+						let k = numcode.length;
+						numcode[k] = pixels[j][i];
+						numcode[k + 1] = i;
+						numcode[k + 2] = j;
+					}
+				}
+			}
+		}
+		picoSetNumcode(numcode);
+		picoShare(true);
 	}
 
 	// Set canvas size.
