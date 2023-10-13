@@ -147,13 +147,14 @@ a {
 <div id="container">
 	<h1 id="header">
 		<div class="logo">
-			<a id="title" href="bros.html">Pico</a>
+			<a id="title" href="?">Pico</a>
+			<a id="bros" href="javascript:startBros();">+</a>
 		</div>
 		<div class="menu">
-			<a class="item dark" id="item7" href="javascript:setCount(7);">x7</a>
-			<a class="item light" id="item8" href="javascript:setCount(8);">x8</a>
-			<a class="item light" id="item16" href="javascript:setCount(16);">x16</a>
-			<a class="item light" id="item24" href="javascript:setCount(24);">x24</a>
+			<a class="item dark" id="item7" href="javascript:setSize(7);">x7</a>
+			<a class="item light" id="item8" href="javascript:setSize(8);">x8</a>
+			<a class="item light" id="item16" href="javascript:setSize(16);">x16</a>
+			<a class="item light" id="item24" href="javascript:setSize(24);">x24</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -167,15 +168,70 @@ a {
 <script>console.log = () => {};</script>
 <script src="daemon.js"></script>
 <script src="image.js"></script>
+<script src="param.js"></script>
 <script src="sound.js"></script>
 <script src="touch.js"></script>
-<!--Menu--><script>
-	var count = 7; // Initial count.
-	var playing = 1; // Playing count.
+<!--Data--><script>
+var width = 7, height = 7; // Canvas size.
+var playing = 1; // Playing count.
+var pixels = null; // Initial pixels.
 
-	// Set count.
-	function setCount(x) {
-		count = x;
+// Load query params.
+if (picoStrings()) {
+	let numcode = picoNumcode();
+	pixels = [];
+	for (let k = 0; k < numcode.length; k += 3) {
+		if (numcode[k] == 0) {
+			width = numcode[k + 1];
+			height = numcode[k + 2];
+			for (let j = 0; j < height; j++) {
+				pixels[j] = [];
+			}
+		} else if (numcode[k] >= 1 && numcode[k] <= 9) {
+			let i = numcode[k + 1];
+			let j = numcode[k + 2];
+			if (i < width && j < height) {
+				pixels[j][i] = numcode[k];
+			}
+		}
+	}
+}
+</script><!--/Data-->
+<!--Menu--><script>
+
+	// Start bros.
+	function startBros() {
+		let numcode = [0, width, height];
+		for (let j = 0; j < height; j++) {
+			for (let i = 0; i < width; i++) {
+				if (pixels[j][i]) {
+					let k = numcode.length;
+					if (pixels[j][i] == 8) {
+						numcode[k] = 2;
+						numcode[k + 3] = 3;
+						numcode[k + 4] = i;
+						numcode[k + 5] = j;
+					} else if (pixels[j][i] == 4) {
+						numcode[k] = 2;
+					} else if (pixels[j][i] == 5) {
+						numcode[k] = 3;
+					} else {
+						numcode[k] = 1;
+					}
+					numcode[k + 1] = i;
+					numcode[k + 2] = j;
+				}
+			}
+		}
+		picoSetNumcode(numcode);
+		let query = picoParams();
+		window.location.href = "bros.html?" + query;
+	}
+
+	// Set canvas size.
+	function setSize(x) {
+		width = height = x;
+		pixels = null;
 		playing = -1; // Restart.
 		let items = [7,8,16,24];
 		for (let i = 0; i < items.length; i++) {
@@ -195,7 +251,9 @@ a {
 	};
 </script><!--/Menu-->
 <!--Main--><script>
-(async () => {
+async function main() {
+
+	// Load pallete data.
 	const colors = [255,255,255,
 		255,219,171, 159,255,243, 188,188,188,
 		231,0,91,    0,115,239,   0,147,59,
@@ -203,22 +261,28 @@ a {
 	const pallete = colors.length / 3;
 	picoColor(colors);
 
+	// Main loop.
 	for (;;) {
 
-		let select = 0;
-		let width = count, height = count;
+		// Initial param.
+		let select = colors.length / 3 - 1;
 		let thick = width <= 8 ? 4 : width <= 16 ? 1 : 0.5;
 		let grid = width <= 8 ? 24 : width <= 16 ? 10 : 8;
 		let offset = width == 8 || width >= 20 ? 2 : 10;
 
-		let pixels = [];
-		for (let j = 0; j < height; j++) {
-			pixels[j] = [];
+		// Reload canvas data.
+		if (!pixels) {
+			pixels = [];
+			for (let j = 0; j < height; j++) {
+				pixels[j] = [];
+			}
 		}
 
+		// Playing loop.
 		for (playing = 1; playing > 0; playing++) {
 			picoClear();
 
+			// Draw pixels.
 			for (let j = 0; j < height; j++) {
 				let y = (j - (height - 1) / 2) * grid - 4;
 				for (let i = 0; i < width; i++) {
@@ -234,6 +298,7 @@ a {
 				}
 			}
 
+			// Draw pallete.
 			for (let i = 0; i < pallete; i++) {
 				let x = (i - (pallete - 1) / 2) * 16;
 				let y = 100 - offset;
@@ -252,10 +317,10 @@ a {
 
 			await picoFlip();
 			await picoRead();
-		}
-
-	}
-})();
+		} // End of playing loop.
+	} // End of main loop.
+};
+main();
 </script><!--/Main-->
 </body>
 </html>
