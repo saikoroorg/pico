@@ -140,10 +140,17 @@ pico.Param = class {
 					console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					if (share) {
-						url = window.location.href.replace(/[\?\#].*$/, '') + query;
-						console.log("Share: " + url);
+						let data = {
+							title: "Pico",
+							url: window.location.href.replace(/[\?\#].*$/, '') + query
+						};
+						console.log("Share: " + JSON.stringify(data));
 						if (navigator.share) {
-							await navigator.share({"title": "", "url": url});
+							await navigator.share(data).then(() => {
+								console.log('Successful share');
+							}).catch((error) => {
+								console.log('Error sharing', error);
+							});
 						}
 					} else {
 						window.location.search = query;
