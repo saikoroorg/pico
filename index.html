@@ -263,6 +263,7 @@ async function main() {
 			if (numcode[k] == 0) {
 				width = numcode[k + 1] >= 0 && numcode[k + 1] < maxsize ? numcode[k + 1] : 7;
 				height = numcode[k + 2] >= 0 && numcode[k + 2] < maxsize ? numcode[k + 2] : 7;
+				changeSize(0);
 			} else if (numcode[k] >= 1 && numcode[k] <= 9) {
 				let i = numcode[k + 1] + xoffset;
 				let j = numcode[k + 2] + yoffset;
