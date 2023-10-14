@@ -1,7 +1,7 @@
 {
 	"name": "pico",
 	"short_name": "Pico",
-	"version": "0.8.31013ag",
+	"version": "0.8.31013ah",
 	"author": "saikoro.org",
 	"background_color": "#fff",
 	"theme_color": "#fff",
@@ -17,5 +17,5 @@
 	}],
 	"display": "standalone",
 	"start_url": "./?v=1",
-	"contents": ["./", "./daemon.js", "./image.js", "./param.js", "./sound.js", "./touch.js"]
+	"contents": ["./", "./bros.html", "./daemon.js", "./image.js", "./param.js", "./sound.js", "./touch.js"]
 }
