@@ -180,7 +180,7 @@ a {
 <!--Data--><script>
 const maxsize = 20; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
-var xoffset = 8, yoffset = 8; // Canvas offset.
+var xoffset = picoDiv(maxsize - width, 2), yoffset = picoDiv(maxsize - height, 2); // Canvas offset.
 var playing = 1; // Playing count.
 var pixels = []; // Pixels.
 </script><!--/Data-->
@@ -211,8 +211,10 @@ var pixels = []; // Pixels.
 					}
 				}
 			}
+			if (width != 7 || height != 7 || numcode.length > 3) {
+				picoSetNumcode(numcode);
+			}
 		}
-		picoSetNumcode(numcode);
 		picoShare(false, "bros.html");
 	}
 
