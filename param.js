@@ -64,8 +64,8 @@ pico.Param = class {
 	}
 
 	// Set param as strings.
-	_setStrings(strings, key=0) {
-		this.__setStrings(strings, key);
+	setStrings(strings, key=0) {
+		this._setStrings(strings, key);
 	}
 
 	// Get param as numbers.
@@ -141,7 +141,6 @@ pico.Param = class {
 					window.history.replaceState(null, "", query);
 					if (share) {
 						let data = {
-							title: "Pico",
 							url: window.location.href.replace(/[\?\#].*$/, '') + query
 						};
 						console.log("Share: " + JSON.stringify(data));

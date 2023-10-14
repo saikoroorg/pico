@@ -272,8 +272,8 @@ async function main() {
 			if (w == 0) {
 				width = x;
 				height = y;
-				thick = width <= 8 ? 4 : width <= 16 ? 1 : 0.5;
-				grid = width <= 8 ? 24 : width <= 16 ? 10 : 8;
+				thick = width <= 4 ? 6 : width <= 8 ? 4 : width <= 9 ? 3 : width <= 12 ? 2 : width <= 16 ? 1 : 0.5;
+				grid = width <= 4 ? 32 : width <= 8 ? 24 : width <= 9 ? 20 : width <= 12 ? 16 : width <= 16 ? 12 : 8;
 				players = [[0, 0], [width - 1, height - 1]];
 				for (let j = 0; j < height; j++) {
 					pixels[j] = [];
