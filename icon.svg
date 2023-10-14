@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="300" height="300">
+	<g stroke-width="2" stroke="none" fill="#000" transform="translate(20,20)">
+		<path d="M-17,-17h34v34h-34Z" stroke="#ccc" fill="#ccc"/>
+		<path d="M-17,-17h6v6h-6Z M-10,-17h6v6h-6Z M-3,-17h6v6h-6Z M4,-17h6v6h-6Z M11,-17h6v6h-6Z" fill="#fff"/>
+		<path d="M-17,-10h6v6h-6Z M-10,-10h6v6h-6Z M-3,-10h6v6h-6Z M4,-10h6v6h-6Z M11,-10h6v6h-6Z" fill="#fff"/>
+		<path d="M-17,-3h6v6h-6Z M-10,-3h6v6h-6Z M-3,-3h6v6h-6Z M4,-3h6v6h-6Z M11,-3h6v6h-6Z" fill="#fff"/>
+		<path d="M-17, 4h6v6h-6Z M-10, 4h6v6h-6Z M-3, 4h6v6h-6Z M4, 4h6v6h-6Z M11, 4h6v6h-6Z" fill="#fff"/>
+		<path d="M-17,11h6v6h-6Z M-10,11h6v6h-6Z M-3,11h6v6h-6Z M4,11h6v6h-6Z M11,11h6v6h-6Z" fill="#fff"/>
+		<path d="M-10,-10h6v6h-6Z" fill="#E7005B"/>
+		<path d="M4,-10h6v6h-6Z" fill="#0073EF"/>
+		<path d="M-10, 4h6v6h-6Z M-3, 4h6v6h-6Z M4, 4h6v6h-6Z M11" fill="#003F17"/>
+	</g>
+</svg>
+<!-- qlmanage -t -s 192 -o ./ icon.svg -or- inkscape -z -o icon.png -w 192 -h 192 icon.svg -->
+<!--svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52" width="384" height="384">
+	<path d="M0,0h56v56h-56Z" fill="#ccc"/>
+	<g stroke-width="2" stroke="none" fill="#000" transform="translate(26,26)">
+		<path d="M-20,-20h40v40h-40Z" stroke="#ccc" fill="#ccc"/>
+		<path d="M-17,-17h6v6h-6Z M-10,-17h6v6h-6Z M-3,-17h6v6h-6Z M4,-17h6v6h-6Z M11,-17h6v6h-6Z" fill="#fff"/>
+		<path d="M-17,-10h6v6h-6Z M-10,-10h6v6h-6Z M-3,-10h6v6h-6Z M4,-10h6v6h-6Z M11,-10h6v6h-6Z" fill="#fff"/>
+		<path d="M-17,-3h6v6h-6Z M-10,-3h6v6h-6Z M-3,-3h6v6h-6Z M4,-3h6v6h-6Z M11,-3h6v6h-6Z" fill="#fff"/>
+		<path d="M-17, 4h6v6h-6Z M-10, 4h6v6h-6Z M-3, 4h6v6h-6Z M4, 4h6v6h-6Z M11, 4h6v6h-6Z" fill="#fff"/>
+		<path d="M-17,11h6v6h-6Z M-10,11h6v6h-6Z M-3,11h6v6h-6Z M4,11h6v6h-6Z M11,11h6v6h-6Z" fill="#fff"/>
+		<path d="M-10,-10h6v6h-6Z" fill="#E7005B"/>
+		<path d="M4,-10h6v6h-6Z" fill="#0073EF"/>
+		<path d="M-10, 4h6v6h-6Z M-3, 4h6v6h-6Z M4, 4h6v6h-6Z M11" fill="#003F17"/>
+	</g>
+</svg!-->
