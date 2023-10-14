@@ -1,8 +1,8 @@
 /* PICO Param module */
 
 // Share params.
-async function picoShare(share=false, url=null) {
-	await pico.param.share(share, url);
+async function picoShare(share=false, url=null, file=null) {
+	await pico.param.share(share, url, file);
 }
 
 // Get all params by one strings.
@@ -49,8 +49,8 @@ var pico = pico || {};
 pico.Param = class {
 
 	// Share param.
-	async share(share=false, url=null) {
-		await this._share(share, url);
+	async share(share=false, url=null, files=null) {
+		await this._share(share, url, files);
 	}
 
 	// Get all params by one strings.
@@ -120,7 +120,7 @@ pico.Param = class {
 	}
 
 	// Share param.
-	_share(share=false, url=null) {
+	_share(share=false, url=null, files=null) {
 		return new Promise(async (resolve) => {
 			let text = this._serialize();
 			if (text != null) {
@@ -130,7 +130,11 @@ pico.Param = class {
 					if (share) {
 						console.log("Share: " + url);
 						if (navigator.share) {
-							navigator.share({url: url});
+							if (files) {
+								navigator.share({url: url, files: files});
+							} else {
+								navigator.share({url: url});
+							}
 						}
 					} else {
 						console.log("Jump: " + url);

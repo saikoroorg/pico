@@ -43,6 +43,9 @@ a {
 #screen {
 	aspect-ratio: 1;
 }
+.offscreen {
+	display: none;
+}
 #footer {
 	width: 100%; height: 12px; margin-top: -8px;
 	flex: 0 1 auto;
@@ -167,7 +170,7 @@ a {
 			<a id="subtitle" href="javascript:startBros();">.</a>
 		</div>
 		<div class="menu center">
-			<a class="item light" id="share" href="javascript:share();">^</a>
+			<a class="item light thumbnail" href="javascript:share();">^</a>
 		</div>
 		<div class="menu">
 			<a class="item clear" href="javascript:changeSize(-1);">-</a>
@@ -180,6 +183,7 @@ a {
 	</h1>
 	<div id="contents">
 		<div id="screen" class="picoImage picoTouch"></div>
+		<div class="offscreen"></div>
 	</div>
 </div>
 <h6 id="footer">
@@ -198,6 +202,10 @@ var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxsize - width, 2), yoffset = picoDiv(maxsize - height, 2); // Canvas offset.
 var playing = 1; // Playing count.
 var pixels = []; // Pixels.
+const colors = [255,255,255,
+	255,219,171, 159,255,243, 188,188,188,
+	231,0,91,    0,115,239,   0,147,59,
+	167,0,0,     143,0,119,   0,63,23];
 </script><!--/Data-->
 <!--Menu--><script>
 
@@ -236,7 +244,9 @@ var pixels = []; // Pixels.
 	}
 
 	// Share.
-	function share() {
+	async function share() {
+
+		// Create num code to share url.
 		let numcode = [0, width, height];
 		if (pixels) {
 			for (let j = yoffset; j < yoffset + height; j++) {
@@ -251,7 +261,25 @@ var pixels = []; // Pixels.
 			}
 		}
 		picoSetNumcode(numcode);
-		picoShare(true);
+
+		// Create offscreen image.
+		{ // @todo replace magic number.
+			const thick = 4, w = thick, h = thick;
+			let offscreen = new pico.Image("offscreen", width * thick *5/4, height * thick *5/4);
+			await offscreen.color(colors);
+			await offscreen.pixel(0, 0, 0, width * thick *5/4, height * thick *5/4);
+			for (let j = yoffset; j < yoffset + height; j++) {
+				let y = (j - yoffset - (height - 1) / 2) * thick * 5;
+				for (let i = xoffset; i < xoffset + width; i++) {
+					if (pixels[j][i]) {
+						let x = (i - xoffset - (width - 1) / 2) * thick * 5;
+						await offscreen.pixel(pixels[j][i], x, y, w, h);
+					}
+				}
+			}
+
+			picoShare(true, null, offscreen.data());
+		}
 	}
 
 	// Change canvas size.
@@ -294,10 +322,6 @@ async function main() {
 	}
 
 	// Load pallete data.
-	const colors = [255,255,255,
-		255,219,171, 159,255,243, 188,188,188,
-		231,0,91,    0,115,239,   0,147,59,
-		167,0,0,     143,0,119,   0,63,23];
 	const pallete = colors.length / 3;
 	picoColor(colors);
 
