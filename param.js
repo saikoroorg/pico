@@ -237,7 +237,7 @@ pico.Param = class {
 	_setNumcode(numcode, key=0) {
 		this.context[key] = "";
 		for (let i = 0; i < numcode.length; i++) {
-			if (0 <= numcode[i]  && numcode[i] < 10) {
+			if (0 <= numcode[i] && numcode[i] < 10) {
 				this.context[key] += numcode[i];
 			} else if (10 <= numcode[i] && numcode[i] < 36) {
 				this.context[key] += String.fromCharCode("a".charCodeAt(0) + numcode[i] - 10);
@@ -286,7 +286,7 @@ pico.Param = class {
 	_serialize() {
 		let params = [];
 		for (let key in this.context) {
-			if (key != null && this.context[key] != null) {
+			if (key != null && this.context[key] != null && this.context[key] != "") {
 				params.push(key + "=" + this.context[key]);
 			}
 		}

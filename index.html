@@ -228,6 +228,8 @@ var pixels = []; // Pixels.
 			}
 			if (width != 7 || height != 7 || numcode.length > 3) {
 				picoSetNumcode(numcode);
+			} else {
+				picoSetNumcode([]);
 			}
 		}
 		picoShare(false, "bros.html");
