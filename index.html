@@ -178,7 +178,7 @@ a {
 <script src="sound.js"></script>
 <script src="touch.js"></script>
 <!--Data--><script>
-const maxsize = 24; // Canvas max size.
+const maxsize = 20; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = 8, yoffset = 8; // Canvas offset.
 var playing = 1; // Playing count.
@@ -287,11 +287,11 @@ async function main() {
 
 		// Initial param.
 		let select = colors.length / 3 - 1;
-		const margin = width <= 7 ? 8 : 6;
-		let thick = 42 / width - margin / 4,  grid = thick * 4 + margin, offset = 10;
-		//let thick = width <= 5 ? 6 : width <= 7 ? 4 : width <= 9 ? 2.5 : width <= 12 ? 1.5 : width <= 16 ? 1 : 0.5;
-		//let grid = width <= 5 ? 32 : width <= 7 ? 24 : width <= 9 ? 18 : width <= 12 ? 12 : width <= 16 ? 10 : 8;
-		//let offset = width <= 16 ? 10 : 2;
+		//const margin = width <= 7 ? 8 : 6;
+		//let thick = 42 / width - margin / 4,  grid = thick * 4 + margin, offset = 10;
+		let thick = width <= 3 ? 10 : width <= 5 ? 6 : width <= 7 ? 4 : width <= 9 ? 2.5 : width <= 12 ? 1.5 : width <= 16 ? 1 : 0.5;
+		let grid  = width <= 3 ? 48 : width <= 5 ? 32 : width <= 7 ? 24 : width <= 9 ? 18 : width <= 12 ? 12 : width <= 16 ? 10 : 8;
+		let offset = 10;//width <= 16 ? 10 : 2;
 
 		// Playing loop.
 		for (playing = 1; playing > 0; playing++) {
