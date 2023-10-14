@@ -67,13 +67,17 @@ a {
 	font-size: 24px;
 	color: #888;
 }
+.logo #subtitle {
+	font-size: 24px;
+	color: #ccc;
+}
 .menu {
 	display: flex; display: -webkit-flex;
 	flex-direction: row; -webkit-flex-direction: row;
 	justify-content: space-between; -webkit-justify-content: space-between;
 	align-items: flex-end; -webkit-align-items: flex-end;
 }
-.menu .item {
+.item {
 	width: 40px; height: 40px; margin: 0px;
 	display: flex; display: -webkit-flex;
 	flex-direction: column; -webkit-flex-direction: column;
@@ -81,16 +85,16 @@ a {
 	align-items: center; -webkit-align-items: center;
 	font-size: 16px;
 }
-.menu .item.dark {
+.item.dark {
 	background-color: #888;
 	color: #fff;
 }
-.menu .light {;
+.light {;
+	background-color: #eee;
 	color: #888;
 }
-.menu .item.extra {
-	background-color: #ccc;
-	color: #fff;
+.clear {;
+	color: #888;
 }
 .menu a {
 	transform: scale(1);
@@ -106,27 +110,35 @@ a {
 }
 @media (max-height: 400px) {
 	#container {
-		display: flex; display: -webkit-flex;
 		flex-direction: row; -webkit-flex-direction: row;
-		justify-content: flex-start; -webkit-justify-content: flex-start;
-		align-items: center; -webkit-align-items: center;
 	}
 	#header {
-		order: 1;
+		order: 1; height: 100%;
+		display: flex; display: -webkit-flex;
+		flex-direction: column; -webkit-flex-direction: column;
+		justify-content: space-between; -webkit-justify-content: space-between;
+		align-items: center; -webkit-align-items: center;
 	}
 	.logo {
 		display: none;
-		width: 0%;
 	}
 	.menu {
+		display: flex; display: -webkit-flex;
 		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: center; -webkit-justify-content: center;
-		align-items: center; -webkit-align-items: center;
+		justify-content: space-between; -webkit-justify-content: space-between;
+		align-items: flex-end; -webkit-align-items: flex-end;
 	}
 }
 @media (min-height: 400px) {
 	#header {
 		width: 100%;
+	}
+	.dummy {
+		display: none;
+	}
+	.center {
+		position: absolute;
+		left: 50%; transform: translate(-50%, 0);
 	}
 }
 @media (orientation: landscape) {
@@ -152,15 +164,18 @@ a {
 	<h1 id="header">
 		<div class="logo">
 			<a id="title" href="?">Pico</a>
-			<a id="bros" href="javascript:startBros();">.</a>
+			<a id="subtitle" href="javascript:startBros();">.</a>
 		</div>
-		<div class="menu">
-			<a class="item light" href="javascript:changeSize(-2);">-</a>
-			<a class="item dark" id="item" href="javascript:changeLevel(0);">x7</a>
-			<a class="item light" href="javascript:changeSize(+2);">+</a>
-		</div>
-		<div class="menu">
+		<div class="menu center">
 			<a class="item light" id="share" href="javascript:share();">^</a>
+		</div>
+		<div class="menu">
+			<a class="item clear" href="javascript:changeSize(-1);">-</a>
+			<a class="item dark" id="size" href="javascript:top.location.reload();">x7</a>
+			<a class="item clear" href="javascript:changeSize(+1);">+</a>
+		</div>
+		<div class="dummy">
+			<a class="item clear"></a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -245,7 +260,7 @@ var pixels = []; // Pixels.
 		yoffset = picoDiv(maxsize - height, 2);
 		console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
 		playing = -1; // Restart.
-		let e = document.getElementById("item");
+		let e = document.getElementById("size");
 		if (e) {
 			e.innerText = "x" + width;
 		}

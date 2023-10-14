@@ -44,7 +44,7 @@ a {
 	aspect-ratio: 1;
 }
 #footer {
-	width: 100%; height: 12px; margin-top: -4px;
+	width: 100%; height: 12px; margin-top: -8px;
 	flex: 0 1 auto;
 	display: flex; display: -webkit-flex;
 	flex-direction: row; -webkit-flex-direction: row;
@@ -67,13 +67,17 @@ a {
 	font-size: 24px;
 	color: #888;
 }
+.logo #subtitle {
+	font-size: 24px;
+	color: #ccc;
+}
 .menu {
 	display: flex; display: -webkit-flex;
 	flex-direction: row; -webkit-flex-direction: row;
 	justify-content: space-between; -webkit-justify-content: space-between;
 	align-items: flex-end; -webkit-align-items: flex-end;
 }
-.menu .item {
+.item {
 	width: 40px; height: 40px; margin: 0px;
 	display: flex; display: -webkit-flex;
 	flex-direction: column; -webkit-flex-direction: column;
@@ -81,16 +85,16 @@ a {
 	align-items: center; -webkit-align-items: center;
 	font-size: 16px;
 }
-.menu .item.dark {
+.item.dark {
 	background-color: #888;
 	color: #fff;
 }
-.menu .light {;
+.light {;
+	background-color: #eee;
 	color: #888;
 }
-.menu .item.extra {
-	background-color: #ccc;
-	color: #fff;
+.clear {;
+	color: #888;
 }
 .menu a {
 	transform: scale(1);
@@ -106,27 +110,35 @@ a {
 }
 @media (max-height: 400px) {
 	#container {
-		display: flex; display: -webkit-flex;
 		flex-direction: row; -webkit-flex-direction: row;
-		justify-content: flex-start; -webkit-justify-content: flex-start;
-		align-items: center; -webkit-align-items: center;
 	}
 	#header {
-		order: 1;
+		order: 1; height: 100%;
+		display: flex; display: -webkit-flex;
+		flex-direction: column; -webkit-flex-direction: column;
+		justify-content: space-between; -webkit-justify-content: space-between;
+		align-items: center; -webkit-align-items: center;
 	}
 	.logo {
 		display: none;
-		width: 0%;
 	}
 	.menu {
+		display: flex; display: -webkit-flex;
 		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: center; -webkit-justify-content: center;
-		align-items: center; -webkit-align-items: center;
+		justify-content: space-between; -webkit-justify-content: space-between;
+		align-items: flex-end; -webkit-align-items: flex-end;
 	}
 }
 @media (min-height: 400px) {
 	#header {
 		width: 100%;
+	}
+	.dummy {
+		display: none;
+	}
+	.center {
+		position: absolute;
+		left: 50%; transform: translate(-50%, 0);
 	}
 }
 @media (orientation: landscape) {
@@ -151,12 +163,13 @@ a {
 <div id="container">
 	<h1 id="header">
 		<div class="logo">
-			<a id="title" href="javascript:history.back();">PicoBros</a>
+			<a id="title" href="javascript:history.back();">Pico</a>
+			<a id="subtitle" href="javascript:top.location.reload();">Bros</a>
 		</div>
 		<div class="menu">
-			<a class="item light" href="javascript:changeLevel(-1);">-</a>
-			<a class="item dark" id="item" href="javascript:changeLevel(0);">1</a>
-			<a class="item light" href="javascript:changeLevel(+1);">+</a>
+			<a class="item clear" href="javascript:changeLevel(-1);">-</a>
+			<a class="item dark" id="level" href="javascript:changeLevel(0);">1</a>
+			<a class="item clear" href="javascript:changeLevel(+1);">+</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -235,7 +248,7 @@ function changeLevel(x) {
 	level = level + x < 1 ? (levels[0] ? 0 : 1) :
 		level + x >= levels.length ? levels.length - 1 : level + x;
 	playing = -1; // Restart.
-	let e = document.getElementById("item");
+	let e = document.getElementById("level");
 	if (e) {
 		e.innerText = "" + level;
 	}
