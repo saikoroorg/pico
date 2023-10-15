@@ -130,7 +130,11 @@ pico.Param = class {
 					if (share) {
 						console.log("Share: " + url);
 						if (navigator.share) {
-							navigator.share({url: url, files: files});
+							if (files) {
+								navigator.share({url: url, files: files});
+							} else {
+								navigator.share({url: url});
+							}
 						}
 					} else {
 						console.log("Jump: " + url);
@@ -140,9 +144,11 @@ pico.Param = class {
 					console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					if (share) {
-						let data = {
+						let data = files ? {
 							url: window.location.href.replace(/[\?\#].*$/, '') + query,
 							files: files
+						} : {
+							url: window.location.href.replace(/[\?\#].*$/, '') + query
 						};
 						console.log("Share: " + JSON.stringify(data));
 						if (navigator.share) {

@@ -88,6 +88,12 @@ a {
 	align-items: center; -webkit-align-items: center;
 	font-size: 16px;
 }
+.item #icon {
+	width: 40px; height: 40px;
+	position: absolute;
+	left: 50%; transform: translate(-50%, 0);
+	display: none;
+}
 .item.dark {
 	background-color: #888;
 	color: #fff;
@@ -170,7 +176,9 @@ a {
 			<a id="subtitle" href="javascript:startBros();">.</a>
 		</div>
 		<div class="menu center">
-			<a class="item light thumbnail" href="javascript:share();">^</a>
+			<a class="item light" id="share" href="javascript:share();">^
+				<img id="icon" src="" />
+			</a>
 		</div>
 		<div class="menu">
 			<a class="item clear" href="javascript:changeSize(-1);">-</a>
@@ -277,8 +285,14 @@ const colors = [255,255,255,
 					}
 				}
 			}
+			let e = document.getElementById("icon");
+			if (e) {
+				e.style.display = "flex";
+				e.src = offscreen.data();
+			}
 
-			picoShare(true, null, [offscreen.data()]);
+			//picoShare(true, null, [offscreen.data()]);
+			picoShare(true, null);
 		}
 	}
 

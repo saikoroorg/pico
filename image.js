@@ -310,12 +310,12 @@ pico.Image = class {
 	}
 
 	// Get image data url.
-	dataUrl() {
+	data() {
 		return this.canvas[this.primary].toDataURL("image/png");
 	}
 
-	// Get image data.
-	data() {
+	// Get image data file.
+	file() {
 		const decoded = atob(this.canvas[this.primary].toDataURL("image/png").replace(/^.*,/, ""));
 		const buffers = new Uint8Array(decoded.length);
 		for (let i = 0; i < decoded.length; i++) {
