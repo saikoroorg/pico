@@ -249,7 +249,7 @@ pico.Param = class {
 			} else if (10 <= numcode[i] && numcode[i] < 36) {
 				this.context[key] += String.fromCharCode("a".charCodeAt(0) + numcode[i] - 10);
 			} else if (36 <= numcode[i] && numcode[i] < 62) {
-				this.context[key] += String.fromCharCode("A".charCodeAt(0) + numcode[i] - 10);
+				this.context[key] += String.fromCharCode("A".charCodeAt(0) + numcode[i] - 36);
 			} else if (numcode[i] == 62) {
 				this.context[key] += ".";
 			} else if (numcode[i] == 63) {

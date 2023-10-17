@@ -210,10 +210,35 @@ var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxsize - width, 2), yoffset = picoDiv(maxsize - height, 2); // Canvas offset.
 var playing = 1; // Playing count.
 var pixels = []; // Pixels.
-const colors = [255,255,255,
-	255,219,171, 159,255,243, 188,188,188,
-	231,0,91,    0,115,239,   0,147,59,
-	167,0,0,     143,0,119,   0,63,23];
+//var colors = colorindexes:[32,55,60,16,22,17,27,6,4,11]; // Colors: 20,37,3c,10,15,11,1b,06,04,0b
+//var colors8 = [255,255,255,255,219,171,159,255,243,188,188,188,231,0,91,0,115,239,0,147,59,167,0,0,143,0,119,0,63,23]; // Color uses original 8 bits.
+//var colors6 = [255,255,255,255,219,171,159,255,243,191,191,191,231,3,91,3,115,239,3,147,59,167,3,3,143,3,119,3,63,23]; // Color uses 6 bits.
+var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,7,95,7,119,239,7,151,63,167,7,7,143,7,119,7,63,23]; // Color uses 5 bits.
+const compression = 2; // Use (8 - compression) bits each r,g,b values. Requires 6 bits to encode with ASCII code only.
+function bitcompress(x0) {
+	let x = x0 ^ 255; // Math.floor(255 - x0);//
+	let r = 0, b = 8 - compression;
+	x = x >> compression;
+	while (b--) {
+		r <<= 1;
+		r |= (x & 1);
+		x >>= 1;
+	}
+	//console.log("Compress: " + ("00000000"+x0.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-6));
+	return r;
+}
+function bitexpand(x0) {
+	let x = x0 ^ 255; // 255 - x0;//
+	let r = 0, b = 8 - compression;
+	while (b--) {
+		r <<= 1;
+		r |= (x & 1);
+		x >>= 1;
+	}
+	r = ((r + 1) << compression) - 1;
+	//console.log("Expand: " + ("00000000"+x0.toString(2)).slice(-6) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+	return r;
+}
 </script><!--/Data-->
 <!--Menu--><script>
 
@@ -261,12 +286,26 @@ const colors = [255,255,255,
 				for (let i = xoffset; i < xoffset + width; i++) {
 					if (pixels[j][i]) {
 						let k = numcode.length;
-						numcode[k] = pixels[j][i];
+						numcode[k + 0] = pixels[j][i];
 						numcode[k + 1] = i - xoffset;
 						numcode[k + 2] = j - yoffset;
 					}
 				}
 			}
+			/*{
+				let k = numcode.length;
+				numcode[k] = numcode[k + 1] = numcode[k + 2] = 0;
+			}*/
+			const compression = 2;
+			for (let i = 0; i < colors.length; i += 3) {
+				let k = numcode.length;
+				for (let l = 0; l < 3; l++) {
+					numcode[k + l] = bitcompress(colors[i + l]);
+				}
+				//console.log("Color" + i + ": " + colors[i] + "," + colors[i+1] + "," + colors[i+2] +
+				//	" -> Numcode" + k + ": " + numcode[k] + "," + numcode[k+1] + "," + numcode[k+2]);
+			}
+			console.log("Color:" + colors + " -> Numcode:" + numcode);
 		}
 		picoSetNumcode(numcode);
 
@@ -317,15 +356,30 @@ async function main() {
 	// Load query params.
 	for (let j = 0; j < maxsize; j++) {
 		pixels[j] = [];
+		for (let i = 0; i < maxsize; i++) {
+			pixels[j][i] = 0;
+		}
 	}
 	if (picoStrings()) {
 		let numcode = picoNumcode();
 		for (let k = 0; k < numcode.length; k += 3) {
-			if (numcode[k] == 0) {
+			if (numcode[k] == 0 && numcode[k + 1] == 0 && numcode[k + 2] == 0) {
+				colors = [];
+				for (; k < numcode.length; k += 3) {
+					let i = colors.length;
+					for (let l = 0; l < 3; l++) {
+						colors[i + l] = bitexpand(numcode[k + l]);
+					}
+
+					//console.log("Numcode" + k + ": " + numcode[k] + "," + numcode[k+1] + "," + numcode[k+2] +
+					//	" -> Color" + i + ": " + colors[i] + "," + colors[i+1] + "," + colors[i+2]);
+				}
+				console.log("Numcode:" + numcode + " -> Color:" + colors);
+			} else if (numcode[k] == 0) {
 				width = numcode[k + 1] >= 0 && numcode[k + 1] < maxsize ? numcode[k + 1] : 7;
 				height = numcode[k + 2] >= 0 && numcode[k + 2] < maxsize ? numcode[k + 2] : 7;
 				changeSize(0);
-			} else if (numcode[k] >= 1 && numcode[k] <= 9) {
+			} else if (numcode[k] > 0) {
 				let i = numcode[k + 1] + xoffset;
 				let j = numcode[k + 2] + yoffset;
 				if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
@@ -336,7 +390,6 @@ async function main() {
 	}
 
 	// Load pallete data.
-	const pallete = colors.length / 3;
 	picoColor(colors);
 
 	// Main loop.
@@ -378,8 +431,8 @@ async function main() {
 			}
 
 			// Draw pallete.
-			for (let i = 0; i < pallete; i++) {
-				let x = (i - (pallete - 1) / 2) * 16;
+			for (let i = 0; i < colors.length / 3; i++) {
+				let x = (i - (colors.length / 3 - 1) / 2) * 16;
 				let y = 100 - offset;
 				if (touching != 1 && picoMotion(x, y, 8, 12)) {
 					touching = 2;
