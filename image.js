@@ -182,7 +182,7 @@ pico.Image = class {
 		 143,  0,119, 171,  0, 19, 167,  0,  0, 127, 11,  0, // 04-07
 		  67, 47,  0,   0, 71,  0,   0, 81,  0,   0, 63, 23, // 08-0b
 		  27, 63, 95,   0,  0,  0,   0,  0,  0,   0,  0,  0, // 0c-0f
-		]; // Master image color. 
+		]; // Master image color. (8bit original parameter)
 
 	// Get random count.
 	random(max) {

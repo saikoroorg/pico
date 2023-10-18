@@ -40,6 +40,16 @@ function picoSetNumcode(numcode, key=0) {
 	return pico.param.setNumcode(numcode, key);
 }
 
+// Get param as color 6bit(0-63) array.
+function picoColcode(key=0) {
+	return pico.param.colcode(key);
+}
+
+// Set param as color 6bit(0-63) array.
+function picoSetColcode(colcode, key=0) {
+	return pico.param.setColcode(colcode, key);
+}
+
 //************************************************************/
 
 // Namespace.
@@ -87,13 +97,23 @@ pico.Param = class {
 	setNumcode(numcode, key=0) {
 		this._setNumcode(numcode, key);
 	}
+
+	// Get param as color 6bit(0-63) array.
+	colcode(key=0) {
+		return this._colcode(key);
+	}
+
+	// Set param as color 6bit(0-63) array.
+	setColcode(colcode, key=0) {
+		this._setColcode(colcode, key);
+	}
 	
 	//*----------------------------------------------------------*/
 
 	// constructor.
 	constructor() {
 		//this.lock = "picoParamLock" + Date.now(); // Lock object identifier.
-		this.context = {};
+		this.context = [];
 
 		// Setup now.
 		this._setup();
@@ -257,7 +277,49 @@ pico.Param = class {
 			}
 		}
 	}
-	
+
+	// Get color 6bit(0-63) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	_colcode(key=0) {
+		let results = this._numcode(key);
+		for (let i = 0; i < results.length; i++) {
+			let x = results[i], r = 0;
+			// Expand color code to number code.
+			/*if (x < (255>>3)) */{ // Almost black set black(numcode:0).
+				let b = 8, a = x ^ 255; // Bit flip.
+				while (b--) { // Bit reverse.
+					r <<= 1;
+					r |= (a & 1);
+					a >>= 1;
+				}
+			}
+			//console.log("Expand: " + ("00000000"+x.toString(2)).slice(-6) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			results[i] = r;
+		}
+		return results;
+	}
+
+	// Set color 6bit(0-63) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	_setColcode(colcode, key=0, compression=2) {
+		let numcode = [];
+		for (let i = 0; i < colcode.length; i++) {
+			let x = colcode[i], r = 0;
+			if (x < 255) {
+				// Compress number code to color code.
+				// Use (8 - compression) bits each r,g,b values. Requires 6 bits to encode with ASCII code only.
+				let b = 8 - compression, a = x ^ 255; // Bit flip.
+				a = a >> compression; // Compress.
+				while (b--) { // Bit reverse.
+					r <<= 1;
+					r |= (a & 1);
+					a >>= 1;
+				}
+			}
+			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-6));
+			numcode[i] = r;
+		}
+		this._setNumcode(numcode, key)
+	}
+
 	// Deserialize context to parameters.
 	_deserialize(context) {
 		this.context = {};
@@ -291,18 +353,18 @@ pico.Param = class {
 
 	// Serialize parameters to context.
 	_serialize() {
-		let params = [];
-		for (let key in this.context) {
-			if (key != null && this.context[key] != null && this.context[key] != "") {
-				params.push(key + "=" + this.context[key]);
+		if (Array.isArray(this.context)) {
+			return this.context.join("+");
+		} else {
+			let params = [];
+			for (let key in this.context) {
+				if (key != null && this.context[key] != null && this.context[key] != "") {
+					params.push(key + "=" + this.context[key]);
+				}
 			}
+			return params.join("&");
 		}
-		if (params.length == 1 && this.context[0]) {
-			return this.context[0];
-		}
-		return params.join("&");
 	}
-
 };
 
 // Master param.
