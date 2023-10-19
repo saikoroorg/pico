@@ -238,7 +238,7 @@ pico.Param = class {
 		this.context[key] = numbers.join(separator);
 	}
 
-	// Get number 6bit(0-63) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	// Get number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
 	_numcode(key=0) {
 		let results = [];
 		if (this.context[key]) {
@@ -254,13 +254,15 @@ pico.Param = class {
 					results[i] = 62;
 				} else if (c == "-".charCodeAt(0)) {
 					results[i] = 63;
+				} else if (c == "_".charCodeAt(0)) {
+					results[i] = 64;
 				}
 			}
 		}
 		return results;
 	}
 
-	// Set number 6bit(0-63) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	// Set number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
 	_setNumcode(numcode, key=0) {
 		this.context[key] = "";
 		for (let i = 0; i < numcode.length; i++) {
@@ -274,37 +276,40 @@ pico.Param = class {
 				this.context[key] += ".";
 			} else if (numcode[i] == 63) {
 				this.context[key] += "-";
+			} else if (numcode[i] == 64) {
+				this.context[key] += "_";
 			}
 		}
 	}
 
-	// Get color 6bit(0-63) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	// Get color 6bit+1(0-64) array.
 	_colcode(key=0) {
 		let results = this._numcode(key);
 		for (let i = 0; i < results.length; i++) {
 			let x = results[i], r = 0;
 			// Expand color code to number code.
-			/*if (x < (255>>3)) */{ // Almost black set black(numcode:0).
-				let b = 8, a = x ^ 255; // Bit flip.
+			if (x > 0) {
+				let b = 8, a = x - 1; // Reserve 0.
 				while (b--) { // Bit reverse.
 					r <<= 1;
 					r |= (a & 1);
 					a >>= 1;
 				}
+				r = r ^ 255; // Bit flip.
 			}
-			//console.log("Expand: " + ("00000000"+x.toString(2)).slice(-6) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			console.log("Expand: " + ("00000000"+x.toString(2)).slice(-6) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
 		return results;
 	}
 
-	// Set color 6bit(0-63) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	// Set color 6bit+1(0-64) array.
 	_setColcode(colcode, key=0, compression=2) {
 		let numcode = [];
 		for (let i = 0; i < colcode.length; i++) {
 			let x = colcode[i], r = 0;
-			if (x < 255) {
-				// Compress number code to color code.
+			// Compress number code to color code.
+			if (x > 0) {
 				// Use (8 - compression) bits each r,g,b values. Requires 6 bits to encode with ASCII code only.
 				let b = 8 - compression, a = x ^ 255; // Bit flip.
 				a = a >> compression; // Compress.
@@ -313,8 +318,9 @@ pico.Param = class {
 					r |= (a & 1);
 					a >>= 1;
 				}
+				r += 1; // Reserve 0.
 			}
-			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-6));
+			console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-6));
 			numcode[i] = r;
 		}
 		this._setNumcode(numcode, key)
