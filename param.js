@@ -328,7 +328,7 @@ pico.Param = class {
 
 	// Deserialize context to parameters.
 	_deserialize(context) {
-		this.context = {};
+		this.context = [];
 		if (context.includes('&')) {
 			context.split('&').forEach((q) => {
 				if (q.includes('=')) {
