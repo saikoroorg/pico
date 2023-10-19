@@ -88,6 +88,15 @@ a {
 	align-items: center; -webkit-align-items: center;
 	font-size: 16px;
 }
+.item #frame {
+	margin: -4px;
+	width: 48px; height: 48px;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: center; -webkit-justify-content: center;
+	align-items: center; -webkit-align-items: center;
+	background-color: #ccc;
+}
 .item #icon {
 	width: 40px; height: 40px;
 	position: absolute;
@@ -176,7 +185,8 @@ a {
 			<a id="subtitle" href="javascript:startBros();">.</a>
 		</div>
 		<div class="menu center">
-			<a class="item light" id="share" href="javascript:share();">^
+			<a class="item light" id="share" href="javascript:share();">
+				<span id="frame">^</span>
 				<img id="icon" src="" />
 			</a>
 		</div>
