@@ -30,22 +30,22 @@ function picoSetNumbers(numbers, key=0) {
 	return pico.param.setNumbers(numbers, key);
 }
 
-// Get param as number 6bit(0-63) array.
+// Get param as number code.
 function picoNumcode(key=0) {
 	return pico.param.numcode(key);
 }
 
-// Set param as number 6bit(0-63) array.
+// Set param as number code.
 function picoSetNumcode(numcode, key=0) {
 	return pico.param.setNumcode(numcode, key);
 }
 
-// Get param as color 6bit(0-63) array.
+// Get param as color code.
 function picoColcode(key=0) {
 	return pico.param.colcode(key);
 }
 
-// Set param as color 6bit(0-63) array.
+// Set param as color code.
 function picoSetColcode(colcode, key=0) {
 	return pico.param.setColcode(colcode, key);
 }
@@ -88,24 +88,27 @@ pico.Param = class {
 		this._setNumbers(numbers, key);
 	}
 
-	// Get param as number 6bit(0-63) array.
+	// Get param as number code.
 	numcode(key=0) {
 		return this._numcode(key);
 	}
 
-	// Set param as number 6bit(0-63) array.
+	// Set param as number code.
 	setNumcode(numcode, key=0) {
 		this._setNumcode(numcode, key);
 	}
 
-	// Get param as color 6bit(0-63) array.
+	// Get param as color code.
 	colcode(key=0) {
-		return this._colcode(key);
+		let numcode = this._numcode(key)
+		return this._expandCode(numcode);
 	}
 
-	// Set param as color 6bit(0-63) array.
+	// Set param as color code.
 	setColcode(colcode, key=0) {
-		this._setColcode(colcode, key);
+		const compression = 2;
+		let numcode = this._compressCode(colcode, compression)
+		this._setNumcode(numcode, key);
 	}
 	
 	//*----------------------------------------------------------*/
@@ -254,7 +257,7 @@ pico.Param = class {
 					results[i] = 62;
 				} else if (c == "-".charCodeAt(0)) {
 					results[i] = 63;
-				} else if (c == "_".charCodeAt(0)) {
+				} else {
 					results[i] = 64;
 				}
 			}
@@ -276,20 +279,20 @@ pico.Param = class {
 				this.context[key] += ".";
 			} else if (numcode[i] == 63) {
 				this.context[key] += "-";
-			} else if (numcode[i] == 64) {
+			} else {
 				this.context[key] += "_";
 			}
 		}
 	}
 
-	// Get color 6bit+1(0-64) array.
-	_colcode(key=0) {
-		let results = this._numcode(key);
-		for (let i = 0; i < results.length; i++) {
-			let x = results[i], r = 0;
+	// Expand code to 8bit code.
+	_expandCode(code) {
+		let results = [];
+		for (let i = 0; i < code.length; i++) {
+			let x = code[i], r = 0;
 			// Expand color code to number code.
-			if (x > 0) {
-				let b = 8, a = x - 1; // Reserve 0.
+			if (x % 64 > 0) { // Ignore over 6bit code.
+				let b = 8, a = x - 1; // Minus 1 to reserve 0.
 				while (b--) { // Bit reverse.
 					r <<= 1;
 					r |= (a & 1);
@@ -297,20 +300,20 @@ pico.Param = class {
 				}
 				r = r ^ 255; // Bit flip.
 			}
-			console.log("Expand: " + ("00000000"+x.toString(2)).slice(-6) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			//console.log("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
 		return results;
 	}
 
-	// Set color 6bit+1(0-64) array.
-	_setColcode(colcode, key=0, compression=2) {
-		let numcode = [];
-		for (let i = 0; i < colcode.length; i++) {
-			let x = colcode[i], r = 0;
+	// Compress code to X (8 - compression) bit code.
+	// Requires 6 (compression >= 2) bits when encode with ASCII code only.
+	_compressCode(code, compression=2) {
+		let results = [];
+		for (let i = 0; i < code.length; i++) {
+			let x = code[i], r = 0;
 			// Compress number code to color code.
 			if (x > 0) {
-				// Use (8 - compression) bits each r,g,b values. Requires 6 bits to encode with ASCII code only.
 				let b = 8 - compression, a = x ^ 255; // Bit flip.
 				a = a >> compression; // Compress.
 				while (b--) { // Bit reverse.
@@ -318,12 +321,13 @@ pico.Param = class {
 					r |= (a & 1);
 					a >>= 1;
 				}
-				r += 1; // Reserve 0.
+				r += 1; // Plus 1 to reserve 0.
+				r = r % (1 << (8 - compression)); // Mask over Xbit code.
 			}
-			console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-6));
-			numcode[i] = r;
+			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			results[i] = r;
 		}
-		this._setNumcode(numcode, key)
+		return results;
 	}
 
 	// Deserialize context to parameters.
