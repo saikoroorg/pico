@@ -10,6 +10,16 @@ function picoParams() {
 	return pico.param.params();
 }
 
+// Reset all params.
+function picoResetParams() {
+	return pico.param.resetParams();
+}
+
+// Get all param keys.
+function picoKeys() {
+	return pico.param.keys();
+}
+
 // Get param as strings.
 function picoStrings(key=0) {
 	return pico.param.strings(key);
@@ -66,6 +76,16 @@ pico.Param = class {
 	// Get all params by one strings.
 	params() {
 		return this._serialize();
+	}
+
+	// Reset all params.
+	resetParams() {
+		this._reset();
+	}
+
+	// Get all param keys.
+	keys() {
+		return this._keys();
 	}
 
 	// Get param as strings.
@@ -142,6 +162,11 @@ pico.Param = class {
 		}); // end of new Promise.
 	}
 
+	// Reset param.
+	_reset() {
+		this.context = [];
+	}
+
 	// Share param.
 	_share(share=false, url=null, files=null) {
 		return new Promise(async (resolve) => {
@@ -210,6 +235,11 @@ pico.Param = class {
 		return false;
 	}
 
+	// Get all param keys.
+	_keys() {
+		return Object.keys(this.context);
+	}
+	
 	// Get value by strings.
 	_strings(key=0) {
 		return this.context[key];
@@ -306,7 +336,7 @@ pico.Param = class {
 		return results;
 	}
 
-	// Compress code to X (8 - compression) bit code.
+	// Compress code to 8bit compatible X (8 - compression) bit code.
 	// Requires 6 (compression >= 2) bits when encode with ASCII code only.
 	_compressCode(code, compression=2) {
 		let results = [];

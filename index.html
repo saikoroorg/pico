@@ -88,17 +88,8 @@ a {
 	align-items: center; -webkit-align-items: center;
 	font-size: 16px;
 }
-.item #frame {
-	margin: -4px;
-	width: 48px; height: 48px;
-	display: flex; display: -webkit-flex;
-	flex-direction: column; -webkit-flex-direction: column;
-	justify-content: center; -webkit-justify-content: center;
-	align-items: center; -webkit-align-items: center;
-	background-color: #ccc;
-}
 .item #icon {
-	width: 40px; height: 40px;
+	width: 32px; height: 32px;
 	position: absolute;
 	left: 50%; transform: translate(-50%, 0);
 	display: none;
@@ -108,7 +99,7 @@ a {
 	color: #fff;
 }
 .light {;
-	background-color: #eee;
+	background-color: #ccc;
 	color: #888;
 }
 .clear {;
@@ -147,16 +138,20 @@ a {
 		align-items: flex-end; -webkit-align-items: flex-end;
 	}
 }
-@media (min-height: 400px) {
+@media (min-height: 401px) {
 	#header {
 		width: 100%;
 	}
-	.dummy {
-		display: none;
+	@media (max-width: 350px) {
+		.logo {
+			display: none;
+		}
 	}
-	.center {
-		position: absolute;
-		left: 50%; transform: translate(-50%, 0);
+	@media (min-width: 351px) {
+		.center {
+			position: absolute;
+			left: 50%; transform: translate(-50%, 0);
+		}
 	}
 }
 @media (orientation: landscape) {
@@ -185,18 +180,17 @@ a {
 			<a id="subtitle" href="javascript:startBros();">.</a>
 		</div>
 		<div class="menu center">
+			<a class="item clear" href="javascript:changeCount(-1);"><</a>
 			<a class="item light" id="share" href="javascript:share();">
-				<span id="frame">^</span>
+				<div class="light" id="count">1</div>
 				<img id="icon" src="" />
 			</a>
+			<a class="item clear" href="javascript:changeCount(+1);">></a>
 		</div>
 		<div class="menu">
 			<a class="item clear" href="javascript:changeSize(-1);">-</a>
 			<a class="item dark" id="size" href="javascript:top.location.reload();">x7</a>
 			<a class="item clear" href="javascript:changeSize(+1);">+</a>
-		</div>
-		<div class="dummy">
-			<a class="item clear"></a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -218,6 +212,9 @@ a {
 const maxsize = 20; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxsize - width, 2), yoffset = picoDiv(maxsize - height, 2); // Canvas offset.
+const maxcount = 20; // Buffer max count.
+var count = 1; // Buffer count.
+var buffers = []; // Pixels buffers.
 var playing = 1; // Playing count.
 var pixels = []; // Pixels.
 //const colors8 = [255,255,255,255,219,171,159,255,243,188,188,188,231,0,91,0,115,239,0,147,59,167,0,0,143,0,119,0,63,23]; // Color uses original 8 bits.
@@ -261,28 +258,38 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 		picoShare(false, "bros.html");
 	}
 
-	// Share.
-	async function share() {
+	// Update thumbnail image.
+	// @todo replace magic number.
+	async function updateThumbnail(force = true) {
+		if (force || buffers[count - 1]) {
+			//console.log("Update" + count + ": " + buffers[count - 1]);
 
-		// Create num code to share url.
-		let numcode = [0, width, height];
-		if (pixels) {
-			for (let j = yoffset; j < yoffset + height; j++) {
-				for (let i = xoffset; i < xoffset + width; i++) {
-					if (pixels[j][i]) {
-						let k = numcode.length;
-						numcode[k + 0] = pixels[j][i];
-						numcode[k + 1] = i - xoffset;
-						numcode[k + 2] = j - yoffset;
+			// Store pixels to buffers.
+			if (!buffers[count - 1]) {
+				buffers[count - 1] = [];
+				for (let j = 0; j < maxsize; j++) {
+					buffers[count - 1][j] = [];
+					for (let i = 0; i < maxsize; i++) {
+						buffers[count - 1][j][i] = 0;
 					}
 				}
 			}
+			let remove = true;
+			for (let j = yoffset; j < yoffset + height; j++) {
+				for (let i = xoffset; i < xoffset + width; i++) {
+					if (pixels[j][i]) {
+						remove = false;
+					}
+					buffers[count - 1][j][i] = pixels[j][i];
+				}
+			}
+			if (remove) {
+				buffers[count - 1] = null;
+			}
 		}
-		picoSetNumcode(numcode, 0);
-		picoSetColcode(colors, 1);
 
-		// Create offscreen image.
-		{ // @todo replace magic number.
+		if (buffers[count - 1]) {
+			// Update thumbnail.
 			const thick = 4, w = thick, h = thick;
 			let offscreen = new pico.Image("offscreen", width * thick *5/4, height * thick *5/4);
 			await offscreen.color(colors);
@@ -290,37 +297,114 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 			for (let j = yoffset; j < yoffset + height; j++) {
 				let y = (j - yoffset - (height - 1) / 2) * thick * 5;
 				for (let i = xoffset; i < xoffset + width; i++) {
-					if (pixels[j][i]) {
+					if (buffers[count - 1][j][i]) {
 						let x = (i - xoffset - (width - 1) / 2) * thick * 5;
-						await offscreen.pixel(pixels[j][i], x, y, w, h);
+						await offscreen.pixel(buffers[count - 1][j][i], x, y, w, h);
 					}
 				}
 			}
+			
+			// Update thumbnail.
 			let e = document.getElementById("icon");
 			if (e) {
 				e.style.display = "flex";
 				e.src = offscreen.data();
 			}
+		} else {
 
-			//picoShare(true, null, [offscreen.data()]);
-			picoShare(true, null);
+			// Disable thumbnail.
+			let e = document.getElementById("icon");
+			if (e) {
+				e.style.display = "none";
+			}
 		}
 	}
 
+	// Share.
+	async function share() {
+		updateThumbnail();
+		picoResetParams();
+
+		// Create num code to share url.
+		let hmax = 0;
+		for (let h = 0; h < maxcount; h++) {
+			if (buffers[h]) {
+				let numcode = [0, width, height];
+				for (let j = yoffset; j < yoffset + height; j++) {
+					for (let i = xoffset; i < xoffset + width; i++) {
+						if (buffers[h][j][i]) {
+							let k = numcode.length;
+							numcode[k + 0] = buffers[h][j][i];
+							numcode[k + 1] = i - xoffset;
+							numcode[k + 2] = j - yoffset;
+						}
+					}
+				}
+				picoSetNumcode(numcode, h);
+				hmax = h + 1;
+			}
+		}
+		//picoSetColcode(colors, hmax);
+
+		// Start sharing.
+		await picoShare(true, null);
+	}
+
+	// Change canvas count.
+	function changeCount(x) {
+			
+		// Update vars.
+		count = count + x < 1 ? 1 : count + x >= maxcount ? maxcount : count + x;
+		//console.log("Count: " + count);
+		playing = -1; // Restart.
+
+		// Load pixels from buffers.
+		if (buffers[count - 1]) {
+			for (let j = 0; j < maxsize; j++) {
+				pixels[j] = [];
+				for (let i = 0; i < maxsize; i++) {
+					pixels[j][i] = buffers[count - 1][j][i];
+				}
+			}
+		} else {
+			for (let j = 0; j < maxsize; j++) {
+				pixels[j] = [];
+				for (let i = 0; i < maxsize; i++) {
+					pixels[j][i] = 0;
+				}
+			}
+		}
+
+		// Update button.
+		let e = document.getElementById("count");
+		if (e) {
+			e.innerText = "" + count;
+		}
+
+		picoBeep(1.2, 0.1);
+		updateThumbnail(false);
+	}
+	
 	// Change canvas size.
 	function changeSize(x) {
+			
+		// Update vars.
 		width = width + x < 3 ? 3 : width + x >= maxsize ? maxsize : width + x;
 		height = height + x < 3 ? 3 : height + x >= maxsize ? maxsize : height + x;
 		xoffset = picoDiv(maxsize - width, 2);
 		yoffset = picoDiv(maxsize - height, 2);
-		console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
+		//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
 		playing = -1; // Restart.
+			
+		// Update button.
 		let e = document.getElementById("size");
 		if (e) {
 			e.innerText = "x" + width;
 		}
+
 		picoBeep(1.2, 0.1);	
-	};
+		updateThumbnail(false);
+	}
 </script><!--/Menu-->
 <!--Main--><script>
 async function main() {
@@ -332,28 +416,61 @@ async function main() {
 			pixels[j][i] = 0;
 		}
 	}
-	// Load pixels param.
-	if (picoStrings(0)) {
-		let numcode = picoNumcode(0);
-		for (let k = 0; k < numcode.length; k += 3) {
-			if (numcode[k] == 0) {
-				width = numcode[k + 1] >= 0 && numcode[k + 1] < maxsize ? numcode[k + 1] : 7;
-				height = numcode[k + 2] >= 0 && numcode[k + 2] < maxsize ? numcode[k + 2] : 7;
-				changeSize(0);
-			} else if (numcode[k] > 0) {
-				let i = numcode[k + 1] + xoffset;
-				let j = numcode[k + 2] + yoffset;
-				if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-					pixels[j][i] = numcode[k];
+
+	// Load params.
+	let keys = picoKeys();
+	for (let h = 0; h < keys.length; h++) {
+		console.log("Param" + h + ": " + keys[h] + " -> " + picoStrings(h));
+
+		// Load colors param.
+		/*if (keys.length >= 2 && h == keys.length - 1) {
+			colors = picoColcode(h);
+			console.log("Color: " + colors);
+
+		// Load pixels param.
+		} else*/ {
+			let numcode = picoNumcode(h);
+
+			// Load pixels to canvas.
+			if (h == 0) {
+				for (let k = 0; k < numcode.length; k += 3) {
+					if (numcode[k] == 0) {
+						width = numcode[k + 1] >= 0 && numcode[k + 1] < maxsize ? numcode[k + 1] : 7;
+						height = numcode[k + 2] >= 0 && numcode[k + 2] < maxsize ? numcode[k + 2] : 7;
+						changeSize(0);
+					} else if (numcode[k] > 0) {
+						let i = numcode[k + 1] + xoffset;
+						let j = numcode[k + 2] + yoffset;
+						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
+							pixels[j][i] = numcode[k];
+						}
+					}
 				}
+				console.log("Pixel: " + pixels);
+				updateThumbnail();
+
+			// Load pixels to buffers.
+			} else if (h < maxcount) {
+				//console.log("Load buffer" + h + ": " + maxcount);
+				buffers[h] = [];
+				for (let j = 0; j < maxsize; j++) {
+					buffers[h][j] = [];
+					for (let i = 0; i < maxsize; i++) {
+						buffers[h][j][i] = 0;
+					}
+				}
+				for (let k = 0; k < numcode.length; k += 3) {
+					if (numcode[k] > 0) {
+						let i = numcode[k + 1] + xoffset;
+						let j = numcode[k + 2] + yoffset;
+						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
+							buffers[h][j][i] = numcode[k];
+						}
+					}
+				}
+				console.log("Buffer" + h + ": " + buffers[h]);
 			}
 		}
-		console.log("Pixel: " + pixels);
-	}
-	// Load colors param.
-	if (picoStrings(1)) {
-		colors = picoColcode(1);
-		console.log("Color: " + colors);
 	}
 
 	// Load colors data.
@@ -378,6 +495,7 @@ async function main() {
 			// Set touching state to avoid touching another area continuously.
 			if (picoAction()) {
 				touching = 0;
+				updateThumbnail();
 			}
 
 			// Draw pixels.
