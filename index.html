@@ -255,7 +255,7 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 				picoSetNumcode([]);
 			}
 		}
-		picoShare(false, "bros.html");
+		picoReload("bros.html");
 	}
 
 	// Update thumbnail image.
@@ -347,7 +347,7 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 		//picoSetColcode(colors, hmax);
 
 		// Start sharing.
-		await picoShare(true, null);
+		await picoShare();
 	}
 
 	// Change canvas count.

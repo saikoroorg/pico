@@ -1,8 +1,13 @@
 /* PICO Param module */
 
+// Reload with param.
+async function picoReload(url=null) {
+	await pico.param.reload(url);
+}
+
 // Share params.
-async function picoShare(share=false, url=null, file=null) {
-	await pico.param.share(share, url, file);
+async function picoShare(url=null, file=null) {
+	await pico.param.share(url, file);
 }
 
 // Get all params by one strings.
@@ -68,9 +73,14 @@ var pico = pico || {};
 // Param class.
 pico.Param = class {
 
+	// Reload with param.
+	async reload(url=null) {
+		await this._reload(url);
+	}
+
 	// Share param.
-	async share(share=false, url=null, files=null) {
-		await this._share(share, url, files);
+	async share(url=null, files=null) {
+		await this._share(url, files);
 	}
 
 	// Get all params by one strings.
@@ -167,51 +177,50 @@ pico.Param = class {
 		this.context = [];
 	}
 
-	// Share param.
-	_share(share=false, url=null, files=null) {
+	// Reload with param.
+	_reload(url=null) {
 		return new Promise(async (resolve) => {
 			let text = this._serialize();
 			if (text != null) {
 				let query = "?" + text;
 				if (url) {
-					url = url + query;
-					if (share) {
-						console.log("Share: " + url);
-						if (navigator.share) {
-							if (files) {
-								navigator.share({url: url, files: files});
-							} else {
-								navigator.share({url: url});
-							}
-						}
-					} else {
-						console.log("Jump: " + url);
-						window.location.href = url;
-					}
+					console.log("Jump: " + query);
+					window.location.href = url + query;
+				} else {
+					console.log("Reload: " + query);
+					window.location.search = query;
+				}
+			}
+			return resolve();
+		}); // end of new Promise.
+	}
+
+	// Share param.
+	_share(url=null, files=null) {
+		return new Promise(async (resolve) => {
+			let text = this._serialize();
+			if (text != null) {
+				let query = "?" + text, data = {};
+				if (url) {
+					data.url = url + query;
 				} else {
 					console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
-					if (share) {
-						let data = files ? {
-							url: window.location.href.replace(/[\?\#].*$/, '') + query,
-							files: files
-						} : {
-							url: window.location.href.replace(/[\?\#].*$/, '') + query
-						};
-						console.log("Share: " + JSON.stringify(data));
-						if (navigator.share) {
-							await navigator.share(data).then(() => {
-								console.log('Successful share');
-							}).catch((error) => {
-								console.log('Error sharing', error);
-							});
-						}
-					} else {
-						window.location.search = query;
-					}
+					data.url = window.location.href.replace(/[\?\#].*$/, '') + query;
+				}
+				if (files) {
+					data.files = files;
+				}
+				if (navigator.share) {
+					console.log("Share: " + JSON.stringify(data));
+					await navigator.share(data).then(() => {
+						console.log('Successful share');
+					}).catch((error) => {
+						console.log('Error sharing', error);
+					});
 				}
 			}
-			return Promise.resolve();
+			return resolve();
 		}); // end of new Promise.
 	}
 
@@ -317,19 +326,18 @@ pico.Param = class {
 
 	// Expand code to 8bit code.
 	_expandCode(code) {
+		const maxbit = 8, maxmask = (1 << maxbit) - 1;
 		let results = [];
 		for (let i = 0; i < code.length; i++) {
-			let x = code[i], r = 0;
+			let r = 0, x = code[i];
 			// Expand color code to number code.
-			if (x % 64 > 0) { // Ignore over 6bit code.
-				let b = 8, a = x - 1; // Minus 1 to reserve 0.
-				while (b--) { // Bit reverse.
-					r <<= 1;
-					r |= (a & 1);
-					a >>= 1;
-				}
-				r = r ^ 255; // Bit flip.
+			let b = maxbit, a = (x - 1) & maxmask; // Minus 1 to reserve 0.
+			while (b--) { // Bit reverse.
+				r <<= 1;
+				r |= (a & 1);
+				a >>= 1;
 			}
+			r = r ^ maxmask; // Bit flip.
 			//console.log("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
@@ -337,23 +345,21 @@ pico.Param = class {
 	}
 
 	// Compress code to 8bit compatible X (8 - compression) bit code.
-	// Requires 6 (compression >= 2) bits when encode with ASCII code only.
+	// Requires 6 (compression >= 2) bit when encode with ASCII code only.
 	_compressCode(code, compression=2) {
+		const maxbit = 8, maxmask = (1 << maxbit) - 1;
 		let results = [];
 		for (let i = 0; i < code.length; i++) {
-			let x = code[i], r = 0;
+			let r = 0, x = code[i];
 			// Compress number code to color code.
-			if (x > 0) {
-				let b = 8 - compression, a = x ^ 255; // Bit flip.
-				a = a >> compression; // Compress.
-				while (b--) { // Bit reverse.
-					r <<= 1;
-					r |= (a & 1);
-					a >>= 1;
-				}
-				r += 1; // Plus 1 to reserve 0.
-				r = r % (1 << (8 - compression)); // Mask over Xbit code.
+			let b = maxbit - compression, a = x ^ maxmask; // Bit flip.
+			a = a >> compression; // Compress.
+			while (b--) { // Bit reverse.
+				r <<= 1;
+				r |= (a & 1);
+				a >>= 1;
 			}
+			r = (r + 1) & maxmask; // Plus 1 to reserve 0.
 			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}

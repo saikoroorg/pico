@@ -40,7 +40,7 @@ let code = [];
 for (let i = 0; i <= 255; i++) {
 	code[i] = i;
 }
-let code1 = pico.param._compressCode(code, 2);
+let code1 = pico.param._compressCode(code, 0);
 let code2 = pico.param._expandCode(code1);
 for (let i = 0; i <= 255; i++) {
 	console.log("" +
