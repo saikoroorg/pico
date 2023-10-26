@@ -286,7 +286,7 @@ async function main() {
 			if (w == 0) {
 				width = x >= 0 && x <= maxsize ? x : 7;
 				height = y >= 0 && y <= maxsize ? y : 7;
-				grid = 160 / (width + 1);
+				grid = 168 / width;
 				margin = width <= 9 ? 2 : 1;
 				players = [[0, 0], [width - 1, height - 1]];
 				for (let j = 0; j < height; j++) {

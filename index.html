@@ -480,10 +480,10 @@ async function main() {
 
 		// Initial param.
 		let select = colors.length / 3 - 1;
-		let grid = 160 / (width + 1);
+		let grid = 168 / width;
 		let margin = width <= 9 ? 2 : 1;
 
-		const offset1 = 4, offset2 = 10; // Offset of pixels and colors.
+		const offset1 = 6, offset2 = 10; // Offset of pixels and colors.
 		let touching = 0; // Touching pixels(0) or colors(1).
 
 		// Playing loop.
