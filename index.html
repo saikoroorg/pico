@@ -259,7 +259,6 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 	}
 
 	// Update thumbnail image.
-	// @todo replace magic number.
 	async function updateThumbnail(force = true) {
 		if (force || buffers[count - 1]) {
 			//console.log("Update" + count + ": " + buffers[count - 1]);
@@ -289,22 +288,22 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 		}
 
 		if (buffers[count - 1]) {
+
 			// Update thumbnail.
-			const thick = 4, w = thick, h = thick;
-			let offscreen = new pico.Image("offscreen", width * thick *5/4, height * thick *5/4);
+			let offscreen = new pico.Image("offscreen", width, height);
 			await offscreen.color(colors);
-			await offscreen.pixel(0, 0, 0, width * thick *5/4, height * thick *5/4);
+			await offscreen.pixel(0, 0, 0, width, height);
 			for (let j = yoffset; j < yoffset + height; j++) {
-				let y = (j - yoffset - (height - 1) / 2) * thick * 5;
+				let y = (j - yoffset - (height - 1) / 2);
 				for (let i = xoffset; i < xoffset + width; i++) {
 					if (buffers[count - 1][j][i]) {
-						let x = (i - xoffset - (width - 1) / 2) * thick * 5;
-						await offscreen.pixel(buffers[count - 1][j][i], x, y, w, h);
+						let x = (i - xoffset - (width - 1) / 2);
+						await offscreen.pixel(buffers[count - 1][j][i], x, y);
 					}
 				}
 			}
 			
-			// Update thumbnail.
+			// Enable thumbnail.
 			let e = document.getElementById("icon");
 			if (e) {
 				e.style.display = "flex";
@@ -481,11 +480,10 @@ async function main() {
 
 		// Initial param.
 		let select = colors.length / 3 - 1;
-		//const margin = width <= 7 ? 8 : 6;
-		//let thick = 42 / width - margin / 4,  grid = thick * 4 + margin, offset = 10;
-		let thick = width <= 3 ? 10 : width <= 5 ? 6  : width <= 7 ? 4  : width <= 8 ? 3  : width <= 9 ? 2.5 : width <= 12 ? 2  : width <= 14 ? 1.5 : width <= 16 ? 1  : 0.5;
-		let grid  = width <= 3 ? 48 : width <= 5 ? 32 : width <= 7 ? 24 : width <= 8 ? 20 : width <= 9 ? 18  : width <= 12 ? 14 : width <= 14 ? 12  : width <= 16 ? 10 : 8;
-		let offset = 10;//width <= 16 ? 10 : 2;
+		let grid = 160 / (width + 1);
+		let margin = width <= 9 ? 2 : 1;
+
+		const offset1 = 4, offset2 = 10; // Offset of pixels and colors.
 		let touching = 0; // Touching pixels(0) or colors(1).
 
 		// Playing loop.
@@ -500,7 +498,7 @@ async function main() {
 
 			// Draw pixels.
 			for (let j = yoffset; j < yoffset + height; j++) {
-				let y = (j - yoffset - (height - 1) / 2) * grid - 4;
+				let y = (j - yoffset - (height - 1) / 2) * grid - offset1;
 				for (let i = xoffset; i < xoffset + width; i++) {
 					let x = (i - xoffset - (width - 1) / 2) * grid;
 					if (touching != 2 && picoMotion(x, y, grid/2)) {
@@ -508,9 +506,9 @@ async function main() {
 						if (pixels[j][i] != select) {
 							pixels[j][i] = select;
 						}
-						picoPixel(pixels[j][i], x, y, thick*1.5, thick*1.5);
+						picoPixel(pixels[j][i], x, y, grid/2-1, grid/2-1);
 					} else {
-						picoPixel(pixels[j][i], x, y, thick, thick);
+						picoPixel(pixels[j][i], x, y, (grid-margin)/2-1, (grid-margin)/2-1);
 					}
 				}
 			}
@@ -518,7 +516,7 @@ async function main() {
 			// Draw colors.
 			for (let i = 0; i < colors.length / 3; i++) {
 				let x = (i - (colors.length / 3 - 1) / 2) * 16;
-				let y = 100 - offset;
+				let y = pico.Image.height/2 - offset2;
 				if (touching != 1 && picoMotion(x, y, 8, 12)) {
 					touching = 2;
 					if (select != i) {
@@ -527,9 +525,9 @@ async function main() {
 					}
 				}
 				if (i == select) {
-					picoChar("+", i, x, y, 0, 1);
+					picoChar("+", i, x, y, 0, 4);
 				} else {
-					picoChar("-", i, x, y, 0, 1);
+					picoChar("-", i, x, y, 0, 4);
 				}
 			}
 

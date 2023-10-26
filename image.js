@@ -102,13 +102,13 @@ var pico = pico || {};
 
 // Image class.
 pico.Image = class {
-	static width = 200; // Image width.
-	static height = 200; // Image height.
-	static unit = 4; // Unit size. (Requires multiple of 2 for center pixel)
+	static width = 200; // Image width. (-width/2 .. width/2)
+	static height = 200; // Image height. (-height/2 .. height/2)
+	static ratio = 4; // Pixel ratio.
 	static parent = "picoImage"; // Parent element id.
 
-	static charWidth = 4 * 4;
-	static charHeight = 4 * 6;
+	static charWidth = 4;
+	static charHeight = 6;
 
 	static numberShapes = [
 		[-1,-2,1,0, -1,-2,0,4, 1,-2,0,4, -1,2,2,0], // 0
@@ -223,12 +223,12 @@ pico.Image = class {
 	}
 
 	// Draw pixel to image.
-	pixel(c=0, x=0, y=0, w=0, h=0) {
+	pixel(c=0, x=0, y=0, dx=0, dy=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
 				await this._reset(x, y);
-				await this._draw(c, -w/2, -h/2, w, h);
+				await this._draw(c, -dx, -dy, dx*2, dy*2);
 				resolve();
 			}); // end of new Promise.
 		}); // end of lock.
@@ -287,15 +287,15 @@ pico.Image = class {
 
 	// Draw multiple lines of text to image.
 	drawText(text, area=null, c=0, x=0, y=0, angle=0, scale=1) {
-		const u = pico.Image.unit, ux = pico.Image.charWidth, uy = pico.Image.charHeight;
+		const ux = pico.Image.charWidth, uy = pico.Image.charHeight;
 		let ox = -(this.canvas[0].width - ux) / 2, oy = -(this.canvas[0].height - uy) / 2;
 		let mx = this.canvas[0].width / ux, my = this.canvas[0].height / uy;
 
 		if (area) {
-			ox = (area[0] + area[2] / 2) * u;
-			oy = (area[1] + area[3] / 2) * u;
-			mx = (area[2] + 1) * u / ux;
-			my = (area[3] + 1) * u / uy;
+			ox = (area[0] + area[2] / 2);
+			oy = (area[1] + area[3] / 2);
+			mx = (area[2] + 1) / ux;
+			my = (area[3] + 1) / uy;
 		}
 
 		//console.log("Textarea: " + ox + "," + oy + " x " + mx + "," + my + " / " + ux + "," + uy);
@@ -303,7 +303,7 @@ pico.Image = class {
 			return new Promise(async (resolve) => {
 				await this._ready();
 				await this._reset(ox + x, oy + y, angle, scale);
-				await this._move((-ux * (mx - 1) + u) / 2 , (-uy * (my - 1) + u) / 2);
+				await this._move((-ux * (mx - 1)) / 2 , (-uy * (my - 1)) / 2);
 				for (let i = 0, ix = 0, iy = 0; i < text.length && iy < my; i++) {
 					let char = text.charCodeAt(i);
 					//console.log("char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
@@ -356,15 +356,10 @@ pico.Image = class {
 		this.palls = pico.Image.colors; // Master image color. 
 		this.seed = Date.now(); // Random seed.
 
-		// Setup now.
 		if (parent) {
 			this._setup(parent, width, height);
-
-		// Setup after load event.
 		} else {
-			window.addEventListener("load", () => {
-				this._setup(pico.Image.parent, width, height);
-			});
+			this._setup(pico.Image.parent, width, height);
 		}
 	}
 
@@ -377,8 +372,8 @@ pico.Image = class {
 				console.log("Create canvas.");
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i] = document.createElement("canvas");
-					this.canvas[i].width = width ? width * pico.Image.unit : pico.Image.width;
-					this.canvas[i].height = width ? height * pico.Image.unit : pico.Image.height;
+					this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
+					this.canvas[i].height = (width ? height : pico.Image.height) * pico.Image.ratio;
 					this.canvas[i].style.width = "100%";
 					// Fix to square canvas. // this.canvas[i].style.height = "100%";
 					this.canvas[i].style.imageRendering = "pixelated";
@@ -481,7 +476,7 @@ pico.Image = class {
 		//console.log("Move: " + x + "," + y);
 		return new Promise((resolve) => {
 			if (x || y) {
-				this.context.translate(x, y);
+				this.context.translate(pico.Image.ratio * x, pico.Image.ratio * y);
 			}
 			resolve();
 		}); // end of new Promise.
@@ -490,7 +485,7 @@ pico.Image = class {
 	// Draw rect to image.
 	_draw(c=0, x=0, y=0, w=0, h=0) {
 		//console.log("Draw: " + c + "," + x + "+" + w + "," + y + "+" + h);
-		const u = pico.Image.unit, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
+		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
 		//console.log("Center: " + cx + "," + cy + " / " + u);
 		return new Promise((resolve) => {
 			let k = c < 0 ? this.palls.length/3 - 1 : c >= this.palls.length/3 ? 0 : c;

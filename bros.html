@@ -273,7 +273,7 @@ async function main() {
 
 		// Initial param.
 		const maxsize = 24; // Max size.
-		let width = 7, height = 7, thick = 4, grid = 24;
+		let width = 7, height = 7, grid = 20, margin = 4;
 		let pixels = [];
 		let players = [[0, 0], [6, 6]];
 		let primary = 0;
@@ -286,8 +286,8 @@ async function main() {
 			if (w == 0) {
 				width = x >= 0 && x <= maxsize ? x : 7;
 				height = y >= 0 && y <= maxsize ? y : 7;
-				thick = width <= 5 ? 6  : width <= 8 ? 4  : width <= 9 ? 3  : width <= 12 ? 2  : width <= 16 ? 1  : 0.5;
-				grid  = width <= 5 ? 36 : width <= 8 ? 24 : width <= 9 ? 20 : width <= 12 ? 16 : width <= 16 ? 12 : 8;
+				grid = 160 / (width + 1);
+				margin = width <= 9 ? 2 : 1;
 				players = [[0, 0], [width - 1, height - 1]];
 				for (let j = 0; j < height; j++) {
 					pixels[j] = [];
@@ -371,11 +371,11 @@ async function main() {
 				let y = (j - (height - 1) / 2) * grid;
 				for (let i = 0; i < width; i++) {
 					let x = (i - (width - 1) / 2) * grid;
-					let expand = 1;
+					let expand = false;
 	
 					// Touch color cell to update primary player.
 					if (pixels[j][i] != 0) {
-						if (picoMotion(x, y, grid/2)) {
+						if (picoMotion(x, y, (grid+margin)/2)) {
 							if (pixels[j][i] == 2) {
 								primary = 0;
 							} else if (pixels[j][i] == 3) {
@@ -386,7 +386,7 @@ async function main() {
 						} else {
 							for (let k = 0; k < 2; k++) {
 								if (i == players[k][0] && j == players[k][1]) {
-									expand = 1.5;
+									expand = true;
 									break;
 								}
 							}
@@ -394,7 +394,11 @@ async function main() {
 					}
 
 					// Draw cell.
-					picoPixel(pixels[j][i], x, y, thick*expand, thick*expand);
+					if (expand) {
+						picoPixel(pixels[j][i], x, y, (grid+margin)/2, (grid+margin)/2);
+					} else {
+						picoPixel(pixels[j][i], x, y, (grid-margin)/2-1, (grid-margin)/2-1);
+					}
 				}
 			}
 
