@@ -27,7 +27,7 @@ a {
 	flex: 0 1 auto;
 	display: flex; display: -webkit-flex;
 	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: space-between; -webkit-justify-content: space-between;
+	justify-content: center; -webkit-justify-content: center;
 	align-items: center; -webkit-align-items: center;
 }
 #contents {
@@ -58,10 +58,7 @@ a {
 }
 .logo {
 	height: 60px; margin: 0px 16px;
-	display: flex; display: -webkit-flex;
-	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: flex-start; -webkit-justify-content: flex-start;
-	align-items: center; -webkit-align-items: center;
+	display: none;
 }
 .logo #icon {
 	width: 40px; height: 40px; padding: 10px; margin-left: -28px;
@@ -92,6 +89,12 @@ a {
 	width: 32px; height: 32px;
 	position: absolute;
 	left: 50%; transform: translate(-50%, 0);
+	display: none;
+}
+.item #count {
+	font-size: 12px;
+}
+.item.count {
 	display: none;
 }
 .item.dark {
@@ -125,11 +128,8 @@ a {
 		order: 1; height: 100%;
 		display: flex; display: -webkit-flex;
 		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: space-between; -webkit-justify-content: space-between;
+		justify-content: center; -webkit-justify-content: center;
 		align-items: center; -webkit-align-items: center;
-	}
-	.logo {
-		display: none;
 	}
 	.menu {
 		display: flex; display: -webkit-flex;
@@ -142,15 +142,22 @@ a {
 	#header {
 		width: 100%;
 	}
-	@media (max-width: 350px) {
-		.logo {
-			display: none;
-		}
-	}
 	@media (min-width: 351px) {
+		#header {
+			display: flex; display: -webkit-flex;
+			flex-direction: row; -webkit-flex-direction: row;
+			justify-content: space-between; -webkit-justify-content: space-between;
+			align-items: center; -webkit-align-items: center;
+		}
 		.center {
 			position: absolute;
 			left: 50%; transform: translate(-50%, 0);
+		}
+		.logo {
+			display: flex; display: -webkit-flex;
+			flex-direction: row; -webkit-flex-direction: row;
+			justify-content: flex-start; -webkit-justify-content: flex-start;
+			align-items: center; -webkit-align-items: center;
 		}
 	}
 }
@@ -176,21 +183,18 @@ a {
 <div id="container">
 	<h1 id="header">
 		<div class="logo">
-			<a id="title" href="?">Pico</a>
-			<a id="subtitle" href="javascript:startBros();">.</a>
+			<a id="title" href="javascript:top.location.reload();">Pico</a>
+			<a id="subtitle" href="javascript:top.location.reload();"></a>
 		</div>
 		<div class="menu center">
-			<a class="item clear" href="javascript:changeCount(-1);"><</a>
+			<a class="item clear count" href="javascript:changeCount(-1);"><</a>
+			<a class="item clear" href="javascript:changeSize(-1);">-</a>
 			<a class="item light" id="share" href="javascript:share();">
-				<div class="light" id="count">1</div>
+				<div class="light" id="count">x7</div>
 				<img id="icon" src="" />
 			</a>
-			<a class="item clear" href="javascript:changeCount(+1);">></a>
-		</div>
-		<div class="menu">
-			<a class="item clear" href="javascript:changeSize(-1);">-</a>
-			<a class="item dark" id="size" href="javascript:top.location.reload();">x7</a>
 			<a class="item clear" href="javascript:changeSize(+1);">+</a>
+			<a class="item clear count" href="javascript:changeCount(+1);">></a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -209,10 +213,11 @@ a {
 <script src="sound.js"></script>
 <script src="touch.js"></script>
 <!--Data--><script>
-const maxsize = 20; // Canvas max size.
+var maxwidth = 20, maxheight = 20; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
-var xoffset = picoDiv(maxsize - width, 2), yoffset = picoDiv(maxsize - height, 2); // Canvas offset.
-const maxcount = 20; // Buffer max count.
+var xoffset = picoDiv(maxwidth - width, 2); // Canvas offset.
+var yoffset = picoDiv(maxheight - height, 2); // Canvas offset.
+var maxcount = 1; // Buffer max count.
 var count = 1; // Buffer count.
 var buffers = []; // Pixels buffers.
 var playing = 1; // Playing count.
@@ -220,44 +225,19 @@ var pixels = []; // Pixels.
 //const colors8 = [255,255,255,255,219,171,159,255,243,188,188,188,231,0,91,0,115,239,0,147,59,167,0,0,143,0,119,0,63,23]; // Color uses original 8 bits.
 //const colors6 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Color uses 6 bits.
 //const colors5 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Color uses 5 bits.
-var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Colors.
+var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23];
+var url = null; // Referenced url.
 </script><!--/Data-->
 <!--Menu--><script>
 
-	// Start bros.
-	function startBros() {
-		let numcode = [0, width, height];
-		if (pixels) {
-			for (let j = yoffset; j < yoffset + height; j++) {
-				for (let i = xoffset; i < xoffset + width; i++) {
-					if (pixels[j][i]) {
-						let k = numcode.length;
-						if (pixels[j][i] == 8) {
-							numcode[k] = 2;
-							numcode[k + 3] = 3;
-							numcode[k + 4] = i - yoffset;
-							numcode[k + 5] = j - xoffset;
-						} else if (pixels[j][i] == 4) {
-							numcode[k] = 2;
-						} else if (pixels[j][i] == 5) {
-							numcode[k] = 3;
-						} else {
-							numcode[k] = 1;
-						}
-						numcode[k + 1] = i - xoffset;
-						numcode[k + 2] = j - yoffset;
-					}
-				}
-			}
-			if (width != 7 || height != 7 || numcode.length > 3) {
-				picoSetNumcode(numcode);
-			} else {
-				picoSetNumcode([]);
-			}
+	// Update subtitle.
+	async function updateSubtitle(title) {
+		let e = document.getElementById("subtitle");
+		if (e) {
+			e.innerText = title;
 		}
-		picoReload("bros.html");
 	}
-
+	
 	// Update thumbnail image.
 	async function updateThumbnail(force = true) {
 		if (force || buffers[count - 1]) {
@@ -266,9 +246,9 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 			// Store pixels to buffers.
 			if (!buffers[count - 1]) {
 				buffers[count - 1] = [];
-				for (let j = 0; j < maxsize; j++) {
+				for (let j = 0; j < maxheight; j++) {
 					buffers[count - 1][j] = [];
-					for (let i = 0; i < maxsize; i++) {
+					for (let i = 0; i < maxwidth; i++) {
 						buffers[count - 1][j][i] = 0;
 					}
 				}
@@ -317,6 +297,27 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 				e.style.display = "none";
 			}
 		}
+
+		// Update count button.
+		if (maxcount >= 2) {
+			let e = document.getElementById("count");
+			if (e) {
+				e.innerText = "" + count + "/" + maxcount;
+			}
+			e = document.getElementsByClassName("count");
+			for (let i = 0; i < e.length; i++) {
+				e[i].style.display = "flex";
+			}
+		} else {
+			let e = document.getElementById("count");
+			if (e) {
+				e.innerText = "x" + width;
+			}
+			e = document.getElementsByClassName("count");
+			for (let i = 0; i < e.length; i++) {
+				e[i].style.display = "none";
+			}
+		}
 	}
 
 	// Share.
@@ -343,10 +344,18 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 				hmax = h + 1;
 			}
 		}
-		//picoSetColcode(colors, hmax);
+		if (hmax > 0 &&
+			((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
+			(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
+			picoSetColcode(colors, hmax);
+		}
 
 		// Start sharing.
-		await picoShare();
+		if (url) {
+			await picoReload(url);
+		} else {
+			await picoShare();
+		}
 	}
 
 	// Change canvas count.
@@ -359,25 +368,19 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 
 		// Load pixels from buffers.
 		if (buffers[count - 1]) {
-			for (let j = 0; j < maxsize; j++) {
+			for (let j = 0; j < maxheight; j++) {
 				pixels[j] = [];
-				for (let i = 0; i < maxsize; i++) {
+				for (let i = 0; i < maxwidth; i++) {
 					pixels[j][i] = buffers[count - 1][j][i];
 				}
 			}
 		} else {
-			for (let j = 0; j < maxsize; j++) {
+			for (let j = 0; j < maxheight; j++) {
 				pixels[j] = [];
-				for (let i = 0; i < maxsize; i++) {
+				for (let i = 0; i < maxwidth; i++) {
 					pixels[j][i] = 0;
 				}
 			}
-		}
-
-		// Update button.
-		let e = document.getElementById("count");
-		if (e) {
-			e.innerText = "" + count;
 		}
 
 		picoBeep(1.2, 0.1);
@@ -388,18 +391,12 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 	function changeSize(x) {
 			
 		// Update vars.
-		width = width + x < 3 ? 3 : width + x >= maxsize ? maxsize : width + x;
-		height = height + x < 3 ? 3 : height + x >= maxsize ? maxsize : height + x;
-		xoffset = picoDiv(maxsize - width, 2);
-		yoffset = picoDiv(maxsize - height, 2);
+		width = width + x < 3 ? 3 : width + x >= maxwidth ? maxwidth : width + x;
+		height = height + x < 3 ? 3 : height + x >= maxheight ? maxheight : height + x;
+		xoffset = picoDiv(maxwidth - width, 2);
+		yoffset = picoDiv(maxheight - height, 2);
 		//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
 		playing = -1; // Restart.
-			
-		// Update button.
-		let e = document.getElementById("size");
-		if (e) {
-			e.innerText = "x" + width;
-		}
 
 		picoBeep(1.2, 0.1);	
 		updateThumbnail(false);
@@ -409,9 +406,9 @@ var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239
 async function main() {
 
 	// Load query params.
-	for (let j = 0; j < maxsize; j++) {
+	for (let j = 0; j < maxheight; j++) {
 		pixels[j] = [];
-		for (let i = 0; i < maxsize; i++) {
+		for (let i = 0; i < maxwidth; i++) {
 			pixels[j][i] = 0;
 		}
 	}
@@ -419,23 +416,51 @@ async function main() {
 	// Load params.
 	let keys = picoKeys();
 	for (let h = 0; h < keys.length; h++) {
-		console.log("Param" + h + ": " + keys[h] + " -> " + picoStrings(h));
+		console.log("Param" + h + ": " + keys[h] + " -> " + picoStrings(keys[h]));
+
+		// Load subtitle.
+		if (keys[h] == "t") {
+			let subtitle = picoStrings(keys[h]);
+			updateSubtitle(subtitle);
+
+		// Load referenced url.
+		} else if (keys[h] == "u") {
+			url = picoStrings(keys[h]);
+
+		// Load count param.
+		} else if (keys[h] == "w") {
+			let w = picoNumbers(keys[h])[0];
+			maxcount = w <= 0 ? 0 : w < 20 ? w : 20;
+			changeCount(0);
+
+		// Load size param.
+		} else if (keys[h] == "x") {
+			let x = picoNumbers(keys[h])[0];
+			maxwidth = maxheight = x <= 0 ? 0 : x < 20 ? x : 20;
+			changeSize(0);
 
 		// Load colors param.
-		/*if (keys.length >= 2 && h == keys.length - 1) {
-			colors = picoColcode(h);
+		} else if (keys[h] == "z") {
+			colors = picoNumbers(keys[h]);
+			//colors = picoColcode(h);
 			console.log("Color: " + colors);
 
 		// Load pixels param.
-		} else*/ {
+		} else {
 			let numcode = picoNumcode(h);
 
+			// Load colors.
+			if ((numcode[0] == 0 && numcode[1] == 0 && numcode[2] == 0) ||
+				(numcode[0] == 1 && numcode[1] == 1 && numcode[2] == 1)) {
+				colors = picoColcode(h);
+				console.log("Color: " + colors);
+
 			// Load pixels to canvas.
-			if (h == 0) {
+			} else if (h == 0) {
 				for (let k = 0; k < numcode.length; k += 3) {
 					if (numcode[k] == 0) {
-						width = numcode[k + 1] >= 0 && numcode[k + 1] < maxsize ? numcode[k + 1] : 7;
-						height = numcode[k + 2] >= 0 && numcode[k + 2] < maxsize ? numcode[k + 2] : 7;
+						width = numcode[k + 1] >= 0 && numcode[k + 1] < maxwidth ? numcode[k + 1] : 7;
+						height = numcode[k + 2] >= 0 && numcode[k + 2] < maxheight ? numcode[k + 2] : 7;
 						changeSize(0);
 					} else if (numcode[k] > 0) {
 						let i = numcode[k + 1] + xoffset;
@@ -452,9 +477,9 @@ async function main() {
 			} else if (h < maxcount) {
 				//console.log("Load buffer" + h + ": " + maxcount);
 				buffers[h] = [];
-				for (let j = 0; j < maxsize; j++) {
+				for (let j = 0; j < maxheight; j++) {
 					buffers[h][j] = [];
-					for (let i = 0; i < maxsize; i++) {
+					for (let i = 0; i < maxwidth; i++) {
 						buffers[h][j][i] = 0;
 					}
 				}

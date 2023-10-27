@@ -182,7 +182,7 @@ pico.Param = class {
 		return new Promise(async (resolve) => {
 			let text = this._serialize();
 			if (text != null) {
-				let query = "?" + text;
+				let query = text ? "?" + text : "";
 				if (url) {
 					console.log("Jump: " + query);
 					window.location.href = url + query;
@@ -359,7 +359,7 @@ pico.Param = class {
 				r |= (a & 1);
 				a >>= 1;
 			}
-			r = (r + 1) & maxmask; // Plus 1 to reserve 0.
+			r = (r + 1) % (1 << (maxbit - compression)); // Plus 1 to reserve 0.
 			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
