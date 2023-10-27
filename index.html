@@ -270,15 +270,16 @@ var url = null; // Referenced url.
 		if (buffers[count - 1]) {
 
 			// Update thumbnail.
-			let offscreen = new pico.Image("offscreen", width, height);
+			const thick = 10;
+			let offscreen = new pico.Image("offscreen", width * thick, height * thick);
 			await offscreen.color(colors);
-			await offscreen.pixel(0, 0, 0, width, height);
+			await offscreen.pixel(0, 0, 0, width * thick, height * thick);
 			for (let j = yoffset; j < yoffset + height; j++) {
-				let y = (j - yoffset - (height - 1) / 2);
+				let y = (j - yoffset - (height - 1) / 2) * thick;
 				for (let i = xoffset; i < xoffset + width; i++) {
 					if (buffers[count - 1][j][i]) {
-						let x = (i - xoffset - (width - 1) / 2);
-						await offscreen.pixel(buffers[count - 1][j][i], x, y);
+						let x = (i - xoffset - (width - 1) / 2) * thick;
+						await offscreen.pixel(buffers[count - 1][j][i], x, y, (thick-1)/2, (thick-1)/2);
 					}
 				}
 			}
@@ -474,7 +475,7 @@ async function main() {
 				updateThumbnail();
 
 			// Load pixels to buffers.
-			} else if (h < maxcount) {
+			} else if (h < 20) {
 				//console.log("Load buffer" + h + ": " + maxcount);
 				buffers[h] = [];
 				for (let j = 0; j < maxheight; j++) {
@@ -493,6 +494,10 @@ async function main() {
 					}
 				}
 				console.log("Buffer" + h + ": " + buffers[h]);
+				if (h >= maxcount) {
+					maxcount = h + 1;
+					changeCount(0);
+				}
 			}
 		}
 	}
