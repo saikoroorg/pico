@@ -91,9 +91,6 @@ a {
 	left: 50%; transform: translate(-50%, 0);
 	display: none;
 }
-.item.count {
-	display: none;
-}
 .item.dark {
 	background-color: #888;
 	color: #fff;
@@ -184,8 +181,8 @@ a {
 <div id="container">
 	<h1 id="header">
 		<div class="logo">
-			<a id="title" href="javascript:top.location.reload();">Pico</a>
-			<a id="subtitle" href="javascript:top.location.reload();"></a>
+			<a id="title" href="?">Pico</a>
+			<a id="subtitle" href="?"></a>
 		</div>
 		<div class="menu center">
 			<a class="item clear count" href="javascript:changeCount(-1);"><</a>
@@ -431,6 +428,7 @@ async function main() {
 			pixels[j][i] = 0;
 		}
 	}
+	updateThumbnail();
 
 	// Load params.
 	let keys = picoKeys();
