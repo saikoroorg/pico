@@ -10,6 +10,7 @@
 body {
 	font-family: Courier, monospace, sans-serif;
 	background-color: #fff;
+	color: #888;
 }
 a {
 	color: #ccc;
@@ -43,6 +44,9 @@ a {
 #screen {
 	aspect-ratio: 1;
 }
+.offscreen {
+	display: none;
+}
 #footer {
 	width: 100%; height: 12px; margin-top: -8px;
 	flex: 0 1 auto;
@@ -62,11 +66,9 @@ a {
 }
 .logo #title {
 	font-size: 24px;
-	color: #888;
 }
 .logo #subtitle {
 	font-size: 24px;
-	color: #ccc;
 }
 .menu {
 	display: flex; display: -webkit-flex;
@@ -82,15 +84,21 @@ a {
 	align-items: center; -webkit-align-items: center;
 	font-size: 16px;
 }
+.item #icon {
+	width: 32px; height: 32px;
+	position: absolute;
+	left: 50%; transform: translate(-50%, 0);
+	display: none;
+}
+.item.count {
+	display: none;
+}
 .item.dark {
 	background-color: #888;
 	color: #fff;
 }
 .light {;
-	background-color: #eee;
-	color: #888;
-}
-.clear {;
+	background-color: #ccc;
 	color: #888;
 }
 .menu a {
@@ -122,10 +130,20 @@ a {
 		justify-content: space-between; -webkit-justify-content: space-between;
 		align-items: flex-end; -webkit-align-items: flex-end;
 	}
+	.center {
+		position: absolute;
+		top: 8px;
+	}
 }
 @media (min-height: 401px) {
 	#header {
 		width: 100%;
+	}
+	@media (max-width: 350px) {
+		.center {
+			position: absolute;
+			left: 8px;
+		}
 	}
 	@media (min-width: 351px) {
 		#header {
@@ -172,6 +190,9 @@ a {
 			<a id="subtitle" href="javascript:top.location.reload();">Bros</a>
 		</div>
 		<div class="menu center">
+			<a class="item light" href="javascript:editLevel();">*</a>
+		</div>
+		<div class="menu">
 			<a class="item clear" href="javascript:changeLevel(-1);">-</a>
 			<a class="item dark" id="level" href="javascript:changeLevel(0);">1</a>
 			<a class="item clear" href="javascript:changeLevel(+1);">+</a>
@@ -249,21 +270,22 @@ var level = 1; // Playing level.
 </script><!--/Data-->
 <!--Menu--><script>
 
+// Edit level.
+function editLevel() {
+	picoResetParams();
+	picoReload("index.html?077+111p060i9f0i04o&u=bros.html");
+}
+
 // Change level.
 function changeLevel(x) {
-	if (x == 0) {
-		picoResetParams();
-		picoReload("index.html?077+111p060i9f0i04o&t=Bros&u=bros.html");
-	} else {
-		level = level + x < 1 ? (levels[0] ? 0 : 1) :
-			level + x >= levels.length ? levels.length - 1 : level + x;
-		playing = -1; // Restart.
-		let e = document.getElementById("level");
-		if (e) {
-			e.innerText = "" + level;
-		}
-		picoBeep(1.2, 0.1);	
+	level = level + x < 1 ? (levels[0] ? 0 : 1) :
+		level + x >= levels.length ? levels.length - 1 : level + x;
+	playing = -1; // Restart.
+	let e = document.getElementById("level");
+	if (e) {
+		e.innerText = "" + level;
 	}
+	picoBeep(1.2, 0.1);	
 };
 </script><!--/Menu-->
 <!--Main--><script>

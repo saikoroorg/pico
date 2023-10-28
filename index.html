@@ -10,6 +10,7 @@
 body {
 	font-family: Courier, monospace, sans-serif;
 	background-color: #fff;
+	color: #888;
 }
 a {
 	color: #ccc;
@@ -65,11 +66,9 @@ a {
 }
 .logo #title {
 	font-size: 24px;
-	color: #888;
 }
 .logo #subtitle {
 	font-size: 24px;
-	color: #ccc;
 }
 .menu {
 	display: flex; display: -webkit-flex;
@@ -91,9 +90,6 @@ a {
 	left: 50%; transform: translate(-50%, 0);
 	display: none;
 }
-.item #count {
-	font-size: 12px;
-}
 .item.count {
 	display: none;
 }
@@ -103,9 +99,6 @@ a {
 }
 .light {;
 	background-color: #ccc;
-	color: #888;
-}
-.clear {;
 	color: #888;
 }
 .menu a {
@@ -137,10 +130,20 @@ a {
 		justify-content: space-between; -webkit-justify-content: space-between;
 		align-items: flex-end; -webkit-align-items: flex-end;
 	}
+	.center {
+		position: absolute;
+		top: 8px;
+	}
 }
 @media (min-height: 401px) {
 	#header {
 		width: 100%;
+	}
+	@media (max-width: 350px) {
+		.center {
+			position: absolute;
+			left: 8px;
+		}
 	}
 	@media (min-width: 351px) {
 		#header {
@@ -188,13 +191,16 @@ a {
 		</div>
 		<div class="menu center">
 			<a class="item clear count" href="javascript:changeCount(-1);"><</a>
-			<a class="item clear" href="javascript:changeSize(-1);">-</a>
 			<a class="item light" id="share" href="javascript:share();">
-				<div class="light" id="count">x7</div>
+				<div class="light" id="count">^</div>
 				<img id="icon" src="" />
 			</a>
-			<a class="item clear" href="javascript:changeSize(+1);">+</a>
 			<a class="item clear count" href="javascript:changeCount(+1);">></a>
+		</div>
+		<div class="menu">
+			<a class="item clear" href="javascript:changeSize(-1);">-</a>
+			<a class="item light" id="size" href="javascript:top.location.reload();">x7</a>
+			<a class="item clear" href="javascript:changeSize(+1);">+</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -230,11 +236,12 @@ var url = null; // Referenced url.
 </script><!--/Data-->
 <!--Menu--><script>
 
-	// Update subtitle.
-	async function updateSubtitle(title) {
-		let e = document.getElementById("subtitle");
+	// Set darkmode.
+	async function changeMode(darkmode=true) {
+		let e = document.body;
 		if (e) {
-			e.innerText = title;
+			e.style.backgroundColor = darkmode ? "#888" : "#fff";
+			e.style.color = darkmode ? "#fff" : "#888";
 		}
 	}
 	
@@ -300,19 +307,23 @@ var url = null; // Referenced url.
 		}
 
 		// Update count button.
+		let e = document.getElementById("size");
+		if (e) {
+			e.innerText = "x" + width;
+		}
 		if (maxcount >= 2) {
-			let e = document.getElementById("count");
+			e = document.getElementById("count");
 			if (e) {
-				e.innerText = "" + count + "/" + maxcount;
+				e.innerText = "" + count;
 			}
 			e = document.getElementsByClassName("count");
 			for (let i = 0; i < e.length; i++) {
 				e[i].style.display = "flex";
 			}
 		} else {
-			let e = document.getElementById("count");
+			e = document.getElementById("count");
 			if (e) {
-				e.innerText = "x" + width;
+				e.innerText = "^";
 			}
 			e = document.getElementsByClassName("count");
 			for (let i = 0; i < e.length; i++) {
@@ -419,14 +430,10 @@ async function main() {
 	for (let h = 0; h < keys.length; h++) {
 		console.log("Param" + h + ": " + keys[h] + " -> " + picoStrings(keys[h]));
 
-		// Load subtitle.
-		if (keys[h] == "t") {
-			let subtitle = picoStrings(keys[h]);
-			updateSubtitle(subtitle);
-
 		// Load referenced url.
-		} else if (keys[h] == "u") {
+		if (keys[h] == "u") {
 			url = picoStrings(keys[h]);
+			changeMode();
 
 		// Load count param.
 		} else if (keys[h] == "w") {
