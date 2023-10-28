@@ -33,10 +33,11 @@ a {
 }
 #contents {
 	position: relative;
-	width: 100%; height: 100%; margin: 8px;
+	width: 100%; height: 80%;
+	margin: 8px;
 	flex: 1 1 auto;
 	display: flex; display: -webkit-flex;
-	flex-direction: row; -webkit-flex-direction: row;
+	flex-direction: column; -webkit-flex-direction: column;
 	justify-content: center; -webkit-justify-content: center;
 	align-items: center; -webkit-align-items: center;
 	background-color: #ccc;
@@ -117,6 +118,9 @@ a {
 	#container {
 		flex-direction: row; -webkit-flex-direction: row;
 	}
+	#contents {
+		width: 100%; height: 100%;
+	}
 	#header {
 		order: 1; height: 100%;
 		display: flex; display: -webkit-flex;
@@ -170,12 +174,6 @@ a {
 	}
 }
 @media (orientation: portrait) {
-	#contents {
-		display: flex; display: -webkit-flex;
-		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: center; -webkit-justify-content: center;
-		align-items: center; -webkit-align-items: center;
-	}
 	#screen {
 		width: 100%;
 	}
