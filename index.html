@@ -28,7 +28,7 @@ a {
 	flex: 0 1 auto;
 	display: flex; display: -webkit-flex;
 	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: center; -webkit-justify-content: center;
+	justify-content: flex-end; -webkit-justify-content: flex-end;
 	align-items: center; -webkit-align-items: center;
 }
 #contents {
@@ -67,6 +67,7 @@ a {
 }
 .logo #title {
 	font-size: 24px;
+	color: #888;
 }
 .logo #subtitle {
 	font-size: 24px;
@@ -85,7 +86,7 @@ a {
 	align-items: center; -webkit-align-items: center;
 	font-size: 16px;
 }
-.item #icon {
+.item #thumbnail {
 	width: 32px; height: 32px;
 	position: absolute;
 	left: 50%; transform: translate(-50%, 0);
@@ -95,9 +96,12 @@ a {
 	background-color: #888;
 	color: #fff;
 }
-.light {;
+.light {
 	background-color: #ccc;
 	color: #888;
+}
+.secret {;
+	display: none;
 }
 .menu a {
 	transform: scale(1);
@@ -122,7 +126,7 @@ a {
 		order: 1; height: 100%;
 		display: flex; display: -webkit-flex;
 		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: center; -webkit-justify-content: center;
+		justify-content: space-between; -webkit-justify-content: space-between;
 		align-items: center; -webkit-align-items: center;
 	}
 	.menu {
@@ -130,10 +134,6 @@ a {
 		flex-direction: column; -webkit-flex-direction: column;
 		justify-content: space-between; -webkit-justify-content: space-between;
 		align-items: flex-end; -webkit-align-items: flex-end;
-	}
-	.center {
-		position: absolute;
-		top: 8px;
 	}
 }
 @media (min-height: 401px) {
@@ -182,15 +182,15 @@ a {
 	<h1 id="header">
 		<div class="logo">
 			<a id="title" href="?">Pico</a>
-			<a id="subtitle" href="?"></a>
+			<a id="subtitle" href="bros.html">.</a>
 		</div>
 		<div class="menu center">
-			<a class="item clear count" href="javascript:changeCount(-1);"><</a>
+			<a class="item clear" id="prev" href="javascript:changePage(-1);"><</a>
 			<a class="item light" id="share" href="javascript:share();">
-				<div class="light" id="count">^</div>
-				<img id="icon" src="" />
+				<div class="light" id="page">^</div>
+				<img id="thumbnail" src="" />
 			</a>
-			<a class="item clear count" href="javascript:changeCount(+1);">></a>
+			<a class="item clear" id="next" href="javascript:changePage(+1);">></a>
 		</div>
 		<div class="menu">
 			<a class="item clear" href="javascript:changeSize(-1);">-</a>
@@ -206,7 +206,6 @@ a {
 <h6 id="footer">
 	<div id="author"></div>/
 	<div id="version"></div>
-	<a id="backdoor" href="bros.html">.</a>
 </h6>
 <!--script>console.log = () => {};</script!-->
 <script src="daemon.js"></script>
@@ -219,8 +218,9 @@ var maxwidth = 20, maxheight = 20; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Canvas offset.
 var yoffset = picoDiv(maxheight - height, 2); // Canvas offset.
-var maxcount = 1; // Buffer max count.
-var count = 1; // Buffer count.
+const maxpage = 20; // Buffer max page.
+var page = 1; // Buffer page index.
+var pagefix = false; // Page fix flag.
 var buffers = []; // Pixels buffers.
 var playing = 1; // Playing count.
 var pixels = []; // Pixels.
@@ -228,6 +228,7 @@ var pixels = []; // Pixels.
 //const colors6 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Color uses 6 bits.
 //const colors5 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Color uses 5 bits.
 var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23];
+const maxcolor = 10; // Color max size.
 var url = null; // Referenced url.
 </script><!--/Data-->
 <!--Menu--><script>
@@ -240,45 +241,47 @@ var url = null; // Referenced url.
 			e.style.color = darkmode ? "#fff" : "#888";
 		}
 		e = document.getElementById("title");
-		if (e && darkmode) {
-			e.innerText = "";
+		if (e) {
+			e.style.display = darkmode ? "none" : "flex";
 		}
-		e = document.getElementById("backdoor");
-		if (e && darkmode) {
-			e.href = "index.html";
+		e = document.getElementById("subtitle");
+		if (e) {
+			e.style.display = darkmode ? "none" : "flex";
 		}
 	}
 	
 	// Update thumbnail image.
 	async function updateThumbnail(force = true) {
-		if (force || buffers[count - 1]) {
-			//console.log("Update" + count + ": " + buffers[count - 1]);
+		if (force || buffers[page - 1]) {
+			//console.log("Update" + page + ": " + buffers[page - 1]);
 
 			// Store pixels to buffers.
-			if (!buffers[count - 1]) {
-				buffers[count - 1] = [];
+			if (!buffers[page - 1]) {
+				buffers[page - 1] = [];
 				for (let j = 0; j < maxheight; j++) {
-					buffers[count - 1][j] = [];
+					buffers[page - 1][j] = [];
 					for (let i = 0; i < maxwidth; i++) {
-						buffers[count - 1][j][i] = 0;
+						buffers[page - 1][j][i] = 0;
 					}
 				}
 			}
+
+			// Remove buffer if emtpy.
 			let remove = true;
 			for (let j = yoffset; j < yoffset + height; j++) {
 				for (let i = xoffset; i < xoffset + width; i++) {
 					if (pixels[j][i]) {
 						remove = false;
 					}
-					buffers[count - 1][j][i] = pixels[j][i];
+					buffers[page - 1][j][i] = pixels[j][i];
 				}
 			}
 			if (remove) {
-				buffers[count - 1] = null;
+				buffers[page - 1] = null;
 			}
 		}
 
-		if (buffers[count - 1]) {
+		if (buffers[page - 1]) {
 
 			// Update thumbnail.
 			const thick = 10;
@@ -288,15 +291,15 @@ var url = null; // Referenced url.
 			for (let j = yoffset; j < yoffset + height; j++) {
 				let y = (j - yoffset - (height - 1) / 2) * thick;
 				for (let i = xoffset; i < xoffset + width; i++) {
-					if (buffers[count - 1][j][i]) {
+					if (buffers[page - 1][j][i]) {
 						let x = (i - xoffset - (width - 1) / 2) * thick;
-						await offscreen.pixel(buffers[count - 1][j][i], x, y, (thick-1)/2, (thick-1)/2);
+						await offscreen.pixel(buffers[page - 1][j][i], x, y, (thick-1)/2, (thick-1)/2);
 					}
 				}
 			}
 			
 			// Enable thumbnail.
-			let e = document.getElementById("icon");
+			let e = document.getElementById("thumbnail");
 			if (e) {
 				e.style.display = "flex";
 				e.src = offscreen.data();
@@ -304,35 +307,28 @@ var url = null; // Referenced url.
 		} else {
 
 			// Disable thumbnail.
-			let e = document.getElementById("icon");
+			let e = document.getElementById("thumbnail");
 			if (e) {
 				e.style.display = "none";
 			}
 		}
 
-		// Update count button.
+		// Update button.
 		let e = document.getElementById("size");
 		if (e) {
 			e.innerText = "x" + width;
 		}
-		if (maxcount >= 2) {
-			e = document.getElementById("count");
-			if (e) {
-				e.innerText = "" + count;
-			}
-			e = document.getElementsByClassName("count");
-			for (let i = 0; i < e.length; i++) {
-				e[i].style.display = "flex";
-			}
-		} else {
-			e = document.getElementById("count");
-			if (e) {
-				e.innerText = "^";
-			}
-			e = document.getElementsByClassName("count");
-			for (let i = 0; i < e.length; i++) {
-				e[i].style.display = "none";
-			}
+		e = document.getElementById("prev");
+		if (e) {
+			e.style.display = (buffers[page - 1] && !pagefix || page >= 2) ? "flex" : "none";
+		}
+		e = document.getElementById("next");
+		if (e) {
+			e.style.display = (buffers[page - 1] && !pagefix || page >= 2) ? "flex" : "none";
+		}
+		e = document.getElementById("page");
+		if (e) {
+			e.innerText = page >= 2 ? "" + page : "^";
 		}
 	}
 
@@ -343,16 +339,18 @@ var url = null; // Referenced url.
 
 		// Create num code to share url.
 		let hmax = 0;
-		for (let h = 0; h < maxcount; h++) {
-			if (buffers[h]) {
+		for (let h = 0; h < maxpage; h++) {
+			if (h == 0 || buffers[h]) {
 				let numcode = [0, width, height];
-				for (let j = yoffset; j < yoffset + height; j++) {
-					for (let i = xoffset; i < xoffset + width; i++) {
-						if (buffers[h][j][i]) {
-							let k = numcode.length;
-							numcode[k + 0] = buffers[h][j][i];
-							numcode[k + 1] = i - xoffset;
-							numcode[k + 2] = j - yoffset;
+				if (buffers[h]) {
+					for (let j = yoffset; j < yoffset + height; j++) {
+						for (let i = xoffset; i < xoffset + width; i++) {
+							if (buffers[h][j][i]) {
+								let k = numcode.length;
+								numcode[k + 0] = buffers[h][j][i];
+								numcode[k + 1] = i - xoffset;
+								numcode[k + 2] = j - yoffset;
+							}
 						}
 					}
 				}
@@ -360,8 +358,7 @@ var url = null; // Referenced url.
 				hmax = h + 1;
 			}
 		}
-		if (hmax > 0 &&
-			((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
+		if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 			(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
 			picoSetColcode(colors, hmax);
 		}
@@ -374,20 +371,20 @@ var url = null; // Referenced url.
 		}
 	}
 
-	// Change canvas count.
-	function changeCount(x) {
+	// Change canvas pave.
+	function changePage(x) {
 			
 		// Update vars.
-		count = count + x < 1 ? 1 : count + x >= maxcount ? maxcount : count + x;
-		//console.log("Count: " + count);
+		page = page + x < 1 ? 1 : page + x >= maxpage ? maxpage : page + x;
+		//console.log("Page: " + page);
 		playing = -1; // Restart.
 
 		// Load pixels from buffers.
-		if (buffers[count - 1]) {
+		if (buffers[page - 1]) {
 			for (let j = 0; j < maxheight; j++) {
 				pixels[j] = [];
 				for (let i = 0; i < maxwidth; i++) {
-					pixels[j][i] = buffers[count - 1][j][i];
+					pixels[j][i] = buffers[page - 1][j][i];
 				}
 			}
 		} else {
@@ -440,18 +437,6 @@ async function main() {
 			url = picoStrings(keys[h]);
 			changeMode();
 
-		// Load count param.
-		} else if (keys[h] == "w") {
-			let w = picoNumbers(keys[h])[0];
-			maxcount = w <= 0 ? 0 : w < 20 ? w : 20;
-			changeCount(0);
-
-		// Load size param.
-		} else if (keys[h] == "x") {
-			let x = picoNumbers(keys[h])[0];
-			maxwidth = maxheight = x <= 0 ? 0 : x < 20 ? x : 20;
-			changeSize(0);
-
 		// Load colors param.
 		} else if (keys[h] == "z") {
 			colors = picoNumbers(keys[h]);
@@ -466,7 +451,9 @@ async function main() {
 			if ((numcode[0] == 0 && numcode[1] == 0 && numcode[2] == 0) ||
 				(numcode[0] == 1 && numcode[1] == 1 && numcode[2] == 1)) {
 				colors = picoColcode(h);
+				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
 				console.log("Color: " + colors);
+				updateThumbnail();
 
 			// Load pixels to canvas.
 			} else if (h == 0) {
@@ -483,12 +470,13 @@ async function main() {
 						}
 					}
 				}
+				pagefix = true; // Fix only one page.
 				console.log("Pixel: " + pixels);
 				updateThumbnail();
 
 			// Load pixels to buffers.
-			} else if (h < 20) {
-				//console.log("Load buffer" + h + ": " + maxcount);
+			} else if (h < maxpage) {
+				//console.log("Load buffer" + h + ": " + maxpage);
 				buffers[h] = [];
 				for (let j = 0; j < maxheight; j++) {
 					buffers[h][j] = [];
@@ -505,11 +493,8 @@ async function main() {
 						}
 					}
 				}
+				pagefix = false; // Nofix two or more pages.
 				console.log("Buffer" + h + ": " + buffers[h]);
-				if (h >= maxcount) {
-					maxcount = h + 1;
-					changeCount(0);
-				}
 			}
 		}
 	}

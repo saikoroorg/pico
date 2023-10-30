@@ -17,7 +17,7 @@ function picoParams() {
 
 // Reset all params.
 function picoResetParams() {
-	return pico.param.resetParams();
+	pico.param.resetParams();
 }
 
 // Get all param keys.
@@ -182,7 +182,8 @@ pico.Param = class {
 		return new Promise(async (resolve) => {
 			let text = this._serialize();
 			if (text != null) {
-				let query = text ? "?" + text : "";
+				let separator = url && url.indexOf("?") < 0 ? "?" : "";
+				let query = text ? separator + text : "";
 				if (url) {
 					console.log("Jump: " + query);
 					window.location.href = url + query;
