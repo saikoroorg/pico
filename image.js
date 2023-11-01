@@ -23,6 +23,11 @@ function picoDiv(a, b) {
 	}
 }
 
+// Square root.
+function picoSqrt(x) {
+	return Math.floor(Math.sqrt(x));
+}
+
 // Wait and flip image.
 async function picoFlip(t=10) {
 	try {
@@ -183,6 +188,10 @@ pico.Image = class {
 		  67, 47,  0,   0, 71,  0,   0, 81,  0,   0, 63, 23, // 08-0b
 		  27, 63, 95,   0,  0,  0,   0,  0,  0,   0,  0,  0, // 0c-0f
 		]; // Master image color. (8bit original parameter)
+
+	static colors8 = [255,255,255,255,219,171,159,255,243,188,188,188,231,0,91,0,115,239,0,147,59,167,0,0,143,0,119,0,63,23]; // 10 colors from the original 8 bits.
+	static colors6 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // 10 colors from the 6 bits.
+	static colors5 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // 10 colors from the 5 bits.
 
 	// Get random count.
 	random(max) {

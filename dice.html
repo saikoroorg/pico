@@ -1,0 +1,211 @@
+<html style="overflow:hidden; user-select:none;">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+<title>Dice</title>
+<link rel="icon" type="image/svg" href="icon.svg" />
+<link rel="apple-touch-icon" href="icon.png" sizes="192x192" />
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="stylesheet.css" />
+</head>
+<body>
+<div id="container">
+	<h1 id="header">
+		<div class="logo">
+			<a id="title" href="./index.html">Pico</a>
+			<a id="subtitle" href="javascript:top.location.reload();">Dice</a>
+		</div>
+		<div class="menu center">
+			<a class="item light secret" id="edit" href="javascript:editLevel();">*</a>
+		</div>
+		<div class="menu">
+			<a class="item clear" href="javascript:changeLevel(-1);">-</a>
+			<a class="item dark" id="level" href="javascript:changeLevel(0);">6</a>
+			<a class="item clear" href="javascript:changeLevel(+1);">+</a>
+		</div>
+	</h1>
+	<div id="contents">
+		<div id="screen" class="picoImage picoTouch"></div>
+	</div>
+</div>
+<h6 id="footer">
+	<div id="author"></div>/
+	<div id="version"></div>
+</h6>
+<!--script>console.log = () => {};</script!-->
+<script src="daemon.js"></script>
+<script src="image.js"></script>
+<script src="param.js"></script>
+<script src="sound.js"></script>
+<script src="touch.js"></script>
+<!--Data--><script>
+const dots = [
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,0,0],
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,-2,2, -1,2,-2],
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,0,0, -1,-2,2, -1,2,-2],
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,-2,-2, -1,-2,2, -1,2,-2, -1,2,2],
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,0,0, -1,-2,-2, -1,-2,2, -1,2,-2, -1,2,2],
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,-2,-2, -1,-2,0, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,0,0, -1,-2,-2, -1,-2,0, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,-2,-2, -1,-2,0, -1,0,-2, -1,0,2, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
+	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,0,0, -1,-2,-2, -1,-2,0, -1,0,-2, -1,0,2, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
+];
+const nums = [
+	[0,-4,-4,0,8,8, -1,-1,-2,0,1,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,2,0,2,0], // 0
+	[0,-4,-4,0,8,8, -1, 0,-2,0,0,4], // 1
+	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,2, -1,-1, 0,0,2,0, -1,-1,0,0,0,2, -1,-1,2,0,2,0], // 2
+	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4, -1,-1, 0,0,2,0, -1,-1,2,0,2,0], // 3
+	[0,-4,-4,0,8,8, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1, 0,0,2,0], // 4
+	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1,-1, 0,0,2,0, -1, 1,0,0,0,2, -1,-1,2,0,2,0], // 5
+	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1,-1, 0,0,2,0, -1, 1,0,0,0,2, -1,-1,2,0,2,0], // 6
+	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4], // 7
+	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0], // 8
+	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
+];
+var count = 1; // Count of dice.
+var maximum = 6; // Maximum of dice faces.
+var rolling = 0; // Rolling count.
+</script><!--/Data-->
+<!--Menu--><script>
+
+// Enable or disable menu.
+function updateMenu(id, enable, text=null, data=null) {
+	let e = document.getElementById(id);
+	if (e) {
+		e.style.display = enable ? "flex" : "none";
+		if (text) {
+			e.innerText = text;
+		}
+		if (data) {
+			e.src = data;
+		}
+	}
+}
+
+// Set maximum of dice faces.
+function setMaximum(x) {
+	maximum = (x > 20) ? 20 : (x < 1) ? 1 : x;
+	rolling = -1; // Reroll.
+};
+
+// Change count of dice.
+function changeLevel(x) {
+	if (x) {
+		count = (count + x > 20) ? 20 : (count + x < 1) ? 1 : count + x;
+	} else {
+	setMaximum(maximum == 6 ? 10 : 6);
+	}
+	rolling = -1; // Reroll.
+	updateMenu("level", true, "" + maximum);
+	picoBeep(1.2, 0.1);
+};
+</script><!--/Menu-->
+<!--Main--><script>
+async function main() {
+	//var count = 1; // Count of dice.
+	//var maximum = 6; // Maximum of dice faces.
+	//var rolling = 0; // Rolling count.
+
+	// Main loop.
+	var number = 0;
+	while (true) {
+
+		// Sprite lines and rows.
+		let lineMax = picoSqrt(count - 1) + 1;
+		let lines = picoDiv(count - 1, lineMax) + 1;
+		let lineMod = picoMod(count - 1, lineMax) + 1;
+		console.log("" + count + " -> " + lineMax + " " + lines + " " + lineMod);
+		let posx = [], posy = [];
+		for (let i = 0; i < count; i++) {
+			let x = picoMod(i, lineMax) + 1, y = picoDiv(i, lineMax) + 1;
+			if (y < lines) {
+				posx[i] = ((x) / (lineMax + 1) - 0.5) * 200;
+				posy[i] = ((lines + 1 - y) / (lines + 1) - 0.5) * 200;
+			} else {
+				posx[i] = ((x) / (lineMod + 1) - 0.5) * 200;
+				posy[i] = ((lines + 1 - y) / (lines + 1) - 0.5) * 200;
+			}
+			console.log("" + x + "," + y + " -> " + posx[i] + "," + posy[i]);
+		}
+
+		// Sprite scale.
+		let scale = 15 / ((count < lineMax ? count : lines >= lineMax ? lines : lineMax) + 1);
+
+		// Rolling dice.
+		let angle = 0;
+		let result = 0;
+		let randoms = [];
+		for (rolling = 1; rolling >= 1; rolling++) {
+
+			if (result > 0) {
+
+				// Restart to roll dice.
+				if (picoMotion()) {
+					if (rolling > 10) {
+						result = 0;
+						rolling = -1;
+					}
+				}
+			} else {
+
+				// Hold to rolling dice.
+				if (picoMotion()) {
+					rolling = 1;
+
+				// Timeout and show result.
+				} else if (rolling > 60) {
+					for (let i = 0; i < count; i++) {
+						result += randoms[i];
+					}
+					angle = 0;
+					rolling = 1;
+					number++;
+
+					// Number matched beeps on show result.
+					const kcents = [-1.0,
+						-0.9,-0.7,-0.5, -0.4,-0.2, 0.0, 0.2, // 1:Do,2:Re,3:Mi, 4:Fa,5:So,6:La,7:Ti
+						 0.3, 0.5, 0.7,  0.8, 1.0, 1.2, 1.4,
+						 1.5, 1.7, 1.9,  2.0, 2.2];
+					const timing = count <= 2 ? 0.2 : 0.5/count;
+					for (let i = 0; i < count; i++) {
+						let k = randoms[i] < 10 ? randoms[i] : randoms[i] - 10;
+						let j = k >= 0 && k < kcents.length ? k : 0;
+						picoBeep(kcents[j], timing/2, timing * i);
+					}
+				}
+			}
+
+			// Update angle.
+			if (result <= 0) {
+				angle = picoMod(angle + 20, 360);
+				for (let i = 0; i < count; i++) {
+					randoms[i] = picoRandom(maximum);
+				}
+			}
+
+			// Clear screen.
+			picoClear();
+
+			// Draw sprites.
+			let n = result <= 0 ? number : number - 1;
+			picoChar(n, 0, 0, -80);
+			let s = rolling < 5 ? scale * (0.8 + 0.04 * rolling) : scale;
+			if (maximum == 10) {
+				for (let i = 0; i < count; i++) {
+					picoSprite(nums[randoms[i]], posx[i], posy[i], angle, s);
+				}
+			} else {
+				for (let i = 0; i < count; i++) {
+					picoSprite(dots[randoms[i]], posx[i], posy[i], angle, s);
+				}
+			}
+
+			await picoFlip();
+			await picoRead();
+		} // End of playing loop.
+	} // End of main loop.
+};
+main();
+</script><!--/Main-->
+</body>
+</html>
