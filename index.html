@@ -1,187 +1,18 @@
 <html style="overflow:hidden; user-select:none;">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
 <title>Pico</title>
-<link rel="icon" type="image/svg" href="icon.svg">
-<link rel="apple-touch-icon" href="icon.png" sizes="192x192">
-<link rel="manifest" href="manifest.json">
-<style>
-body {
-	font-family: Courier, monospace, sans-serif;
-	background-color: #fff;
-	color: #888;
-}
-a {
-	color: #ccc;
-	text-decoration: none;
-}
-#container {
-	width: 100%; height: 100%;
-	display: flex; display: -webkit-flex;
-	flex-direction: column; -webkit-flex-direction: column;
-	justify-content: flex-start; -webkit-justify-content: flex-start;
-	align-items: center; -webkit-align-items: center;
-}
-#header {
-	margin: 0px;
-	flex: 0 1 auto;
-	display: flex; display: -webkit-flex;
-	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: flex-end; -webkit-justify-content: flex-end;
-	align-items: center; -webkit-align-items: center;
-}
-#contents {
-	position: relative;
-	width: 100%; height: 80%;
-	margin: 8px;
-	flex: 1 1 auto;
-	display: flex; display: -webkit-flex;
-	flex-direction: column; -webkit-flex-direction: column;
-	justify-content: center; -webkit-justify-content: center;
-	align-items: center; -webkit-align-items: center;
-	background-color: #ccc;
-}
-#screen {
-	aspect-ratio: 1;
-}
-.offscreen {
-	display: none;
-}
-#footer {
-	width: 100%; height: 12px; margin-top: -8px;
-	flex: 0 1 auto;
-	display: flex; display: -webkit-flex;
-	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: flex-end; -webkit-justify-content: flex-end;
-	align-items: center; -webkit-align-items: center;
-	font-size: 12px;
-	opacity: 0.1;
-}
-.logo {
-	height: 60px; margin: 0px 16px;
-	display: none;
-}
-.logo #icon {
-	width: 40px; height: 40px; padding: 10px; margin-left: -28px;
-}
-.logo #title {
-	font-size: 24px;
-	color: #888;
-}
-.logo #subtitle {
-	font-size: 24px;
-}
-.menu {
-	display: flex; display: -webkit-flex;
-	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: space-between; -webkit-justify-content: space-between;
-	align-items: flex-end; -webkit-align-items: flex-end;
-}
-.item {
-	width: 40px; height: 40px; margin: 0px;
-	display: flex; display: -webkit-flex;
-	flex-direction: column; -webkit-flex-direction: column;
-	justify-content: center; -webkit-justify-content: center;
-	align-items: center; -webkit-align-items: center;
-	font-size: 16px;
-}
-.item #thumbnail {
-	width: 32px; height: 32px;
-	position: absolute;
-	left: 50%; transform: translate(-50%, 0);
-	display: none;
-}
-.item.dark {
-	background-color: #888;
-	color: #fff;
-}
-.light {
-	background-color: #ccc;
-	color: #888;
-}
-.secret {;
-	display: none;
-}
-.menu a {
-	transform: scale(1);
-	opacity: 1;
-}
-.menu a:hover {
-	transform: scale(1);
-	opacity: 0.6;
-}
-.menu a:active {
-	transform: scale(0.9);
-	opacity: 1;
-}
-@media (max-height: 400px) {
-	#container {
-		flex-direction: row; -webkit-flex-direction: row;
-	}
-	#contents {
-		width: 100%; height: 100%;
-	}
-	#header {
-		order: 1; height: 100%;
-		display: flex; display: -webkit-flex;
-		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: space-between; -webkit-justify-content: space-between;
-		align-items: center; -webkit-align-items: center;
-	}
-	.menu {
-		display: flex; display: -webkit-flex;
-		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: space-between; -webkit-justify-content: space-between;
-		align-items: flex-end; -webkit-align-items: flex-end;
-	}
-}
-@media (min-height: 401px) {
-	#header {
-		width: 100%;
-	}
-	@media (max-width: 350px) {
-		.center {
-			position: absolute;
-			left: 8px;
-		}
-	}
-	@media (min-width: 351px) {
-		#header {
-			display: flex; display: -webkit-flex;
-			flex-direction: row; -webkit-flex-direction: row;
-			justify-content: space-between; -webkit-justify-content: space-between;
-			align-items: center; -webkit-align-items: center;
-		}
-		.center {
-			position: absolute;
-			left: 50%; transform: translate(-50%, 0);
-		}
-		.logo {
-			display: flex; display: -webkit-flex;
-			flex-direction: row; -webkit-flex-direction: row;
-			justify-content: flex-start; -webkit-justify-content: flex-start;
-			align-items: center; -webkit-align-items: center;
-		}
-	}
-}
-@media (orientation: landscape) {
-	#screen {
-		height: 100%;
-	}
-}
-@media (orientation: portrait) {
-	#screen {
-		width: 100%;
-	}
-}
-</style>
+<link rel="icon" type="image/svg" href="icon.svg" />
+<link rel="apple-touch-icon" href="icon.png" sizes="192x192" />
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="stylesheet.css" />
 </head>
 <body>
 <div id="container">
 	<h1 id="header">
 		<div class="logo">
-			<a id="title" href="?">Pico</a>
+			<a id="title" href="./index.html">Pico</a>
 			<a id="subtitle" href="bros.html">.</a>
 		</div>
 		<div class="menu center">
@@ -194,7 +25,7 @@ a {
 		</div>
 		<div class="menu">
 			<a class="item clear" href="javascript:changeSize(-1);">-</a>
-			<a class="item light" id="size" href="javascript:top.location.reload();">x7</a>
+			<a class="item light" id="size" href="javascript:changeSize(0);">x7</a>
 			<a class="item clear" href="javascript:changeSize(+1);">+</a>
 		</div>
 	</h1>
@@ -224,196 +55,182 @@ var pagefix = false; // Page fix flag.
 var buffers = []; // Pixels buffers.
 var playing = 1; // Playing count.
 var pixels = []; // Pixels.
-//const colors8 = [255,255,255,255,219,171,159,255,243,188,188,188,231,0,91,0,115,239,0,147,59,167,0,0,143,0,119,0,63,23]; // Color uses original 8 bits.
-//const colors6 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Color uses 6 bits.
-//const colors5 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Color uses 5 bits.
-var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23];
+var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Colors.
 const maxcolor = 10; // Color max size.
 var url = null; // Referenced url.
 </script><!--/Data-->
 <!--Menu--><script>
 
-	// Set darkmode.
-	async function changeMode(darkmode=true) {
-		let e = document.body;
-		if (e) {
-			e.style.backgroundColor = darkmode ? "#888" : "#fff";
-			e.style.color = darkmode ? "#fff" : "#888";
+// Enable or disable menu.
+function updateMenu(id, enable, text=null, data=null) {
+	let e = document.getElementById(id);
+	if (e) {
+		e.style.display = enable ? "flex" : "none";
+		if (text) {
+			e.innerText = text;
 		}
-		e = document.getElementById("title");
-		if (e) {
-			e.style.display = darkmode ? "none" : "flex";
-		}
-		e = document.getElementById("subtitle");
-		if (e) {
-			e.style.display = darkmode ? "none" : "flex";
+		if (data) {
+			e.src = data;
 		}
 	}
-	
-	// Update thumbnail image.
-	async function updateThumbnail(force = true) {
-		if (force || buffers[page - 1]) {
-			//console.log("Update" + page + ": " + buffers[page - 1]);
+}
 
-			// Store pixels to buffers.
-			if (!buffers[page - 1]) {
-				buffers[page - 1] = [];
-				for (let j = 0; j < maxheight; j++) {
-					buffers[page - 1][j] = [];
-					for (let i = 0; i < maxwidth; i++) {
-						buffers[page - 1][j][i] = 0;
-					}
+// Set darkmode.
+async function darkmode() {
+	let e = document.body;
+	if (e) {
+		e.style.backgroundColor ="#888";
+		e.style.color ="#fff";
+	}
+	updateMenu("title", false);
+	updateMenu("subtitle", false);
+}
+
+// Update thumbnail image.
+async function updateThumbnail(force = true) {
+	if (force || buffers[page - 1]) {
+		//console.log("Update" + page + ": " + buffers[page - 1]);
+
+		// Store pixels to buffers.
+		if (!buffers[page - 1]) {
+			buffers[page - 1] = [];
+			for (let j = 0; j < maxheight; j++) {
+				buffers[page - 1][j] = [];
+				for (let i = 0; i < maxwidth; i++) {
+					buffers[page - 1][j][i] = 0;
 				}
 			}
+		}
 
-			// Remove buffer if emtpy.
-			let remove = true;
-			for (let j = yoffset; j < yoffset + height; j++) {
-				for (let i = xoffset; i < xoffset + width; i++) {
-					if (pixels[j][i]) {
-						remove = false;
-					}
-					buffers[page - 1][j][i] = pixels[j][i];
+		// Remove buffer if emtpy.
+		let remove = true;
+		for (let j = yoffset; j < yoffset + height; j++) {
+			for (let i = xoffset; i < xoffset + width; i++) {
+				if (pixels[j][i]) {
+					remove = false;
 				}
-			}
-			if (remove) {
-				buffers[page - 1] = null;
+				buffers[page - 1][j][i] = pixels[j][i];
 			}
 		}
-
-		if (buffers[page - 1]) {
-
-			// Update thumbnail.
-			const thick = 10;
-			let offscreen = new pico.Image("offscreen", width * thick, height * thick);
-			await offscreen.color(colors);
-			await offscreen.pixel(0, 0, 0, width * thick, height * thick);
-			for (let j = yoffset; j < yoffset + height; j++) {
-				let y = (j - yoffset - (height - 1) / 2) * thick;
-				for (let i = xoffset; i < xoffset + width; i++) {
-					if (buffers[page - 1][j][i]) {
-						let x = (i - xoffset - (width - 1) / 2) * thick;
-						await offscreen.pixel(buffers[page - 1][j][i], x, y, (thick-1)/2, (thick-1)/2);
-					}
-				}
-			}
-			
-			// Enable thumbnail.
-			let e = document.getElementById("thumbnail");
-			if (e) {
-				e.style.display = "flex";
-				e.src = offscreen.data();
-			}
-		} else {
-
-			// Disable thumbnail.
-			let e = document.getElementById("thumbnail");
-			if (e) {
-				e.style.display = "none";
-			}
-		}
-
-		// Update button.
-		let e = document.getElementById("size");
-		if (e) {
-			e.innerText = "x" + width;
-		}
-		e = document.getElementById("prev");
-		if (e) {
-			e.style.display = (buffers[page - 1] && !pagefix || page >= 2) ? "flex" : "none";
-		}
-		e = document.getElementById("next");
-		if (e) {
-			e.style.display = (buffers[page - 1] && !pagefix || page >= 2) ? "flex" : "none";
-		}
-		e = document.getElementById("page");
-		if (e) {
-			e.innerText = page >= 2 ? "" + page : "^";
+		if (remove) {
+			buffers[page - 1] = null;
 		}
 	}
 
-	// Share.
-	async function share() {
-		updateThumbnail();
-		picoResetParams();
+	if (buffers[page - 1]) {
 
-		// Create num code to share url.
-		let hmax = 0;
-		for (let h = 0; h < maxpage; h++) {
-			if (h == 0 || buffers[h]) {
-				let numcode = [0, width, height];
-				if (buffers[h]) {
-					for (let j = yoffset; j < yoffset + height; j++) {
-						for (let i = xoffset; i < xoffset + width; i++) {
-							if (buffers[h][j][i]) {
-								let k = numcode.length;
-								numcode[k + 0] = buffers[h][j][i];
-								numcode[k + 1] = i - xoffset;
-								numcode[k + 2] = j - yoffset;
-							}
+		// Update thumbnail.
+		const thick = 10;
+		let offscreen = new pico.Image("offscreen", width * thick, height * thick);
+		await offscreen.color(colors);
+		await offscreen.pixel(0, 0, 0, width * thick, height * thick);
+		for (let j = yoffset; j < yoffset + height; j++) {
+			let y = (j - yoffset - (height - 1) / 2) * thick;
+			for (let i = xoffset; i < xoffset + width; i++) {
+				if (buffers[page - 1][j][i]) {
+					let x = (i - xoffset - (width - 1) / 2) * thick;
+					await offscreen.pixel(buffers[page - 1][j][i], x, y, (thick-1)/2, (thick-1)/2);
+				}
+			}
+		}
+		
+		// Enable thumbnail.
+		updateMenu("thumbnail", true, null, offscreen.data());
+	} else {
+
+		// Disable thumbnail.
+		updateMenu("thumbnail", false);
+	}
+
+	// Update buttons.
+	updateMenu("size", true, "x" + width);
+	updateMenu("page", true, page >= 2 ? "" + page : "^");
+	updateMenu("prev",  buffers[page - 1] && !pagefix || page >= 2);
+	updateMenu("next",  buffers[page - 1] && !pagefix || page >= 2);
+}
+
+// Share.
+async function share() {
+	updateThumbnail();
+	picoResetParams();
+
+	// Create num code to share url.
+	let hmax = 0;
+	for (let h = 0; h < maxpage; h++) {
+		if (h == 0 || buffers[h]) {
+			let numcode = [0, width, height];
+			if (buffers[h]) {
+				for (let j = yoffset; j < yoffset + height; j++) {
+					for (let i = xoffset; i < xoffset + width; i++) {
+						if (buffers[h][j][i]) {
+							let k = numcode.length;
+							numcode[k + 0] = buffers[h][j][i];
+							numcode[k + 1] = i - xoffset;
+							numcode[k + 2] = j - yoffset;
 						}
 					}
 				}
-				picoSetNumcode(numcode, h);
-				hmax = h + 1;
+			}
+			picoSetNumcode(numcode, h);
+			hmax = h + 1;
+		}
+	}
+	if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
+		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
+		picoSetColcode(colors, hmax);
+	}
+
+	// Start sharing.
+	if (url) {
+		await picoReload(url);
+	} else {
+		await picoShare();
+	}
+}
+
+// Change canvas pave.
+function changePage(x) {
+		
+	// Update variables.
+	page = page + x < 1 ? 1 : page + x >= maxpage ? maxpage : page + x;
+	//console.log("Page: " + page);
+	playing = -1; // Restart.
+
+	// Load pixels from buffers.
+	if (buffers[page - 1]) {
+		for (let j = 0; j < maxheight; j++) {
+			pixels[j] = [];
+			for (let i = 0; i < maxwidth; i++) {
+				pixels[j][i] = buffers[page - 1][j][i];
 			}
 		}
-		if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
-			(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-			picoSetColcode(colors, hmax);
-		}
-
-		// Start sharing.
-		if (url) {
-			await picoReload(url);
-		} else {
-			await picoShare();
+	} else {
+		for (let j = 0; j < maxheight; j++) {
+			pixels[j] = [];
+			for (let i = 0; i < maxwidth; i++) {
+				pixels[j][i] = 0;
+			}
 		}
 	}
 
-	// Change canvas pave.
-	function changePage(x) {
-			
-		// Update vars.
-		page = page + x < 1 ? 1 : page + x >= maxpage ? maxpage : page + x;
-		//console.log("Page: " + page);
-		playing = -1; // Restart.
+	picoBeep(1.2, 0.1);
+	updateThumbnail(false);
+}
 
-		// Load pixels from buffers.
-		if (buffers[page - 1]) {
-			for (let j = 0; j < maxheight; j++) {
-				pixels[j] = [];
-				for (let i = 0; i < maxwidth; i++) {
-					pixels[j][i] = buffers[page - 1][j][i];
-				}
-			}
-		} else {
-			for (let j = 0; j < maxheight; j++) {
-				pixels[j] = [];
-				for (let i = 0; i < maxwidth; i++) {
-					pixels[j][i] = 0;
-				}
-			}
-		}
+// Change canvas size.
+function changeSize(x) {
+		
+	// Update variables.
+	width = width + x < 3 ? 3 : width + x >= maxwidth ? maxwidth : width + x;
+	height = height + x < 3 ? 3 : height + x >= maxheight ? maxheight : height + x;
+	xoffset = picoDiv(maxwidth - width, 2);
+	yoffset = picoDiv(maxheight - height, 2);
+	//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
+	playing = -1; // Restart.
 
-		picoBeep(1.2, 0.1);
-		updateThumbnail(false);
-	}
-	
-	// Change canvas size.
-	function changeSize(x) {
-			
-		// Update vars.
-		width = width + x < 3 ? 3 : width + x >= maxwidth ? maxwidth : width + x;
-		height = height + x < 3 ? 3 : height + x >= maxheight ? maxheight : height + x;
-		xoffset = picoDiv(maxwidth - width, 2);
-		yoffset = picoDiv(maxheight - height, 2);
-		//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
-		playing = -1; // Restart.
-
-		picoBeep(1.2, 0.1);	
-		updateThumbnail(false);
-	}
+	picoBeep(1.2, 0.1);	
+	updateThumbnail(false);
+}
 </script><!--/Menu-->
 <!--Main--><script>
 async function main() {
@@ -435,7 +252,7 @@ async function main() {
 		// Load referenced url.
 		if (keys[h] == "u") {
 			url = picoStrings(keys[h]);
-			changeMode();
+			darkmode();
 
 		// Load colors param.
 		} else if (keys[h] == "z") {

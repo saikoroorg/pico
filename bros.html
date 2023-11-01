@@ -1,191 +1,22 @@
 <html style="overflow:hidden; user-select:none;">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
 <title>PicoBros</title>
-<link rel="icon" type="image/svg" href="icon.svg">
-<link rel="apple-touch-icon" href="icon.png" sizes="192x192">
-<link rel="manifest" href="manifest.json">
-<style>
-body {
-	font-family: Courier, monospace, sans-serif;
-	background-color: #fff;
-	color: #888;
-}
-a {
-	color: #ccc;
-	text-decoration: none;
-}
-#container {
-	width: 100%; height: 100%;
-	display: flex; display: -webkit-flex;
-	flex-direction: column; -webkit-flex-direction: column;
-	justify-content: flex-start; -webkit-justify-content: flex-start;
-	align-items: center; -webkit-align-items: center;
-}
-#header {
-	margin: 0px;
-	flex: 0 1 auto;
-	display: flex; display: -webkit-flex;
-	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: flex-end; -webkit-justify-content: flex-end;
-	align-items: center; -webkit-align-items: center;
-}
-#contents {
-	position: relative;
-	width: 100%; height: 80%;
-	margin: 8px;
-	flex: 1 1 auto;
-	display: flex; display: -webkit-flex;
-	flex-direction: column; -webkit-flex-direction: column;
-	justify-content: center; -webkit-justify-content: center;
-	align-items: center; -webkit-align-items: center;
-	background-color: #ccc;
-}
-#screen {
-	aspect-ratio: 1;
-}
-.offscreen {
-	display: none;
-}
-#footer {
-	width: 100%; height: 12px; margin-top: -8px;
-	flex: 0 1 auto;
-	display: flex; display: -webkit-flex;
-	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: flex-end; -webkit-justify-content: flex-end;
-	align-items: center; -webkit-align-items: center;
-	font-size: 12px;
-	opacity: 0.1;
-}
-.logo {
-	height: 60px; margin: 0px 16px;
-	display: none;
-}
-.logo #icon {
-	width: 40px; height: 40px; padding: 10px; margin-left: -28px;
-}
-.logo #title {
-	font-size: 24px;
-	color: #888;
-}
-.logo #subtitle {
-	font-size: 24px;
-}
-.menu {
-	display: flex; display: -webkit-flex;
-	flex-direction: row; -webkit-flex-direction: row;
-	justify-content: space-between; -webkit-justify-content: space-between;
-	align-items: flex-end; -webkit-align-items: flex-end;
-}
-.item {
-	width: 40px; height: 40px; margin: 0px;
-	display: flex; display: -webkit-flex;
-	flex-direction: column; -webkit-flex-direction: column;
-	justify-content: center; -webkit-justify-content: center;
-	align-items: center; -webkit-align-items: center;
-	font-size: 16px;
-}
-.item #thumbnail {
-	width: 32px; height: 32px;
-	position: absolute;
-	left: 50%; transform: translate(-50%, 0);
-	display: none;
-}
-.item.dark {
-	background-color: #888;
-	color: #fff;
-}
-.light {
-	background-color: #ccc;
-	color: #888;
-}
-.secret {;
-	display: none;
-}
-.menu a {
-	transform: scale(1);
-	opacity: 1;
-}
-.menu a:hover {
-	transform: scale(1);
-	opacity: 0.6;
-}
-.menu a:active {
-	transform: scale(0.9);
-	opacity: 1;
-}
-@media (max-height: 400px) {
-	#container {
-		flex-direction: row; -webkit-flex-direction: row;
-	}
-	#contents {
-		width: 100%; height: 100%;
-	}
-	#header {
-		order: 1; height: 100%;
-		display: flex; display: -webkit-flex;
-		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: space-between; -webkit-justify-content: space-between;
-		align-items: center; -webkit-align-items: center;
-	}
-	.menu {
-		display: flex; display: -webkit-flex;
-		flex-direction: column; -webkit-flex-direction: column;
-		justify-content: space-between; -webkit-justify-content: space-between;
-		align-items: flex-end; -webkit-align-items: flex-end;
-	}
-}
-@media (min-height: 401px) {
-	#header {
-		width: 100%;
-	}
-	@media (max-width: 350px) {
-		.center {
-			position: absolute;
-			left: 8px;
-		}
-	}
-	@media (min-width: 351px) {
-		#header {
-			display: flex; display: -webkit-flex;
-			flex-direction: row; -webkit-flex-direction: row;
-			justify-content: space-between; -webkit-justify-content: space-between;
-			align-items: center; -webkit-align-items: center;
-		}
-		.center {
-			position: absolute;
-			left: 50%; transform: translate(-50%, 0);
-		}
-		.logo {
-			display: flex; display: -webkit-flex;
-			flex-direction: row; -webkit-flex-direction: row;
-			justify-content: flex-start; -webkit-justify-content: flex-start;
-			align-items: center; -webkit-align-items: center;
-		}
-	}
-}
-@media (orientation: landscape) {
-	#screen {
-		height: 100%;
-	}
-}
-@media (orientation: portrait) {
-	#screen {
-		width: 100%;
-	}
-}
-</style>
+<link rel="icon" type="image/svg" href="icon.svg" />
+<link rel="apple-touch-icon" href="icon.png" sizes="192x192" />
+<link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="stylesheet.css" />
 </head>
 <body>
 <div id="container">
 	<h1 id="header">
 		<div class="logo">
-			<a id="title" href="javascript:history.back();">Pico</a>
+			<a id="title" href="./index.html">Pico</a>
 			<a id="subtitle" href="javascript:top.location.reload();">Bros</a>
 		</div>
 		<div class="menu center">
-			<a class="item secret" id="edit" href="javascript:editLevel();">*</a>
+			<a class="item light secret" id="edit" href="javascript:editLevel();">*</a>
 		</div>
 		<div class="menu">
 			<a class="item clear" href="javascript:changeLevel(-1);">-</a>
@@ -209,84 +40,106 @@ a {
 <script src="touch.js"></script>
 <!--Data--><script>
 var levels = [ // Level data.
-[0,7,7,1,0,0,2,6,6],
-[0,7,7,1,0,0,2,6,6,4,6,0,4,0,6],
-[0,7,7,1,0,0,2,6,6,4,1,1],
-[0,7,7,1,0,0,2,6,6,4,5,1,4,5,2,4,5,3,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5],
-[0,7,7,1,2,2,2,4,4,4,2,3,4,2,4,4,3,4],
-[0,7,7,1,0,6,2,6,6,4,3,2],
-[0,7,7,1,0,0,2,4,4,4,2,2,4,3,2,4,5,2,4,6,2,4,2,3,4,6,3,4,2,4,4,6,4,4,2,5,4,6,5,4,2,6,4,3,6,4,4,6,4,5,6,4,6,6],
-[0,7,7,1,0,0,2,4,4,4,1,1,4,5,1,4,5,2,4,5,3,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5],
-[0,7,7,1,1,1,2,5,1,4,3,3],
-[0,7,7,1,1,3,2,5,3,4,3,5],
-[0,7,7,1,2,3,2,4,3,4,0,0,4,6,0,4,0,3,4,6,3,4,0,6,4,3,6,4,6,6],
-[0,7,7,1,2,3,2,4,3,4,0,0,4,6,0,4,0,5,4,3,5,4,6,5,4,0,6,4,3,6,4,6,6],
-[0,7,7,1,2,6,2,4,6,4,0,0,4,6,0,4,0,5,4,6,5,4,0,6,4,1,6,4,5,6,4,6,6],
-[0,7,7,1,0,0,2,6,6,4,1,2,4,5,2],
-[0,7,7,1,1,1,2,5,1],
-[0,7,7,1,1,1,2,5,1,4,2,3,4,3,3,4,4,3],
-[0,7,7,1,2,2,2,4,2,4,3,2,4,2,3,4,4,3,4,2,6,4,4,6],
-[0,7,7,1,2,2,2,4,2,4,2,4,4,3,4,4,4,4],
-[0,7,7,1,1,1,2,5,1,4,1,3,4,2,3,4,3,3,4,4,3,4,5,3],
-[0,7,7,1,1,1,2,5,1,4,1,4,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5],
-[0,7,7,1,1,2,2,5,2,4,1,1,4,5,1,4,1,5,4,5,5],
-[0,7,7,1,3,2,2,2,3,4,2,0,4,0,2,4,2,2],
-[0,7,7,1,6,4,2,4,6,4,3,0,4,3,2,4,4,2,4,0,3,4,2,3,4,3,3,4,4,3,4,2,4,4,3,4,4,4,4],
-[0,7,7,1,2,1,2,1,2,4,2,2,4,4,2,4,2,4,4,4,4],
-[0,7,7,1,1,1,2,5,5,4,3,1,4,3,2,4,1,3,4,2,3,4,3,3],
-[0,7,7,3,1,5,4,1,3,4,3,5],
-[0,7,7,1,1,5,2,5,1,4,2,1,4,1,2,4,2,2],
-[0,7,7,3,3,2,4,3,4],
-[0,7,7,3,3,3,4,3,4],
-[0,7,7,1,1,1,2,5,1,4,1,2,4,2,2,4,4,2,4,5,2,4,2,4,4,4,4],
-[0,7,7,1,2,3,2,4,3,4,1,1,4,2,1,4,3,1,4,1,2,4,2,2,4,1,3],
-[0,7,7,1,2,0,2,6,4,4,3,0,4,4,0,4,5,0,4,6,0,4,4,1,4,5,1,4,6,1,4,5,2,4,6,2,4,6,3],
-[0,7,7,1,2,2,2,4,2,4,0,0,4,6,0,4,0,1,4,2,1,4,4,1,4,6,1,4,0,2,4,6,2,4,0,3,4,2,3,4,4,3,4,6,3,4,0,4,4,2,4,4,4,4,4,6,4,4,0,5,4,6,5,4,0,6,4,6,6],
-[0,7,7,3,0,6,4,3,0,4,1,1,4,5,1,4,0,3,4,2,3,4,4,3,4,6,3,4,1,5,4,3,5,4,5,5,4,3,6],
-[0,7,7,3,3,3,4,2,0,4,3,0,4,4,0,4,2,1,4,4,1,4,4,2,4,3,5],
-[0,7,7,3,2,3,4,0,0,4,1,0,4,2,0,4,3,0,4,0,1,4,1,1,4,0,2,4,0,3,4,0,4,4,0,5,4,1,5,4,0,6,4,1,6,4,2,6,4,3,6],
-[0,7,7,1,1,2,2,2,1,4,1,1,4,4,1,4,5,1,4,1,4,4,1,5,4,5,5],
-[0,7,7,1,3,2,2,3,0,4,0,0,4,1,0,4,2,0,4,4,0,4,5,0,4,6,0,4,1,2,4,5,2,4,1,5,4,5,5],
-[0,7,7,1,2,2,2,4,2,4,1,1,4,5,1,4,2,3,4,4,3],
-[0,7,7,1,2,3,2,4,3,4,3,1],
-[0,7,7,1,2,5,2,4,5,4,1,4,4,5,4,4,1,5,4,5,5],
-[0,7,7,1,1,4,2,2,5,4,3,1,4,5,1,4,3,3,4,0,5,4,1,5,4,0,6,4,1,6],
-[0,7,7,1,1,4,2,5,4,4,2,3,4,3,3,4,4,3],
-[0,7,7,1,1,2,2,3,2,4,5,1,4,5,2,4,5,3],
-[0,7,7,1,1,5,2,5,5,4,1,1,4,2,1,4,3,1,4,4,1,4,5,1,4,1,2,4,5,2,4,1,3,4,5,3],
-[0,7,7,3,3,2,4,3,0],
-[0,7,7,1,1,5,2,3,5,4,5,0,4,6,0,4,6,1,4,0,5,4,0,6],
-[0,7,7,1,2,4,2,4,4,4,0,0,4,1,0,4,4,0,4,5,0,4,6,0,4,0,1,4,5,1,4,6,1,4,6,2],
-[0,7,7,1,2,2,2,4,2,4,3,4,4,2,5,4,3,5,4,4,5],
-[]]; // Secret user level.
-const userlevel = levels.length - 1; // Secret user level.
+[0,7,7,1,0,0,2,6,6], //"Bros",
+[0,7,7,1,0,0,2,6,6,4,6,0,4,0,6], //"Block",
+[0,7,7,1,0,0,2,6,6,4,1,1], //"Pole",
+[0,7,7,1,0,0,2,6,6,4,5,1,4,5,2,4,5,3,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5], //"Wall",
+[0,7,7,1,2,2,2,4,4,4,2,3,4,2,4,4,3,4], //"Boomerang",
+[0,7,7,1,0,6,2,6,6,4,3,2], //"Cracker",
+[0,7,7,1,0,0,2,4,4,4,2,2,4,3,2,4,5,2,4,6,2,4,2,3,4,6,3,4,2,4,4,6,4,4,2,5,4,6,5,4,2,6,4,3,6,4,4,6,4,5,6,4,6,6], //"Room",
+[0,7,7,1,0,0,2,4,4,4,1,1,4,5,1,4,5,2,4,5,3,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5], //"Inside",
+[0,7,7,1,1,1,2,5,1,4,3,3], //"Belly",
+[0,7,7,1,1,3,2,5,3,4,3,5], //"Baby",
+[0,7,7,1,2,3,2,4,3,4,0,0,4,6,0,4,0,3,4,6,3,4,0,6,4,3,6,4,6,6], //"Urchin",
+[0,7,7,1,2,3,2,4,3,4,0,0,4,6,0,4,0,5,4,3,5,4,6,5,4,0,6,4,3,6,4,6,6], //"Shaggy",
+[0,7,7,1,2,6,2,4,6,4,0,0,4,6,0,4,0,5,4,6,5,4,0,6,4,1,6,4,5,6,4,6,6], //"Crab",
+[0,7,7,1,0,0,2,6,6,4,1,2,4,5,2], //"Asymmetry",
+[0,7,7,1,1,1,2,5,1], //"Eyes",
+[0,7,7,1,1,1,2,5,1,4,2,3,4,3,3,4,4,3], //"Raise",
+[0,7,7,1,2,2,2,4,2,4,3,2,4,2,3,4,4,3,4,2,6,4,4,6], //"Horseshoe",
+[0,7,7,1,2,2,2,4,2,4,2,4,4,3,4,4,4,4], //"Face",
+[0,7,7,1,1,1,2,5,1,4,1,3,4,2,3,4,3,3,4,4,3,4,5,3], //"Teeth",
+[0,7,7,1,1,1,2,5,1,4,1,4,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5], //"Smile",
+[0,7,7,1,1,2,2,5,2,4,1,1,4,5,1,4,1,5,4,5,5], //"Mask",
+[0,7,7,1,3,2,2,2,3,4,2,0,4,0,2,4,2,2], //"Scissor",
+[0,7,7,1,6,4,2,4,6,4,3,0,4,3,2,4,4,2,4,0,3,4,2,3,4,3,3,4,4,3,4,2,4,4,3,4,4,4,4], //"Turtle",
+[0,7,7,1,2,1,2,1,2,4,2,2,4,4,2,4,2,4,4,4,4], //"Cross",
+[0,7,7,1,1,1,2,5,5,4,3,1,4,3,2,4,1,3,4,2,3,4,3,3], //"Sling",
+[0,7,7,3,1,5,4,1,3,4,3,5], //"Unite",
+[0,7,7,1,1,5,2,5,1,4,2,1,4,1,2,4,2,2], //"Balance",
+[0,7,7,3,3,2,4,3,4], //"Jump",
+[0,7,7,3,3,3,4,3,4], //"Ignition",
+[0,7,7,1,1,1,2,5,1,4,1,2,4,2,2,4,4,2,4,5,2,4,2,4,4,4,4], //"Duel",
+[0,7,7,1,2,3,2,4,3,4,1,1,4,2,1,4,3,1,4,1,2,4,2,2,4,1,3], //"Salute",
+[0,7,7,1,2,0,2,6,4,4,3,0,4,4,0,4,5,0,4,6,0,4,4,1,4,5,1,4,6,1,4,5,2,4,6,2,4,6,3], //"Stairs",
+[0,7,7,1,2,2,2,4,2,4,0,0,4,6,0,4,0,1,4,2,1,4,4,1,4,6,1,4,0,2,4,6,2,4,0,3,4,2,3,4,4,3,4,6,3,4,0,4,4,2,4,4,4,4,4,6,4,4,0,5,4,6,5,4,0,6,4,6,6], //"River",
+[0,7,7,3,0,6,4,3,0,4,1,1,4,5,1,4,0,3,4,2,3,4,4,3,4,6,3,4,1,5,4,3,5,4,5,5,4,3,6], //"Firework",
+[0,7,7,3,3,3,4,2,0,4,3,0,4,4,0,4,2,1,4,4,1,4,4,2,4,3,5], //"Question",
+[0,7,7,3,2,3,4,0,0,4,1,0,4,2,0,4,3,0,4,0,1,4,1,1,4,0,2,4,0,3,4,0,4,4,0,5,4,1,5,4,0,6,4,1,6,4,2,6,4,3,6], //"Crescent",
+[0,7,7,1,1,2,2,2,1,4,1,1,4,4,1,4,5,1,4,1,4,4,1,5,4,5,5], //"Umbrella",
+[0,7,7,1,3,2,2,3,0,4,0,0,4,1,0,4,2,0,4,4,0,4,5,0,4,6,0,4,1,2,4,5,2,4,1,5,4,5,5], //"Throne",
+[0,7,7,1,2,2,2,4,2,4,1,1,4,5,1,4,2,3,4,4,3], //"Fountain",
+[0,7,7,1,2,3,2,4,3,4,3,1], //"Triangle",
+[0,7,7,1,2,5,2,4,5,4,1,4,4,5,4,4,1,5,4,5,5], //"Devil",
+[0,7,7,1,1,4,2,2,5,4,3,1,4,5,1,4,3,3,4,0,5,4,1,5,4,0,6,4,1,6], //"Meteorite",
+[0,7,7,1,1,4,2,5,4,4,2,3,4,3,3,4,4,3], //"Sunset",
+[0,7,7,1,1,2,2,3,2,4,5,1,4,5,2,4,5,3], //"Password",
+[0,7,7,1,1,5,2,5,5,4,1,1,4,2,1,4,3,1,4,4,1,4,5,1,4,1,2,4,5,2,4,1,3,4,5,3], //"Bridge",
+[0,7,7,3,3,2,4,3,0], //"Drop",
+[0,7,7,1,1,5,2,3,5,4,5,0,4,6,0,4,6,1,4,0,5,4,0,6], //"Trick",
+[0,7,7,1,2,4,2,4,4,4,0,0,4,1,0,4,4,0,4,5,0,4,6,0,4,0,1,4,5,1,4,6,1,4,6,2], //"Mountain",
+[0,7,7,1,2,2,2,4,2,4,3,4,4,2,5,4,3,5,4,4,5], //"Boss",
+[] //,"Extra"
+];
+const maxlevel = levels.length - 1; // Extra user level.
 const colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23];
-var playing = 1; // Playing count.
 var level = 0; // Playing level.
+var playing = 1; // Playing count.
+var blocking = 0; // Blocking count.
 </script><!--/Data-->
 <!--Menu--><script>
 
-// Edit level.
+// Enable or disable menu.
+function updateMenu(id, enable, text=null, data=null) {
+	let e = document.getElementById(id);
+	if (e) {
+		e.style.display = enable ? "flex" : "none";
+		if (text) {
+			e.innerText = text;
+		}
+		if (data) {
+			e.src = data;
+		}
+	}
+}
+
+// Edit or share level.
 async function editLevel() {
 	picoResetParams();
 	picoSetNumcode(levels[level], 0);
 	picoSetColcode(colors, 1);
-	await picoReload("index.html?u=bros.html&");//111p060i9f0i04o+");
+	if (blocking <= 0) {
+		await picoShare();//111p060i9f0i04o+");
+	} else {
+		await picoReload("index.html?u=bros.html&");//111p060i9f0i04o+");
+	}
 }
 
 // Change level.
 function changeLevel(x) {
-	level = level + x < 0 ? 0 : level + x < userlevel ? level + x : userlevel;
+	level = level + x < 0 ? 0 : level + x < levels.length ? level + x : 0;
 	playing = -1; // Restart.
-	let e = document.getElementById("level");
-	if (e) {
-		e.innerText = level < userlevel ? "" + (level + 1) : "?";
-	}
-	e = document.getElementById("edit");
-	if (e) {
-		e.style.display = level < userlevel ? "none" : "flex";
-	}
-	picoBeep(1.2, 0.1);	
+	updateMenu("level", true, level < maxlevel ? "" + (level + 1) : "?");
+	updateMenu("edit", level >= maxlevel, "*");
+	picoBeep(1.2, 0.1);
+};
+
+// Clear level.
+function clearLevel() {
+	updateMenu("edit", true, "^");
+	picoBeep(1.2, 0.1);
+	picoBeep(1.2, 0.1, 0.2);
+	picoBeep(1.2, 0.1, 0.4);
 };
 </script><!--/Menu-->
 <!--Main--><script>
@@ -294,8 +147,10 @@ async function main() {
 
 	// Load query params.
 	if (picoStrings()) {
-		levels[userlevel] = picoNumcode();
-		changeLevel(userlevel);
+		levels[maxlevel] = picoNumcode();
+		changeLevel(maxlevel);
+	} else {
+		changeLevel(0);
 	}
 
 	// Load pallete data.
@@ -329,6 +184,7 @@ async function main() {
 							pixels[j][i] = 0;
 						}
 					}
+					blocking = width * height;
 				} else if (w >= 1 && w <= 4 && x >= 0 && x < width && y >= 0 && y < height) {
 					if (w >= 1 && w <= 2) {
 						if (pixels[players[w - 1][1]][players[w - 1][0]] >= 3) {
@@ -344,6 +200,7 @@ async function main() {
 						players[1] = [x, y];
 					}
 					pixels[y][x] = w;
+					blocking -= 1;
 				}
 			}
 		}
@@ -376,6 +233,7 @@ async function main() {
 							if (next[0] && next[1] && next2) {
 								pixels[j][i] = 3;
 								players[0] = players[1] = [i, j];
+								blocking -= 1;
 							} else {
 								// Move primary player first.
 								for (let k = 0; k < 2; k++) {
@@ -389,16 +247,22 @@ async function main() {
 											if (pixels[j2][i2] == 0) {
 												pixels[j2][i2] = k2 == 0 ? 1 : 2;
 												players[k2] = [i2, j2];
+												blocking -= 1;
 											}
 										}
 										players[k1] = [i, j];
+										blocking -= 1;
 										break; // Only one player moves forward.
 									}
 								}
 							}
 						}
+						//updateMenu("subtitle", true, "" + blocking);
+						if (blocking <= 0) {
+							players = [[], []];
+							clearLevel();
+						}
 					}
-
 				}
 			}
 

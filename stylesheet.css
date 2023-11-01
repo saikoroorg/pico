@@ -1,0 +1,168 @@
+body {
+	font-family: Courier, monospace, sans-serif;
+	background-color: #fff;
+	color: #888;
+}
+a {
+	color: #ccc;
+	text-decoration: none;
+}
+#container {
+	width: 100%; height: 100%;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: flex-start; -webkit-justify-content: flex-start;
+	align-items: center; -webkit-align-items: center;
+}
+#header {
+	margin: 0px;
+	flex: 0 1 auto;
+	display: flex; display: -webkit-flex;
+	flex-direction: row; -webkit-flex-direction: row;
+	justify-content: flex-end; -webkit-justify-content: flex-end;
+	align-items: center; -webkit-align-items: center;
+}
+#contents {
+	position: relative;
+	width: 100%; height: 80%;
+	margin: 8px;
+	flex: 1 1 auto;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: center; -webkit-justify-content: center;
+	align-items: center; -webkit-align-items: center;
+	background-color: #ccc;
+}
+#screen {
+	aspect-ratio: 1;
+}
+.offscreen {
+	display: none;
+}
+#footer {
+	width: 100%; height: 12px; margin-top: -8px;
+	flex: 0 1 auto;
+	display: flex; display: -webkit-flex;
+	flex-direction: row; -webkit-flex-direction: row;
+	justify-content: flex-end; -webkit-justify-content: flex-end;
+	align-items: center; -webkit-align-items: center;
+	font-size: 12px;
+	opacity: 0.1;
+}
+.logo {
+	height: 60px; margin: 0px 16px;
+	display: none;
+}
+.logo #icon {
+	width: 40px; height: 40px; padding: 10px; margin-left: -28px;
+}
+.logo #title {
+	font-size: 24px;
+	color: #888;
+}
+.logo #subtitle {
+	font-size: 24px;
+}
+.menu {
+	display: flex; display: -webkit-flex;
+	flex-direction: row; -webkit-flex-direction: row;
+	justify-content: space-between; -webkit-justify-content: space-between;
+	align-items: flex-end; -webkit-align-items: flex-end;
+}
+.item {
+	width: 40px; height: 40px; margin: 0px;
+	display: flex; display: -webkit-flex;
+	flex-direction: column; -webkit-flex-direction: column;
+	justify-content: center; -webkit-justify-content: center;
+	align-items: center; -webkit-align-items: center;
+	font-size: 16px;
+}
+.item #thumbnail {
+	width: 32px; height: 32px;
+	position: absolute;
+	left: 50%; transform: translate(-50%, 0);
+	display: none;
+}
+.item.dark {
+	background-color: #888;
+	color: #fff;
+}
+.light {
+	background-color: #ccc;
+	color: #888;
+}
+.secret {;
+	display: none;
+}
+.menu a {
+	transform: scale(1);
+	opacity: 1;
+}
+.menu a:hover {
+	transform: scale(1);
+	opacity: 0.6;
+}
+.menu a:active {
+	transform: scale(0.9);
+	opacity: 1;
+}
+@media (max-height: 400px) {
+	#container {
+		flex-direction: row; -webkit-flex-direction: row;
+	}
+	#contents {
+		width: 100%; height: 100%;
+	}
+	#header {
+		order: 1; height: 100%;
+		display: flex; display: -webkit-flex;
+		flex-direction: column; -webkit-flex-direction: column;
+		justify-content: space-between; -webkit-justify-content: space-between;
+		align-items: center; -webkit-align-items: center;
+	}
+	.menu {
+		display: flex; display: -webkit-flex;
+		flex-direction: column; -webkit-flex-direction: column;
+		justify-content: space-between; -webkit-justify-content: space-between;
+		align-items: flex-end; -webkit-align-items: flex-end;
+	}
+}
+@media (min-height: 401px) {
+	#header {
+		width: 100%;
+	}
+	@media (max-width: 350px) {
+		.center {
+			position: absolute;
+			left: 8px;
+		}
+	}
+	@media (min-width: 351px) {
+		#header {
+			display: flex; display: -webkit-flex;
+			flex-direction: row; -webkit-flex-direction: row;
+			justify-content: space-between; -webkit-justify-content: space-between;
+			align-items: center; -webkit-align-items: center;
+		}
+		.center {
+			position: absolute;
+			left: 50%; transform: translate(-50%, 0);
+		}
+		.logo {
+			display: flex; display: -webkit-flex;
+			flex-direction: row; -webkit-flex-direction: row;
+			justify-content: flex-start; -webkit-justify-content: flex-start;
+			align-items: center; -webkit-align-items: center;
+		}
+	}
+}
+@media (orientation: landscape) {
+	#screen {
+		height: 100%;
+	}
+}
+@media (orientation: portrait) {
+	#screen {
+		width: 100%;
+	}
+}
