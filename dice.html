@@ -63,7 +63,7 @@ const nums = [
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
 ];
 var colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23, 127,127,127];
-var pixels = [];
+var pixels = [], width = 7, height = 7; // Original design.
 var count = 1; // Count of dice.
 var maximum = 6; // Maximum of dice faces.
 var rolling = 0; // Rolling count.
@@ -94,10 +94,25 @@ async function editLevel() {
 	}
 }
 
+// Start rolling.
+function startRolling() {
+
+	// Update buttons.
+	updateMenu("edit", maximum == 0, "*");
+};
+
+// Start showing.
+function startShowing() {
+
+	// Update buttons.
+	updateMenu("edit", maximum == 0, "^");
+};
+
 // Set maximum of dice faces.
 function setMaximum(x) {
 	maximum = (x > 20) ? 20 : (x < 0) ? 0 : x;
 	updateMenu("edit", maximum == 0);
+	updateMenu("level", true, maximum > 0 ? "" + maximum : "?");
 };
 
 // Change count of dice.
@@ -108,7 +123,7 @@ function changeLevel(x) {
 		setMaximum(maximum == 6 ? 10 : maximum == 10 ? 0 : 6);
 	}
 	rolling = -1; // Reroll.
-	updateMenu("level", true, "" + maximum);
+	startRolling();
 	picoBeep(1.2, 0.1);
 };
 </script><!--/Menu-->
@@ -131,7 +146,7 @@ async function main() {
 
 		// Load pixels.
 		} else {
-			let index = 0, width = 7, height = 7;
+			let index = 0;
 			for (let n = 0; n < numcode.length; n += 3) {
 				if (numcode[n] == 0) {
 					index = 0;
@@ -147,12 +162,17 @@ async function main() {
 			}
 		}
 	}
+
+	// Set original design.
 	if (pixels.length > 0) {
 		setMaximum(0);
 	}
 
 	// Load pallete data.
 	picoColor(colors);
+
+	// Start rolling.
+	startRolling();
 
 	// Main loop.
 	var number = 0; // Rolled number.
@@ -173,7 +193,7 @@ async function main() {
 				posx[i] = ((x) / (lineMod + 1) - 0.5) * 200;
 				posy[i] = ((lines + 1 - y) / (lines + 1) - 0.5) * 200;
 			}
-			console.log("" + x + "," + y + " -> " + posx[i] + "," + posy[i]);
+			//console.log("" + x + "," + y + " -> " + posx[i] + "," + posy[i]);
 		}
 
 		// Sprite scale.
@@ -192,6 +212,9 @@ async function main() {
 					if (rolling > 10) {
 						result = 0;
 						rolling = -1;
+
+						// Restart rolling.
+						startRolling();
 					}
 				}
 			} else {
@@ -203,11 +226,14 @@ async function main() {
 				// Timeout and show result.
 				} else if (rolling > 60) {
 					for (let i = 0; i < count; i++) {
-						result += randoms[i];
+						result += (randoms[i] + 1);
 					}
 					angle = 0;
 					rolling = 1;
 					number++;
+
+					// End rolling.
+					startShowing();
 
 					// Number matched beeps on show result.
 					const kcents = [-1.0,
@@ -249,6 +275,7 @@ async function main() {
 			if (maximum == 0) {
 				if (pixels.length > 0) {
 					for (let i = 0; i < count; i++) {
+						picoRect([-width/2, -height/2, width, height], 0, posx[i], posy[i], angle, s);
 						picoSprite(pixels[randoms[i]], posx[i], posy[i], angle, s);
 					}
 				}
