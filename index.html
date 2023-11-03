@@ -13,8 +13,9 @@
 	<h1 id="header">
 		<div class="logo">
 			<a id="title" href="./index.html">Pico</a>
-			<a id="subtitle" href="bros.html">.</a>
-			<a id="subtitle" href="dice.html">.</a>
+			<div id="subtitle">
+				<a href="bros.html">.</a><a href="dice.html">.</a>
+			</div>
 		</div>
 		<div class="menu center">
 			<a class="item clear" id="prev" href="javascript:changePage(-1);"><</a>
@@ -156,29 +157,29 @@ async function share() {
 	picoResetParams();
 
 	// Create num code to share url.
-	let hmax = 0;
-	for (let h = 0; h < maxpage; h++) {
-		if (h == 0 || buffers[h]) {
+	let k = 0;
+	for (let p = 0; p < maxpage; p++) {
+		if (k == 0 || buffers[p]) {
 			let numcode = [0, width, height];
-			if (buffers[h]) {
+			if (buffers[p]) {
 				for (let j = yoffset; j < yoffset + height; j++) {
 					for (let i = xoffset; i < xoffset + width; i++) {
-						if (buffers[h][j][i]) {
-							let k = numcode.length;
-							numcode[k + 0] = buffers[h][j][i];
-							numcode[k + 1] = i - xoffset;
-							numcode[k + 2] = j - yoffset;
+						if (buffers[p][j][i]) {
+							let n = numcode.length;
+							numcode[n] = buffers[p][j][i];
+							numcode[n + 1] = i - xoffset;
+							numcode[n + 2] = j - yoffset;
 						}
 					}
 				}
 			}
-			picoSetNumcode(numcode, h);
-			hmax = h + 1;
+			picoSetNumcode(numcode, k);
+			k++;
 		}
 	}
 	if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-		picoSetColcode(colors, hmax);
+		picoSetColcode(colors, k);
 	}
 
 	// Start sharing.
@@ -191,8 +192,6 @@ async function share() {
 
 // Change canvas pave.
 function changePage(x) {
-		
-	// Update variables.
 	page = page + x < 1 ? 1 : page + x >= maxpage ? maxpage : page + x;
 	//console.log("Page: " + page);
 	playing = -1; // Restart.
@@ -220,8 +219,6 @@ function changePage(x) {
 
 // Change canvas size.
 function changeSize(x) {
-		
-	// Update variables.
 	width = width + x < 3 ? 3 : width + x >= maxwidth ? maxwidth : width + x;
 	height = height + x < 3 ? 3 : height + x >= maxheight ? maxheight : height + x;
 	xoffset = picoDiv(maxwidth - width, 2);
@@ -236,86 +233,85 @@ function changeSize(x) {
 <!--Main--><script>
 async function main() {
 
-	// Load query params.
+	// Initialize pixels on max size.
 	for (let j = 0; j < maxheight; j++) {
 		pixels[j] = [];
 		for (let i = 0; i < maxwidth; i++) {
 			pixels[j][i] = 0;
 		}
 	}
-	updateThumbnail();
 
 	// Load params.
 	let keys = picoKeys();
-	for (let h = 0; h < keys.length; h++) {
-		console.log("Param" + h + ": " + keys[h] + " -> " + picoStrings(keys[h]));
+	for (let k = 0; k < keys.length; k++) {
+		console.log("Param" + k + ": " + keys[k] + " -> " + picoStrings(keys[k]));
 
 		// Load referenced url.
-		if (keys[h] == "u") {
-			url = picoStrings(keys[h]);
+		if (keys[k] == "u") {
+			url = picoStrings(keys[k]);
 			darkmode();
 
 		// Load colors param.
-		} else if (keys[h] == "z") {
-			colors = picoNumbers(keys[h]);
-			//colors = picoColcode(h);
+		} else if (keys[k] == "z") {
+			colors = picoNumbers(keys[k]);
+			//colors = picoColcode(k);
 			console.log("Color: " + colors);
 
 		// Load pixels param.
 		} else {
-			let numcode = picoNumcode(h);
+			let numcode = picoNumcode(k);
 
 			// Load colors.
 			if ((numcode[0] == 0 && numcode[1] == 0 && numcode[2] == 0) ||
 				(numcode[0] == 1 && numcode[1] == 1 && numcode[2] == 1)) {
-				colors = picoColcode(h);
+				colors = picoColcode(k);
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
 				console.log("Color: " + colors);
-				updateThumbnail();
 
 			// Load pixels to canvas.
-			} else if (h == 0) {
-				for (let k = 0; k < numcode.length; k += 3) {
-					if (numcode[k] == 0) {
-						width = numcode[k + 1] >= 0 && numcode[k + 1] < maxwidth ? numcode[k + 1] : 7;
-						height = numcode[k + 2] >= 0 && numcode[k + 2] < maxheight ? numcode[k + 2] : 7;
+			} else if (k == 0) {
+				for (let n = 0; n < numcode.length; n += 3) {
+					if (numcode[n] == 0) {
+						width = numcode[n + 1] >= 0 && numcode[n + 1] < maxwidth ? numcode[n + 1] : 7;
+						height = numcode[n + 2] >= 0 && numcode[n + 2] < maxheight ? numcode[n + 2] : 7;
 						changeSize(0);
-					} else if (numcode[k] > 0) {
-						let i = numcode[k + 1] + xoffset;
-						let j = numcode[k + 2] + yoffset;
+					} else if (numcode[n] > 0) {
+						let i = numcode[n + 1] + xoffset;
+						let j = numcode[n + 2] + yoffset;
 						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-							pixels[j][i] = numcode[k];
+							pixels[j][i] = numcode[n];
 						}
+
+						pagefix = true; // Fix only one page.
 					}
 				}
-				pagefix = true; // Fix only one page.
 				console.log("Pixel: " + pixels);
-				updateThumbnail();
 
 			// Load pixels to buffers.
-			} else if (h < maxpage) {
-				//console.log("Load buffer" + h + ": " + maxpage);
-				buffers[h] = [];
+			} else if (k < maxpage) {
+				console.log("Load buffer" + k + ": " + maxpage);
+				buffers[k] = [];
 				for (let j = 0; j < maxheight; j++) {
-					buffers[h][j] = [];
+					buffers[k][j] = [];
 					for (let i = 0; i < maxwidth; i++) {
-						buffers[h][j][i] = 0;
+						buffers[k][j][i] = 0;
 					}
 				}
-				for (let k = 0; k < numcode.length; k += 3) {
-					if (numcode[k] > 0) {
-						let i = numcode[k + 1] + xoffset;
-						let j = numcode[k + 2] + yoffset;
+				for (let n = 0; n < numcode.length; n += 3) {
+					if (numcode[n] > 0) {
+						let i = numcode[n + 1] + xoffset;
+						let j = numcode[n + 2] + yoffset;
 						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-							buffers[h][j][i] = numcode[k];
+							buffers[k][j][i] = numcode[n];
 						}
 					}
 				}
 				pagefix = false; // Nofix two or more pages.
-				console.log("Buffer" + h + ": " + buffers[h]);
+				console.log("Buffer" + k + ": " + buffers[k]);
 			}
 		}
 	}
+	updateThumbnail();
 
 	// Load colors data.
 	picoColor(colors);

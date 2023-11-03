@@ -51,20 +51,23 @@ const dots = [
 	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,0,0, -1,-2,-2, -1,-2,0, -1,0,-2, -1,0,2, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
 ];
 const nums = [
-	[0,-4,-4,0,8,8, -1,-1,-2,0,1,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,2,0,2,0], // 0
-	[0,-4,-4,0,8,8, -1, 0,-2,0,0,4], // 1
-	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,2, -1,-1, 0,0,2,0, -1,-1,0,0,0,2, -1,-1,2,0,2,0], // 2
-	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4, -1,-1, 0,0,2,0, -1,-1,2,0,2,0], // 3
-	[0,-4,-4,0,8,8, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1, 0,0,2,0], // 4
-	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1,-1, 0,0,2,0, -1, 1,0,0,0,2, -1,-1,2,0,2,0], // 5
-	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1,-1, 0,0,2,0, -1, 1,0,0,0,2, -1,-1,2,0,2,0], // 6
-	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4], // 7
-	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0], // 8
-	[0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,1,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,2,0,2,0], // 0
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1, 0,-2,0,0,4], // 1
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,2, -1,-1, 0,0,2,0, -1,-1,0,0,0,2, -1,-1,2,0,2,0], // 2
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4, -1,-1, 0,0,2,0, -1,-1,2,0,2,0], // 3
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1, 0,0,2,0], // 4
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1,-1, 0,0,2,0, -1, 1,0,0,0,2, -1,-1,2,0,2,0], // 5
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1,-1, 0,0,2,0, -1, 1,0,0,0,2, -1,-1,2,0,2,0], // 6
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4], // 7
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0], // 8
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
 ];
+var colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23, 127,127,127];
+var pixels = [];
 var count = 1; // Count of dice.
 var maximum = 6; // Maximum of dice faces.
 var rolling = 0; // Rolling count.
+var result = 0; // Result.
 </script><!--/Data-->
 <!--Menu--><script>
 
@@ -82,10 +85,19 @@ function updateMenu(id, enable, text=null, data=null) {
 	}
 }
 
+// Edit or share level.
+async function editLevel() {
+	if (result > 0) {
+		await picoShare();
+	} else {
+		await picoReload("index.html?u=dice.html&");
+	}
+}
+
 // Set maximum of dice faces.
 function setMaximum(x) {
-	maximum = (x > 20) ? 20 : (x < 1) ? 1 : x;
-	rolling = -1; // Reroll.
+	maximum = (x > 20) ? 20 : (x < 0) ? 0 : x;
+	updateMenu("edit", maximum == 0);
 };
 
 // Change count of dice.
@@ -93,7 +105,7 @@ function changeLevel(x) {
 	if (x) {
 		count = (count + x > 20) ? 20 : (count + x < 1) ? 1 : count + x;
 	} else {
-	setMaximum(maximum == 6 ? 10 : 6);
+		setMaximum(maximum == 6 ? 10 : maximum == 10 ? 0 : 6);
 	}
 	rolling = -1; // Reroll.
 	updateMenu("level", true, "" + maximum);
@@ -106,8 +118,44 @@ async function main() {
 	//var maximum = 6; // Maximum of dice faces.
 	//var rolling = 0; // Rolling count.
 
+	// Load query params.
+	let keys = picoKeys();
+	for (let k = 0; k < keys.length; k++) {
+		console.log("Param" + k + ": " + keys[k] + " -> " + picoStrings(keys[k]));
+		let numcode = picoNumcode(k);
+
+		// Load colors.
+		if ((numcode[0] == 0 && numcode[1] == 0 && numcode[2] == 0) ||
+			(numcode[0] == 1 && numcode[1] == 1 && numcode[2] == 1)) {
+			colors = picoColcode(k);
+
+		// Load pixels.
+		} else {
+			let index = 0, width = 7, height = 7;
+			for (let n = 0; n < numcode.length; n += 3) {
+				if (numcode[n] == 0) {
+					index = 0;
+					width  = numcode[n + 1] >= 0 && numcode[n + 1] <= 20 ? numcode[n + 1] : 7;
+					height = numcode[n + 2] >= 0 && numcode[n + 2] <= 20 ? numcode[n + 2] : 7;
+					pixels[k] = [];
+				} else {
+					pixels[k][index * 3] = numcode[n];
+					pixels[k][index * 3 + 1] = numcode[n + 1] - (width - 1) / 2;
+					pixels[k][index * 3 + 2] = numcode[n + 2] - (height - 1) / 2;
+					index++;
+				}
+			}
+		}
+	}
+	if (pixels.length > 0) {
+		setMaximum(0);
+	}
+
+	// Load pallete data.
+	picoColor(colors);
+
 	// Main loop.
-	var number = 0;
+	var number = 0; // Rolled number.
 	while (true) {
 
 		// Sprite lines and rows.
@@ -133,8 +181,8 @@ async function main() {
 
 		// Rolling dice.
 		let angle = 0;
-		let result = 0;
 		let randoms = [];
+		result = 0;
 		for (rolling = 1; rolling >= 1; rolling++) {
 
 			if (result > 0) {
@@ -178,8 +226,16 @@ async function main() {
 			// Update angle.
 			if (result <= 0) {
 				angle = picoMod(angle + 20, 360);
-				for (let i = 0; i < count; i++) {
-					randoms[i] = picoRandom(maximum);
+				if (maximum == 0) {
+					if (pixels.length > 0) {
+						for (let i = 0; i < count; i++) {
+							randoms[i] = picoRandom(pixels.length);
+						}
+					}
+				} else {
+					for (let i = 0; i < count; i++) {
+						randoms[i] = picoRandom(maximum);
+					}
 				}
 			}
 
@@ -190,7 +246,13 @@ async function main() {
 			let n = result <= 0 ? number : number - 1;
 			picoChar(n, 0, 0, -80);
 			let s = rolling < 5 ? scale * (0.8 + 0.04 * rolling) : scale;
-			if (maximum == 10) {
+			if (maximum == 0) {
+				if (pixels.length > 0) {
+					for (let i = 0; i < count; i++) {
+						picoSprite(pixels[randoms[i]], posx[i], posy[i], angle, s);
+					}
+				}
+			} else if (maximum == 10) {
 				for (let i = 0; i < count; i++) {
 					picoSprite(nums[randoms[i]], posx[i], posy[i], angle, s);
 				}
