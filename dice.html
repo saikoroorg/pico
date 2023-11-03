@@ -64,6 +64,7 @@ var pixels = [
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
 ]; // Original design pixels.
 var width = 7, height = 7; // Original design size.
+var orignal = false; // Original design flag.
 var count = 1; // Count of dice.
 var maximum = 6; // Maximum of dice faces.
 var rolling = 0; // Rolling count.
@@ -87,7 +88,7 @@ function updateMenu(id, enable, text=null, data=null) {
 
 // Edit or share level.
 async function editLevel() {
-	if (result > 0) {
+	if (orignal && result > 0) {
 		await picoShare();
 	} else {
 		await picoReload("index.html?u=dice.html&");
@@ -106,15 +107,15 @@ function startRolling() {
 function startShowing() {
 
 	// Update buttons.
-	updateMenu("edit", !maximum, "^");
+	updateMenu("edit", !maximum, orignal ? "^" : "*");
 };
 
 // Change count of dice.
 function changeLevel(x) {
 	if (x) {
 		count = (count + x > 20) ? 20 : (count + x < 1) ? 1 : count + x;
-	} else {
-		maximum = maximum && pixels.length > 0 ? 0 : 6;
+	} else if (!orignal) {
+		maximum = maximum ? 0 : 6;
 	}
 	rolling = -1; // Reroll.
 	startRolling();
@@ -158,6 +159,7 @@ async function main() {
 
 	// Set original colors and pixels.
 	if (originalpixels.length > 0 && originalpixels[0].length > 0) {
+		orignal = true;
 		colors = originalcolors;
 		pixels = originalpixels;
 		maximum = 0;
@@ -189,7 +191,12 @@ async function main() {
 		}
 
 		// Sprite scale.
-		let scale = 15 / ((count < lineMax ? count : lines >= lineMax ? lines : lineMax) + 1);
+		let scale = 1;
+		if (maximum == 0 && pixels.length > 0) {
+			scale = 15 / ((count < lineMax ? count : lines >= lineMax ? lines : lineMax) + 1) * 7 / width;
+		} else {
+			scale = 15 / ((count < lineMax ? count : lines >= lineMax ? lines : lineMax) + 1);
+		}
 
 		// Rolling dice.
 		let angle = 0;
@@ -264,18 +271,11 @@ async function main() {
 			let n = result <= 0 ? number : number - 1;
 			picoChar(n, 0, 0, -80);
 			let s = rolling < 5 ? scale * (0.8 + 0.04 * rolling) : scale;
-			if (maximum == 0) {
-				if (pixels.length > 0) {
-					picoColor(colors);
-					for (let i = 0; i < count; i++) {
-						picoRect([-(width - 1)/2, -(height - 1)/2, (width - 1), (height - 1)], 0, posx[i], posy[i], angle, s);
-						picoSprite(pixels[randoms[i]], posx[i], posy[i], angle, s);
-					}
-				}
-			} else if (maximum == 10) {
-				picoColor(null);
+			if (maximum == 0 && pixels.length > 0) {
+				picoColor(colors);
 				for (let i = 0; i < count; i++) {
-					picoSprite(nums[randoms[i]], posx[i], posy[i], angle, s);
+					picoRect([-(width - 1)/2, -(height - 1)/2, (width - 1), (height - 1)], 0, posx[i], posy[i], angle, s);
+					picoSprite(pixels[randoms[i]], posx[i], posy[i], angle, s);
 				}
 			} else {
 				picoColor(null);
