@@ -92,6 +92,8 @@ pico.Worker = class {
 							let reg2 = new RegExp("(<" + key + ".*>).*(<\/" + key + ".*>)");
 							text = text.replace(reg2, "$1" + replacing[key] + "$2");
 						}
+						let reg0 = new RegExp("\/index.html");
+						text = text.replace(reg0, "\/");
 						console.log("Replaced file: " + text.replace(/\s+/g, " ").substr(-1000));
 
 						// Replaced responce.
