@@ -2,7 +2,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-<title>Dice</title>
+<title>PicoDice</title>
 <link rel="icon" type="image/svg" href="icon.svg" />
 <link rel="apple-touch-icon" href="icon.png" sizes="192x192" />
 <link rel="manifest" href="manifest.json" />
@@ -50,7 +50,8 @@ const dots = [
 	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,-2,-2, -1,-2,0, -1,0,-2, -1,0,2, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
 	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,0,0, -1,-2,-2, -1,-2,0, -1,0,-2, -1,0,2, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
 ];
-const nums = [
+var colors = [255,255,255, 0,0,0]; // Original design colors.
+var pixels = [
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,1,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,2,0,2,0], // 0
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1, 0,-2,0,0,4], // 1
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,2, -1,-1, 0,0,2,0, -1,-1,0,0,0,2, -1,-1,2,0,2,0], // 2
@@ -61,9 +62,8 @@ const nums = [
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4], // 7
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0], // 8
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
-];
-var colors = []; // Colors.
-var pixels = [], width = 7, height = 7; // Original design.
+]; // Original design pixels.
+var width = 7, height = 7; // Original design size.
 var count = 1; // Count of dice.
 var maximum = 6; // Maximum of dice faces.
 var rolling = 0; // Rolling count.
@@ -98,21 +98,15 @@ async function editLevel() {
 function startRolling() {
 
 	// Update buttons.
-	updateMenu("edit", maximum == 0, "*");
+	updateMenu("edit", !maximum, "*");
+	updateMenu("level", true, maximum > 0 ? "" + maximum : "" + pixels.length);
 };
 
 // Start showing.
 function startShowing() {
 
 	// Update buttons.
-	updateMenu("edit", maximum == 0, "^");
-};
-
-// Set maximum of dice faces.
-function setMaximum(x) {
-	maximum = (x > 20) ? 20 : (x < 0) ? 0 : x;
-	updateMenu("edit", maximum == 0);
-	updateMenu("level", true, maximum > 0 ? "" + maximum : "?");
+	updateMenu("edit", !maximum, "^");
 };
 
 // Change count of dice.
@@ -120,7 +114,7 @@ function changeLevel(x) {
 	if (x) {
 		count = (count + x > 20) ? 20 : (count + x < 1) ? 1 : count + x;
 	} else {
-		setMaximum(maximum == 6 ? 10 : maximum == 10 ? 0 : 6);
+		maximum = maximum && pixels.length > 0 ? 0 : 6;
 	}
 	rolling = -1; // Reroll.
 	startRolling();
@@ -134,7 +128,7 @@ async function main() {
 	//var rolling = 0; // Rolling count.
 
 	// Load query params.
-	let keys = picoKeys();
+	let keys = picoKeys(), originalcolors = [], originalpixels = [];
 	for (let k = 0; k < keys.length; k++) {
 		console.log("Param" + k + ": " + keys[k] + " -> " + picoStrings(keys[k]));
 		let numcode = picoNumcode(k);
@@ -142,30 +136,31 @@ async function main() {
 		// Load colors.
 		if ((numcode[0] == 0 && numcode[1] == 0 && numcode[2] == 0) ||
 			(numcode[0] == 1 && numcode[1] == 1 && numcode[2] == 1)) {
-			colors = picoColcode(k);
+			originalcolors = picoColcode(k);
 
 		// Load pixels.
 		} else {
 			let index = 0;
 			for (let n = 0; n < numcode.length; n += 3) {
 				if (numcode[n] == 0) {
-					index = 0;
 					width  = numcode[n + 1] >= 0 && numcode[n + 1] <= 20 ? numcode[n + 1] : 7;
 					height = numcode[n + 2] >= 0 && numcode[n + 2] <= 20 ? numcode[n + 2] : 7;
-					pixels[k] = [];
+					originalpixels[k] = [];
 				} else {
-					pixels[k][index * 3] = numcode[n];
-					pixels[k][index * 3 + 1] = numcode[n + 1] - (width - 1) / 2;
-					pixels[k][index * 3 + 2] = numcode[n + 2] - (height - 1) / 2;
+					originalpixels[k][index * 3] = numcode[n];
+					originalpixels[k][index * 3 + 1] = numcode[n + 1] - (width - 1) / 2;
+					originalpixels[k][index * 3 + 2] = numcode[n + 2] - (height - 1) / 2;
 					index++;
 				}
 			}
 		}
 	}
 
-	// Set original design.
-	if (pixels.length > 0) {
-		setMaximum(0);
+	// Set original colors and pixels.
+	if (originalpixels.length > 0 && originalpixels[0].length > 0) {
+		colors = originalcolors;
+		pixels = originalpixels;
+		maximum = 0;
 	}
 
 	// Start rolling.
@@ -273,7 +268,7 @@ async function main() {
 				if (pixels.length > 0) {
 					picoColor(colors);
 					for (let i = 0; i < count; i++) {
-						picoRect([-width/2, -height/2, width, height], 0, posx[i], posy[i], angle, s);
+						picoRect([-(width - 1)/2, -(height - 1)/2, (width - 1), (height - 1)], 0, posx[i], posy[i], angle, s);
 						picoSprite(pixels[randoms[i]], posx[i], posy[i], angle, s);
 					}
 				}
