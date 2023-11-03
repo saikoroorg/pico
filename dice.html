@@ -62,7 +62,7 @@ const nums = [
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0], // 8
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
 ];
-var colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23, 127,127,127];
+var colors = []; // Colors.
 var pixels = [], width = 7, height = 7; // Original design.
 var count = 1; // Count of dice.
 var maximum = 6; // Maximum of dice faces.
@@ -168,9 +168,6 @@ async function main() {
 		setMaximum(0);
 	}
 
-	// Load pallete data.
-	picoColor(colors);
-
 	// Start rolling.
 	startRolling();
 
@@ -274,16 +271,19 @@ async function main() {
 			let s = rolling < 5 ? scale * (0.8 + 0.04 * rolling) : scale;
 			if (maximum == 0) {
 				if (pixels.length > 0) {
+					picoColor(colors);
 					for (let i = 0; i < count; i++) {
 						picoRect([-width/2, -height/2, width, height], 0, posx[i], posy[i], angle, s);
 						picoSprite(pixels[randoms[i]], posx[i], posy[i], angle, s);
 					}
 				}
 			} else if (maximum == 10) {
+				picoColor(null);
 				for (let i = 0; i < count; i++) {
 					picoSprite(nums[randoms[i]], posx[i], posy[i], angle, s);
 				}
 			} else {
+				picoColor(null);
 				for (let i = 0; i < count; i++) {
 					picoSprite(dots[randoms[i]], posx[i], posy[i], angle, s);
 				}

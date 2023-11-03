@@ -225,9 +225,9 @@ pico.Image = class {
 	}
 
 	// Set image color pallete.
-	color(palls=[0,0,0]) {
+	color(palls=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			this.palls = palls;
+			this.palls = palls ? palls : pico.Image.colors;
 		}); // end of lock.
 	}
 
