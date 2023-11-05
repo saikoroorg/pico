@@ -50,6 +50,19 @@ const dots = [
 	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,-2,-2, -1,-2,0, -1,0,-2, -1,0,2, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
 	[-1,-4,-4,0,8,8, 0,-3,-3,0,6,6, -1,0,0, -1,-2,-2, -1,-2,0, -1,0,-2, -1,0,2, -1,-2,2, -1,2,-2, -1,2,0, -1,2,2],
 ];
+var nums = [
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,1,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,2,0,2,0], // 0
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1, 0,-2,0,0,4], // 1
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,2, -1,-1, 0,0,2,0, -1,-1,0,0,0,2, -1,-1,2,0,2,0], // 2
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4, -1,-1, 0,0,2,0, -1,-1,2,0,2,0], // 3
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1, 0,0,2,0], // 4
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1,-1, 0,0,2,0, -1, 1,0,0,0,2, -1,-1,2,0,2,0], // 5
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1,-1, 0,0,2,0, -1, 1,0,0,0,2, -1,-1,2,0,2,0], // 6
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1, 1,-2,0,0,4], // 7
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0], // 8
+	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
+];
+
 var colors = [255,255,255, 0,0,0]; // Original design colors.
 var pixels = [
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,1,0, -1,-1,-2,0,0,4, -1, 1,-2,0,0,4, -1,-1,2,0,2,0], // 0
@@ -64,9 +77,9 @@ var pixels = [
 	[-1,-4,-4,0,8,8, 0,-4,-4,0,8,8, -1,-1,-2,0,2,0, -1,-1,-2,0,0,2, -1, 1,-2,0,0,4, -1,-1,0,0,2,0, -1,-1,2,0,2,0] // 9
 ]; // Original design pixels.
 var width = 7, height = 7; // Original design size.
-var orignal = false; // Original design flag.
+var original = false; // Original design flag.
 var count = 1; // Count of dice.
-var maximum = 6; // Maximum of dice faces.
+var maximum = 0; // Maximum of dice faces.
 var rolling = 0; // Rolling count.
 var result = 0; // Result.
 </script><!--/Data-->
@@ -88,38 +101,26 @@ function updateMenu(id, enable, text=null, data=null) {
 
 // Edit or share level.
 async function editLevel() {
-	if (orignal && result > 0) {
+	if (original && result > 0) {
 		await picoShare();
 	} else {
 		await picoReload("index.html?u=dice.html&");
 	}
 }
 
-// Start rolling.
-function startRolling() {
-
-	// Update buttons.
-	updateMenu("edit", !maximum, "*");
-	updateMenu("level", true, maximum > 0 ? "" + maximum : "" + pixels.length);
-};
-
-// Start showing.
-function startShowing() {
-
-	// Update buttons.
-	updateMenu("edit", !maximum, orignal ? "^" : "*");
-};
-
 // Change count of dice.
 function changeLevel(x) {
 	if (x) {
-		count = (count + x > 20) ? 20 : (count + x < 1) ? 1 : count + x;
-	} else if (!orignal) {
-		maximum = maximum ? 0 : 6;
+		count = (count + x > 20) ? 20 : (count + x < 0) ? 0 : count + x;
+	} else if (!original) {
+		maximum = maximum == 6 ? 10 : 6;
 	}
 	rolling = -1; // Reroll.
-	startRolling();
 	picoBeep(1.2, 0.1);
+
+	// Update buttons.
+	updateMenu("edit", original || !count, count ? "^" : "*");
+	updateMenu("level", true, maximum > 0 ? "" + maximum : "" + pixels.length);
 };
 </script><!--/Menu-->
 <!--Main--><script>
@@ -159,14 +160,14 @@ async function main() {
 
 	// Set original colors and pixels.
 	if (originalpixels.length > 0 && originalpixels[0].length > 0) {
-		orignal = true;
+		original = true;
 		colors = originalcolors;
 		pixels = originalpixels;
 		maximum = 0;
 	}
 
 	// Start rolling.
-	startRolling();
+	changeLevel(0);
 
 	// Main loop.
 	var number = 0; // Rolled number.
@@ -211,12 +212,9 @@ async function main() {
 					if (rolling > 10) {
 						result = 0;
 						rolling = -1;
-
-						// Restart rolling.
-						startRolling();
 					}
 				}
-			} else {
+			} else if (count > 0) {
 
 				// Hold to rolling dice.
 				if (picoMotion()) {
@@ -230,9 +228,6 @@ async function main() {
 					angle = 0;
 					rolling = 1;
 					number++;
-
-					// End rolling.
-					startShowing();
 
 					// Number matched beeps on show result.
 					const kcents = [-1.0,
@@ -251,11 +246,9 @@ async function main() {
 			// Update angle.
 			if (result <= 0) {
 				angle = picoMod(angle + 20, 360);
-				if (maximum == 0) {
-					if (pixels.length > 0) {
-						for (let i = 0; i < count; i++) {
-							randoms[i] = picoRandom(pixels.length);
-						}
+				if (maximum == 0 && pixels.length > 0) {
+					for (let i = 0; i < count; i++) {
+						randoms[i] = picoRandom(pixels.length);
 					}
 				} else {
 					for (let i = 0; i < count; i++) {
@@ -277,10 +270,15 @@ async function main() {
 					picoRect([-(width - 1)/2, -(height - 1)/2, (width - 1), (height - 1)], 0, posx[i], posy[i], angle, s);
 					picoSprite(pixels[randoms[i]], posx[i], posy[i], angle, s);
 				}
-			} else {
+			} else if (maximum > 2 && maximum < 10) {
 				picoColor(null);
 				for (let i = 0; i < count; i++) {
 					picoSprite(dots[randoms[i]], posx[i], posy[i], angle, s);
+				}
+			} else {
+				picoColor(null);
+				for (let i = 0; i < count; i++) {
+					picoSprite(nums[randoms[i]], posx[i], posy[i], angle, s);
 				}
 			}
 
