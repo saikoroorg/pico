@@ -1,10 +1,5 @@
 /* PICO Image module */
 
-// Random.
-function picoRandom(max) {
-	return pico.image.random(max);
-}
-
 // Mod.
 function picoMod(a, b) {
 	if (a >= 0 && b >= 0 || a <= 0 && b <= 0) {
@@ -193,21 +188,6 @@ pico.Image = class {
 	static colors6 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // 10 colors from the 6 bits.
 	static colors5 = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // 10 colors from the 5 bits.
 
-	// Get random count.
-	random(max) {
-
-		// Xorshift algorythm.
-		this.seed = this.seed ^ (this.seed << 13);
-		this.seed = this.seed ^ (this.seed >>> 17);
-		this.seed = this.seed ^ (this.seed << 15);
-		return Math.abs(this.seed % max);
-
-		// LCG algorythm.
-		// this.seed = (this.seed * 9301 + 49297) % 233280;
-		// let rand = this.seed / 233280;
-		// return Math.round(rand * max);
-	}
-
 	// Wait and flip image.
 	flip(t=10) {
 		return new Promise(r => setTimeout(r, t)).then(() => {
@@ -256,17 +236,21 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	drawSprite(cells=[1,0,0], x=0, y=0, angle=0, scale=1) {
+	drawSprite(cells=[0,7,7,1,0,0], x=0, y=0, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
 				await this._reset(x, y, angle, scale);
+				let x0 = 0, y0 = 0;
 				for (let i = 0; i < cells.length; i += 3) {
-					if (cells[i+3] == 0) {
-						await this._draw(cells[i], cells[i+1], cells[i+2], cells[i+4], cells[i+5]);
+					if (i == 0 && cells[i] == 0) {
+						x0 = -(cells[i+1] - 1) / 2;
+						y0 = -(cells[i+2] - 1) / 2;
+					} else if (cells[i+3] == 0) {
+						await this._draw(cells[i], cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
 						i += 3;
 					} else {
-						await this._draw(cells[i], cells[i+1], cells[i+2]);
+						await this._draw(cells[i], cells[i+1] + x0, cells[i+2] + y0);
 					}
 				}
 				resolve();
@@ -363,7 +347,6 @@ pico.Image = class {
 		this.primary = 0; // Primary canvas index.
 		this.context = null; // Canvas 2d context.
 		this.palls = pico.Image.colors; // Master image color. 
-		this.seed = Date.now(); // Random seed.
 
 		if (parent) {
 			this._setup(parent, width, height);

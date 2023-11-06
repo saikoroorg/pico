@@ -5,6 +5,10 @@
 <body>
 <script src="param.js"></script>
 <!--Main--><script>
+console.log("Seed: " + picoRandomSeed());
+console.log("Random: " + picoRandom(100));
+console.log("NewSeed: " + picoRandomSeed());
+
 document.addEventListener("click", async (evt) => {
 
 console.log("Strings: " + picoStrings());

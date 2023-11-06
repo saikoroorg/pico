@@ -1,5 +1,14 @@
 /* PICO Param module */
 
+// Random.
+function picoRandom(max, seed=0) {
+	return pico.param.random(max, seed);
+}
+// Random seed.
+function picoRandomSeed() {
+	return pico.param.randomSeed();
+}
+
 // Reload with param.
 async function picoReload(url=null) {
 	await pico.param.reload(url);
@@ -72,6 +81,32 @@ var pico = pico || {};
 
 // Param class.
 pico.Param = class {
+
+	// Get random count.
+	random(max, seed=0) {
+		if (seed > 0) {
+			this.seed = seed;
+		}
+		if (max > 0) {
+
+			// Xorshift algorythm.
+			this.seed = this.seed ^ (this.seed << 13);
+			this.seed = this.seed ^ (this.seed >>> 17);
+			this.seed = this.seed ^ (this.seed << 15);
+			return Math.abs(this.seed % max);
+
+			// LCG algorythm.
+			// this.seed = (this.seed * 9301 + 49297) % 233280;
+			// let rand = this.seed / 233280;
+			// return Math.round(rand * max);
+		}
+		return 0;
+	}
+
+	// Get random seed.
+	randomSeed() {
+		return this.seed >>> 0;
+	}
 
 	// Reload with param.
 	async reload(url=null) {
@@ -147,6 +182,7 @@ pico.Param = class {
 	constructor() {
 		//this.lock = "picoParamLock" + Date.now(); // Lock object identifier.
 		this.context = [];
+		this.seed = Date.now(); // Random seed.
 
 		// Setup now.
 		this._setup();
