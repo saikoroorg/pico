@@ -89,7 +89,7 @@ var levels = [ // Level data.
 [0,7,7,1,1,5,2,3,5,4,5,0,4,6,0,4,6,1,4,0,5,4,0,6], //"Trick",
 [0,7,7,1,2,4,2,4,4,4,0,0,4,1,0,4,4,0,4,5,0,4,6,0,4,0,1,4,5,1,4,6,1,4,6,2], //"Mountain",
 [0,7,7,1,2,2,2,4,2,4,3,4,4,2,5,4,3,5,4,4,5], //"Boss",
-[] //,"Extra"
+[], //"Extra"
 ];
 const colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23];
 var level = 0; // Playing level.
@@ -114,22 +114,35 @@ function updateMenu(id, enable, text=null, data=null) {
 	}
 }
 
+// Update buttons.
+function updateButtons() {
+	updateMenu("level", true, level >= levels.length - 1 ? "?" : "" + (level + 1));
+	updateMenu("edit", level >= levels.length - 1 || blocking == 0, blocking == 0 ? "^" : "*");
+	updateMenu("plus", true, level < maxlevel && !extra ? "+" : " ");
+	updateMenu("minus", true, level > 0 && !extra ? "-" : " ");
+}
+
 // Edit or share level.
 async function editLevel() {
 	picoResetParams();
-	picoSetNumcode(levels[level], 0);
-	picoSetColcode(colors, 1);
-	if (blocking == 0) {
-		await picoShare();//111p060i9f0i04o+");
+	if (level < levels.length - 1) {
+		let password = picoRandom(1000000, (level + 1));
+		picoSetStrings("" + (level + 1) + "@" + password, 0);
+		await picoShare();
 	} else {
-		await picoReload("index.html?u=bros.html&");//111p060i9f0i04o+");
+		picoSetNumcode(levels[level], 0);
+		picoSetColcode(colors, 1);
+		if (blocking == 0) {
+			await picoShare();
+		} else {
+			picoSetStrings("bros.html", "u");
+			await picoReload("index.html");
+		}
 	}
 }
 
 // Change level.
 function changeLevel(x) {
-
-	// Update level.
 	if (x == 0) {
 		blocking = -1;
 		playing = -1; // Restart.
@@ -142,39 +155,39 @@ function changeLevel(x) {
 	} else {
 		picoBeep(0, 0.1);
 	}
-
-	// Update buttons.
-	updateMenu("level", true, level >= levels.length - 1 ? "?" : "" + (level + 1));
-	updateMenu("edit", level >= levels.length - 1, blocking == 0 ? "^" : "*");
-	updateMenu("plus", true, level < maxlevel && !extra ? "+" : " ");
-	updateMenu("minus", true, level > 0 && !extra ? "-" : " ");
+	updateButtons();
 }
 
 // Clear level.
 function clearLevel() {
-
-	// Update cleared level.
 	maxlevel = level + 1 < levels.length ? level + 1 : levels.length;
 	picoBeep(1.2, 0.1);
 	picoBeep(1.2, 0.1, 0.2);
-
-	// Update buttons.
-	updateMenu("level", true, level >= levels.length - 1 ? "?" : "" + (level + 1));
-	updateMenu("edit", level >= levels.length - 1, blocking == 0 ? "^" : "*");
-	updateMenu("plus", true, level < maxlevel && !extra ? "+" : " ");
-	updateMenu("minus", true, level > 0 && !extra ? "-" : " ");
+	updateButtons();
 };
 </script><!--/Menu-->
 <!--Main--><script>
 async function main() {
 
 	// Load query params.
-	if (picoStrings()) {
-		levels[levels.length - 1] = picoNumcode();
-		level = levels.length - 1;
-		extra = true;
+	let value = picoStrings();
+	if (value) {
+
+		// Load extra level.
+		if (value[0] == "0") {
+			levels[levels.length - 1] = picoNumcode();
+			level = levels.length - 1;
+			extra = true;
+
+		// Load max level.
+		} else {
+			let numbers = picoNumbers();
+			if (picoRandom(1000000, numbers[0]) == numbers[1]) {
+				maxlevel = level = numbers[0];
+			}
+		}
 	}
-	changeLevel(0);
+	updateButtons();
 
 	// Load pallete data.
 	picoColor(colors);

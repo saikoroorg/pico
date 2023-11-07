@@ -87,9 +87,9 @@ async function picoText(text, area=null, c=0, x=0, y=0, angle=0, scale=1) {
 }
 
 // Draw sprite.
-async function picoSprite(cells=[1,0,0], x=0, y=0, angle=0, scale=1) {
+async function picoSprite(cells=[1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
 	try {
-		await pico.image.drawSprite(cells, x, y, angle, scale);
+		await pico.image.drawSprite(cells, c, x, y, angle, scale);
 	} catch (error) {
 		console.error(error);
 	}
@@ -236,17 +236,22 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	drawSprite(cells=[0,7,7,1,0,0], x=0, y=0, angle=0, scale=1) {
+	drawSprite(cells=[0,9,9,1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
-				await this._reset(x, y, angle, scale);
 				let x0 = 0, y0 = 0;
-				for (let i = 0; i < cells.length; i += 3) {
-					if (i == 0 && cells[i] == 0) {
-						x0 = -(cells[i+1] - 1) / 2;
-						y0 = -(cells[i+2] - 1) / 2;
-					} else if (cells[i+3] == 0) {
+				if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
+					x0 = -(cells[1] - 1) / 2;
+					y0 = -(cells[2] - 1) / 2;
+					scale = scale * 9 / (cells[1] < cells[2] ? cells[1] : cells[2]);
+				}
+				await this._reset(x, y, angle, scale);
+				if (c >= 0 && x0 < 0 && y0 < 0) {
+					this._rect([x0, y0, x0*-2, y0*-2], c);
+				}
+				for (let i = 3; i < cells.length; i += 3) {
+					if (cells[i+3] == 0) {
 						await this._draw(cells[i], cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
 						i += 3;
 					} else {

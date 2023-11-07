@@ -59,7 +59,7 @@ var playing = 1; // Playing count.
 var pixels = []; // Pixels.
 var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Colors.
 const maxcolor = 10; // Color max size.
-var url = null; // Referenced url.
+var appurl = null; // Referenced url.
 </script><!--/Data-->
 <!--Menu--><script>
 
@@ -78,14 +78,23 @@ function updateMenu(id, enable, text=null, data=null) {
 }
 
 // Set darkmode.
-async function darkmode() {
+async function darkmode(enable) {
 	let e = document.body;
 	if (e) {
-		e.style.backgroundColor ="#888";
-		e.style.color ="#fff";
+		e.style.backgroundColor = enable ? "#888" : "#fff";
+		e.style.color = enable ? "#fff" : "#888";
 	}
-	updateMenu("title", false);
-	updateMenu("subtitle", false);
+	updateMenu("title", !enable);
+	updateMenu("subtitle", !enable);
+}
+
+// Update buttons.
+function updateButtons() {
+	// Update buttons.
+	updateMenu("size", true, "x" + width);
+	updateMenu("page", true, page >= 2 ? "" + page : "^");
+	updateMenu("prev",  buffers[page - 1] && !pagefix || page >= 2);
+	updateMenu("next",  buffers[page - 1] && !pagefix || page >= 2);
 }
 
 // Update thumbnail image.
@@ -143,15 +152,10 @@ async function updateThumbnail(force = true) {
 		// Disable thumbnail.
 		updateMenu("thumbnail", false);
 	}
-
-	// Update buttons.
-	updateMenu("size", true, "x" + width);
-	updateMenu("page", true, page >= 2 ? "" + page : "^");
-	updateMenu("prev",  buffers[page - 1] && !pagefix || page >= 2);
-	updateMenu("next",  buffers[page - 1] && !pagefix || page >= 2);
+	updateButtons();
 }
 
-// Share.
+// Back to app or start sharing.
 async function share() {
 	updateThumbnail();
 	picoResetParams();
@@ -182,9 +186,9 @@ async function share() {
 		picoSetColcode(colors, k);
 	}
 
-	// Start sharing.
-	if (url) {
-		await picoReload(url);
+	// Back to app or start sharing.
+	if (appurl) {
+		await picoReload(appurl);
 	} else {
 		await picoShare();
 	}
@@ -248,8 +252,8 @@ async function main() {
 
 		// Load referenced url.
 		if (keys[k] == "u") {
-			url = picoStrings(keys[k]);
-			darkmode();
+			appurl = picoStrings(keys[k]);
+			darkmode(true);
 
 		// Load colors param.
 		} else if (keys[k] == "z") {

@@ -5,8 +5,8 @@ function picoRandom(max, seed=0) {
 	return pico.param.random(max, seed);
 }
 // Random seed.
-function picoRandomSeed() {
-	return pico.param.randomSeed();
+function picoSeed() {
+	return pico.param.seed();
 }
 
 // Reload with param.
@@ -50,8 +50,8 @@ function picoNumbers(key=0) {
 }
 
 // Set param as numbers.
-function picoSetNumbers(numbers, key=0) {
-	return pico.param.setNumbers(numbers, key);
+function picoSetNumbers(numbers, key=0, separator=".") {
+	return pico.param.setNumbers(numbers, key, separator);
 }
 
 // Get param as number code.
@@ -85,27 +85,27 @@ pico.Param = class {
 	// Get random count.
 	random(max, seed=0) {
 		if (seed > 0) {
-			this.seed = seed;
+			this.rand = seed;
 		}
 		if (max > 0) {
 
 			// Xorshift algorythm.
-			this.seed = this.seed ^ (this.seed << 13);
-			this.seed = this.seed ^ (this.seed >>> 17);
-			this.seed = this.seed ^ (this.seed << 15);
-			return Math.abs(this.seed % max);
+			this.rand = this.rand ^ (this.rand << 13);
+			this.rand = this.rand ^ (this.rand >>> 17);
+			this.rand = this.rand ^ (this.rand << 15);
+			return Math.abs(this.rand % max);
 
 			// LCG algorythm.
-			// this.seed = (this.seed * 9301 + 49297) % 233280;
-			// let rand = this.seed / 233280;
+			// this.rand = (this.rand * 9301 + 49297) % 233280;
+			// let rand = this.rand / 233280;
 			// return Math.round(rand * max);
 		}
 		return 0;
 	}
 
 	// Get random seed.
-	randomSeed() {
-		return this.seed >>> 0;
+	seed() {
+		return this.rand >>> 0;
 	}
 
 	// Reload with param.
@@ -182,7 +182,7 @@ pico.Param = class {
 	constructor() {
 		//this.lock = "picoParamLock" + Date.now(); // Lock object identifier.
 		this.context = [];
-		this.seed = Date.now(); // Random seed.
+		this.rand = Date.now(); // Random seed.
 
 		// Setup now.
 		this._setup();
@@ -237,10 +237,14 @@ pico.Param = class {
 		return new Promise(async (resolve) => {
 			let text = this._serialize();
 			if (text != null) {
-				let query = "?" + text, data = {};
+				let data = {};
 				if (url) {
+					let separator = url && url.indexOf("?") < 0 ? "?" : "";
+					let query = text ? separator + text : "";
+					console.log("Share query: " + query);
 					data.url = url + query;
 				} else {
+					let query = text ? "?" + text : "";
 					console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					data.url = window.location.href.replace(/[\?\#].*$/, '') + query;
@@ -436,17 +440,22 @@ pico.Param = class {
 
 	// Serialize parameters to context.
 	_serialize() {
-		if (Array.isArray(this.context)) {
-			return this.context.join("+");
-		} else {
-			let params = [];
-			for (let key in this.context) {
-				if (key != null && this.context[key] != null && this.context[key] != "") {
+		let param0 = "", params = [];
+		for (let key in this.context) {
+			if (key != null && this.context[key] != null && this.context[key] != "") {
+				if (isNaN(key)) {
 					params.push(key + "=" + this.context[key]);
+				} else if (param0.length > 0) {
+					param0 = param0 + "+" + this.context[key];
+				} else {
+					param0 = this.context[key];
 				}
 			}
-			return params.join("&");
 		}
+		if (param0.length > 0) {
+			params.unshift(param0);
+		}
+		return params.join("&");
 	}
 };
 
