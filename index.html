@@ -18,17 +18,18 @@
 			</div>
 		</div>
 		<div class="menu center">
-			<a class="item clear" id="prev" href="javascript:changePage(-1);"><</a>
-			<a class="item light" id="share" href="javascript:share();">
-				<div class="light" id="page">^</div>
-				<img id="thumbnail" src="" />
+			<a class="item light secret" id="action" href="javascript:menuAction();">
+				<span id="actionText"></span>
+				<img class="icon" id="actionIcon" src="" />
 			</a>
-			<a class="item clear" id="next" href="javascript:changePage(+1);">></a>
 		</div>
 		<div class="menu">
-			<a class="item clear" href="javascript:changeSize(-1);">-</a>
-			<a class="item light" id="size" href="javascript:changeSize(0);">x7</a>
-			<a class="item clear" href="javascript:changeSize(+1);">+</a>
+			<a class="item clear" id="minus" href="javascript:menuSelect(-1);">-</a>
+			<a class="item dark" id="select" href="javascript:menuSelect(0);">
+				<span id="selectText"></span>
+				<img class="icon" id="selectIcon" src="" />
+			</a>
+			<a class="item clear" id="plus" href="javascript:menuSelect(+1);">+</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -53,7 +54,7 @@ var xoffset = picoDiv(maxwidth - width, 2); // Canvas offset.
 var yoffset = picoDiv(maxheight - height, 2); // Canvas offset.
 const maxpage = 20; // Buffer max page.
 var page = 1; // Buffer page index.
-var pagefix = false; // Page fix flag.
+var mode = 0; // Menu mode: 0=size 1=page
 var buffers = []; // Pixels buffers.
 var playing = 1; // Playing count.
 var pixels = []; // Pixels.
@@ -64,15 +65,22 @@ var appurl = null; // Referenced url.
 <!--Menu--><script>
 
 // Enable or disable menu.
-function updateMenu(id, enable, text=null, data=null) {
+function updateMenu(id, enable, text=null, icon=null) {
 	let e = document.getElementById(id);
 	if (e) {
 		e.style.display = enable ? "flex" : "none";
-		if (text) {
-			e.innerText = text;
+		let e1 = document.getElementById(id + "Text");
+		if (e1) {
+			e1.style.display = text ? "flex" : "none";
+			e1.innerText = text ? text : "";
+		} else {
+			e.style.display = text ? "flex" : "none";
+			e.innerText = text ? text : "";
 		}
-		if (data) {
-			e.src = data;
+		let e2 = document.getElementById(id + "Icon");
+		if (e2) {
+			e2.style.display = icon ? "flex" : "none";
+			e2.src = icon ? icon : "";
 		}
 	}
 }
@@ -90,15 +98,19 @@ async function darkmode(enable) {
 
 // Update buttons.
 function updateButtons() {
-	// Update buttons.
-	updateMenu("size", true, "x" + width);
-	updateMenu("page", true, page >= 2 ? "" + page : "^");
-	updateMenu("prev",  buffers[page - 1] && !pagefix || page >= 2);
-	updateMenu("next",  buffers[page - 1] && !pagefix || page >= 2);
+	if (mode == 0) {
+		updateMenu("select", true, "x" + width);
+		updateMenu("minus", true, "-");
+		updateMenu("plus", true, "+");
+	} else {
+		updateMenu("select", true, "" + page);
+		updateMenu("minus", true, "<");
+		updateMenu("plus", true, ">");
+	}
 }
 
-// Update thumbnail image.
-async function updateThumbnail(force = true) {
+// Update icon image.
+async function updateIcons(force = true) {
 	if (force || buffers[page - 1]) {
 		//console.log("Update" + page + ": " + buffers[page - 1]);
 
@@ -130,7 +142,7 @@ async function updateThumbnail(force = true) {
 
 	if (buffers[page - 1]) {
 
-		// Update thumbnail.
+		// Update icon image.
 		const thick = 10;
 		let offscreen = new pico.Image("offscreen", width * thick, height * thick);
 		await offscreen.color(colors);
@@ -145,19 +157,19 @@ async function updateThumbnail(force = true) {
 			}
 		}
 		
-		// Enable thumbnail.
-		updateMenu("thumbnail", true, null, offscreen.data());
+		// Enable icon.
+		updateMenu("action", true, null, offscreen.data());
 	} else {
 
-		// Disable thumbnail.
-		updateMenu("thumbnail", false);
+		// Disable icon.
+		updateMenu("action", true, "^");
 	}
 	updateButtons();
 }
 
-// Back to app or start sharing.
-async function share() {
-	updateThumbnail();
+// Action button for back to app or start sharing.
+async function menuAction() {
+	updateIcons();
 	picoResetParams();
 
 	// Create num code to share url.
@@ -194,44 +206,48 @@ async function share() {
 	}
 }
 
-// Change canvas pave.
-function changePage(x) {
-	page = page + x < 1 ? 1 : page + x >= maxpage ? maxpage : page + x;
-	//console.log("Page: " + page);
-	playing = -1; // Restart.
+// Select button.
+function menuSelect(x) {
 
-	// Load pixels from buffers.
-	if (buffers[page - 1]) {
-		for (let j = 0; j < maxheight; j++) {
-			pixels[j] = [];
-			for (let i = 0; i < maxwidth; i++) {
-				pixels[j][i] = buffers[page - 1][j][i];
-			}
-		}
+	// Change menu mode.
+	if (x == 0) {
+		mode = mode ? 0 : 1;
+
+	// Change canvas size.
+	} else if (mode == 0) {
+		width = width + x < 3 ? 3 : width + x >= maxwidth ? maxwidth : width + x;
+		height = height + x < 3 ? 3 : height + x >= maxheight ? maxheight : height + x;
+		xoffset = picoDiv(maxwidth - width, 2);
+		yoffset = picoDiv(maxheight - height, 2);
+		//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
+		playing = -1; // Restart.
+
+	// Change canvas page.
 	} else {
-		for (let j = 0; j < maxheight; j++) {
-			pixels[j] = [];
-			for (let i = 0; i < maxwidth; i++) {
-				pixels[j][i] = 0;
+		page = page + x < 1 ? 1 : page + x >= maxpage ? maxpage : page + x;
+		//console.log("Page: " + page);
+		playing = -1; // Restart.
+
+		// Load pixels from buffers.
+		if (buffers[page - 1]) {
+			for (let j = 0; j < maxheight; j++) {
+				pixels[j] = [];
+				for (let i = 0; i < maxwidth; i++) {
+					pixels[j][i] = buffers[page - 1][j][i];
+				}
+			}
+		} else {
+			for (let j = 0; j < maxheight; j++) {
+				pixels[j] = [];
+				for (let i = 0; i < maxwidth; i++) {
+					pixels[j][i] = 0;
+				}
 			}
 		}
 	}
 
-	picoBeep(1.2, 0.1);
-	updateThumbnail(false);
-}
-
-// Change canvas size.
-function changeSize(x) {
-	width = width + x < 3 ? 3 : width + x >= maxwidth ? maxwidth : width + x;
-	height = height + x < 3 ? 3 : height + x >= maxheight ? maxheight : height + x;
-	xoffset = picoDiv(maxwidth - width, 2);
-	yoffset = picoDiv(maxheight - height, 2);
-	//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
-	playing = -1; // Restart.
-
 	picoBeep(1.2, 0.1);	
-	updateThumbnail(false);
+	updateIcons(false);
 }
 </script><!--/Menu-->
 <!--Main--><script>
@@ -278,15 +294,12 @@ async function main() {
 					if (numcode[n] == 0) {
 						width = numcode[n + 1] >= 0 && numcode[n + 1] < maxwidth ? numcode[n + 1] : 7;
 						height = numcode[n + 2] >= 0 && numcode[n + 2] < maxheight ? numcode[n + 2] : 7;
-						changeSize(0);
 					} else if (numcode[n] > 0) {
 						let i = numcode[n + 1] + xoffset;
 						let j = numcode[n + 2] + yoffset;
 						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
 							pixels[j][i] = numcode[n];
 						}
-
-						pagefix = true; // Fix only one page.
 					}
 				}
 				console.log("Pixel: " + pixels);
@@ -310,12 +323,11 @@ async function main() {
 						}
 					}
 				}
-				pagefix = false; // Nofix two or more pages.
 				console.log("Buffer" + k + ": " + buffers[k]);
 			}
 		}
 	}
-	updateThumbnail();
+	updateIcons();
 
 	// Load colors data.
 	picoColor(colors);
@@ -338,7 +350,7 @@ async function main() {
 			// Set touching state to avoid touching another area continuously.
 			if (picoAction()) {
 				touching = 0;
-				updateThumbnail();
+				updateIcons();
 			}
 
 			// Draw pixels.

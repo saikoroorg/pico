@@ -16,16 +16,23 @@
 			<a id="subtitle" href="javascript:top.location.reload();">Dice</a>
 		</div>
 		<div class="menu center">
-			<a class="item light secret" id="edit" href="javascript:editLevel();">*</a>
+			<a class="item light secret" id="action" href="javascript:menuAction();">
+				<span id="actionText"></span>
+				<img class="icon" id="actionIcon" src="" />
+			</a>
 		</div>
 		<div class="menu">
-			<a class="item clear" href="javascript:changeLevel(-1);">-</a>
-			<a class="item dark" id="level" href="javascript:changeLevel(0);">6</a>
-			<a class="item clear" href="javascript:changeLevel(+1);">+</a>
+			<a class="item clear" id="minus" href="javascript:menuSelect(-1);">-</a>
+			<a class="item dark" id="select" href="javascript:menuSelect(0);">
+				<span id="selectText"></span>
+				<img class="icon" id="selectIcon" src="" />
+			</a>
+			<a class="item clear" id="plus" href="javascript:menuSelect(+1);">+</a>
 		</div>
 	</h1>
 	<div id="contents">
 		<div id="screen" class="picoImage picoTouch"></div>
+		<div class="offscreen"></div>
 	</div>
 </div>
 <h6 id="footer">
@@ -64,7 +71,6 @@ const nums = [ // Numbered design pixels.
 ];
 var colors = [];//[255,255,255, 127,127,127]; // Original design colors.
 var pixels = []; // Original design pixels.
-var width = 7, height = 7; // Original design size.
 var count = 1; // Count of dice.
 var maximum = 6; // Maximum of dice faces.
 var rolling = 0; // Rolling count.
@@ -73,21 +79,28 @@ var result = 0; // Result.
 <!--Menu--><script>
 
 // Enable or disable menu.
-function updateMenu(id, enable, text=null, data=null) {
+function updateMenu(id, enable, text=null, icon=null) {
 	let e = document.getElementById(id);
 	if (e) {
 		e.style.display = enable ? "flex" : "none";
-		if (text) {
-			e.innerText = text;
+		let e1 = document.getElementById(id + "Text");
+		if (e1) {
+			e1.style.display = text ? "flex" : "none";
+			e1.innerText = text ? text : "";
+		} else {
+			e.style.display = text ? "flex" : "none";
+			e.innerText = text ? text : "";
 		}
-		if (data) {
-			e.src = data;
+		let e2 = document.getElementById(id + "Icon");
+		if (e2) {
+			e2.style.display = icon ? "flex" : "none";
+			e2.src = icon ? icon : "";
 		}
 	}
 }
 
 // Set darkmode.
-async function darkmode(enable) {
+function darkmode(enable) {
 	let e = document.body;
 	if (e) {
 		e.style.backgroundColor = enable ? "#888" : "#fff";
@@ -98,20 +111,29 @@ async function darkmode(enable) {
 }
 
 // Update buttons.
-function updateButtons() {
+async function updateButtons() {
 	if (count == 0) {
-		updateMenu("edit", true, "*");
+		updateMenu("action", true, "*");
 	} else if (result > 0) {
-		updateMenu("edit", true, "^");
+		updateMenu("action", true, "^");
 	} else {
-		updateMenu("edit", false);
+		updateMenu("action", false);
 	}
-	updateMenu("level", true, "" + maximum);
+	if (pixels.length > 0 || count == 0) {
+		let data = await picoSpriteData(pixels[pixels.length - 1], colors);
+		updateMenu("select", true, null, data);
+	} else if (maximum <= 2 || maximum >= 10) {
+		let data = await picoSpriteData(nums[maximum - 1]);
+		updateMenu("select", true, null, data);
+	} else {
+		let data = await picoSpriteData(dots[maximum - 1]);
+		updateMenu("select", true, null, data);
+	}
 	//darkmode(maximum == 0);
 }
 
-// Edit or share level.
-async function editLevel() {
+// Action button for edit or share level.
+async function menuAction() {
 	picoResetParams();
 	if (result > 0) {
 		picoSetStrings("" + count + "d" + maximum + "@" + result, 0);
@@ -136,14 +158,15 @@ async function editLevel() {
 	}
 }
 
-// Change count of dice.
-function changeLevel(x) {
+// Select button for change count of dice.
+function menuSelect(x) {
 	if (x) {
 		count = (count + x > 20) ? 20 : (count + x < 0) ? 0 : count + x;
 	} else if (pixels.length <= 0) {
 		maximum = maximum == 6 ? 10 : 6;
 	}
 	rolling = -1; // Reroll.
+	result = 0;
 	updateButtons();
 	picoBeep(1.2, 0.1);
 };
@@ -279,7 +302,8 @@ async function main() {
 			} else if (pixels.length > 0) {
 				picoColor(colors);
 				for (let i = 0; i < count; i++) {
-					picoSprite(pixels[randoms[i]], 0, posx[i], posy[i], angle, s);
+					let s1 = s * 9 / picoSpriteSize(pixels[randoms[i]]);
+					picoSprite(pixels[randoms[i]], 0, posx[i], posy[i], angle, s1);
 				}
 
 			// Draw numbered design sprite.

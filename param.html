@@ -9,6 +9,10 @@ console.log("Seed: " + picoSeed());
 console.log("Random: " + picoRandom(100));
 console.log("NewSeed: " + picoSeed());
 
+for (let i = 0; i < 100; i++) {
+	console.log("Random" + i + ": " + picoRandom(1000000, i));
+}
+
 document.addEventListener("click", async (evt) => {
 
 console.log("Strings: " + picoStrings());

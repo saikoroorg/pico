@@ -86,8 +86,22 @@ async function picoText(text, area=null, c=0, x=0, y=0, angle=0, scale=1) {
 	}
 }
 
+// Get sprite size.
+function picoSpriteSize(cells=[0,9,9,1,0,0]) {
+	return pico.image.spriteSize(cells);
+}
+
+// Get sprite data.
+async function picoSpriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
+	let size = picoSpriteSize(cells);
+	let offscreen = new pico.Image(null, size * scale, size * scale);
+	await offscreen.color(colors);
+	await offscreen.drawSprite(cells, 0, 0, 0, 0, scale);
+	return offscreen.data();
+}
+
 // Draw sprite.
-async function picoSprite(cells=[1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
+async function picoSprite(cells=[0,9,9,1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
 	try {
 		await pico.image.drawSprite(cells, c, x, y, angle, scale);
 	} catch (error) {
@@ -235,6 +249,14 @@ pico.Image = class {
 		}); // end of lock.
 	}
 
+	// Get sprite size.
+	spriteSize(cells=[0,9,9,1,0,0]) {
+		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
+			return (cells[1] > cells[2] ? cells[1] : cells[2]);
+		}
+		return 1;
+	}
+
 	// Draw sprite to image.
 	drawSprite(cells=[0,9,9,1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
@@ -244,7 +266,7 @@ pico.Image = class {
 				if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
 					x0 = -(cells[1] - 1) / 2;
 					y0 = -(cells[2] - 1) / 2;
-					scale = scale * 9 / (cells[1] < cells[2] ? cells[1] : cells[2]);
+					//scale = scale * 9 / (cells[1] < cells[2] ? cells[1] : cells[2]);
 				}
 				await this._reset(x, y, angle, scale);
 				if (c >= 0 && x0 < 0 && y0 < 0) {
@@ -353,11 +375,7 @@ pico.Image = class {
 		this.context = null; // Canvas 2d context.
 		this.palls = pico.Image.colors; // Master image color. 
 
-		if (parent) {
-			this._setup(parent, width, height);
-		} else {
-			this._setup(pico.Image.parent, width, height);
-		}
+		this._setup(parent, width, height);
 	}
 
 	// Setup canvas.
@@ -375,10 +393,12 @@ pico.Image = class {
 					// Fix to square canvas. // this.canvas[i].style.height = "100%";
 					this.canvas[i].style.imageRendering = "pixelated";
 					this.canvas[i].style.display = i == this.primary ? "flex" : "none";
-					if (parent && document.getElementsByClassName(parent)[0]) {
-						document.getElementsByClassName(parent)[0].appendChild(this.canvas[i]);
-					} else {
-						document.body.appendChild(this.canvas[i]);
+					if (parent) {
+						if (document.getElementsByClassName(parent)[0]) {
+							document.getElementsByClassName(parent)[0].appendChild(this.canvas[i]);
+						} else {
+							document.body.appendChild(this.canvas[i]);
+						}
 					}
 				}
 				this.context = this.canvas[this.primary].getContext("2d");
@@ -527,4 +547,4 @@ pico.Image = class {
 };
 
 // Master image.
-pico.image = new pico.Image();
+pico.image = new pico.Image(pico.Image.parent);

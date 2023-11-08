@@ -59,16 +59,7 @@ pico.Touch = class {
 		this.touching = [[], []]; // Double buffered touching states.
 		this.primary = 0; // Primary touching index.
 
-		// Setup now.
-		if (parent) {
-			this._setup(parent);
-
-		// Setup after load event.
-		} else {
-			window.addEventListener("load", () => {
-				this._setup(pico.Touch.parent);
-			});
-		}
+		this._setup(parent);
 	}
 
 	// Setup touch panel.
@@ -308,4 +299,4 @@ pico.Touch = class {
 };
 
 // Master touch.
-pico.touch = new pico.Touch();
+pico.touch = new pico.Touch(pico.Touch.parent);

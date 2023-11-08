@@ -16,12 +16,18 @@
 			<a id="subtitle" href="javascript:top.location.reload();">Bros</a>
 		</div>
 		<div class="menu center">
-			<a class="item light secret" id="edit" href="javascript:editLevel();">*</a>
+			<a class="item light secret" id="action" href="javascript:menuAction();">
+				<span id="actionText"></span>
+				<img class="icon" id="actionIcon" src="" />
+			</a>
 		</div>
 		<div class="menu">
-			<a class="item clear" id="minus" href="javascript:changeLevel(-1);">-</a>
-			<a class="item dark" id="level" href="javascript:changeLevel(0);">1</a>
-			<a class="item clear" id="plus" href="javascript:changeLevel(+1);">+</a>
+			<a class="item clear" id="minus" href="javascript:menuSelect(-1);">-</a>
+			<a class="item dark" id="select" href="javascript:menuSelect(0);">
+				<span id="selectText"></span>
+				<img class="icon" id="selectIcon" src="" />
+			</a>
+			<a class="item clear" id="plus" href="javascript:menuSelect(+1);">+</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -101,29 +107,36 @@ var blocking = -1; // Blocking count.
 <!--Menu--><script>
 
 // Enable or disable menu.
-function updateMenu(id, enable, text=null, data=null) {
+function updateMenu(id, enable, text=null, icon=null) {
 	let e = document.getElementById(id);
 	if (e) {
 		e.style.display = enable ? "flex" : "none";
-		if (text) {
-			e.innerText = text;
+		let e1 = document.getElementById(id + "Text");
+		if (e1) {
+			e1.style.display = text ? "flex" : "none";
+			e1.innerText = text ? text : "";
+		} else {
+			e.style.display = text ? "flex" : "none";
+			e.innerText = text ? text : "";
 		}
-		if (data) {
-			e.src = data;
+		let e2 = document.getElementById(id + "Icon");
+		if (e2) {
+			e2.style.display = icon ? "flex" : "none";
+			e2.src = icon ? icon : "";
 		}
 	}
 }
 
 // Update buttons.
 function updateButtons() {
-	updateMenu("level", true, level >= levels.length - 1 ? "?" : "" + (level + 1));
-	updateMenu("edit", level >= levels.length - 1 || blocking == 0, blocking == 0 ? "^" : "*");
+	updateMenu("action", level >= levels.length - 1 || blocking == 0, blocking == 0 ? "^" : "*");
+	updateMenu("select", true, level >= levels.length - 1 ? "?" : "" + (level + 1));
 	updateMenu("plus", true, level < maxlevel && !extra ? "+" : " ");
 	updateMenu("minus", true, level > 0 && !extra ? "-" : " ");
 }
 
-// Edit or share level.
-async function editLevel() {
+// Action button for edit or share level.
+async function menuAction() {
 	picoResetParams();
 	if (level < levels.length - 1) {
 		let password = picoRandom(1000000, (level + 1));
@@ -141,8 +154,8 @@ async function editLevel() {
 	}
 }
 
-// Change level.
-function changeLevel(x) {
+// Select button for change level.
+function menuSelect(x) {
 	if (x == 0) {
 		blocking = -1;
 		playing = -1; // Restart.
@@ -157,14 +170,6 @@ function changeLevel(x) {
 	}
 	updateButtons();
 }
-
-// Clear level.
-function clearLevel() {
-	maxlevel = level + 1 < levels.length ? level + 1 : levels.length;
-	picoBeep(1.2, 0.1);
-	picoBeep(1.2, 0.1, 0.2);
-	updateButtons();
-};
 </script><!--/Menu-->
 <!--Main--><script>
 async function main() {
@@ -182,8 +187,10 @@ async function main() {
 		// Load max level.
 		} else {
 			let numbers = picoNumbers();
-			if (picoRandom(1000000, numbers[0]) == numbers[1]) {
-				maxlevel = level = numbers[0];
+			if (numbers[0] >= 0 && numbers[0] < levels.length &&
+			picoRandom(1000000, numbers[0]) == numbers[1]) {
+				maxlevel = numbers[0];
+				level = numbers[0] - 1;
 			}
 		}
 	}
@@ -294,9 +301,14 @@ async function main() {
 							}
 						}
 						//updateMenu("subtitle", true, "" + blocking);
+
+						// Clear level.
 						if (blocking == 0) {
 							players = [[], []];
-							clearLevel();
+							maxlevel = level + 1 < levels.length ? level + 1 : levels.length;
+							picoBeep(1.2, 0.1);
+							picoBeep(1.2, 0.1, 0.2);
+							updateButtons();
 						}
 					}
 				}

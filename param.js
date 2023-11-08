@@ -92,7 +92,7 @@ pico.Param = class {
 			// Xorshift algorythm.
 			this.rand = this.rand ^ (this.rand << 13);
 			this.rand = this.rand ^ (this.rand >>> 17);
-			this.rand = this.rand ^ (this.rand << 15);
+			this.rand = this.rand ^ (this.rand << 5);
 			return Math.abs(this.rand % max);
 
 			// LCG algorythm.
