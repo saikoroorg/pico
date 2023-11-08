@@ -18,14 +18,14 @@
 			</div>
 		</div>
 		<div class="menu center">
-			<a class="item light secret" id="action" href="javascript:menuAction();">
+			<a class="item dark secret" id="action" href="javascript:menuAction();">
 				<span id="actionText"></span>
 				<img class="icon" id="actionIcon" src="" />
 			</a>
 		</div>
 		<div class="menu">
 			<a class="item clear" id="minus" href="javascript:menuSelect(-1);">-</a>
-			<a class="item dark" id="select" href="javascript:menuSelect(0);">
+			<a class="item light" id="select" href="javascript:menuSelect(0);">
 				<span id="selectText"></span>
 				<img class="icon" id="selectIcon" src="" />
 			</a>
@@ -57,7 +57,7 @@ var page = 1; // Buffer page index.
 var mode = 0; // Menu mode: 0=size 1=page
 var buffers = []; // Pixels buffers.
 var playing = 1; // Playing count.
-var pixels = []; // Pixels.
+var canvas = []; // Canvas pixels.
 var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Colors.
 const maxcolor = 10; // Color max size.
 var appurl = null; // Referenced url.
@@ -111,57 +111,33 @@ function updateButtons() {
 
 // Update icon image.
 async function updateIcons(force = true) {
+
+	// Update buffer.
 	if (force || buffers[page - 1]) {
 		//console.log("Update" + page + ": " + buffers[page - 1]);
 
-		// Store pixels to buffers.
-		if (!buffers[page - 1]) {
-			buffers[page - 1] = [];
-			for (let j = 0; j < maxheight; j++) {
-				buffers[page - 1][j] = [];
-				for (let i = 0; i < maxwidth; i++) {
-					buffers[page - 1][j][i] = 0;
-				}
-			}
-		}
-
-		// Remove buffer if emtpy.
-		let remove = true;
+		// Store canvas pixels to buffers.
+		buffers[page-1] = [0, width, height];
 		for (let j = yoffset; j < yoffset + height; j++) {
 			for (let i = xoffset; i < xoffset + width; i++) {
-				if (pixels[j][i]) {
-					remove = false;
+				if (canvas[j][i]) {
+					let k = buffers[page-1].length;
+					buffers[page-1][k] = canvas[j][i];
+					buffers[page-1][k+1] = i - xoffset;
+					buffers[page-1][k+2] = j - yoffset;
 				}
-				buffers[page - 1][j][i] = pixels[j][i];
 			}
 		}
-		if (remove) {
-			buffers[page - 1] = null;
+		if (buffers[page-1].length <= 3) {
+			buffers[page-1] = null;
 		}
 	}
 
+	// Update icon image.
 	if (buffers[page - 1]) {
-
-		// Update icon image.
-		const thick = 10;
-		let offscreen = new pico.Image("offscreen", width * thick, height * thick);
-		await offscreen.color(colors);
-		await offscreen.pixel(0, 0, 0, width * thick, height * thick);
-		for (let j = yoffset; j < yoffset + height; j++) {
-			let y = (j - yoffset - (height - 1) / 2) * thick;
-			for (let i = xoffset; i < xoffset + width; i++) {
-				if (buffers[page - 1][j][i]) {
-					let x = (i - xoffset - (width - 1) / 2) * thick;
-					await offscreen.pixel(buffers[page - 1][j][i], x, y, (thick-1)/2, (thick-1)/2);
-				}
-			}
-		}
-		
-		// Enable icon.
-		updateMenu("action", true, null, offscreen.data());
+		let data = await picoSpriteData(buffers[page - 1], colors);
+		updateMenu("action", true, null, data);
 	} else {
-
-		// Disable icon.
 		updateMenu("action", true, "^");
 	}
 	updateButtons();
@@ -176,20 +152,11 @@ async function menuAction() {
 	let k = 0;
 	for (let p = 0; p < maxpage; p++) {
 		if (k == 0 || buffers[p]) {
-			let numcode = [0, width, height];
 			if (buffers[p]) {
-				for (let j = yoffset; j < yoffset + height; j++) {
-					for (let i = xoffset; i < xoffset + width; i++) {
-						if (buffers[p][j][i]) {
-							let n = numcode.length;
-							numcode[n] = buffers[p][j][i];
-							numcode[n + 1] = i - xoffset;
-							numcode[n + 2] = j - yoffset;
-						}
-					}
-				}
+				picoSetNumcode(buffers[p], k);
+			} else {
+				picoSetNumcode([0,9,9], k);
 			}
-			picoSetNumcode(numcode, k);
 			k++;
 		}
 	}
@@ -228,19 +195,28 @@ function menuSelect(x) {
 		//console.log("Page: " + page);
 		playing = -1; // Restart.
 
-		// Load pixels from buffers.
+		// Load canvas from buffers.
 		if (buffers[page - 1]) {
 			for (let j = 0; j < maxheight; j++) {
-				pixels[j] = [];
-				for (let i = 0; i < maxwidth; i++) {
-					pixels[j][i] = buffers[page - 1][j][i];
+				canvas[j] = [];
+			}
+			for (let n = 0; n < buffers[page-1].length; n += 3) {
+				if (buffers[page-1][n] == 0) {
+					width = buffers[page-1][n + 1] >= 0 && buffers[page-1][n + 1] < maxwidth ? buffers[page-1][n + 1] : 7;
+					height = buffers[page-1][n + 2] >= 0 && buffers[page-1][n + 2] < maxheight ? buffers[page-1][n + 2] : 7;
+				} else if (buffers[page-1][n] > 0) {
+					let i = buffers[page-1][n + 1] + xoffset;
+					let j = buffers[page-1][n + 2] + yoffset;
+					if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
+						canvas[j][i] = buffers[page-1][n];
+					}
 				}
 			}
 		} else {
 			for (let j = 0; j < maxheight; j++) {
-				pixels[j] = [];
+				canvas[j] = [];
 				for (let i = 0; i < maxwidth; i++) {
-					pixels[j][i] = 0;
+					canvas[j][i] = 0;
 				}
 			}
 		}
@@ -253,11 +229,11 @@ function menuSelect(x) {
 <!--Main--><script>
 async function main() {
 
-	// Initialize pixels on max size.
+	// Initialize canvas on max size.
 	for (let j = 0; j < maxheight; j++) {
-		pixels[j] = [];
+		canvas[j] = [];
 		for (let i = 0; i < maxwidth; i++) {
-			pixels[j][i] = 0;
+			canvas[j][i] = 0;
 		}
 	}
 
@@ -286,7 +262,7 @@ async function main() {
 				(numcode[0] == 1 && numcode[1] == 1 && numcode[2] == 1)) {
 				colors = picoColcode(k);
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
-				console.log("Color: " + colors);
+				console.log("Load color: " + colors);
 
 			// Load pixels to canvas.
 			} else if (k == 0) {
@@ -298,32 +274,16 @@ async function main() {
 						let i = numcode[n + 1] + xoffset;
 						let j = numcode[n + 2] + yoffset;
 						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-							pixels[j][i] = numcode[n];
+							canvas[j][i] = numcode[n];
 						}
 					}
 				}
-				console.log("Pixel: " + pixels);
+				console.log("Load canvas: " + canvas);
 
 			// Load pixels to buffers.
 			} else if (k < maxpage) {
-				console.log("Load buffer" + k + ": " + maxpage);
-				buffers[k] = [];
-				for (let j = 0; j < maxheight; j++) {
-					buffers[k][j] = [];
-					for (let i = 0; i < maxwidth; i++) {
-						buffers[k][j][i] = 0;
-					}
-				}
-				for (let n = 0; n < numcode.length; n += 3) {
-					if (numcode[n] > 0) {
-						let i = numcode[n + 1] + xoffset;
-						let j = numcode[n + 2] + yoffset;
-						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-							buffers[k][j][i] = numcode[n];
-						}
-					}
-				}
-				console.log("Buffer" + k + ": " + buffers[k]);
+				buffers[k] = numcode;
+				console.log("Load buffer" + k + ": " + buffers[k]);
 			}
 		}
 	}
@@ -340,8 +300,8 @@ async function main() {
 		let grid = 168 / width;
 		let margin = width <= 9 ? 2 : 1;
 
-		const offset1 = 6, offset2 = 10; // Offset of pixels and colors.
-		let touching = 0; // Touching pixels(0) or colors(1).
+		const offset1 = 6, offset2 = 10; // Offset of canvas and pallete.
+		let touching = 0; // Touching canvas(0) or pallete(1).
 
 		// Playing loop.
 		for (playing = 1; playing > 0; playing++) {
@@ -353,24 +313,24 @@ async function main() {
 				updateIcons();
 			}
 
-			// Draw pixels.
+			// Draw canvas.
 			for (let j = yoffset; j < yoffset + height; j++) {
 				let y = (j - yoffset - (height - 1) / 2) * grid - offset1;
 				for (let i = xoffset; i < xoffset + width; i++) {
 					let x = (i - xoffset - (width - 1) / 2) * grid;
 					if (touching != 2 && picoMotion(x, y, grid/2)) {
 						touching = 1;
-						if (pixels[j][i] != select) {
-							pixels[j][i] = select;
+						if (canvas[j][i] != select) {
+							canvas[j][i] = select;
 						}
-						picoPixel(pixels[j][i], x, y, grid/2-1, grid/2-1);
+						picoPixel(canvas[j][i], x, y, grid/2-1, grid/2-1);
 					} else {
-						picoPixel(pixels[j][i], x, y, (grid-margin)/2-1, (grid-margin)/2-1);
+						picoPixel(canvas[j][i], x, y, (grid-margin)/2-1, (grid-margin)/2-1);
 					}
 				}
 			}
 
-			// Draw colors.
+			// Draw pallete.
 			for (let i = 0; i < colors.length / 3; i++) {
 				let x = (i - (colors.length / 3 - 1) / 2) * 16;
 				let y = pico.Image.height/2 - offset2;
