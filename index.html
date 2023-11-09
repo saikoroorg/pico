@@ -53,10 +53,12 @@ var xoffset = picoDiv(maxwidth - width, 2); // Canvas offset.
 var yoffset = picoDiv(maxheight - height, 2); // Canvas offset.
 const maxpage = 20; // Buffer max page.
 var page = 1; // Buffer page index.
-var mode = 0; // Menu mode: 0=size 1=page
+const maxdepth = 6; // Max color depth.
+var depth = 2; // Color depth.
+var menumode = 0; // Menu mode: 0=size 1=page 2=color
 var buffers = []; // Pixels buffers.
 var playing = 1; // Playing count.
-var canvas = []; // Canvas pixels.
+var pixels = []; // Canvas pixels.
 var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Colors.
 const maxcolor = 10; // Color max size.
 var appurl = null; // Referenced url.
@@ -97,12 +99,16 @@ async function darkmode(enable) {
 
 // Update buttons.
 function updateButtons() {
-	if (mode == 0) {
+	if (menumode == 0) {
 		updateMenu("select", true, "x" + width);
 		updateMenu("minus", true, "-");
 		updateMenu("plus", true, "+");
-	} else {
+	} else if (menumode == 1) {
 		updateMenu("select", true, "" + page);
+		updateMenu("minus", true, "<");
+		updateMenu("plus", true, ">");
+	} else if (menumode == 2) {
+		updateMenu("select", true, "x" + depth);
 		updateMenu("minus", true, "<");
 		updateMenu("plus", true, ">");
 	}
@@ -119,9 +125,9 @@ async function updateIcons(force = true) {
 		buffers[page-1] = [0, width, height];
 		for (let j = yoffset; j < yoffset + height; j++) {
 			for (let i = xoffset; i < xoffset + width; i++) {
-				if (canvas[j][i]) {
+				if (pixels[j][i]) {
 					let k = buffers[page-1].length;
-					buffers[page-1][k] = canvas[j][i];
+					buffers[page-1][k] = pixels[j][i];
 					buffers[page-1][k+1] = i - xoffset;
 					buffers[page-1][k+2] = j - yoffset;
 				}
@@ -174,10 +180,10 @@ function menuSelect(x) {
 
 	// Change menu mode.
 	if (x == 0) {
-		mode = mode ? 0 : 1;
+		menumode = menumode >= 0 && menumode + 1 <= 2 ? menumode + 1 : 0;
 
 	// Change canvas size.
-	} else if (mode == 0) {
+	} else if (menumode == 0) {
 		width = width + x < 3 ? 3 : width + x >= maxwidth ? maxwidth : width + x;
 		height = height + x < 3 ? 3 : height + x >= maxheight ? maxheight : height + x;
 		xoffset = picoDiv(maxwidth - width, 2);
@@ -186,7 +192,7 @@ function menuSelect(x) {
 		playing = -1; // Restart.
 
 	// Change canvas page.
-	} else {
+	} else if (menumode == 1) {
 		page = page + x < 1 ? 1 : page + x >= maxpage ? maxpage : page + x;
 		//console.log("Page: " + page);
 		playing = -1; // Restart.
@@ -194,7 +200,7 @@ function menuSelect(x) {
 		// Load canvas from buffers.
 		if (buffers[page - 1]) {
 			for (let j = 0; j < maxheight; j++) {
-				canvas[j] = [];
+				pixels[j] = [];
 			}
 			for (let n = 0; n < buffers[page-1].length; n += 3) {
 				if (buffers[page-1][n] == 0) {
@@ -204,18 +210,22 @@ function menuSelect(x) {
 					let i = buffers[page-1][n + 1] + xoffset;
 					let j = buffers[page-1][n + 2] + yoffset;
 					if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-						canvas[j][i] = buffers[page-1][n];
+						pixels[j][i] = buffers[page-1][n];
 					}
 				}
 			}
 		} else {
 			for (let j = 0; j < maxheight; j++) {
-				canvas[j] = [];
+				pixels[j] = [];
 				for (let i = 0; i < maxwidth; i++) {
-					canvas[j][i] = 0;
+					pixels[j][i] = 0;
 				}
 			}
 		}
+
+	// Change color depth.
+	} else if (menumode == 2) {
+		depth = depth + x < 1 ? 1 : depth + x >= maxdepth ? maxdepth : depth + x;
 	}
 
 	picoBeep(1.2, 0.1);	
@@ -227,9 +237,9 @@ async function main() {
 
 	// Initialize canvas on max size.
 	for (let j = 0; j < maxheight; j++) {
-		canvas[j] = [];
+		pixels[j] = [];
 		for (let i = 0; i < maxwidth; i++) {
-			canvas[j][i] = 0;
+			pixels[j][i] = 0;
 		}
 	}
 
@@ -270,7 +280,7 @@ async function main() {
 						let i = numcode[n + 1] + xoffset;
 						let j = numcode[n + 2] + yoffset;
 						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-							canvas[j][i] = numcode[n];
+							pixels[j][i] = numcode[n];
 						}
 					}
 				}
@@ -310,19 +320,53 @@ async function main() {
 			}
 
 			// Draw canvas.
-			for (let j = yoffset; j < yoffset + height; j++) {
-				let y = (j - yoffset - (height - 1) / 2) * grid - offset1;
-				for (let i = xoffset; i < xoffset + width; i++) {
-					let x = (i - xoffset - (width - 1) / 2) * grid;
-					if (touching != 2 && picoMotion(x, y, grid/2)) {
-						touching = 1;
-						if (canvas[j][i] != select) {
-							canvas[j][i] = select;
+			if (menumode < 2) {
+				for (let j = yoffset; j < yoffset + height; j++) {
+					let y = (j - yoffset - (height - 1) / 2) * grid - offset1;
+					for (let i = xoffset; i < xoffset + width; i++) {
+						let x = (i - xoffset - (width - 1) / 2) * grid;
+						if (touching != 2 && picoMotion(x, y, grid/2)) {
+							touching = 1;
+							if (pixels[j][i] != select) {
+								pixels[j][i] = select;
+							}
+							picoPixel(pixels[j][i], x, y, grid/2-1, grid/2-1);
+						} else {
+							picoPixel(pixels[j][i], x, y, (grid-margin)/2-1, (grid-margin)/2-1);
 						}
-						picoPixel(canvas[j][i], x, y, grid/2-1, grid/2-1);
-					} else {
-						picoPixel(canvas[j][i], x, y, (grid-margin)/2-1, (grid-margin)/2-1);
 					}
+				}
+
+			// Draw color editor.
+			} else if (menumode == 2) {
+				for (let i = 0; i < 3; i++) {
+					let y = (i - 1) * 30 - offset1, x = -40;
+					if (picoAction(x, y, 10)) {
+						colors[select * 3 + i] = colors[select * 3 + i] + 1;
+						colors[select * 3 + i] = colors[select * 3 + i] >> (8 - (depth-1));
+						colors[select * 3 + i] = colors[select * 3 + i] - 1 > 0 ? colors[select * 3 + i] - 1 : 0;
+						colors[select * 3 + i] = colors[select * 3 + i] << (8 - (depth-1));
+						colors[select * 3 + i] = colors[select * 3 + i] - 1 > 0 ? colors[select * 3 + i] - 1 : 0;
+						picoChar("-", select, x, y, 0, 4);
+					} else if (picoMotion(x, y, 10)) {
+						picoChar("-", select, x, y, 0, 6);
+					} else {
+						picoChar("-", select, x, y, 0, 4);
+					}
+					x = 40;
+					if (picoAction(x, y, 10)) {
+						colors[select * 3 + i] = colors[select * 3 + i] + 1;
+						colors[select * 3 + i] = colors[select * 3 + i] >> (8 - (depth-1));
+						colors[select * 3 + i] = colors[select * 3 + i] + 1 < (1 << (depth-1)) ? colors[select * 3 + i] + 1 : (1 << (depth-1));
+						colors[select * 3 + i] = colors[select * 3 + i] << (8 - (depth-1));
+						colors[select * 3 + i] = colors[select * 3 + i] - 1;
+						picoChar("+", select, x, y, 0, 4);
+					} else if (picoMotion(x, y, 10)) {
+						picoChar("+", select, x, y, 0, 6);
+					} else {
+						picoChar("+", select, x, y, 0, 4);
+					}
+					picoChar("" + colors[select * 3 + i], select, 0, y, 0, 4);
 				}
 			}
 
