@@ -86,24 +86,28 @@ async function picoText(text, area=null, c=0, x=0, y=0, angle=0, scale=1) {
 	}
 }
 
-// Get sprite size.
-function picoSpriteSize(cells=[0,9,9,1,0,0]) {
-	return pico.image.spriteSize(cells);
-}
-
-// Get sprite data.
-async function picoSpriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
-	let size = picoSpriteSize(cells);
-	let offscreen = new pico.Image(null, size * scale, size * scale);
-	await offscreen.color(colors);
-	await offscreen.drawSprite(cells, 0, 0, 0, 0, scale);
-	return offscreen.data();
-}
-
 // Draw sprite.
 async function picoSprite(cells=[0,9,9,1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
 	try {
 		await pico.image.drawSprite(cells, c, x, y, angle, scale);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+// Get sprite size.
+function picoSpriteSize(cells=[0,9,9,1,0,0]) {
+	try {
+		return pico.image._spriteSize(cells);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+// Get sprite data.
+async function picoSpriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
+	try {
+		return await pico.image.spriteData(cells, colors, scale);
 	} catch (error) {
 		console.error(error);
 	}
@@ -221,7 +225,7 @@ pico.Image = class {
 	// Set image color pallete.
 	color(palls=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			this.palls = palls ? palls : pico.Image.colors;
+			this._color(palls);
 		}); // end of lock.
 	}
 
@@ -244,42 +248,6 @@ pico.Image = class {
 				await this._ready();
 				await this._reset(x, y, angle, scale);
 				await this._rect(rects, c);
-				resolve();
-			}); // end of new Promise.
-		}); // end of lock.
-	}
-
-	// Get sprite size.
-	spriteSize(cells=[0,9,9,1,0,0]) {
-		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
-			return (cells[1] > cells[2] ? cells[1] : cells[2]);
-		}
-		return 1;
-	}
-
-	// Draw sprite to image.
-	drawSprite(cells=[0,9,9,1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
-		return navigator.locks.request(this.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				await this._ready();
-				let x0 = 0, y0 = 0;
-				if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
-					x0 = -(cells[1] - 1) / 2;
-					y0 = -(cells[2] - 1) / 2;
-					//scale = scale * 9 / (cells[1] < cells[2] ? cells[1] : cells[2]);
-				}
-				await this._reset(x, y, angle, scale);
-				if (c >= 0 && x0 < 0 && y0 < 0) {
-					this._rect([x0, y0, x0*-2, y0*-2], c);
-				}
-				for (let i = 3; i < cells.length; i += 3) {
-					if (cells[i+3] == 0) {
-						await this._draw(cells[i], cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
-						i += 3;
-					} else {
-						await this._draw(cells[i], cells[i+1] + x0, cells[i+2] + y0);
-					}
-				}
 				resolve();
 			}); // end of new Promise.
 		}); // end of lock.
@@ -342,27 +310,31 @@ pico.Image = class {
 		}); // end of lock.
 	}
 
-	// Get image data url.
-	data() {
-		return this.canvas[this.primary].toDataURL("image/png");
+	// Draw sprite to image.
+	drawSprite(cells=[0,9,9,1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			return new Promise(async (resolve) => {
+				await this._ready();
+				await this._reset(x, y, angle, scale);
+				await this._sprite(cells, c);
+				resolve();
+			}); // end of new Promise.
+		}); // end of lock.
 	}
 
-	// Get image data file.
-	file() {
-		const decoded = atob(this.canvas[this.primary].toDataURL("image/png").replace(/^.*,/, ""));
-		const buffers = new Uint8Array(decoded.length);
-		for (let i = 0; i < decoded.length; i++) {
-			buffers[i] = decoded.charCodeAt(i);
-		}
-		try {
-			const blob = new Blob([buffers.buffer], {type: "image/png"});
-			const imageFile = new File([blob], "image.png", {type: "image/png"});
-			console.log("Image data: " + imageFile.size);
-			return imageFile;
-		} catch (error) {
-			console.error(error);
-			return null;
-		}
+	// Draw offscreen and get sprite data.
+	spriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
+		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
+			return new Promise(async (resolve) => {
+				await pico.image.offscreen._color(colors);
+				let size = pico.image.offscreen._spriteSize(cells);
+				await pico.image.offscreen._resize(size * scale, size * scale);
+				await pico.image.offscreen._ready();
+				await pico.image.offscreen._reset(0, 0, 0, scale);
+				await pico.image.offscreen._sprite(cells, 0);
+				resolve(pico.image.offscreen._data());
+			}); // end of new Promise.
+		}); // end of lock.
 	}
 
 	//*----------------------------------------------------------*/
@@ -375,7 +347,22 @@ pico.Image = class {
 		this.context = null; // Canvas 2d context.
 		this.palls = pico.Image.colors; // Master image color. 
 
+		// Setup canvas.
 		this._setup(parent, width, height);
+	}
+
+	// Resize canvas.
+	_resize(width=0, height=0) {
+		return this._ready().then(() => {
+			//console.log("Flip.");
+			return new Promise((resolve) => {
+				for (let i = 0; i < 2; i++) {
+					this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
+					this.canvas[i].height = (width ? height : pico.Image.height) * pico.Image.ratio;
+				}
+				resolve();
+			}); // end of new Promise.
+		});
 	}
 
 	// Setup canvas.
@@ -499,7 +486,12 @@ pico.Image = class {
 		}); // end of new Promise.
 	}
 
-	// Draw rect to image.
+	// Set image color pallete.
+	_color(palls=null) {
+		this.palls = palls && palls.length > 0 ? palls : pico.Image.colors;
+	}
+
+	// Draw pixel to image.
 	_draw(c=0, x=0, y=0, w=0, h=0) {
 		//console.log("Draw: " + c + "," + x + "+" + w + "," + y + "+" + h);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
@@ -514,7 +506,7 @@ pico.Image = class {
 		}); // end of new Promise.
 	}
 
-	// Draw rect to image.
+	// Draw rects to image.
 	_rect(rects, c=0) {
 		return new Promise(async (resolve) => {
 			for (let i = 0; i < rects.length; i += 4) {
@@ -544,7 +536,64 @@ pico.Image = class {
 		}
 		return this._rect(rects, c);
 	}
+
+	// Draw sprite to image.
+	_sprite(cells=[0,9,9,1,0,0], c=-1) {
+		return new Promise(async (resolve) => {
+			let x0 = 0, y0 = 0;
+			if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
+				x0 = -(cells[1] - 1) / 2;
+				y0 = -(cells[2] - 1) / 2;
+			}
+			if (c >= 0 && x0 < 0 && y0 < 0) {
+				this._rect([x0, y0, x0*-2, y0*-2], c);
+			}
+			for (let i = 3; i < cells.length; i += 3) {
+				if (cells[i+3] == 0) {
+					await this._draw(cells[i], cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
+					i += 3;
+				} else {
+					await this._draw(cells[i], cells[i+1] + x0, cells[i+2] + y0);
+				}
+			}
+			resolve();
+		}); // end of new Promise.
+	}
+
+	// Get sprite size.
+	_spriteSize(cells=[0,9,9,1,0,0]) {
+		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
+			return (cells[1] > cells[2] ? cells[1] : cells[2]);
+		}
+		return 1;
+	}
+
+	// Get image data url.
+	_data() {
+		return this.canvas[this.primary].toDataURL("image/png");
+	}
+
+	// Get image data file.
+	_file() {
+		const decoded = atob(this.canvas[this.primary].toDataURL("image/png").replace(/^.*,/, ""));
+		const buffers = new Uint8Array(decoded.length);
+		for (let i = 0; i < decoded.length; i++) {
+			buffers[i] = decoded.charCodeAt(i);
+		}
+		try {
+			const blob = new Blob([buffers.buffer], {type: "image/png"});
+			const imageFile = new File([blob], "image.png", {type: "image/png"});
+			console.log("Image data: " + imageFile.size);
+			return imageFile;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
+	}
 };
 
 // Master image.
 pico.image = new pico.Image(pico.Image.parent);
+
+// Create offscreen image class.
+pico.image.offscreen = new pico.Image("");

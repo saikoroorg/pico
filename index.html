@@ -34,7 +34,6 @@
 	</h1>
 	<div id="contents">
 		<div id="screen" class="picoImage picoTouch"></div>
-		<div class="offscreen"></div>
 	</div>
 </div>
 <h6 id="footer">
@@ -151,16 +150,13 @@ async function menuAction() {
 	// Create num code to share url.
 	let k = 0;
 	for (let p = 0; p < maxpage; p++) {
-		if (k == 0 || buffers[p]) {
-			if (buffers[p]) {
-				picoSetNumcode(buffers[p], k);
-			} else {
-				picoSetNumcode([0,9,9], k);
-			}
+		if (buffers[p]) {
+			picoSetNumcode(buffers[p], k);
 			k++;
 		}
 	}
-	if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
+	if (k > 0 &&
+		((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
 		picoSetColcode(colors, k);
 	}
@@ -349,7 +345,7 @@ async function main() {
 			}
 
 			await picoFlip();
-			await picoRead(0);
+			await picoRead(-1);
 		} // End of playing loop.
 	} // End of main loop.
 };

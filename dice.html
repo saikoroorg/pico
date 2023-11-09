@@ -32,14 +32,13 @@
 	</h1>
 	<div id="contents">
 		<div id="screen" class="picoImage picoTouch"></div>
-		<div class="offscreen"></div>
 	</div>
 </div>
 <h6 id="footer">
 	<div id="author"></div>/
 	<div id="version"></div>
 </h6>
-<!--script>console.log = () => {};</script!-->
+<script>console.log = () => {};</script>
 <script src="daemon.js"></script>
 <script src="image.js"></script>
 <script src="param.js"></script>
@@ -72,6 +71,7 @@ const nums = [ // Numbered design pixels.
 var colors = [];//[255,255,255, 127,127,127]; // Original design colors.
 var pixels = []; // Original design pixels.
 var count = 1; // Count of dice.
+const maxcount = 20;
 var maximum = 6; // Maximum of dice faces.
 var rolling = 0; // Rolling count.
 var result = 0; // Result.
@@ -112,14 +112,14 @@ function darkmode(enable) {
 
 // Update buttons.
 async function updateButtons() {
-	if (count == 0) {
-		updateMenu("action", true, "*");
-	} else if (result > 0) {
+	if (count > 0 && result > 0) {
 		updateMenu("action", true, "^");
 	} else {
 		updateMenu("action", false);
 	}
-	if (pixels.length > 0 || count == 0) {
+	if (count == 0) {
+		updateMenu("select", true, "*");
+	} else if (pixels.length > 0) {
 		let data = await picoSpriteData(pixels[pixels.length - 1], colors);
 		updateMenu("select", true, null, data);
 	} else if (maximum <= 2 || maximum >= 10) {
@@ -134,8 +134,8 @@ async function updateButtons() {
 
 // Action button for edit or share level.
 async function menuAction() {
-	picoResetParams();
 	if (result > 0) {
+		picoResetParams();
 		picoSetStrings("" + count + "d" + maximum + "@" + result, 0);
 		let key = 0;
 		for (; key < pixels.length; key++) {
@@ -145,7 +145,39 @@ async function menuAction() {
 		}
 		picoSetColcode(colors, key + 1);
 		await picoShare();
+	}
+}
+
+// Select button for change count of dice.
+async function menuSelect(x) {
+
+	// Change count of dice.
+	if (x) {
+		if ((x > 0 && count + x <= maxcount) || (x < 0 && count + x > 0)) {
+			count = count + x;
+			rolling = -1; // Reroll.
+			result = 0;
+			picoBeep(1.2, 0.1);
+		} else if (x < 0 && count + x == 0) {
+			count = 0;
+			result = 1;
+			picoBeep(1.2, 0.1);
+		} else {
+			picoBeep(0, 0.1);
+		}
+		updateButtons();
+
+	// Change maximum of dice faces.
+	} else if (count > 0) {
+		maximum = maximum == 6 ? 10 : 6;
+		rolling = -1; // Reroll.
+		result = 0;
+		picoBeep(1.2, 0.1);
+		updateButtons();
+
+	// Enter to edit mode.
 	} else {
+		picoResetParams();
 		let key = 0;
 		for (; key < pixels.length; key++) {
 			if (pixels[key].length > 0) {
@@ -156,19 +188,6 @@ async function menuAction() {
 		picoSetStrings("dice.html", "u");
 		await picoReload("index.html");
 	}
-}
-
-// Select button for change count of dice.
-function menuSelect(x) {
-	if (x) {
-		count = (count + x > 20) ? 20 : (count + x < 0) ? 0 : count + x;
-	} else if (pixels.length <= 0) {
-		maximum = maximum == 6 ? 10 : 6;
-	}
-	rolling = -1; // Reroll.
-	result = 0;
-	updateButtons();
-	picoBeep(1.2, 0.1);
 };
 </script><!--/Menu-->
 <!--Main--><script>
@@ -239,13 +258,22 @@ async function main() {
 			if (result > 0) {
 
 				// Restart to roll dice.
-				if (picoMotion()) {
-					if (rolling > 10) {
+				if (count > 0) {
+					if (picoMotion()) {
 						result = 0;
 						rolling = -1;
 						updateButtons();
 					}
+
+				// Change blank dice face.
+				} else {
+					if (picoMotion()) {
+						rolling = 0;
+					} else if (picoAction()) {
+						result = picoMod(result, maximum) + 1;
+					}
 				}
+
 			} else if (count > 0) {
 
 				// Hold to rolling dice.
@@ -278,7 +306,7 @@ async function main() {
 			}
 
 			// Update angle.
-			if (result <= 0) {
+			if (count > 0 && result <= 0) {
 				angle = picoMod(angle + 20, 360);
 				for (let i = 0; i < count; i++) {
 					randoms[i] = picoMod((i + rolling), maximum);
@@ -288,41 +316,61 @@ async function main() {
 			// Clear screen.
 			picoClear();
 
-			// Draw sprites.
-			let n = result <= 0 ? number : number - 1;
-			picoChar(n, 0, 0, -80);
+			// Draw number sprite.
+			if (count > 0) {
+				let n = result <= 0 ? number : number - 1;
+				picoChar(n, 0, 0, -80);
+			}
+
 			let s = rolling < 5 ? scale * (0.8 + 0.04 * rolling) : scale;
 
-			// Draw blank sprite.
-			if (count == 0) {
-				picoColor([255,255,255]);
-				picoSprite([0,9,9], 0, posx[0], posy[0], angle, s);
-
 			// Draw original design sprite.
-			} else if (pixels.length > 0) {
-				picoColor(colors);
-				for (let i = 0; i < count; i++) {
-					let s1 = s * 9 / picoSpriteSize(pixels[randoms[i]]);
-					picoSprite(pixels[randoms[i]], 0, posx[i], posy[i], angle, s1);
+			if (pixels.length > 0) {
+				if (count > 0) {
+					picoColor(colors);
+					for (let i = 0; i < count; i++) {
+						let s1 = s * 9 / picoSpriteSize(pixels[randoms[i]]);
+						picoSprite(pixels[randoms[i]], 0, posx[i], posy[i], angle, s1);
+					}
+
+				// Draw blank sprite.
+				} else {
+					picoColor([255,255,255, 127,127,127, 127,127,127, 127,127,127, 127,127,127, 127,127,127, 127,127,127, 127,127,127, 127,127,127, 127,127,127]);
+					let s1 = s * 9 / picoSpriteSize(pixels[result - 1]);
+					picoSprite(pixels[result - 1], 0, posx[0], posy[0], 0, s1);
 				}
 
 			// Draw numbered design sprite.
 			} else if (maximum <= 2 || maximum >= 10) {
-				picoColor(null);
-				for (let i = 0; i < count; i++) {
-					picoSprite(nums[randoms[i]], 0, posx[i], posy[i], angle, s);
+				if (count > 0) {
+					picoColor(null);
+					for (let i = 0; i < count; i++) {
+						picoSprite(nums[randoms[i]], 0, posx[i], posy[i], angle, s);
+					}
+
+				// Draw blank sprite.
+				} else {
+					picoColor([255,255,255, 127,127,127]);
+					picoSprite(nums[result - 1], 0, posx[0], posy[0], 0, s);
 				}
 
 			// Draw dotted design sprite.
 			} else {
-				picoColor(null);
-				for (let i = 0; i < count; i++) {
-					picoSprite(dots[randoms[i]], 0, posx[i], posy[i], angle, s);
+				if (count > 0) {
+					picoColor(null);
+					for (let i = 0; i < count; i++) {
+						picoSprite(dots[randoms[i]], 0, posx[i], posy[i], angle, s);
+					}
+
+				// Draw blank sprite.
+				} else {
+					picoColor([255,255,255, 127,127,127]);
+					picoSprite(dots[result - 1], 0, posx[0], posy[0], 0, s);
 				}
 			}
 
 			await picoFlip();
-			await picoRead(0);
+			await picoRead(result > 0 && rolling >= 5 ? -1 : 0);
 		} // End of playing loop.
 	} // End of main loop.
 };

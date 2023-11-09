@@ -33,11 +33,26 @@ pico.Touch = class {
 
 	// Read touch event.
 	read(t=10) {
-		return new Promise(r => setTimeout(r, t)).then(() => {
-			return navigator.locks.request(this.lock, async (lock) => {
-				return this._read();
-			}); // end of lock.
-		});
+		if (t >= 0) {
+			return new Promise(r => setTimeout(r, t)).then(() => {
+				return navigator.locks.request(this.lock, async (lock) => {
+					return this._read();
+				}); // end of lock.
+			}); // end of new Promise.
+
+		// Wait until input.
+		} else {
+			return new Promise((resolve) => {
+				const timer = setInterval(() => {
+					if (pico.touch.allscreen._motion()) {
+						clearInterval(timer);
+						this._read();
+						resolve();
+					}
+					pico.touch.allscreen._read();
+				}, 10); // end of setInterval.
+			}); // end of new Promise.
+		}
 	}
 
 	// Check touch motion.
@@ -300,3 +315,6 @@ pico.Touch = class {
 
 // Master touch.
 pico.touch = new pico.Touch(pico.Touch.parent);
+
+// Create allscreen touch class.
+pico.touch.allscreen = new pico.Touch("");
