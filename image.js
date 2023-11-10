@@ -497,7 +497,7 @@ pico.Image = class {
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
 		//console.log("Center: " + cx + "," + cy + " / " + u);
 		return new Promise((resolve) => {
-			let k = c < 0 ? this.palls.length/3 - 1 : c >= this.palls.length/3 ? 0 : c;
+			let k = c >= 0 && c < this.palls.length/3 ? c : this.palls.length/3 - 1;
 			let r = this.palls[k*3], g = this.palls[k*3+1], b = this.palls[k*3+2];
 			//console.log("Color: " + r + "," + g + "," + b);
 			this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
