@@ -1,12 +1,17 @@
 /* PICO Touch module */
 
 // Read touch event.
-async function picoRead(t=10) {
+async function picoRead(t=-1) {
 	try {
 		return await pico.touch.read(t);
 	} catch (error) {
 		console.error(error);
 	}
+}
+
+// Flush touch event.
+function picoFlush() {
+	pico.touch.flush();
 }
 
 // Check touch motion.
@@ -44,8 +49,9 @@ pico.Touch = class {
 		} else {
 			return new Promise((resolve) => {
 				const timer = setInterval(() => {
-					if (pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
+					if (this.flushing || pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
 						clearInterval(timer);
+						this.flushing = false;
 						this._read();
 						resolve();
 					}
@@ -53,6 +59,11 @@ pico.Touch = class {
 				}, 10); // end of setInterval.
 			}); // end of new Promise.
 		}
+	}
+
+	// Flush touch event.
+	flush() {
+		this.flushing = true;
 	}
 
 	// Check touch motion.
@@ -73,6 +84,7 @@ pico.Touch = class {
 		this.panel = null; // Touch panel element.
 		this.touching = [[], []]; // Double buffered touching states.
 		this.primary = 0; // Primary touching index.
+		this.flushing = false; // Flushing flag.
 
 		this._setup(parent);
 	}

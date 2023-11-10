@@ -166,6 +166,7 @@ async function menuSelect(x) {
 			picoBeep(0, 0.1);
 		}
 		updateButtons();
+		picoFlush();
 
 	// Change maximum of dice faces.
 	} else if (count > 0) {
@@ -174,6 +175,7 @@ async function menuSelect(x) {
 		result = 0;
 		picoBeep(1.2, 0.1);
 		updateButtons();
+		picoFlush();
 
 	// Enter to edit mode.
 	} else {

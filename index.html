@@ -230,6 +230,7 @@ function menuSelect(x) {
 
 	picoBeep(1.2, 0.1);	
 	updateIcons(false);
+	picoFlush();
 }
 </script><!--/Menu-->
 <!--Main--><script>
@@ -284,7 +285,7 @@ async function main() {
 						}
 					}
 				}
-				console.log("Load canvas: " + canvas);
+				console.log("Load pixel: " + pixels);
 
 			// Load pixels to buffers.
 			} else if (k < maxpage) {
@@ -400,7 +401,7 @@ async function main() {
 			}
 
 			await picoFlip();
-			await picoRead(-1);
+			await picoRead();
 		} // End of playing loop.
 	} // End of main loop.
 };

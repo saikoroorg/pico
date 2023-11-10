@@ -161,6 +161,7 @@ async function menuSelect(x) {
 			picoBeep(0, 0.1);
 		}
 		updateButtons();
+		picoFlush();
 
 	// Restart level.
 	} else if (level < levels.length - 1) {
@@ -358,7 +359,7 @@ async function main() {
 			}
 
 			await picoFlip();
-			await picoRead(-1);
+			await picoRead();
 		} // End of playing loop.
 	} // End of main loop.
 };
