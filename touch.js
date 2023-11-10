@@ -44,7 +44,7 @@ pico.Touch = class {
 		} else {
 			return new Promise((resolve) => {
 				const timer = setInterval(() => {
-					if (pico.touch.allscreen._motion()) {
+					if (pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
 						clearInterval(timer);
 						this._read();
 						resolve();
