@@ -187,8 +187,8 @@ function menuSelect(x) {
 
 	// Change canvas size.
 	} else if (menumode == 0) {
-		width = width + x < 3 ? 3 : width + x >= maxwidth ? maxwidth : width + x;
-		height = height + x < 3 ? 3 : height + x >= maxheight ? maxheight : height + x;
+		width = width + x < 3 ? 3 : width + x > maxwidth ? maxwidth : width + x;
+		height = height + x < 3 ? 3 : height + x > maxheight ? maxheight : height + x;
 		xoffset = picoDiv(maxwidth - width, 2);
 		yoffset = picoDiv(maxheight - height, 2);
 		//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
@@ -251,8 +251,10 @@ async function main() {
 			} else if (k == 0) {
 				for (let n = 0; n < numcode.length; n += 3) {
 					if (numcode[n] == 0) {
-						width = numcode[n + 1] >= 0 && numcode[n + 1] < maxwidth ? numcode[n + 1] : 7;
-						height = numcode[n + 2] >= 0 && numcode[n + 2] < maxheight ? numcode[n + 2] : 7;
+						width = numcode[n + 1] >= 0 && numcode[n + 1] <= maxwidth ? numcode[n + 1] : 7;
+						height = numcode[n + 2] >= 0 && numcode[n + 2] <= maxheight ? numcode[n + 2] : 7;
+						xoffset = picoDiv(maxwidth - width, 2);
+						yoffset = picoDiv(maxheight - height, 2);
 					} else if (numcode[n] > 0) {
 						let i = numcode[n + 1] + xoffset;
 						let j = numcode[n + 2] + yoffset;
@@ -281,8 +283,6 @@ async function main() {
 
 		// Initial param.
 		let selecting = colors.length / 3 - 1, selected = -1;
-		let grid = 168 / width;
-		let margin = width <= 9 ? 2 : 1;
 
 		const offset1 = 6, offset2 = 10, offset3 = 18; // Offset of canvas and pallete.
 		let touching = 0; // Touching canvas(0) or pallete(1).
@@ -299,6 +299,8 @@ async function main() {
 
 			// Draw canvas.
 			if (menumode == 0) {
+				let grid = 168 / width;
+				let margin = width <= 9 ? 2 : 1;
 				for (let j = yoffset; j < yoffset + height; j++) {
 					let y = (j - yoffset - (height - 1) / 2) * grid - offset1;
 					for (let i = xoffset; i < xoffset + width; i++) {
@@ -372,12 +374,14 @@ async function main() {
 				// Back to pixel mode.
 				if (picoAction(0, 0, 50, 50)) {
 					menumode = 0;
-					picoSprite(sprite, 0, 0, offset1, 0, 20);
+					picoFlush();
 
 				} else if (picoMotion(0, 0, 50, 50)) {
-					picoSprite(sprite, 0, 0, offset1, 0, 18);
+					let size = picoSpriteSize(sprite);
+					picoSprite(sprite, 0, 0, offset1, 0, 18 * 7 / size);
 				} else {
-					picoSprite(sprite, 0, 0, offset1, 0, 20);
+					let size = picoSpriteSize(sprite);
+					picoSprite(sprite, 0, 0, offset1, 0, 20 * 7 / size);
 				}
 			}
 
@@ -392,6 +396,7 @@ async function main() {
 						picoSprite([0,9,9], 0, x, y, 0, 1);
 					} else {
 						let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
+						let size = picoSpriteSize(sprite);
 						if (picoMotion(x, y, 8, 12)) {
 
 							// Change buffer.
@@ -404,8 +409,10 @@ async function main() {
 								}
 								for (let n = 0; n < buffers[page].length; n += 3) {
 									if (buffers[page][n] == 0) {
-										width = buffers[page][n + 1] >= 0 && buffers[page][n + 1] < maxwidth ? buffers[page][n + 1] : 7;
-										height = buffers[page][n + 2] >= 0 && buffers[page][n + 2] < maxheight ? buffers[page][n + 2] : 7;
+										width = buffers[page][n + 1] >= 0 && buffers[page][n + 1] <= maxwidth ? buffers[page][n + 1] : 7;
+										height = buffers[page][n + 2] >= 0 && buffers[page][n + 2] <= maxheight ? buffers[page][n + 2] : 7;
+										xoffset = picoDiv(maxwidth - width, 2);
+										yoffset = picoDiv(maxheight - height, 2);
 									} else if (buffers[page][n] > 0) {
 										let i = buffers[page][n + 1] + xoffset;
 										let j = buffers[page][n + 2] + yoffset;
@@ -424,13 +431,13 @@ async function main() {
 							}
 							updateIcons();
 
-							picoSprite(sprite, 0, x, y, 0, 2);
+							picoSprite(sprite, 0, x, y, 0, 2 * 7 / size);
 						/*} else if (picoMotion(x, y, 8, 12)) {
 							picoSprite(sprite, 0, x, y, 0, 1.5);*/
 						} else if (i == page) {
-							picoSprite(sprite, 0, x, y, 0, 2.5);
+							picoSprite(sprite, 0, x, y, 0, 2.5 * 7 / size);
 						} else {
-							picoSprite(sprite, 0, x, y, 0, 2);
+							picoSprite(sprite, 0, x, y, 0, 2 * 7 / size);
 						}
 					}
 				}
