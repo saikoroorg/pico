@@ -168,6 +168,13 @@ async function menuSelect(x) {
 		updateButtons();
 		picoFlush();
 
+	// Reload on original design dice.
+	} else if (pixels.length > 0) {
+		rolling = -1; // Reroll.
+		result = 0;
+		picoBeep(1.2, 0.1);
+		updateButtons();
+
 	// Change maximum of dice faces.
 	} else if (count > 0) {
 		maximum = maximum == 6 ? 10 : 6;
