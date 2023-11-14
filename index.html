@@ -2,7 +2,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-<title>Pico</title>
+<title>*</title>
 <link rel="icon" type="image/svg" href="icon.svg" />
 <link rel="apple-touch-icon" href="icon.png" sizes="192x192" />
 <link rel="manifest" href="manifest.json" />
@@ -163,7 +163,11 @@ async function menuAction() {
 				k++;
 			}
 		}
-		if (k > 0 &&
+		if (k == 0) {
+			picoSetNumcode([0,7,7], k);
+			k++
+		}
+		if (
 			((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 			(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
 			picoSetColcode(colors, k);
@@ -197,6 +201,7 @@ function menuSelect(x) {
 	// Change canvas page.
 	} else if (menumode == 1) {
 		anime = anime + x < 1 ? 1 : anime + x >= maxanime ? maxanime : anime + x;
+		page = page < anime ? page : anime - 1;
 
 	// Change color depth.
 	} else if (menumode == 2) {
@@ -284,7 +289,8 @@ async function main() {
 		// Initial param.
 		let selecting = colors.length / 3 - 1, selected = -1;
 
-		const offset1 = 6, offset2 = 10, offset3 = 18; // Offset of canvas and pallete.
+		const offset1 = 6, offset2 = 10; // Offset of canvas and pallete.
+		const offset3 = 18, offset4 = 24; // Offset of preview and buffer.
 		let touching = 0; // Touching canvas(0) or pallete(1).
 
 		// Playing loop.
@@ -370,6 +376,7 @@ async function main() {
 			// Draw preview.
 			} else if (menumode == 1) {
 				let sprite = buffers[page] ? buffers[page] : [0, 7, 7];
+				let y = anime <= 1 ? 0 : anime <= 10 ? -offset1 : -offset3;
 
 				// Back to pixel mode.
 				if (picoAction(0, 0, 50, 50)) {
@@ -378,23 +385,22 @@ async function main() {
 
 				} else if (picoMotion(0, 0, 50, 50)) {
 					let size = picoSpriteSize(sprite);
-					picoSprite(sprite, 0, 0, offset1, 0, 18 * 7 / size);
+					picoSprite(sprite, 0, 0, y, 0, 18 * 7 / size);
 				} else {
 					let size = picoSpriteSize(sprite);
-					picoSprite(sprite, 0, 0, offset1, 0, 20 * 7 / size);
+					picoSprite(sprite, 0, 0, y, 0, 20 * 7 / size);
 				}
 			}
 
 			// Draw buffers.
 			if (menumode == 1) {
-				let imin = anime <= 10 ? 0 : anime - 10;
-				let imax = anime <= 10 ? anime : imin + 10;
-				for (let i = imin; i < imax; i++) {
-					let x = (i - (imin + imax - 1) / 2) * 16;
-					let y = -pico.Image.height/2 + offset3;
-					if (page == i) {
+				let imin = anime <= 1 ? 1 : 0;
+				for (let i = imin; i < anime; i++) {
+					let x = anime <= 10 ? (i - (anime - 1) / 2) * 16 : (picoMod(i, 10) - (10 - 1) / 2) * 16;
+					let y = pico.Image.height/2 - (anime <= 10 ? offset3 : offset4 + 8 - 16 * picoDiv(i, 10));
+					/*if (page == i) {
 						picoSprite([0,9,9], 0, x, y, 0, 1);
-					} else {
+					} else {*/
 						let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
 						let size = picoSpriteSize(sprite);
 						if (picoMotion(x, y, 8, 12)) {
@@ -431,19 +437,17 @@ async function main() {
 							}
 							updateIcons();
 
-							picoSprite(sprite, 0, x, y, 0, 2 * 7 / size);
-						/*} else if (picoMotion(x, y, 8, 12)) {
-							picoSprite(sprite, 0, x, y, 0, 1.5);*/
+							picoSprite(sprite, 0, x, y, 0, 1.5 * 7 / size);
 						} else if (i == page) {
-							picoSprite(sprite, 0, x, y, 0, 2.5 * 7 / size);
+							picoSprite(sprite, 0, x, y, 0, 1.5 * 7 / size);
 						} else {
 							picoSprite(sprite, 0, x, y, 0, 2 * 7 / size);
 						}
-					}
+					//}
 				}
 
 			// Draw colors.
-			} else {
+			} else if (menumode == 0 || menumode == 2) {
 				for (let i = 0; i < depth; i++) {
 					let x = (i - (depth - 1) / 2) * 16;
 					let y = pico.Image.height/2 - offset2;

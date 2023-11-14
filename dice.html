@@ -112,12 +112,14 @@ function darkmode(enable) {
 
 // Update buttons.
 async function updateButtons() {
-	if (count > 0 && result > 0) {
+	if (maximum == 0 || (pixels.length > 0 && result == 0)) {
+		updateMenu("action", true, "*");
+	} else if (count > 0 && result > 0) {
 		updateMenu("action", true, "^");
 	} else {
 		updateMenu("action", false);
 	}
-	if (count == 0) {
+	if (maximum == 0 || count == 0) {
 		updateMenu("select", true, "*");
 	} else if (pixels.length > 0) {
 		let data = await picoSpriteData(pixels[pixels.length - 1], colors);
@@ -132,9 +134,24 @@ async function updateButtons() {
 	//darkmode(maximum == 0);
 }
 
-// Action button for edit or share level.
+// Action button for edit or start sharing.
 async function menuAction() {
-	if (result > 0) {
+
+	// Enter to edit mode.
+	if (maximum == 0 || (pixels.length > 0 && result == 0)) {
+		picoResetParams();
+		let key = 0;
+		for (; key < pixels.length; key++) {
+			if (pixels[key].length > 0) {
+				picoSetNumcode(pixels[key], key);
+			}
+		}
+		picoSetColcode(colors, key);
+		picoSetStrings("dice.html", "u");
+		await picoReload("index.html");
+
+	// Start sharing.
+	} else if (result > 0) {
 		picoResetParams();
 		picoSetStrings("" + count + "d" + maximum + "@" + result, 0);
 		let key = 0;
@@ -158,26 +175,26 @@ async function menuSelect(x) {
 			rolling = -1; // Reroll.
 			result = 0;
 			picoBeep(1.2, 0.1);
-		} else if (x < 0 && count + x == 0) {
+		/*} else if (x < 0 && count + x == 0) {
 			count = 0;
 			result = 1;
-			picoBeep(1.2, 0.1);
+			picoBeep(1.2, 0.1);*/
 		} else {
-			picoBeep(0, 0.1);
+			picoBeep(-1.2, 0.1);
 		}
 		updateButtons();
 		picoFlush();
 
-	// Reload on original design dice.
+	// Reroll.
 	} else if (pixels.length > 0) {
 		rolling = -1; // Reroll.
 		result = 0;
 		picoBeep(1.2, 0.1);
-		updateButtons();
+		picoFlush();
 
 	// Change maximum of dice faces.
 	} else if (count > 0) {
-		maximum = maximum == 6 ? 10 : 6;
+		maximum = maximum == 6 ? 10 : maximum == 10 ? 0 : 6;
 		rolling = -1; // Reroll.
 		result = 0;
 		picoBeep(1.2, 0.1);
@@ -218,8 +235,10 @@ async function main() {
 
 		// Load pixels.
 		} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
-			pixels[pixels.length] = picoNumcode(k);
-			maximum = pixels.length;
+			if (value.length >= 6) {
+				pixels[pixels.length] = picoNumcode(k);
+				maximum = pixels.length;
+			}
 
 		// Load initial params.
 		} else {
@@ -279,7 +298,7 @@ async function main() {
 					if (picoMotion()) {
 						rolling = 0;
 					} else if (picoAction()) {
-						result = picoMod(result, maximum) + 1;
+						result = picoMod(result, pixels.length) + 1;
 					}
 				}
 
@@ -293,7 +312,7 @@ async function main() {
 				} else if (rolling > 60) {
 					result = picoSeed(); // Set result seed.
 					for (let i = 0; i < count; i++) {
-						randoms[i] = picoRandom(maximum);
+						randoms[i] = picoRandom(maximum > 0 ? maximum : pixels.length);
 					}
 					angle = 0;
 					rolling = 1;
@@ -318,7 +337,7 @@ async function main() {
 			if (count > 0 && result <= 0) {
 				angle = picoMod(angle + 20, 360);
 				for (let i = 0; i < count; i++) {
-					randoms[i] = picoMod((i + rolling), maximum);
+					randoms[i] = picoMod((i + rolling), maximum > 0 ? maximum : pixels.length);
 				}
 			}
 
@@ -333,8 +352,15 @@ async function main() {
 
 			let s = rolling < 5 ? scale * (0.8 + 0.04 * rolling) : scale;
 
+			// Draw blank sprite.
+			if (maximum == 0) {
+				picoColor([255,255,255, 127,127,127]);
+				for (let i = 0; i < count; i++) {
+					picoSprite([0,9,9], 0, posx[i], posy[i], 0, s);
+				}
+
 			// Draw original design sprite.
-			if (pixels.length > 0) {
+			} else if (pixels.length > 0) {
 				if (count > 0) {
 					picoColor(colors);
 					for (let i = 0; i < count; i++) {
@@ -360,7 +386,7 @@ async function main() {
 				// Draw blank sprite.
 				} else {
 					picoColor([255,255,255, 127,127,127]);
-					picoSprite(nums[result - 1], 0, posx[0], posy[0], 0, s);
+					picoSprite([0,9,9], 0, posx[0], posy[0], 0, s);
 				}
 
 			// Draw dotted design sprite.
@@ -374,7 +400,7 @@ async function main() {
 				// Draw blank sprite.
 				} else {
 					picoColor([255,255,255, 127,127,127]);
-					picoSprite(dots[result - 1], 0, posx[0], posy[0], 0, s);
+					picoSprite([0,9,9], 0, posx[0], posy[0], 0, s);
 				}
 			}
 
