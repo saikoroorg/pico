@@ -283,7 +283,7 @@ async function main() {
 		result = 0;
 		for (rolling = 1; rolling >= 1; rolling++) {
 
-			if (result > 0) {
+			if (result > 0 || maximum == 0) {
 
 				// Restart to roll dice.
 				if (count > 0) {
