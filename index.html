@@ -187,7 +187,8 @@ function menuSelect(x) {
 
 	// Change menu mode.
 	if (x == 0) {
-		menumode = menumode >= 0 && menumode + 1 <= 1 ? menumode + 1 : 0;
+		//menumode = menumode >= 0 && menumode + 1 <= 2 ? menumode + 1 : 0;
+		menumode = menumode == 0 /*&& anime > 1*/ ? menumode + 1 : 0;
 
 	// Change canvas size.
 	} else if (menumode == 0) {
@@ -274,6 +275,7 @@ async function main() {
 			} else if (k < maxanime) {
 				buffers[k] = numcode;
 				anime = anime > k + 1 ? anime : k + 1;
+				menumode = 1;
 				console.log("Load buffer" + k + ": " + buffers[k]);
 			}
 		}
