@@ -74,6 +74,7 @@ var pixels = []; // Original design pixels.
 var count = 1; // Count of dice.
 const maxcount = 20;
 var maximum = 6; // Maximum of dice faces.
+var custom = 0; // Customized maximum.
 var rolling = 0; // Rolling count.
 var result = 0; // Result.
 </script><!--/Data-->
@@ -120,7 +121,7 @@ async function updateButtons() {
 	} else {
 		updateMenu("action", false);
 	}
-	if (maximum == 0 || count == 0) {
+	if (count == 0) {
 		updateMenu("select", true, "?");
 	} else if (pixels.length > 0) {
 		let data = await picoSpriteData(pixels[pixels.length - 1], colors);
@@ -128,7 +129,7 @@ async function updateButtons() {
 	} else if (maximum >= 3 && maximum <= 9) {
 		let data = await picoSpriteData(dots[maximum - 1]);
 		updateMenu("select", true, null, data);
-	} else if (maximum <= 10) {
+	} else if (maximum >= 1 && maximum <= 10) {
 		let data = await picoSpriteData(nums[maximum]);
 		updateMenu("select", true, null, data);
 	} else {
@@ -193,11 +194,12 @@ async function menuSelect(x) {
 		rolling = -1; // Reroll.
 		result = 0;
 		picoBeep(1.2, 0.1);
+		updateButtons();
 		picoFlush();
 
 	// Change maximum of dice faces.
 	} else if (count > 0) {
-		maximum = maximum == 6 ? 10 : maximum == 10 ? 0 : 6;
+		maximum = maximum == 6 ? 10 : maximum == 10 ? custom : 6;
 		rolling = -1; // Reroll.
 		result = 0;
 		picoBeep(1.2, 0.1);
@@ -240,14 +242,19 @@ async function main() {
 		} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
 			if (value.length >= 6) {
 				pixels[pixels.length] = picoNumcode(k);
-				maximum = pixels.length;
+				maximum = custom = pixels.length;
 			}
 
 		// Load initial params.
 		} else {
 			let numbers = picoNumbers(k);
-			count = numbers[0] < 20 ? numbers[0] : 20;
-			maximum = numbers[1] < 20 ? numbers[1] : 20;
+			count = numbers[0] < 1 ? 1 : numbers[0] < 20 ? numbers[0] : 20;
+			if (numbers[1] == 6 || numbers[1] == 10) {
+				maximum = numbers[1] < 20 ? numbers[1] : 20;
+				custom = 0;
+			} else {
+				maximum = custom = numbers[1] < 20 ? numbers[1] : 20;
+			}
 			picoRandom(0, numbers[2]);
 		}
 	}
@@ -315,7 +322,7 @@ async function main() {
 				} else if (rolling > 60) {
 					result = picoSeed(); // Set result seed.
 					for (let i = 0; i < count; i++) {
-						randoms[i] = picoRandom(maximum > 0 ? maximum : pixels.length);
+						randoms[i] = picoRandom(maximum > 0 ? maximum : custom);
 					}
 					angle = 0;
 					rolling = 1;
@@ -340,7 +347,7 @@ async function main() {
 			if (count > 0 && result <= 0) {
 				angle = picoMod(angle + 20, 360);
 				for (let i = 0; i < count; i++) {
-					randoms[i] = picoMod((i + rolling), maximum > 0 ? maximum : pixels.length);
+					randoms[i] = picoMod((i + rolling), maximum > 0 ? maximum : custom);
 				}
 			}
 
