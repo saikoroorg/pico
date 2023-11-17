@@ -188,7 +188,7 @@ function menuSelect(x) {
 	// Change menu mode.
 	if (x == 0) {
 		//menumode = menumode >= 0 && menumode + 1 <= 2 ? menumode + 1 : 0;
-		menumode = menumode == 0 /*&& anime > 1*/ ? menumode + 1 : 0;
+		menumode = menumode != 1 /*&& anime > 1*/ ? 1 : 0;
 
 	// Change canvas size.
 	} else if (menumode == 0) {
@@ -293,7 +293,7 @@ async function main() {
 
 		const offset1 = 6, offset2 = 10; // Offset of canvas and pallete.
 		const offset3 = 18, offset4 = 24; // Offset of preview and buffer.
-		let touching = 0; // Touching canvas(0) or pallete(1).
+		let touching = 0; // Touching pixel(1) or color(2).
 
 		// Playing loop.
 		for (playing = 1; playing > 0; playing++) {
@@ -301,12 +301,12 @@ async function main() {
 
 			// Set touching state to avoid touching another area continuously.
 			if (picoAction()) {
-				touching = 0;
+				touching = 0; // Touch nothing.
 				updateIcons();
 			}
 
-			// Draw canvas.
-			if (menumode == 0) {
+			// Draw pixels.
+			if (menumode != 1) {
 				let grid = 168 / width;
 				let margin = width <= 9 ? 2 : 1;
 				for (let j = yoffset; j < yoffset + height; j++) {
@@ -314,9 +314,19 @@ async function main() {
 					for (let i = xoffset; i < xoffset + width; i++) {
 						let x = (i - xoffset - (width - 1) / 2) * grid;
 						if (touching != 2 && picoMotion(x, y, grid/2)) {
-							touching = 1;
+							touching = 1; // Touch pixels.
+
+							// Put pixel.
 							if (pixels[j][i] != selecting) {
 								pixels[j][i] = selecting;
+							}
+
+							// Back to pixel mode.
+							if (menumode != 0) {
+								menumode = 0;
+								selected = -1;
+								touching = 1; // Touch pixels.
+								picoFlush();
 							}
 							picoPixel(pixels[j][i], x, y, grid/2-1, grid/2-1);
 						} else {
@@ -324,89 +334,10 @@ async function main() {
 						}
 					}
 				}
-
-			// Draw color editor.
-			} else if (menumode == 2) {
-				const compression = 2, maxcompresed = (1 << (8 - compression));
-
-				// Draw - or + buttons to update colors.
-				if (selecting > 0) {
-					for (let i = 0; i < 3; i++) {
-						let x = -36, s = 4;
-						let y = (i - 1) * 28 - offset1, c = colors[selecting * 3 + i];
-						if (picoAction(x, y, 10)) {
-							c = (c + 1) >> compression; // Bit shift for compressed decrease.
-							c = c - 1 > 0 ? c - 1 : 0; // Decrease.
-							c = (c << compression) - 1; // Bit unshift.
-							c = c > 0 ? c : 0;
-						} else if (picoMotion(x, y, 10)) {
-							s = 5;
-						}
-						picoChar("-", selecting, x, y, 0, s);
-						x = 36; s = 4;
-						if (picoAction(x, y, 10)) {
-							c = (c + 1) >> compression; // Bit shift for compressed Increase.
-							c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
-							c = (c << compression) - 1; // Bit unshift.
-						} else if (picoMotion(x, y, 10)) {
-							s = 5;
-						}
-						picoChar("+", selecting, x, y, 0, s);
-						colors[selecting * 3 + i] = c;
-					}
-
-				// Draw - or + buttons to update color 0.
-				} else {
-					let x = -36, s = 4;
-					if (picoAction(x, 0, 10, 40)) {
-						for (let i = 0; i < 3; i++) {
-							colors[selecting * 3 + i] = 0;
-						}
-					} else if (picoMotion(x, 0, 10, 40)) {
-						s = 5;
-					}
-					for (let i = 0; i < 3; i++) {
-						let y = (i - 1) * 28 - offset1;
-						picoChar("-", selecting, x, y, 0, s);
-					}
-					x = 36; s = 4;
-					if (picoAction(x, 0, 10, 40)) {
-						for (let i = 0; i < 3; i++) {
-							colors[selecting * 3 + i] = 255;
-						}
-					} else if (picoMotion(x, 0, 10, 40)) {
-						s = 5;
-					}
-					for (let i = 0; i < 3; i++) {
-						let y = (i - 1) * 28 - offset1;
-						picoChar("+", selecting, x, y, 0, s);
-					}
-				}
-
-				// Draw color numbers.
-				for (let i = 0; i < 3; i++) {
-					let y = (i - 1) * 28 - offset1;
-
-					// Convert range 255 to 100.
-					let c1 = picoDiv(colors[selecting * 3 + i] * 99, 255);
-					c1 = c1 > 0 ? c1 + 1 : 0;
-
-					// Back to pixel mode.
-					if (picoAction(0, 0, 20, 40)) {
-						selected =-1;
-						menumode = 0;
-						picoFlush();
-						picoChar("" + c1, selecting, 0, y, 0, 4);
-
-					} else if (picoMotion(0, 0, 20, 40)) {
-						picoChar("" + c1, selecting, 0, y, 0, 3.5);
-					} else {
-						picoChar("" + c1, selecting, 0, y, 0, 4);
-					}
-				}
+			}
 
 			// Draw preview.
-			} else if (menumode == 1) {
+			if (menumode == 1) {
 				let sprite = buffers[page] ? buffers[page] : [0, 7, 7];
 				let y = anime <= 1 ? 0 : anime <= 10 ? offset1 : offset3;
 
@@ -477,43 +408,120 @@ async function main() {
 						}
 					//}
 				}
+			}
 
 			// Draw colors.
-			} else if (menumode == 0 || menumode == 2) {
+			if (menumode != 2) {
 				for (let i = 0; i < depth; i++) {
 					let x = (i - (depth - 1) / 2) * 16;
 					let y = pico.Image.height/2 - offset2;
 
 					// Enter color mode.
 					if (touching != 1 && picoAction(x, y, 8, 12)) {
+
+						// Select same color.
 						if (selected == i) {
 							selecting = i;
 
-							// Enter coloe edit mode.
-							if (menumode == 0) {
+							// Enter color edit mode.
+							if (i > 0) {
+								selected = -1;
 								menumode = 2;
 								picoFlush();
+
+							// Change background color.
+							} else {
+								selected = -1;
+								for (let j = 0; j < 3; j++) {
+									let c = colors[selecting * 3 + j];
+									c = c <= 0 ? 255 : 0;
+									colors[selecting * 3 + j] = c;
+								}
 							}
-							//menumode = 0;
-							//picoFlush();
+
+						// Select different color.
 						} else {
-							selected = selecting;
-							selecting = i;
+							selected = selecting = i;
 							picoBeep(0, 0.1);
 						}
 						picoChar("+", i, x, y, 0, 4);
 
 					} else if (touching != 1 && picoMotion(x, y, 8, 12)) {
-						touching = 2;
+						touching = 2; // Touch colors.
+
+						// Touch different color.
 						if (selecting != i) {
-							selected =-1;
+							selected = selecting;
 							selecting = i;
 						}
-						picoChar("+", i, x, y, 0, 5);
+						picoChar("+", i, x, y, 0, 3.5);
 					} else if (i == selecting) {
 						picoChar("+", i, x, y, 0, 4);
 					} else {
 						picoChar("-", i, x, y, 0, 4);
+					}
+				}
+			}
+
+			// Draw color editor.
+			if (menumode == 2) {
+				const compression = 2, maxcompresed = (1 << (8 - compression));
+
+				// Draw buttons and color numbers.
+				if (selecting > 0) {
+					let s = 4;
+					let x = - (10 - 1) / 2 * 16;
+					let y = pico.Image.height/2 - offset2;
+
+					// Back to pixel mode.
+					if (picoAction(x, y, 8, 12)) {
+						menumode = 0;
+						selected = -1;
+						touching = 1; // Touch pixels.
+						picoFlush();
+					} else if (picoMotion(x, y, 8, 12)) {
+						s = 3.5;
+					}
+
+					// Draw plus button.
+					picoChar("+", selecting, x, y, 0, s);
+
+					for (let i = 0; i < 3; i++) {
+						let c = colors[selecting * 3 + i];
+						s = 4;
+
+						// Decrease color number.
+						let x = ((i * 3 + 1) - (10 - 1) / 2) * 16;
+						if (picoAction(x, y, 8, 12)) {
+							c = (c + 1) >> compression; // Bit shift for compressed decrease.
+							c = c - 1 > 0 ? c - 1 : 0; // Decrease.
+							c = (c << compression) - 1; // Bit unshift.
+							c = c > 0 ? c : 0;
+						} else if (picoMotion(x, y, 8, 12)) {
+							s = 3.5;
+						}
+
+						// Draw minus button.
+						picoChar(":", selecting, x, y, 0, s);
+
+						// Increase color number.
+						x = ((i * 3 + 2.5) - (10 - 1) / 2) * 16;
+						s = 4;
+						if (picoAction(x, y, 16, 12)) {
+							c = (c + 1) >> compression; // Bit shift for compressed increase.
+							c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
+							c = (c << compression) - 1; // Bit unshift.
+						} else if (picoMotion(x, y, 16, 12)) {
+							s = 3.5;
+						}
+						colors[selecting * 3 + i] = c;
+
+						// Convert range 0-255 to 0-100.
+						let c99 = picoDiv(colors[selecting * 3 + i] * 99, 255);
+						let c00 = c99 >= 99 ? "00" : c99 >= 9 ? "" + (c99 + 1) : c99 >= 1 ? " " + (c99 + 1) : " 0";
+
+						// Draw color numbers.
+						picoChar(c00, selecting, x, y, 0, s);
 					}
 				}
 			}
