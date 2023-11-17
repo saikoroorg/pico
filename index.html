@@ -291,8 +291,9 @@ async function main() {
 		// Initial param.
 		let selecting = colors.length / 3 - 1, selected = -1;
 
-		const offset1 = 6, offset2 = 10; // Offset of canvas and pallete.
-		const offset3 = 18, offset4 = 24; // Offset of preview and buffer.
+		const offset1 = 10, offset1a = -4;; // Offset of pixels
+		const offset2 = 14; // Offset of colors.
+		const offset3 = 18, offset3a = 18; // Offset of buffer.
 		let touching = 0; // Touching pixel(1) or color(2).
 
 		// Playing loop.
@@ -306,11 +307,13 @@ async function main() {
 			}
 
 			// Draw pixels.
-			if (menumode != 1) {
-				let grid = 168 / width;
+			/*if (menumode != 1) */{
+				let y0 = menumode != 1 /*|| anime <= 1*/ ? offset1 : offset1a;
+				let w0 = menumode != 1 /*|| anime <= 1*/ ? width : (width * 1.2);
+				let grid = 168 / w0;
 				let margin = width <= 9 ? 2 : 1;
 				for (let j = yoffset; j < yoffset + height; j++) {
-					let y = (j - yoffset - (height - 1) / 2) * grid - offset1;
+					let y = (j - yoffset - (height - 1) / 2) * grid - y0;
 					for (let i = xoffset; i < xoffset + width; i++) {
 						let x = (i - xoffset - (width - 1) / 2) * grid;
 						if (touching != 2 && picoMotion(x, y, grid/2)) {
@@ -322,7 +325,7 @@ async function main() {
 							}
 
 							// Back to pixel mode.
-							if (menumode != 0) {
+							if (menumode == 2) {
 								menumode = 0;
 								selected = -1;
 								touching = 1; // Touch pixels.
@@ -337,7 +340,7 @@ async function main() {
 			}
 
 			// Draw preview.
-			if (menumode == 1) {
+			/*if (menumode == 1) {
 				let sprite = buffers[page] ? buffers[page] : [0, 7, 7];
 				let y = anime <= 1 ? 0 : anime <= 10 ? offset1 : offset3;
 
@@ -353,20 +356,20 @@ async function main() {
 					let size = picoSpriteSize(sprite);
 					picoSprite(sprite, 0, 0, y, 0, 20 * 7 / size);
 				}
-			}
+			}*/
 
 			// Draw buffers.
 			if (menumode == 1) {
-				let imin = anime <= 1 ? 1 : 0;
+				let imin = /*anime <= 1 ? 1 :*/ 0;
 				for (let i = imin; i < anime; i++) {
 					let x = anime <= 10 ? (i - (anime - 1) / 2) * 16 : (picoMod(i, 10) - (10 - 1) / 2) * 16;
-					let y = -pico.Image.height/2 + (anime <= 10 ? offset3 : offset4 - 8 + 16 * picoDiv(i, 10));
+					let y = -pico.Image.height/2 + (anime <= 10 ? offset3 : offset3a - 8 + 16 * picoDiv(i, 10));
 					/*if (page == i) {
 						picoSprite([0,9,9], 0, x, y, 0, 1);
 					} else {*/
 						let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
 						let size = picoSpriteSize(sprite);
-						if (picoMotion(x, y, 8, 12)) {
+						if (picoMotion(x, y, 8, 8)) {
 
 							// Change buffer.
 							page = i;
