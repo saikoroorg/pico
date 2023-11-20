@@ -55,6 +55,7 @@ const maxanime = 20; // Buffer max size.
 var page = 0; // Buffer page index.
 var anime = 1; // Buffer count.
 var minanime = 1; // Buffer min index.
+var frame = 0; // Anime frame count.
 var menumode = 0; // Menu mode: 0=size 1=anime 2=color
 var buffers = []; // Pixels buffers.
 var playing = 1; // Playing count.
@@ -197,12 +198,13 @@ function menuSelect(x) {
 		xoffset = picoDiv(maxwidth - width, 2);
 		yoffset = picoDiv(maxheight - height, 2);
 		//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
-		playing = -1; // Restart.
+		//playing = -1; // Restart.
 
 	// Change canvas page.
 	} else if (menumode == 1) {
 		anime = anime + x < 1 ? 1 : anime + x >= maxanime ? maxanime : anime + x;
 		page = page < anime ? page : anime - 1;
+		//playing = -1; // Restart.
 
 	// Change color depth.
 	} else if (menumode == 2) {
@@ -253,40 +255,55 @@ async function main() {
 				depth = colors.length / 3;
 				console.log("Load color: " + colors);
 
-			// Load pixels to canvas.
-			} else if (k == 0) {
-				for (let n = 0; n < numcode.length; n += 3) {
-					if (numcode[n] == 0) {
-						width = numcode[n + 1] >= 0 && numcode[n + 1] <= maxwidth ? numcode[n + 1] : 7;
-						height = numcode[n + 2] >= 0 && numcode[n + 2] <= maxheight ? numcode[n + 2] : 7;
-						xoffset = picoDiv(maxwidth - width, 2);
-						yoffset = picoDiv(maxheight - height, 2);
-					} else if (numcode[n] > 0) {
-						let i = numcode[n + 1] + xoffset;
-						let j = numcode[n + 2] + yoffset;
-						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-							pixels[j][i] = numcode[n];
-						}
-					}
-				}
-				console.log("Load pixel: " + pixels);
-
 			// Load pixels to buffers.
 			} else if (k < maxanime) {
 				buffers[k] = numcode;
 				anime = anime > k + 1 ? anime : k + 1;
+				frame = anime - 1;
 				menumode = 1;
 				console.log("Load buffer" + k + ": " + buffers[k]);
 			}
 		}
 	}
-	updateIcons();
-
-	// Load colors data.
-	picoColor(colors);
 
 	// Main loop.
 	for (;;) {
+
+		// Load pixels to canvas.
+		if (page != frame) {
+			page = frame;
+			if (page >= 0 && buffers[page]) {
+				for (let j = 0; j < maxheight; j++) {
+					pixels[j] = [];
+				}
+				for (let n = 0; n < buffers[page].length; n += 3) {
+					if (buffers[page][n] == 0) {
+						width = buffers[page][n + 1] >= 0 && buffers[page][n + 1] <= maxwidth ? buffers[page][n + 1] : 7;
+						height = buffers[page][n + 2] >= 0 && buffers[page][n + 2] <= maxheight ? buffers[page][n + 2] : 7;
+						xoffset = picoDiv(maxwidth - width, 2);
+						yoffset = picoDiv(maxheight - height, 2);
+					} else if (buffers[page][n] > 0) {
+						let i = buffers[page][n + 1] + xoffset;
+						let j = buffers[page][n + 2] + yoffset;
+						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
+							pixels[j][i] = buffers[page][n];
+						}
+					}
+				}
+			} else {
+				for (let j = 0; j < maxheight; j++) {
+					pixels[j] = [];
+					for (let i = 0; i < maxwidth; i++) {
+						pixels[j][i] = 0;
+					}
+				}
+			}
+			console.log("Load pixel: " + pixels);
+		}
+		updateIcons();
+
+		// Load colors data.
+		picoColor(colors);
 
 		// Initial param.
 		let selecting = colors.length / 3 - 1, selected = -1;
@@ -372,36 +389,8 @@ async function main() {
 						if (picoMotion(x, y, 8, 8)) {
 
 							// Change buffer.
-							page = i;
-
-							// Load canvas from buffers.
-							if (buffers[page]) {
-								for (let j = 0; j < maxheight; j++) {
-									pixels[j] = [];
-								}
-								for (let n = 0; n < buffers[page].length; n += 3) {
-									if (buffers[page][n] == 0) {
-										width = buffers[page][n + 1] >= 0 && buffers[page][n + 1] <= maxwidth ? buffers[page][n + 1] : 7;
-										height = buffers[page][n + 2] >= 0 && buffers[page][n + 2] <= maxheight ? buffers[page][n + 2] : 7;
-										xoffset = picoDiv(maxwidth - width, 2);
-										yoffset = picoDiv(maxheight - height, 2);
-									} else if (buffers[page][n] > 0) {
-										let i = buffers[page][n + 1] + xoffset;
-										let j = buffers[page][n + 2] + yoffset;
-										if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-											pixels[j][i] = buffers[page][n];
-										}
-									}
-								}
-							} else {
-								for (let j = 0; j < maxheight; j++) {
-									pixels[j] = [];
-									for (let i = 0; i < maxwidth; i++) {
-										pixels[j][i] = 0;
-									}
-								}
-							}
-							updateIcons();
+							frame = i;
+							playing = -1;
 
 							picoSprite(sprite, 0, x, y, 0, 2.5 * 7 / size);
 						} else if (i == page) {
