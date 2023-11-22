@@ -287,25 +287,33 @@ async function main() {
 	while (true) {
 
 		// Sprite lines and rows.
-		let lineMax = picoSqrt(count - 1) + 1;
+		const colMax = 5;//picoSqrt(count - 1) + 1;
+		let row = picoDiv(count - 1, colMax) + 1; // Row count.
+		let col = picoDiv(count - 1, row) + 1; // Column count.
+		let colMod = picoMod(count - 1, col) + 1; // Extra column count.
+
+		/*let lineMax = col;//picoSqrt(count - 1) + 1;
 		let lines = picoDiv(count - 1, lineMax) + 1;
 		let lineMod = picoMod(count - 1, lineMax) + 1;
-		console.log("" + count + " -> " + lineMax + " " + lines + " " + lineMod);
+		console.log("" + count + " -> " + lineMax + " " + lines + " " + lineMod);*/
+
+		const size = 200;
 		let posx = [], posy = [];
 		for (let i = 0; i < count; i++) {
-			let x = picoMod(i, lineMax) + 1, y = picoDiv(i, lineMax) + 1;
-			if (y < lines) {
-				posx[i] = ((x) / (lineMax + 1) - 0.5) * 200;
-				posy[i] = ((lines + 1 - y) / (lines + 1) - 0.5) * 200;
+			let x = picoMod(i, col) + 1, y = picoDiv(i, col) + 1;
+			if (y < row) {
+				posx[i] = (x / (col + 1) - 0.5) * size;
+				posy[i] = (y / (row + 1) - 0.5) * size;
 			} else {
-				posx[i] = ((x) / (lineMod + 1) - 0.5) * 200;
-				posy[i] = ((lines + 1 - y) / (lines + 1) - 0.5) * 200;
+				posx[i] = (x / (colMod + 1) - 0.5) * size;
+				posy[i] = (y / (row + 1) - 0.5) * size;
 			}
 			//console.log("" + x + "," + y + " -> " + posx[i] + "," + posy[i]);
 		}
 
 		// Sprite scale.
-		let scale = 20 / ((count < 1 ? 1 : count < lineMax ? count : lines >= lineMax ? lines : lineMax) + 1);
+		let c0 = count < 1 ? 1 : count < col ? count : row >= col ? row : col;
+		let scale = 20 / (c0 + 1);
 
 		// Rolling dice.
 		let angle = 0;
