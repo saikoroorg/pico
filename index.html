@@ -52,17 +52,17 @@ var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Canvas offset.
 var yoffset = picoDiv(maxheight - height, 2); // Canvas offset.
 const maxanime = 20; // Buffer max size.
-var page = 0; // Buffer page index.
 var anime = 1; // Buffer count.
 var minanime = 1; // Buffer min index.
 var frame = 0; // Anime frame count.
-var menumode = 0; // Menu mode: 0=size 1=anime 2=color
 var buffers = []; // Pixels buffers.
+var animeflag = 0; // Anime editing flag.
 var playing = 1; // Playing count.
 var pixels = []; // Canvas pixels.
 var colors = [255,255,255,255,223,175,159,255,247,191,191,191,231,0,95,0,119,239,0,151,63,167,0,0,143,0,119,0,63,23]; // Colors.
 var depth = 10; // Color count.
 const maxcolor = 10; // Color max size.
+var colorflag = 0; // Color editing flag.
 var appurl = null; // Referenced url.
 </script><!--/Data-->
 <!--Menu--><script>
@@ -101,12 +101,12 @@ async function darkmode(enable) {
 
 // Update buttons.
 function updateButtons() {
-	if (menumode == 0) {
+	if (colorflag) {
+		updateMenu("select", true, "" + depth);
+	} else if (animeflag) {
+		updateMenu("select", true, "" + anime);
+	} else {
 		updateMenu("select", true, "x" + width);
-	} else if (menumode == 1) {
-		updateMenu("select", true, "+" + anime);
-	} else if (menumode == 2) {
-		updateMenu("select", true, "-" + depth);
 	}
 }
 
@@ -114,29 +114,29 @@ function updateButtons() {
 async function updateIcons(force = true) {
 
 	// Update buffer.
-	if (force || buffers[page]) {
-		//console.log("Update" + page + ": " + buffers[page]);
+	if (force || buffers[frame]) {
+		//console.log("Update" + frame + ": " + buffers[frame]);
 
 		// Store canvas pixels to buffers.
-		buffers[page] = [0, width, height];
+		buffers[frame] = [0, width, height];
 		for (let j = yoffset; j < yoffset + height; j++) {
 			for (let i = xoffset; i < xoffset + width; i++) {
 				if (pixels[j][i]) {
-					let k = buffers[page].length;
-					buffers[page][k] = pixels[j][i];
-					buffers[page][k+1] = i - xoffset;
-					buffers[page][k+2] = j - yoffset;
+					let k = buffers[frame].length;
+					buffers[frame][k] = pixels[j][i];
+					buffers[frame][k+1] = i - xoffset;
+					buffers[frame][k+2] = j - yoffset;
 				}
 			}
 		}
-		if (buffers[page].length <= 3) {
-			buffers[page] = null;
+		if (buffers[frame].length <= 3) {
+			buffers[frame] = null;
 		}
 	}
 
 	// Update icon image.
-	if (buffers[page]) {
-		let data = await picoSpriteData(buffers[page], colors);
+	if (buffers[frame]) {
+		let data = await picoSpriteData(buffers[frame], colors);
 		updateMenu("action", true, null, data);
 	} else {
 		updateMenu("action", true, "^");
@@ -147,40 +147,33 @@ async function updateIcons(force = true) {
 // Action button for back to app or start sharing.
 async function menuAction() {
 
-	// Enter anime mode.
-	//if (menumode != 1) {
-	//	menumode = 1;
-	//	picoFlush();
+	// Back to app or start sharing.
+	picoResetParams();
+
+	// Create num code to share url.
+	let k = 0;
+	for (let p = 0; p < maxanime; p++) {
+		if (buffers[p]) {
+			picoSetNumcode(buffers[p], k);
+			k++;
+		}
+	}
+	if (k == 0) {
+		picoSetNumcode([0,7,7], k);
+		k++
+	}
+	if (
+		((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
+		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
+		picoSetColcode(colors, k);
+	}
 
 	// Back to app or start sharing.
-	//} else {
-		picoResetParams();
-
-		// Create num code to share url.
-		let k = 0;
-		for (let p = 0; p < maxanime; p++) {
-			if (buffers[p]) {
-				picoSetNumcode(buffers[p], k);
-				k++;
-			}
-		}
-		if (k == 0) {
-			picoSetNumcode([0,7,7], k);
-			k++
-		}
-		if (
-			((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
-			(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-			picoSetColcode(colors, k);
-		}
-
-		// Back to app or start sharing.
-		if (appurl) {
-			await picoReload(appurl);
-		} else {
-			await picoShare();
-		}
-	//}
+	if (appurl) {
+		await picoReload(appurl);
+	} else {
+		await picoShare();
+	}
 }
 
 // Select button.
@@ -188,27 +181,27 @@ function menuSelect(x) {
 
 	// Change menu mode.
 	if (x == 0) {
-		//menumode = menumode >= 0 && menumode + 1 <= 2 ? menumode + 1 : 0;
-		menumode = menumode != 1 /*&& anime > 1*/ ? 1 : 0;
+		animeflag = animeflag ? 0 : 1;
+		colorflag = 0;
+
+	// Change color depth.
+	} else if (colorflag) {
+		depth = depth + x < 1 ? 1 : depth + x >= maxcolor ? maxcolor : depth + x;
+
+	// Change canvas frame.
+	} else if (animeflag) {
+		anime = anime + x < 1 ? 1 : anime + x >= maxanime ? maxanime : anime + x;
+		frame = frame < anime ? frame : anime - 1;
+		//playing = -1; // Restart.
 
 	// Change canvas size.
-	} else if (menumode == 0) {
+	} else {
 		width = width + x < 3 ? 3 : width + x > maxwidth ? maxwidth : width + x;
 		height = height + x < 3 ? 3 : height + x > maxheight ? maxheight : height + x;
 		xoffset = picoDiv(maxwidth - width, 2);
 		yoffset = picoDiv(maxheight - height, 2);
 		//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
 		//playing = -1; // Restart.
-
-	// Change canvas page.
-	} else if (menumode == 1) {
-		anime = anime + x < 1 ? 1 : anime + x >= maxanime ? maxanime : anime + x;
-		page = page < anime ? page : anime - 1;
-		//playing = -1; // Restart.
-
-	// Change color depth.
-	} else if (menumode == 2) {
-		depth = depth + x < 1 ? 1 : depth + x >= maxcolor ? maxcolor : depth + x;
 	}
 
 	picoBeep(1.2, 0.1);	
@@ -229,6 +222,9 @@ async function main() {
 
 	// Load params.
 	let keys = picoKeys();
+
+	// Load data and frames.
+	let frameselecting = 0, frameselected = -1;
 	for (let k = 0; k < keys.length; k++) {
 		console.log("Param" + k + ": " + keys[k] + " -> " + picoStrings(keys[k]));
 
@@ -259,8 +255,8 @@ async function main() {
 			} else if (k < maxanime) {
 				buffers[k] = numcode;
 				anime = anime > k + 1 ? anime : k + 1;
-				frame = anime - 1;
-				menumode = 1;
+				frameselecting = anime - 1;
+				animeflag = 1;
 				console.log("Load buffer" + k + ": " + buffers[k]);
 			}
 		}
@@ -270,23 +266,23 @@ async function main() {
 	for (;;) {
 
 		// Load pixels to canvas.
-		if (page != frame) {
-			page = frame;
-			if (page >= 0 && buffers[page]) {
+		if (frame != frameselecting) {
+			frame = frameselecting;
+			if (frame >= 0 && buffers[frame]) {
 				for (let j = 0; j < maxheight; j++) {
 					pixels[j] = [];
 				}
-				for (let n = 0; n < buffers[page].length; n += 3) {
-					if (buffers[page][n] == 0) {
-						width = buffers[page][n + 1] >= 0 && buffers[page][n + 1] <= maxwidth ? buffers[page][n + 1] : 7;
-						height = buffers[page][n + 2] >= 0 && buffers[page][n + 2] <= maxheight ? buffers[page][n + 2] : 7;
+				for (let n = 0; n < buffers[frame].length; n += 3) {
+					if (buffers[frame][n] == 0) {
+						width = buffers[frame][n + 1] >= 0 && buffers[frame][n + 1] <= maxwidth ? buffers[frame][n + 1] : 7;
+						height = buffers[frame][n + 2] >= 0 && buffers[frame][n + 2] <= maxheight ? buffers[frame][n + 2] : 7;
 						xoffset = picoDiv(maxwidth - width, 2);
 						yoffset = picoDiv(maxheight - height, 2);
-					} else if (buffers[page][n] > 0) {
-						let i = buffers[page][n + 1] + xoffset;
-						let j = buffers[page][n + 2] + yoffset;
+					} else if (buffers[frame][n] > 0) {
+						let i = buffers[frame][n + 1] + xoffset;
+						let j = buffers[frame][n + 2] + yoffset;
 						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-							pixels[j][i] = buffers[page][n];
+							pixels[j][i] = buffers[frame][n];
 						}
 					}
 				}
@@ -304,13 +300,11 @@ async function main() {
 
 		// Load colors data.
 		picoColor(colors);
+		let colorselecting = colors.length / 3 - 1, colorselected = -1;
 
-		// Initial param.
-		let selecting = colors.length / 3 - 1, selected = -1;
-
-		const offset1 = 10, offset1a = -4;; // Offset of pixels
-		const offset2 = 14; // Offset of colors.
-		const offset3 = 18, offset3a = 18; // Offset of buffer.
+		const offset1 = -10, offset1a = 4;; // Offset of pixels from center.
+		const offset2 = 14; // Offset of colors from bottom.
+		const offset3 = 18, offset3b = 8; // Offset of buffer from top.
 		let touching = 0; // Touching pixel(1) or color(2).
 
 		// Playing loop.
@@ -324,86 +318,153 @@ async function main() {
 			}
 
 			// Draw pixels.
-			/*if (menumode != 1) */{
-				let y0 = menumode != 1 /*|| anime <= 1*/ ? offset1 : offset1a;
-				let w0 = menumode != 1 /*|| anime <= 1*/ ? width : (width * 1.2);
-				let grid = 168 / w0;
-				let margin = width <= 9 ? 2 : 1;
+			/*if (animeflag <= 1) */{
+				let y0 = !animeflag ? offset1 : offset1a;
+				let s0 = !animeflag ? 168 : 140;
+				let size = width < height ? width : height;
+				let grid = s0 / size;
+				let margin = size <= 9 ? 2 : 1;
+				let w0 = grid / 2 - 1; // Width for touching.
+				let w1 = (grid - margin) / 2 - 1; // Width.
 				for (let j = yoffset; j < yoffset + height; j++) {
-					let y = (j - yoffset - (height - 1) / 2) * grid - y0;
+					let y = (j - yoffset - (height - 1) / 2) * grid + y0;
 					for (let i = xoffset; i < xoffset + width; i++) {
 						let x = (i - xoffset - (width - 1) / 2) * grid;
 						if (touching != 2 && picoMotion(x, y, grid/2)) {
 							touching = 1; // Touch pixels.
 
 							// Put pixel.
-							if (pixels[j][i] != selecting) {
-								pixels[j][i] = selecting;
+							if (pixels[j][i] != colorselecting) {
+								pixels[j][i] = colorselecting;
 							}
 
-							// Back to pixel mode.
-							if (menumode == 2) {
-								menumode = 0;
-								selected = -1;
+							// Cancel color editing.
+							if (colorflag) {
+								colorflag = 0;
+								colorselected = -1;
 								touching = 1; // Touch pixels.
 								picoFlush();
 							}
-							picoPixel(pixels[j][i], x, y, grid/2-1, grid/2-1);
+							picoPixel(pixels[j][i], x, y, w0, w0);
 						} else {
-							picoPixel(pixels[j][i], x, y, (grid-margin)/2-1, (grid-margin)/2-1);
+							picoPixel(pixels[j][i], x, y, w1, w1);
 						}
 					}
 				}
-			}
 
 			// Draw preview.
-			/*if (menumode == 1) {
-				let sprite = buffers[page] ? buffers[page] : [0, 7, 7];
-				let y = anime <= 1 ? 0 : anime <= 10 ? offset1 : offset3;
+			/*} else {
+				let sprite = buffers[frame] ? buffers[frame] : [0, 7, 7];
+				let y0 = !animeflag ? offset1 : offset1a;
+				let s0 = 140;
+				let size = picoSpriteSize(sprite);
+				let s1 = s0 / size; // Preview scale.
+				//let s2 = s1 * 0.95; // Touching scale.
 
-				// Back to pixel mode.
-				if (picoAction(0, 0, 70, 70)) {
-					menumode = 0;
+				// Back to anime edit mode.
+				if (picoAction(0, y0, 70, 70)) {
+
+					// Paste pixels to buffers.
+					updateIcons();
+
+					animeflag = 1;
 					picoFlush();
 
-				} else if (picoMotion(0, 0, 70, 70)) {
+				} else if (picoMotion(0, y0, 70, 70)) {
 					let size = picoSpriteSize(sprite);
-					picoSprite(sprite, 0, 0, y, 0, 18 * 7 / size);
+					picoSprite(sprite, 0, 0, y0, 0, s2);
 				} else {
 					let size = picoSpriteSize(sprite);
-					picoSprite(sprite, 0, 0, y, 0, 20 * 7 / size);
-				}
-			}*/
+					picoSprite(sprite, 0, 0, y0, 0, s1);
+				}*/
+			}
 
-			// Draw buffers.
-			if (menumode == 1) {
+			// Draw anime editor.
+			if (animeflag >= 1) {
 				let imin = /*anime <= 1 ? 1 :*/ 0;
 				for (let i = imin; i < anime; i++) {
 					let x = anime <= 10 ? (i - (anime - 1) / 2) * 16 : (picoMod(i, 10) - (10 - 1) / 2) * 16;
-					let y = -pico.Image.height/2 + (anime <= 10 ? offset3 : offset3a - 8 + 16 * picoDiv(i, 10));
-					/*if (page == i) {
+					let y = -pico.Image.height/2 + (anime <= 10 ? offset3 : offset3 - offset3b + offset3b*2 * picoDiv(i, 10));
+					/*if (frame == i) {
 						picoSprite([0,9,9], 0, x, y, 0, 1);
 					} else {*/
-						let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
+						let sprite = animeflag == 2 && i == frameselecting && buffers[frame] ? buffers[frame] :
+							buffers[i] ? buffers[i] : [0, 7, 7];
 						let size = picoSpriteSize(sprite);
-						if (picoMotion(x, y, 8, 8)) {
+						let s0 = 2.25 * 7 / size; // Frame scale for touching/selecting.
+						let s1 = 2.0 * 7 / size; // Frame scale.
+						let s2 = 2.75 * 7 / size; // Frame scale for holding.
 
-							// Change buffer.
-							frame = i;
-							playing = -1;
+						// Enter preview mode.
+						if (picoAction(x, y, 8, 8)) {
 
-							picoSprite(sprite, 0, x, y, 0, 2.5 * 7 / size);
-						} else if (i == page) {
-							picoSprite(sprite, 0, x, y, 0, 2.25 * 7 / size);
+							// Select same color.
+							if (frameselected == i) {
+								frame = frameselecting = i;
+
+								// Paste pixels to buffers.
+								updateIcons();
+
+								// Toggle preview mode and edit mode.
+								animeflag = animeflag == 1 ? 2 : 1;
+								frameselected = -1;
+								picoFlush();
+
+							// Select different frame.
+							} else {
+								frameselected = frameselecting = i;
+								picoBeep(0, 0.1);
+							}
+
+							// Touch holding frame.
+							if (animeflag == 2) {
+								picoSprite(sprite, 0, x, y, 0, s2);
+							} else {
+								picoSprite(sprite, 0, x, y, 0, s0);
+							}
+
+						} else if (picoMotion(x, y, 8, 8)) {
+
+							// Select frame.
+							frameselecting = i;
+
+							// Reload to change buffer.
+							if (animeflag <= 1) {
+								playing = -1;
+							}
+
+							// Cancel color editing.
+							if (colorflag) {
+								colorflag = 0;
+								colorselected = -1;
+								touching = 0; // Touch buffers.
+								picoFlush();
+							}
+
+							// Touch holding frame.
+							if (animeflag == 2) {
+								picoSprite(sprite, 0, x, y, 0, s2);
+							} else {
+								picoSprite(sprite, 0, x, y, 0, s0);
+							}
+
+						// Touch holding frame.
+						} else if (animeflag == 2 && i == frameselecting) {
+							picoSprite(sprite, 0, x, y, 0, s2);
+
+						// Selecting frame.
+						} else if (i == frameselecting) {
+							picoSprite(sprite, 0, x, y, 0, s0);
+
 						} else {
-							picoSprite(sprite, 0, x, y, 0, 2 * 7 / size);
+							picoSprite(sprite, 0, x, y, 0, s1);
 						}
 					//}
 				}
 			}
 
 			// Draw colors.
-			if (menumode != 2) {
+			if (colorflag <= 0) {
 				for (let i = 0; i < depth; i++) {
 					let x = (i - (depth - 1) / 2) * 16;
 					let y = pico.Image.height/2 - offset2;
@@ -412,28 +473,28 @@ async function main() {
 					if (touching != 1 && picoAction(x, y, 8, 12)) {
 
 						// Select same color.
-						if (selected == i) {
-							selecting = i;
+						if (colorselected == i) {
+							colorselecting = i;
 
 							// Enter color edit mode.
 							if (i > 0) {
-								selected = -1;
-								menumode = 2;
+								colorflag = 1;
+								colorselected = -1;
 								picoFlush();
 
 							// Change background color.
 							} else {
-								selected = -1;
+								colorselected = -1;
 								for (let j = 0; j < 3; j++) {
-									let c = colors[selecting * 3 + j];
+									let c = colors[colorselecting * 3 + j];
 									c = c <= 0 ? 255 : 0;
-									colors[selecting * 3 + j] = c;
+									colors[colorselecting * 3 + j] = c;
 								}
 							}
 
 						// Select different color.
 						} else {
-							selected = selecting = i;
+							colorselected = colorselecting = i;
 							picoBeep(0, 0.1);
 						}
 						picoChar("+", i, x, y, 0, 4);
@@ -442,33 +503,32 @@ async function main() {
 						touching = 2; // Touch colors.
 
 						// Touch different color.
-						if (selecting != i) {
-							selected = selecting;
-							selecting = i;
+						if (colorselecting != i) {
+							colorselected = colorselecting;
+							colorselecting = i;
 						}
 						picoChar("+", i, x, y, 0, 3.5);
-					} else if (i == selecting) {
+					} else if (i == colorselecting) {
 						picoChar("+", i, x, y, 0, 4);
 					} else {
 						picoChar("-", i, x, y, 0, 4);
 					}
 				}
-			}
 
 			// Draw color editor.
-			if (menumode == 2) {
+			} else {
 				const compression = 2, maxcompresed = (1 << (8 - compression));
 
 				// Draw buttons and color numbers.
-				if (selecting > 0) {
+				if (colorselecting > 0) {
 					let s = 2;
 					let x = - (10 - 1) / 2 * 16;
 					let y = pico.Image.height/2 - offset2;
 
 					// Back to pixel mode.
 					if (picoAction(x, y, 8, 12)) {
-						menumode = 0;
-						selected = -1;
+						colorflag = 0;
+						colorselected = -1;
 						touching = 1; // Touch pixels.
 						picoFlush();
 					} else if (picoMotion(x, y, 8, 12)) {
@@ -476,10 +536,10 @@ async function main() {
 					}
 
 					// Draw plus button.
-					picoChar("+", selecting, x, y, 0, s);
+					picoChar("+", colorselecting, x, y, 0, s);
 
 					for (let i = 0; i < 3; i++) {
-						let c = colors[selecting * 3 + i];
+						let c = colors[colorselecting * 3 + i];
 
 						// Decrease color number.
 						let x = ((i * 3 + 1) - (10 - 1) / 2) * 16;
@@ -494,7 +554,7 @@ async function main() {
 						}
 
 						// Draw minus button.
-						picoChar("<", selecting, x, y, 0, s);
+						picoChar("<", colorselecting, x, y, 0, s);
 
 						// Increase color number.
 						x = ((i * 3 + 3) - (10 - 1) / 2) * 16;
@@ -506,19 +566,19 @@ async function main() {
 						} else if (picoMotion(x, y, 8, 12)) {
 							s = 3.5;
 						}
-						colors[selecting * 3 + i] = c;
+						colors[colorselecting * 3 + i] = c;
 
 						// Draw plus button.
-						picoChar(">", selecting, x, y, 0, s);
+						picoChar(">", colorselecting, x, y, 0, s);
 
 						// Convert range 0-255 to 0-100.
-						let c99 = picoDiv(colors[selecting * 3 + i] * 99, 255);
+						let c99 = picoDiv(colors[colorselecting * 3 + i] * 99, 255);
 						let c00 = c99 >= 99 ? "100" : c99 >= 9 ? "" + (c99 + 1) : c99 >= 1 ? " " + (c99 + 1) : " 0";
 
 						// Draw color numbers.
 						x = ((i * 3 + 2) - (10 - 1) / 2) * 16;
 						s = 2;
-						picoChar(c00, selecting, x, y, 0, s);
+						picoChar(c00, colorselecting, x, y, 0, s);
 					}
 				}
 			}
