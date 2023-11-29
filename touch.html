@@ -8,9 +8,11 @@
 <script src="image.js"></script>
 <!--Main--><script>
 (async () => {
+	//pico.Image.debug = true;
+	pico.Touch.debug = true;
 
 	picoColor([204,204,204, 221,221,221, 238,238,238, 255,255,255]);
-	let keyboard = ["1234567890", "QWERTYUIOP", "ASDFGHJKL<", "ZXCVBNM._>"];
+	let keyboard = ["1234567890", "QWERTYUIOP", "ASDFGHJKL<", "ZXCVBNM./>"];
 	let textarea = "";
 
 	for (;;) {
@@ -18,7 +20,7 @@
 		picoPixel(0, -100,-100,200,200);
 
 		for (let j = 0; j < keyboard.length; j++) {
-			let y = j * 24 + 2;
+			let y = j * 24;
 			for (let i = 0; i < keyboard[j].length; i++) {
 				let x = (i - keyboard[j].length / 2) * 16 + 8;
 				let char = keyboard[j].substr(i, 1);
@@ -28,17 +30,20 @@
 					} else if (char == ">") {
 						textarea = "";
 					} else {
-						textarea = textarea.substr(-10, 10) + char;
+						textarea = textarea.substr(-9, 9) + char;
 					}
-					picoChar(char, 1, x, y, 0, 0.8);
+					picoChar(char, 1, x, y, 0, 3);
 				} else if (picoMotion(x, y, 8, 12)) {
-					picoChar(char, 1, x, y, 0, 0.8);
+					picoChar(char, 1, x, y, 0, 3);
 				} else {
-					picoChar(char, 2, x, y, 0, 1);
+					picoChar(char, 2, x, y, 0, 4);
 				}
 			}
 		}
-		picoText(textarea, [-22,-16,44,16], 2);
+		picoRect(
+			[-20,-24,40,24], 1, 0,0, 0, 1);
+		picoText(textarea,
+			[-20,-24,40,24], 2, 0,0, 0, 1);
 
 		await picoFlip();
 		await picoRead();

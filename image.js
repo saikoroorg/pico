@@ -120,6 +120,7 @@ var pico = pico || {};
 
 // Image class.
 pico.Image = class {
+	static debug = false; // Debug print.
 	static width = 200; // Image width. (-width/2 .. width/2)
 	static height = 200; // Image height. (-height/2 .. height/2)
 	static ratio = 4; // Pixel ratio.
@@ -168,20 +169,20 @@ pico.Image = class {
 		[-1,-2,0,1, 0,0,0,2, 1,-2,0,1], // Y
 		[-1,-2,2,0, 1,-2,0,1, 0,0,0,0, -1,1,0,1, -1,2,2,0]]; // Z
 
-	static markChars = ".?!:-+=<>()_";
+	static markChars = "./?:-+=<>,'*";
 	static markShapes = [
 		[0,2,0,0], // .
+		[-1,2,0,0, 0,-1,0,2, 1,-2,0,0], // /
 		[-1,-2,2,0, 1,-2,0,1, 0,0,0,0, 0,2,0,0], // ?
-		[0,-2,0,2, 0,2,0,0], // !
 		[0,-1,0,0, 0,1,0,0], // :
 		[-1,0,2,0], // -
 		[-1,0,2,0, 0,-1,0,2], // +
 		[-1,-1,2,0, -1,1,2,0], // =
 		[-1,0,0,0, 0,-1,0,0, 0,1,0,0, 1,-2,0,0, 1,2,0,0], // <
 		[-1,-2,0,0, -1,2,0,0, 0,-1,0,0, 0,1,0,0, 1,0,0,0], // >
-		[0,-1,0,2, 1,-2,0,0, 1,2,0,0], // (
-		[-1,-2,0,0, -1,2,0,0, 0,-1,0,2], // )
-		[-1,2,2,0]]; // _
+		[-1,1,0,0, 0,2,0,0, 1,1,0,0], // ,
+		[-1,-1,0,0, 0,-2,0,0, 1,-1,0,0], // '
+		[-1,-1,0,0, -1,1,0,0, 0,0,0,0, 1,-1,0,0, 1,1,0,0]]; // *
 
 	static colors = [
 		 255,255,255, 171,231,255, 199,215,255, 215,203,255, // 30-33
@@ -282,11 +283,11 @@ pico.Image = class {
 		if (area) {
 			ox = (area[0] + area[2] / 2);
 			oy = (area[1] + area[3] / 2);
-			mx = (area[2] + 1) / ux;
-			my = (area[3] + 1) / uy;
+			mx = (area[2]) / ux;
+			my = (area[3]) / uy;
 		}
 
-		//console.log("Textarea: " + ox + "," + oy + " x " + mx + "," + my + " / " + ux + "," + uy);
+		this._debug("Textarea: " + ox + "," + oy + " x " + mx + "," + my + " / " + ux + "," + uy);
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
@@ -294,7 +295,7 @@ pico.Image = class {
 				await this._move((-ux * (mx - 1)) / 2 , (-uy * (my - 1)) / 2);
 				for (let i = 0, ix = 0, iy = 0; i < text.length && iy < my; i++) {
 					let char = text.charCodeAt(i);
-					//console.log("char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
+					this._debug("char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
 					if (char == "\r".charCodeAt(0) || char == "\n".charCodeAt(0)) {
 						await this._move(-ux * ix, uy);
 						ix = 0;
@@ -351,10 +352,17 @@ pico.Image = class {
 		this._setup(parent, width, height);
 	}
 
+	// Debug print.
+	_debug(text) {
+		if (pico.Image.debug) {
+			console.log(text);
+		}
+	}
+
 	// Resize canvas.
 	_resize(width=0, height=0) {
 		return this._ready().then(() => {
-			//console.log("Flip.");
+			this._debug("Flip.");
 			return new Promise((resolve) => {
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
@@ -371,7 +379,7 @@ pico.Image = class {
 
 			// Create canvas.
 			if (this.context == null) {
-				console.log("Create canvas.");
+				this._debug("Create canvas.");
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i] = document.createElement("canvas");
 					this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
@@ -397,7 +405,7 @@ pico.Image = class {
 	// Flip image.
 	_flip() {
 		return this._ready().then(() => {
-			//console.log("Flip.");
+			this._debug("Flip.");
 			return new Promise((resolve) => {
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i].style.display = i == this.primary ? "flex" : "none";
@@ -412,7 +420,7 @@ pico.Image = class {
 	// Clear image.
 	_clear() {
 		return this._ready().then(() => {
-			//console.log("Clear.");
+			this._debug("Clear.");
 			return new Promise((resolve) => {
 
 				// Clear image.
@@ -431,7 +439,7 @@ pico.Image = class {
 	// Ready to draw.
 	_ready() {
 		if (this.context == null) {
-			console.log("No context.");
+			this._debug("No context.");
 			return Promise.reject();
 		}
 		return Promise.resolve();
@@ -439,7 +447,7 @@ pico.Image = class {
 
 	// Reset image transform (scale, rotate, move).
 	_reset(x=0, y=0, angle=0, scale=1) {
-		//console.log("Reset transform matrix.");
+		this._debug("Reset transform matrix.");
 		return new Promise(async (resolve) => {
 			this.context.setTransform(1, 0, 0, 1, 0, 0);
 			await this._move(x, y);
@@ -451,7 +459,7 @@ pico.Image = class {
 
 	// Scale image.
 	_scale(scale=1) {
-		//console.log("Scale: " + scale);
+		this._debug("Scale: " + scale);
 		return new Promise((resolve) => {
 			if (scale != 1) {
 				this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
@@ -464,7 +472,7 @@ pico.Image = class {
 
 	// Rotate image.
 	_rotate(angle=0) {
-		//console.log("Rotate: " + angle);
+		this._debug("Rotate: " + angle);
 		return new Promise((resolve) => {
 			if (angle) {
 				this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
@@ -477,7 +485,7 @@ pico.Image = class {
 
 	// Move image.
 	_move(x, y) {
-		//console.log("Move: " + x + "," + y);
+		this._debug("Move: " + x + "," + y);
 		return new Promise((resolve) => {
 			if (x || y) {
 				this.context.translate(pico.Image.ratio * x, pico.Image.ratio * y);
@@ -493,13 +501,13 @@ pico.Image = class {
 
 	// Draw pixel to image.
 	_draw(c=0, x=0, y=0, w=0, h=0) {
-		//console.log("Draw: " + c + "," + x + "+" + w + "," + y + "+" + h);
+		this._debug("Draw: " + c + "," + x + "+" + w + "," + y + "+" + h);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
-		//console.log("Center: " + cx + "," + cy + " / " + u);
+		this._debug("Center: " + cx + "," + cy + " / " + u);
 		return new Promise((resolve) => {
 			let k = c >= 0 && c < this.palls.length/3 ? c : this.palls.length/3 - 1;
 			let r = this.palls[k*3], g = this.palls[k*3+1], b = this.palls[k*3+2];
-			//console.log("Color: " + r + "," + g + "," + b);
+			this._debug("Color: " + r + "," + g + "," + b);
 			this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
 			this.context.fillRect(cx + u * x, cy + u * y, u * (w + 1), u * (h + 1));
 			resolve();
@@ -583,7 +591,7 @@ pico.Image = class {
 		try {
 			const blob = new Blob([buffers.buffer], {type: "image/png"});
 			const imageFile = new File([blob], "image.png", {type: "image/png"});
-			console.log("Image data: " + imageFile.size);
+			this._debug("Image data: " + imageFile.size);
 			return imageFile;
 		} catch (error) {
 			console.error(error);

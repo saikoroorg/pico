@@ -81,6 +81,7 @@ var pico = pico || {};
 
 // Param class.
 pico.Param = class {
+	static debug = false; // Debug print.
 
 	// Get random count.
 	random(max, seed=0) {
@@ -193,6 +194,13 @@ pico.Param = class {
 		//});
 	}
 
+	// Debug print.
+	_debug(text) {
+		if (pico.Param.debug) {
+			console.log(text);
+		}
+	}
+
 	// Setup param.
 	_setup() {
 		return new Promise((resolve) => {
@@ -200,7 +208,7 @@ pico.Param = class {
 			// Loadd query.
 			let query = window.location.search;
 			if (query != null && query != "") {
-				console.log("Load query: " + query);
+				this._debug("Load query: " + query);
 				let text = query.slice(1);
 				this._deserialize(text);
 			}
@@ -221,10 +229,10 @@ pico.Param = class {
 				let separator = url && url.indexOf("?") < 0 ? "?" : "";
 				let query = text ? separator + text : "";
 				if (url) {
-					console.log("Jump: " + query);
+					this._debug("Jump: " + query);
 					window.location.href = url + query;
 				} else {
-					console.log("Reload: " + query);
+					this._debug("Reload: " + query);
 					window.location.search = query;
 				}
 			}
@@ -241,11 +249,11 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "";
 					let query = text ? separator + text : "";
-					console.log("Share query: " + query);
+					this._debug("Share query: " + query);
 					data.url = url + query;
 				} else {
 					let query = text ? "?" + text : "";
-					console.log("Flush query: " + query);
+					this._debug("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					data.url = window.location.href.replace(/[\?\#].*$/, '') + query;
 				}
@@ -253,11 +261,11 @@ pico.Param = class {
 					data.files = files;
 				}
 				if (navigator.share) {
-					console.log("Share: " + JSON.stringify(data));
+					this._debug("Share: " + JSON.stringify(data));
 					await navigator.share(data).then(() => {
-						console.log('Successful share');
+						this._debug('Successful share');
 					}).catch((error) => {
-						console.log('Error sharing', error);
+						this._debug('Error sharing', error);
 					});
 				}
 			}
@@ -379,7 +387,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = r ^ maxmask; // Bit flip.
-			//console.log("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			this._debug("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
 		return results;
@@ -401,7 +409,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = (r + 1) % (1 << (maxbit - compression)); // Plus 1 to reserve 0.
-			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			this._debug("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
 		return results;
