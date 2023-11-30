@@ -392,8 +392,7 @@ async function main() {
 								console.log("Copy and holding.");
 								animeflag = 2;
 								picoFlush(); // Update after action event.
-								picoBeep(0, 0.1);
-								picoBeep(1.2, 0.1, 0.2);
+								picoBeep(1.2, 0.1);
 							}
 
 						// Single touched frame.
@@ -523,8 +522,7 @@ async function main() {
 							if (i > 0) {
 								colorflag = 1;
 								picoFlush(); // Update after action event.
-								picoBeep(0, 0.1);
-								picoBeep(1.2, 0.1, 0.2);
+								picoBeep(1.2, 0.1);
 
 							// Change background color.
 							} else {
@@ -533,8 +531,7 @@ async function main() {
 									c = c <= 0 ? 255 : 0;
 									colors[colorselecting * 3 + j] = c;
 								}
-								picoBeep(0, 0.1);
-								picoBeep(1.2, 0.1, 0.2);
+								picoBeep(1.2, 0.1);
 							}
 
 						// Single touched color.
