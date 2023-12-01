@@ -274,13 +274,27 @@ async function main() {
 				for (let j = 0; j < maxheight; j++) {
 					pixels[j] = [];
 				}
-				for (let n = 0; n < buffers[frame].length; n += 3) {
-					if (buffers[frame][n] == 0) {
-						width = buffers[frame][n + 1] >= 0 && buffers[frame][n + 1] <= maxwidth ? buffers[frame][n + 1] : 7;
-						height = buffers[frame][n + 2] >= 0 && buffers[frame][n + 2] <= maxheight ? buffers[frame][n + 2] : 7;
-						xoffset = picoDiv(maxwidth - width, 2);
-						yoffset = picoDiv(maxheight - height, 2);
-					} else if (buffers[frame][n] > 0) {
+				if (buffers[frame][0] == 0) {
+					width = buffers[frame][0 + 1] >= 0 && buffers[frame][0 + 1] <= maxwidth ? buffers[frame][0 + 1] : 7;
+					height = buffers[frame][0 + 2] >= 0 && buffers[frame][0 + 2] <= maxheight ? buffers[frame][0 + 2] : 7;
+					xoffset = picoDiv(maxwidth - width, 2);
+					yoffset = picoDiv(maxheight - height, 2);
+				}
+				for (let n = 3; n < buffers[frame].length; n += 3) {
+					if (buffers[frame][n + 3] == 0) {
+						let imax = buffers[frame][n + 1] + buffers[frame][n + 4] + xoffset;
+						let jmax = buffers[frame][n + 2] + buffers[frame][n + 5] + yoffset;
+						//console.log("Put pixel: " + "->" + imax + "," + jmax);
+						for (let i = buffers[frame][n + 1] + xoffset; i <= imax; i++) {
+							for (let j = buffers[frame][n + 2] + yoffset; j <= jmax; j++) {
+								//console.log("Put pixel: " + i + "," + j);
+								if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
+									pixels[j][i] = buffers[frame][n];
+								}
+							}
+						}
+						n += 3;
+					} else {
 						let i = buffers[frame][n + 1] + xoffset;
 						let j = buffers[frame][n + 2] + yoffset;
 						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
