@@ -1,12 +1,16 @@
 body {
 	font-family: Courier, monospace, sans-serif;
-	background-color: #fff;
-	color: #888;
+	background-color: #ffffff;
+	color: #7f7f7f;
 	overflow: hidden;
 	user-select: none; -webkit-user-select: none;
 }
+body.dark {
+	background-color: #7f7f7f;
+	color: #ffffff;
+}
 a {
-	color: #ccc;
+	color: #bfbfbf;
 	text-decoration: none;
 }
 #container {
@@ -32,7 +36,7 @@ a {
 	flex-direction: column; -webkit-flex-direction: column;
 	justify-content: center; -webkit-justify-content: center;
 	align-items: center; -webkit-align-items: center;
-	background-color: #ccc;
+	background-color: #bfbfbf;
 }
 #screen {
 	aspect-ratio: 1;
@@ -56,7 +60,7 @@ a {
 }
 .logo #title {
 	font-size: 24px;
-	color: #888;
+	color: #7f7f7f;
 }
 .logo #subtitle {
 	font-size: 24px;
@@ -84,12 +88,12 @@ a {
 	display: none;
 }
 .item.dark {
-	background-color: #888;
-	color: #fff;
+	background-color: #7f7f7f;
+	color: #ffffff;
 }
 .light {
-	background-color: #ccc;
-	color: #888;
+	background-color: #bfbfbf;
+	color: #7f7f7f;
 }
 .secret {;
 	display: none;

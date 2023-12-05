@@ -206,9 +206,7 @@ pico.Image = class {
 	static colors8 = [255,255,255, 159,255,243, 255,219,171, 188,188,188, 0,115,239, 231,0,91, 0,147,59, 143,0,119, 167,0,0, 0,63,23]; // 10 colors from the original 8 bits.
 	static colors6 = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // 10 colors from the 6 bits.
 	static colors5 = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // 10 colors from the 5 bits.
-	static colors0 = [255,255,255, 239,239,239, 191,191,191, 119,119,119, 63,63,63, 31,31,31, 0,0,0]; // 6 gray scale colors: ffffff efefef bfbfbf 777777 3f3f3f 1f1f1f 000000
-	static colors1 = [255,255,255, 239,239,239, 191,191,191, 119,119,119, 71,71,71, 47,47,47, 0,0,0]; // 6 gray scale colors: ffffff efefef bfbfbf 777777 474747 2f2f2f 000000
-	static colors2 = [255,255,255, 239,239,239, 191,191,191, 119,119,119, 63,63,63, 0,0,0]; // 5 gray scale colors: ffffff efefef bfbfbf 777777 3f3f3f 000000
+	static colors0 = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // 5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000
 
 	// Wait and flip image.
 	flip(t=10) {
