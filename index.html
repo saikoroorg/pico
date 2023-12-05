@@ -55,6 +55,7 @@ const maxanime = 20; // Buffer max size.
 var anime = 1; // Buffer count.
 var minanime = 1; // Buffer min index.
 var frame = 0; // Anime frame count.
+var frameselecting = 0; // Touching frame index.
 var buffers = []; // Pixels buffers.
 var animeflag = 0; // Anime editing flag.
 var playing = 1; // Playing count.
@@ -63,6 +64,7 @@ var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231
 var depth = 10; // Color count.
 const maxcolor = 10; // Color max size.
 var colorflag = 0; // Color editing flag.
+var appver = 0; // App version.
 var appurl = null; // Referenced url.
 </script><!--/Data-->
 <!--Menu--><script>
@@ -92,8 +94,11 @@ function updateMenu(id, enable, text=null, icon=null) {
 async function darkmode(enable) {
 	let e = document.body;
 	if (e) {
-		e.style.backgroundColor = enable ? "#888" : "#fff";
-		e.style.color = enable ? "#fff" : "#888";
+		if (enable) {
+			e.classList.add("dark");
+		} else {
+			e.classList.remove("dark");
+		}
 	}
 	updateMenu("title", !enable);
 	updateMenu("subtitle", !enable);
@@ -191,8 +196,10 @@ function menuSelect(x) {
 	// Change canvas frame.
 	} else if (animeflag) {
 		anime = anime + x < 1 ? 1 : anime + x >= maxanime ? maxanime : anime + x;
-		frame = frame < anime ? frame : anime - 1;
-		//playing = -1; // Restart.
+		if (frame >= anime) {
+			frameselecting = anime - 1;
+			playing = -1; // Restart.
+		}
 
 	// Change canvas size.
 	} else {
@@ -225,13 +232,17 @@ async function main() {
 
 	// Load data and frames.
 	let frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
-	let frameselecting = 0; // Touching frame index.
 	let frameselected = -1; // Previous touched frame index.
+	frameselecting = 0;
 	for (let k = 0; k < keys.length; k++) {
 		console.log("Param" + k + ": " + keys[k] + " -> " + picoStrings(keys[k]));
 
+		// Load version.
+		if (keys[k] == "v") {
+			appver = picoStrings(keys[k]);
+
 		// Load referenced url.
-		if (keys[k] == "u") {
+		} else if (keys[k] == "u") {
 			appurl = picoStrings(keys[k]);
 			darkmode(true);
 
