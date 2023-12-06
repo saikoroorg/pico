@@ -60,7 +60,8 @@ var buffers = []; // Pixels buffers.
 var animeflag = 0; // Anime editing flag.
 var playing = 1; // Playing count.
 var pixels = []; // Canvas pixels.
-var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23, 0,0,0]; // Colors.
+var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23, 223,223,223]; // Colors.
+var bgcolors = [63, 223]; // Background colors.
 var depth = 10; // Color count.
 const maxcolor = 10; // Color max size.
 var colorflag = 0; // Color editing flag.
@@ -196,7 +197,7 @@ function menuSelect(x) {
 	// Change color depth.
 	} else if (colorflag) {
 		depth = depth + x < 1 ? 1 : depth + x >= maxcolor ? maxcolor : depth + x;
-		colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = colors[depth * 3 - 1] ? 0 : 255; // Add end color for background.
+		colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = colors[depth * 3 - 1] > 0 ? bgcolors[0] : bgcolors[1]; // Add end color for background.
 
 	// Change canvas frame.
 	} else if (animeflag) {
@@ -261,7 +262,7 @@ async function main() {
 				colors = picoColcode(k);
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
 				depth = colors.length / 3;
-				colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = colors[0] > 0 ? 0 : 255; // Add end color for background.
+				colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = colors[0] > 0 ? bgcolors[0] : bgcolors[1]; // Add end color for background.
 				console.log("Load color: " + colors);
 
 			// Load pixels to buffers.
@@ -354,7 +355,7 @@ async function main() {
 			}
 
 			// Draw background color.
-			picoPixel(-1, 0, 0, 100, 100);
+			picoPixel(-1, 0, 0, 86, 96);
 
 			// Draw pixels.
 			{
@@ -558,8 +559,8 @@ async function main() {
 							// Change background color.
 							} else {
 								let c = colors[0];
-								colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = c;
 								colors[0] = colors[1] = colors[2] = c > 0 ? 0 : 255;
+								colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = c > 0 ? bgcolors[0] : bgcolors[1];
 								picoBeep(1.2, 0.1);
 							}
 

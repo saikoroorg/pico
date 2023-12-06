@@ -36,7 +36,7 @@ a {
 	flex-direction: column; -webkit-flex-direction: column;
 	justify-content: center; -webkit-justify-content: center;
 	align-items: center; -webkit-align-items: center;
-	background-color: #7f7f7f;
+	background-color: #bfbfbf;
 }
 #screen {
 	aspect-ratio: 1;
@@ -60,9 +60,11 @@ a {
 }
 .logo #title {
 	font-size: 24px;
+	color: #bfbfbf;
 }
 .logo #subtitle {
 	font-size: 24px;
+	color: #dfdfdf;
 }
 .menu {
 	display: flex; display: -webkit-flex;
