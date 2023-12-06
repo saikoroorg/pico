@@ -23,7 +23,7 @@ pico.Worker = class {
 	// Debug print.
 	_debug(text) {
 		if (pico.Worker.debug) {
-			this._debug(text);
+			console.log(text);
 		}
 	}
 
@@ -414,12 +414,12 @@ if (!self || !self.registration) {
 		// Register worker.
 		if (pico.Worker.script) {
 			if (navigator.serviceWorker) {
-				this._debug("Register worker: " + pico.Worker.script);
+				pico.worker._debug("Register worker: " + pico.Worker.script);
 				(async()=>{
 					await navigator.serviceWorker.register(pico.Worker.script);
 				})();
 			} else {
-				this._debug("No worker.");
+				pico.worker._debug("No worker.");
 			}
 		}
 
@@ -427,10 +427,10 @@ if (!self || !self.registration) {
 		// Not work on iOS 16 PWA.
 		// https://bugs.webkit.org/show_bug.cgi?id=254545
 		if (navigator.wakeLock) {
-			this._debug("Request wake lock.");
+			pico.worker._debug("Request wake lock.");
 			navigator.wakeLock.request("screen");
 		} else {
-			this._debug("No wake lock.");
+			pico.worker._debug("No wake lock.");
 		}
 
 	} catch (error) {
@@ -442,19 +442,19 @@ if (!self || !self.registration) {
 
 	// Event on installing worker.
 	self.addEventListener("install", (event) => {
-		this._debug("Install worker: " + pico.Worker.script);
+		pico.worker._debug("Install worker: " + pico.Worker.script);
 		event.waitUntil(pico.worker.install());
 	});
 
 	// Event on activating worker.
 	self.addEventListener("activate", (event) => {
-		this._debug("Activate worker: " + pico.Worker.script);
+		pico.worker._debug("Activate worker: " + pico.Worker.script);
 		event.waitUntil(pico.worker.activate());
 	});
 
 	// Event on fetching network request.
 	self.addEventListener("fetch", (event) => {
-		this._debug("Fetch by worker: " + event.request.url);
+		pico.worker._debug("Fetch by worker: " + event.request.url);
 		event.respondWith(pico.worker.fetch(event.request.url));
 	});
 }
