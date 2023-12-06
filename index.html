@@ -54,13 +54,13 @@ var yoffset = picoDiv(maxheight - height, 2); // Canvas offset.
 const maxanime = 20; // Buffer max size.
 var anime = 1; // Buffer count.
 var minanime = 1; // Buffer min index.
-var frame = 0; // Anime frame count.
+var frame = -1; // Anime frame count.
 var frameselecting = 0; // Touching frame index.
 var buffers = []; // Pixels buffers.
 var animeflag = 0; // Anime editing flag.
 var playing = 1; // Playing count.
 var pixels = []; // Canvas pixels.
-var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
+var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23, 0,0,0]; // Colors.
 var depth = 10; // Color count.
 const maxcolor = 10; // Color max size.
 var colorflag = 0; // Color editing flag.
@@ -170,7 +170,11 @@ async function menuAction() {
 	if (
 		((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-		picoSetColcode(colors, k);
+		let c = []; // Remove end color to share.
+		for (let i = 0; i < colors.length - 3; i++) {
+			c[i] = colors[i];
+		}
+		picoSetColcode(c, k);
 	}
 
 	// Back to app or start sharing.
@@ -192,6 +196,7 @@ function menuSelect(x) {
 	// Change color depth.
 	} else if (colorflag) {
 		depth = depth + x < 1 ? 1 : depth + x >= maxcolor ? maxcolor : depth + x;
+		colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = colors[depth * 3 - 1] ? 0 : 255; // Add end color for background.
 
 	// Change canvas frame.
 	} else if (animeflag) {
@@ -246,12 +251,6 @@ async function main() {
 			appurl = picoStrings(keys[k]);
 			darkmode(true);
 
-		// Load colors param.
-		} else if (keys[k] == "z") {
-			colors = picoNumbers(keys[k]);
-			//colors = picoColcode(k);
-			console.log("Color: " + colors);
-
 		// Load pixels param.
 		} else {
 			let numcode = picoNumcode(k);
@@ -262,6 +261,7 @@ async function main() {
 				colors = picoColcode(k);
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
 				depth = colors.length / 3;
+				colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = colors[0] > 0 ? 0 : 255; // Add end color for background.
 				console.log("Load color: " + colors);
 
 			// Load pixels to buffers.
@@ -269,7 +269,9 @@ async function main() {
 				buffers[k] = numcode;
 				anime = anime > k + 1 ? anime : k + 1;
 				frameselecting = anime - 1;
-				animeflag = 1;
+				if (anime >= 2) {
+					animeflag = 1;
+				}
 				console.log("Load buffer" + k + ": " + buffers[k]);
 			}
 		}
@@ -330,7 +332,7 @@ async function main() {
 
 		// Color touching flags and states.
 		let colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
-		let colorselecting = colors.length / 3 - 1; // Touching color index.
+		let colorselecting = depth - 1; // Touching color index.
 		let colorselected = -1; // Previous touched color index.
 
 		const offset1 = -10, offset1a = 4;; // Offset of pixels from center.
@@ -350,6 +352,9 @@ async function main() {
 				frametouching = 0;
 				updateIcons();
 			}
+
+			// Draw background color.
+			picoPixel(-1, 0, 0, 100, 100);
 
 			// Draw pixels.
 			{
@@ -528,9 +533,10 @@ async function main() {
 
 			// Draw colors.
 			if (colorflag <= 0) {
+				let y = pico.Image.height/2 - offset2;
+
 				for (let i = 0; i < depth; i++) {
 					let x = (i - (depth - 1) / 2) * 16;
-					let y = pico.Image.height/2 - offset2;
 
 					// Release touching color.
 					if (colortouching >= 0 && picoAction(x, y, 8, 12)) {
@@ -551,11 +557,9 @@ async function main() {
 
 							// Change background color.
 							} else {
-								for (let j = 0; j < 3; j++) {
-									let c = colors[colorselecting * 3 + j];
-									c = c <= 0 ? 255 : 0;
-									colors[colorselecting * 3 + j] = c;
-								}
+								let c = colors[0];
+								colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = c;
+								colors[0] = colors[1] = colors[2] = c > 0 ? 0 : 255;
 								picoBeep(1.2, 0.1);
 							}
 
@@ -615,12 +619,12 @@ async function main() {
 			// Draw color editor.
 			} else {
 				const compression = 2, maxcompresed = (1 << (8 - compression));
+				let y = pico.Image.height/2 - offset2e;
 
 				// Draw buttons and color numbers.
 				if (colorselecting > 0) {
 					let s = 4;
 					let x = - (10 - 1) / 2 * 16;
-					let y = pico.Image.height/2 - offset2e;
 
 					// Back to pixel mode.
 					if (picoAction(x, y, 8, 12)) {
