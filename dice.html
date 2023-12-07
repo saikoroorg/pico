@@ -98,17 +98,14 @@ function updateMenu(id, enable, text=null, icon=null) {
 	if (e) {
 		e.style.display = enable ? "flex" : "none";
 		let e1 = document.getElementById(id + "Text");
-		if (e1) {
-			e1.style.display = text ? "flex" : "none";
-			e1.innerText = text ? text : "";
-		} else {
-			e.style.display = text ? "flex" : "none";
-			e.innerText = text ? text : "";
+		if (e1 && text) {
+			e1.style.display = "flex";
+			e1.innerText = text;
 		}
 		let e2 = document.getElementById(id + "Icon");
-		if (e2) {
-			e2.style.display = icon ? "flex" : "none";
-			e2.src = icon ? icon : "";
+		if (e2 && icon) {
+			e2.style.display = "flex";
+			e2.src = icon;
 		}
 	}
 }
@@ -246,7 +243,7 @@ async function menuSelect(x) {
 	// Switch custom flag.
 	} else {
 		custom = custom ? false : true;
-		darkmode(custom);
+		//darkmode(custom);
 		rolling = -1; // Reroll.
 		result = 0;
 		picoBeep(1.2, 0.1);
@@ -498,6 +495,12 @@ async function main() {
 						} else if (maximum <= maxnumber) {
 							picoSprite(nums[maximum], 0, 0, 0, 0, s);
 						}
+					}
+
+					// Draw custom number.
+					{
+						let x = 0, y = 60, s = 4;
+						picoChar("" + maximum + "/" + maxnumber, -1, x, y, 0, s);
 					}
 
 					// Ignore action after holding.

@@ -60,8 +60,8 @@ var buffers = []; // Pixels buffers.
 var animeflag = 0; // Anime editing flag.
 var playing = 1; // Playing count.
 var pixels = []; // Canvas pixels.
-var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23, 223,223,223]; // Colors.
-var bgcolors = [63, 223]; // Background colors.
+var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
+var bgcolors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // Background colors.
 var depth = 10; // Color count.
 const maxcolor = 10; // Color max size.
 var colorflag = 0; // Color editing flag.
@@ -76,17 +76,20 @@ function updateMenu(id, enable, text=null, icon=null) {
 	if (e) {
 		e.style.display = enable ? "flex" : "none";
 		let e1 = document.getElementById(id + "Text");
-		if (e1) {
-			e1.style.display = text ? "flex" : "none";
-			e1.innerText = text ? text : "";
-		} else {
-			e.style.display = text ? "flex" : "none";
-			e.innerText = text ? text : "";
-		}
 		let e2 = document.getElementById(id + "Icon");
-		if (e2) {
-			e2.style.display = icon ? "flex" : "none";
-			e2.src = icon ? icon : "";
+		if (e1 && text) {
+			e1.style.display = "flex";
+			e1.innerText = text;
+			if (e2 && !icon) {
+				e2.style.display = "none";
+			}
+		}
+		if (e2 && icon) {
+			e2.style.display = "flex";
+			e2.src = icon;
+			if (e1 && !text) {
+				e1.style.display = "none";
+			}
 		}
 	}
 }
@@ -101,15 +104,17 @@ async function darkmode(enable) {
 			e.classList.remove("dark");
 		}
 	}
-	updateMenu("title", !enable);
-	updateMenu("subtitle", !enable);
 }
 
 // Update buttons.
 function updateButtons() {
-	if (colorflag) {
+	if (appurl) {
+		updateMenu("title", false);
+		updateMenu("subtitle", false);
+	}
+	/*if (colorflag) {
 		updateMenu("select", true, "" + depth);
-	} else if (animeflag) {
+	} else*/ if (animeflag) {
 		updateMenu("select", true, "" + anime);
 	} else {
 		updateMenu("select", true, "x" + width);
@@ -171,11 +176,7 @@ async function menuAction() {
 	if (
 		((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-		let c = []; // Remove end color to share.
-		for (let i = 0; i < colors.length - 3; i++) {
-			c[i] = colors[i];
-		}
-		picoSetColcode(c, k);
+		picoSetColcode(colors, k);
 	}
 
 	// Back to app or start sharing.
@@ -192,12 +193,11 @@ function menuSelect(x) {
 	// Change menu mode.
 	if (x == 0) {
 		animeflag = animeflag ? 0 : 1;
-		colorflag = 0;
+	//	colorflag = 0;
 
 	// Change color depth.
-	} else if (colorflag) {
-		depth = depth + x < 1 ? 1 : depth + x >= maxcolor ? maxcolor : depth + x;
-		colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = colors[depth * 3 - 1] > 0 ? bgcolors[0] : bgcolors[1]; // Add end color for background.
+	//} else if (colorflag) {
+	//	depth = depth + x < 1 ? 1 : depth + x >= maxcolor ? maxcolor : depth + x;
 
 	// Change canvas frame.
 	} else if (animeflag) {
@@ -250,7 +250,8 @@ async function main() {
 		// Load referenced url.
 		} else if (keys[k] == "u") {
 			appurl = picoStrings(keys[k]);
-			darkmode(true);
+			//darkmode(true);
+			updateButtons();
 
 		// Load pixels param.
 		} else {
@@ -262,7 +263,6 @@ async function main() {
 				colors = picoColcode(k);
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
 				depth = colors.length / 3;
-				colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = colors[0] > 0 ? bgcolors[0] : bgcolors[1]; // Add end color for background.
 				console.log("Load color: " + colors);
 
 			// Load pixels to buffers.
@@ -328,17 +328,11 @@ async function main() {
 		}
 		updateIcons();
 
-		// Load colors data.
-		picoColor(colors);
-
 		// Color touching flags and states.
+		let bgindex = 1; // Background color index.
 		let colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
 		let colorselecting = depth - 1; // Touching color index.
 		let colorselected = -1; // Previous touched color index.
-
-		const offset1 = -10, offset1a = 4;; // Offset of pixels from center.
-		const offset2 = 14, offset2e = 14; // Offset of colors/coloreditor from bottom.
-		const offset3 = 18, offset3b = 8; // Offset of buffer from top.
 		let touching = 0; // Touching pixel(1) or color(2) or frame(3).
 
 		// Playing loop.
@@ -355,12 +349,16 @@ async function main() {
 			}
 
 			// Draw background color.
-			picoPixel(-1, 0, 0, 86, 96);
+			picoColor(bgcolors);
+			picoPixel(bgindex, 0, 0, 100, 100);
+
+			// Set colors data.
+			picoColor(colors);
 
 			// Draw pixels.
 			{
-				let y0 = !animeflag ? offset1 : offset1a;
-				let s0 = !animeflag ? 168 : 140;
+				let y0 = !animeflag ? -10 : 4; // Offset of pixels from center.
+				let s0 = !animeflag ? 168 : 140; // 168,140 for size7(grid24,20) / 162,144 for size9(grid18,16)
 				let size = width < height ? width : height;
 				let grid = s0 / size;
 				let margin = size <= 9 ? 2 : 1;
@@ -402,7 +400,7 @@ async function main() {
 				let imin = /*anime <= 1 ? 1 :*/ 0;
 				for (let i = imin; i < anime; i++) {
 					let x = anime <= 10 ? (i - (anime - 1) / 2) * 16 : (picoMod(i, 10) - (10 - 1) / 2) * 16;
-					let y = -pico.Image.height/2 + (anime <= 10 ? offset3 : offset3 - offset3b + offset3b*2 * picoDiv(i, 10));
+					let y = -pico.Image.height/2 + (anime <= 10 ? 18 : 10 + 16 * picoDiv(i, 10)); // Offset of buffer from top.
 					let sprite = animeflag == 2 && i == frameselecting && buffers[frame] ? buffers[frame] :
 						buffers[i] ? buffers[i] : [0, 7, 7];
 					let s = 7 / picoSpriteSize(sprite);
@@ -532,12 +530,88 @@ async function main() {
 				}
 			}
 
+			// Touching background.
+			let backgroundtouching = false;
+			{
+				let y = pico.Image.height/2 - 14; // Offset of colors/coloreditor from bottom.
+
+				// Release touching background.
+				if (colortouching >= 0 && picoAction(0, 0, 100, 100) && !picoAction(0, y, 84, 94)) {
+					console.log("Release touching background.");
+					touching = 0; // Touch nothing.
+					colortouching = 0;
+
+					// Double touched background.
+					if (colorselected == 0) {
+						console.log("Double touched background.");
+						colorselected = -1;
+
+						// Change background color.
+						let c = colors[0];
+						colors[0] = colors[1] = colors[2] = c > 0 ? 0 : 255;
+						bgindex = colors[0] > 0 ? 1 : 4;
+						picoBeep(1.2, 0.1);
+
+					// Single touched background.
+					} else if (colorselected == -1) {
+						console.log("Single touched background.");
+
+						if (colorflag <= 0) {
+							colorselected = colorselecting;
+							picoBeep(0, 0.1);
+
+						// Back to pixel mode.
+						} else {
+							console.log("Back to pixel mode.");
+							touching = 2; // Continue touching colors.
+							colorflag = 0;
+							colortouching = 0;
+							colorselected = -1;
+							picoFlush(); // Update after action event.
+							picoBeep(1.2, 0.1);
+						}
+
+					// Touched background after hovering.
+					} else {
+						console.log("Touched color after hovering:" + colorselected);
+						colorselected = -1;
+						picoBeep(0, 0.1);
+					}
+
+				// Touching background.
+				} else if (colortouching >= 0 && picoMotion(0, 0, 100, 100) && !picoMotion(0, y, 84, 94)) {
+
+					if (colorflag <= 0) {
+						// Start to touching background.
+						if (colortouching == 0) {
+							console.log("Touching background.");
+							colorselecting = 0;
+
+						// Hovering from another color.
+						} else if (colorselecting != 0) {
+							console.log("Touching another background.");
+							colorselecting = 0;
+							colorselected = -2;
+
+						// Continue touching background.
+						} else {
+							console.log("Continue touching background:" + colorselected);
+						}
+					}
+
+					touching = 2; // Touch colors.
+					colortouching = 1;
+					backgroundtouching = true;
+				}
+			}
+
 			// Draw colors.
 			if (colorflag <= 0) {
-				let y = pico.Image.height/2 - offset2;
+				let y = pico.Image.height/2 - 14; // Offset of colors from bottom.
+				let grid = 20;
 
-				for (let i = 0; i < depth; i++) {
-					let x = (i - (depth - 1) / 2) * 16;
+				for (let i = 1; i < depth; i++) {
+					let x = (i-1 - (depth-1 - 1) / 2) * grid; // Margins for each color.
 
 					// Release touching color.
 					if (colortouching >= 0 && picoAction(x, y, 8, 12)) {
@@ -551,18 +625,9 @@ async function main() {
 							colorselected = -1;
 
 							// Enter color edit mode.
-							if (i > 0) {
-								colorflag = 1;
-								picoFlush(); // Update after action event.
-								picoBeep(1.2, 0.1);
-
-							// Change background color.
-							} else {
-								let c = colors[0];
-								colors[0] = colors[1] = colors[2] = c > 0 ? 0 : 255;
-								colors[depth * 3] = colors[depth * 3 + 1] = colors[depth * 3 + 2] = c > 0 ? bgcolors[0] : bgcolors[1];
-								picoBeep(1.2, 0.1);
-							}
+							colorflag = 1;
+							picoFlush(); // Update after action event.
+							picoBeep(1.2, 0.1);
 
 						// Single touched color.
 						} else if (colorselected == -1) {
@@ -607,50 +672,35 @@ async function main() {
 						}
 						picoChar("+", i, x, y, 0, 3.5);
 
-					// Not touching but selecting color.
-					} else if (i == colorselecting) {
-						picoChar("+", i, x, y, 0, 4);
-
-					// Other colors.
 					} else {
-						picoChar("-", i, x, y, 0, 4);
+						let s = backgroundtouching ? 3.5 : 4;
+
+						// Not touching but selecting color.
+						if (colorselecting == i) {
+							picoChar("+", i, x, y, 0, s);
+
+						// Other colors.
+						} else {
+							picoChar("-", i, x, y, 0, s);
+						}
 					}
 				}
 
 			// Draw color editor.
 			} else {
 				const compression = 2, maxcompresed = (1 << (8 - compression));
-				let y = pico.Image.height/2 - offset2e;
+				let y = pico.Image.height/2 - 14; // Offset of coloreditor from bottom.
+				let grid = 20;
 
 				// Draw buttons and color numbers.
 				if (colorselecting > 0) {
-					let s = 4;
-					let x = - (10 - 1) / 2 * 16;
-
-					// Back to pixel mode.
-					if (picoAction(x, y, 8, 12)) {
-						console.log("Back to pixel mode.");
-						touching = 2; // Continue touching colors.
-						colorflag = 0;
-						colortouching = 0;
-						colorselected = -1;
-						picoFlush();
-						picoBeep(1.2, 0.1);
-					} else if (picoMotion(x, y, 8, 12)) {
-						s = 3.5;
-					}
-
-					// Draw close button.
-					picoChar("*", colorselecting, x, y, 0, s);
-
 					for (let i = 0; i < 3; i++) {
 						let c = colors[colorselecting * 3 + i];
 
 						// Decrease color number.
 						if (c > 0) {
-							x = ((i * 3 + 1) - (10 - 1) / 2) * 16;
-							y = pico.Image.height/2 - offset2e + 0;
-							s = 4;
+							let x = (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
+							let s = backgroundtouching ? 3.5 : 4;
 							if (picoAction(x, y+6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed decrease.
 								c = c - 1 > 0 ? c - 1 : 0; // Decrease.
@@ -666,9 +716,8 @@ async function main() {
 
 						// Increase color number.
 						if (c < 255) {
-							x = ((i * 3 + 1) - (10 - 1) / 2) * 16;
-							y = pico.Image.height/2 - offset2e - 0;
-							s = 4;
+							let x = (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
+							let s = backgroundtouching ? 3.5 : 4;
 							if (picoAction(x, y-6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed increase.
 								c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
@@ -687,9 +736,8 @@ async function main() {
 						let c00 = c99 >= 99 ? "100" : c99 >= 9 ? " " + (c99 + 1) : c99 >= 1 ? " 0" + (c99 + 1) : " 00";
 
 						// Draw color numbers.
-						x = ((i * 3 + 2) - (10 - 1) / 2) * 16;
-						y = pico.Image.height/2 - offset2e;
-						s = 4;
+						let x = (i*3+1 - (9 - 1) / 2) * grid; // Margins for each color number.
+						let s = backgroundtouching ? 3.5 : 4;
 						picoChar(c00, colorselecting, x, y, 0, s);
 					}
 				}

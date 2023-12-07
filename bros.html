@@ -112,17 +112,26 @@ function updateMenu(id, enable, text=null, icon=null) {
 	if (e) {
 		e.style.display = enable ? "flex" : "none";
 		let e1 = document.getElementById(id + "Text");
-		if (e1) {
-			e1.style.display = text ? "flex" : "none";
-			e1.innerText = text ? text : "";
-		} else {
-			e.style.display = text ? "flex" : "none";
-			e.innerText = text ? text : "";
+		if (e1 && text) {
+			e1.style.display = "flex";
+			e1.innerText = text;
 		}
 		let e2 = document.getElementById(id + "Icon");
-		if (e2) {
-			e2.style.display = icon ? "flex" : "none";
-			e2.src = icon ? icon : "";
+		if (e2 && icon) {
+			e2.style.display = "flex";
+			e2.src = icon;
+		}
+	}
+}
+
+// Set darkmode.
+async function darkmode(enable) {
+	let e = document.body;
+	if (e) {
+		if (enable) {
+			e.classList.add("dark");
+		} else {
+			e.classList.remove("dark");
 		}
 	}
 }
