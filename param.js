@@ -8,6 +8,10 @@ function picoRandom(max, seed=0) {
 function picoSeed() {
 	return pico.param.seed();
 }
+// Time.
+function picoTime() {
+	return Date.now();
+}
 
 // Reload with param.
 async function picoReload(url=null) {
