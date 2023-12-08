@@ -82,13 +82,14 @@ function updateMenu(id, enable, text=null, icon=null) {
 			if (e2 && !icon) {
 				e2.style.display = "none";
 			}
-		}
-		if (e2 && icon) {
+		} else if (e2 && icon) {
 			e2.style.display = "flex";
 			e2.src = icon;
 			if (e1 && !text) {
 				e1.style.display = "none";
 			}
+		} else if (text) {
+			e.innerText = text;
 		}
 	}
 }
@@ -113,7 +114,7 @@ async function updateIcons(force = true) {
 
 	// Update buffer.
 	if (force || buffers[frame]) {
-		//console.log("Update" + frameselecting + ": " + buffers[frame]);
+		console.log("Update" + frame + ": " + buffers[frame]);
 
 		// Store canvas pixels to buffers.
 		buffers[frame] = [0, width, height];
@@ -184,6 +185,7 @@ function menuSelect(x) {
 	if (x == 0) {
 		animeflag = animeflag ? 0 : 1;
 	//	colorflag = 0;
+		updateIcons(false);
 
 	// Change color depth.
 	//} else if (colorflag) {
@@ -192,6 +194,9 @@ function menuSelect(x) {
 	// Change canvas frame.
 	} else if (animeflag) {
 		anime = anime + x < 1 ? 1 : anime + x >= maxanime ? maxanime : anime + x;
+		updateIcons();
+
+		// Remove reduced frame after update icons.
 		if (frame >= anime) {
 			frame = anime - 1;
 			playing = -1; // Restart.
@@ -476,11 +481,11 @@ async function main() {
 				let y0 = -pico.Image.height/2 + 17; // Offset of buffer from top.
 				for (let i = 0; i < anime; i++) {
 					let x = (i - (anime - 1) / 2) * grid;
-					let sprite = animeflag == 2 && i == frame && buffers[frame] ? buffers[frame] :
-						buffers[i] ? buffers[i] : [0, 7, 7];
+					let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
+					let w0 = grid/2 * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
 					// Release touching frame.
-					if (frametouching >= 0 && picoAction(x, y0, w1, w1)) {
+					if (frametouching >= 0 && picoAction(x, y0, w0, w0)) {
 						console.log("Release touching frame.");
 						frametouching = 0;
 
@@ -533,13 +538,13 @@ async function main() {
 
 						// Release holding frame.
 						if (anime >= 2) {
-							picoSprite(sprite, 0, x, y0, 0, w2 / picoSpriteSize(sprite));; // Frame scale for selecting.
+							picoSprite(sprite, 0, x, y0, 0, w2 / picoSpriteSize(sprite));; // Selecting frame.
 						} else {
-							picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite));; // Frame scale for selecting.
+							picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite));; // Only one frame.
 						}
 
 					// Touching frame.
-					} else if (frametouching >= 0 && picoMotion(x, y0, w1, w1)) {
+					} else if (frametouching >= 0 && picoMotion(x, y0, w0, w0)) {
 
 						// Start to touching frame.
 						if (frametouching == 0 && frameselected == frame) {
@@ -582,9 +587,13 @@ async function main() {
 
 						// Touch holding frame.
 						if (animeflag == 2) {
-							picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Frame scale for holding.
+							if (buffers[frame]) {
+								picoSprite(buffers[frame], 0, x, y0, 0, w3 / picoSpriteSize(buffers[frame])); // Hovering frame.
+							} else {
+								picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Holding frame.
+							}
 						} else {
-							picoSprite(sprite, 0, x, y0, 0, w2 / picoSpriteSize(sprite)); // Frame scale for touching.
+							picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Touching frame.
 						}
 
 					// Not touching but selecting color.
@@ -592,16 +601,16 @@ async function main() {
 
 						// Touch holding frame.
 						if (animeflag == 2) {
-							picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Frame scale for holding.
+							picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Holding frame.
 						} else if (anime >= 2) {
-							picoSprite(sprite, 0, x, y0, 0, w2 / picoSpriteSize(sprite));; // Frame scale for selecting.
+							picoSprite(sprite, 0, x, y0, 0, w2 / picoSpriteSize(sprite));; // Selecting frame.
 						} else {
-							picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite));; // Frame scale for selecting.
+							picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite));; // Only one frame.
 						}
 
 					// Other frames.
 					} else {
-						picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite)); // Frame scale.
+						picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite)); // Unselecting frames.
 					}
 				}
 			}

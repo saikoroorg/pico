@@ -99,14 +99,21 @@ function updateMenu(id, enable, text=null, icon=null) {
 	if (e) {
 		e.style.display = enable ? "flex" : "none";
 		let e1 = document.getElementById(id + "Text");
+		let e2 = document.getElementById(id + "Icon");
 		if (e1 && text) {
 			e1.style.display = "flex";
 			e1.innerText = text;
-		}
-		let e2 = document.getElementById(id + "Icon");
-		if (e2 && icon) {
+			if (e2 && !icon) {
+				e2.style.display = "none";
+			}
+		} else if (e2 && icon) {
 			e2.style.display = "flex";
 			e2.src = icon;
+			if (e1 && !text) {
+				e1.style.display = "none";
+			}
+		} else if (text) {
+			e.innerText = text;
 		}
 	}
 }
@@ -115,16 +122,16 @@ function updateMenu(id, enable, text=null, icon=null) {
 async function updateButtons() {
 	if (custom) {
 		updateMenu("action", true, "*");
-		updateMenu("minus", true, "<");
-		updateMenu("plus", true, ">");
+		updateMenu("minus", true, maximum > 1 ? "<" : " ");
+		updateMenu("plus", true, maximum < maxmaximum ? ">" : " ");
 	} else {
-		updateMenu("minus", true, "-");
-		updateMenu("plus", true, "+");
 		if (count > 0 && result > 0) {
 			updateMenu("action", true, "^");
 		} else {
 			updateMenu("action", false);
 		}
+		updateMenu("minus", true, count > 1 ? "-" : " ");
+		updateMenu("plus", true, count < maxcount ? "+" : " ");
 	}
 	if (pixels.length > 0) {
 		let data = await picoSpriteData(pixels[maximum - 1], colors);
@@ -331,14 +338,14 @@ async function main() {
 					// Hold to rolling dice.
 					if (picoMotion()) {
 						rolling = 1;
-						holding++;
+						//holding++;
 
 						// Holding to enter custom mode.
-						if (holding > 60) {
+						/*if (holding > 60) {
 							custom = true;
 							rolling = -1;
 							updateButtons();
-						}
+						}*/
 
 					// Timeout and show result.
 					} else if (rolling > 60) {
@@ -365,7 +372,7 @@ async function main() {
 
 					// Continue rolling.
 					} else {
-						holding = 0;						
+						//holding = 0;						
 					}
 				}
 
@@ -381,37 +388,37 @@ async function main() {
 			// Clear screen.
 			picoClear();
 
-			// Draw custom buttons.
+			// Draw customizing dice.
 			if (custom) {
 
 				// Draw maximum count.
-				let x0 = 0, y0 = 60, s0 = 4;
-				if (!holding) { // Ignore after holding.
+				let x0 = 0, y0 = -80, c0 = 0, s0 = 1;
+				/*if (!holding) { // Ignore after holding.
 					if (picoAction(x0-30, y0, 30, 20)) {
 						maximum = maximum - 1 >= 1 ? maximum - 1 : 1;
 						updateButtons();
 					} else if (picoMotion(x0-30, y0, 30, 20)) {
-						s0 = 3.6;
+						s0 = 1.2;
 						picoChar("-", -1, x0-44, y0, 0, s0);
 					} else if (picoAction(x0+30, y0, 30, 20)) {
 						maximum = maximum + 1 <= maxmaximum ? maximum + 1 : maxmaximum;
 						updateButtons();
 					} else if (picoMotion(x0+30, y0, 30, 20)) {
-						s0 = 3.6;
+						s0 = 1.2;
 						picoChar("+", -1, x0+44, y0, 0, s0);
 					}
-				}
-				picoChar(maximum + "/" + maxmaximum, -1, x0, y0, 0, s0);
+				}*/
+				picoChar(maximum + "/" + maxmaximum, c0, x0, y0, 0, s0);
 
 				// Draw icon.
-				let x1 = 0, y1 = 0, s1 = 10;
+				let x1 = 0, y1 = 0, s1 = 10, w1 = 32;
 				if (!holding) { // Ignore after holding.
-					if (picoAction(x1, y1, 40, 40)) {
+					if (picoAction(x1, y1, w1, w1)) {
 						custom = 0;
 						rolling = -1;
 						picoBeep(1.2, 0.1);
 						updateButtons();
-					} else if (picoMotion(x1, y1, 40, 40)) {
+					} else if (picoMotion(x1, y1, w1, w1)) {
 						s1 = 8;
 					}
 				}
@@ -428,6 +435,7 @@ async function main() {
 					holding = 0;
 				}
 
+			// Draw rolling dice.
 			} else {
 
 				// Draw number sprite.

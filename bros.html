@@ -112,14 +112,21 @@ function updateMenu(id, enable, text=null, icon=null) {
 	if (e) {
 		e.style.display = enable ? "flex" : "none";
 		let e1 = document.getElementById(id + "Text");
+		let e2 = document.getElementById(id + "Icon");
 		if (e1 && text) {
 			e1.style.display = "flex";
 			e1.innerText = text;
-		}
-		let e2 = document.getElementById(id + "Icon");
-		if (e2 && icon) {
+			if (e2 && !icon) {
+				e2.style.display = "none";
+			}
+		} else if (e2 && icon) {
 			e2.style.display = "flex";
 			e2.src = icon;
+			if (e1 && !text) {
+				e1.style.display = "none";
+			}
+		} else if (text) {
+			e.innerText = text;
 		}
 	}
 }
@@ -128,8 +135,8 @@ function updateMenu(id, enable, text=null, icon=null) {
 function updateButtons() {
 	updateMenu("action", level >= levels.length - 1 || blocking == 0, blocking == 0 ? "^" : "*");
 	updateMenu("select", true, level >= levels.length - 1 ? "?" : "" + (level + 1));
-	updateMenu("plus", true, level < maxlevel && !extra ? "+" : " ");
 	updateMenu("minus", true, level > 0 && !extra ? "-" : " ");
+	updateMenu("plus", true, level < maxlevel && !extra ? "+" : " ");
 }
 
 // Action button for edit or share level.
