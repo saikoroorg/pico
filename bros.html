@@ -124,18 +124,6 @@ function updateMenu(id, enable, text=null, icon=null) {
 	}
 }
 
-// Set darkmode.
-async function darkmode(enable) {
-	let e = document.body;
-	if (e) {
-		if (enable) {
-			e.classList.add("dark");
-		} else {
-			e.classList.remove("dark");
-		}
-	}
-}
-
 // Update buttons.
 function updateButtons() {
 	updateMenu("action", level >= levels.length - 1 || blocking == 0, blocking == 0 ? "^" : "*");

@@ -110,18 +110,6 @@ function updateMenu(id, enable, text=null, icon=null) {
 	}
 }
 
-// Set darkmode.
-async function darkmode(enable) {
-	let e = document.body;
-	if (e) {
-		if (enable) {
-			e.classList.add("dark");
-		} else {
-			e.classList.remove("dark");
-		}
-	}
-}
-
 // Update buttons.
 async function updateButtons() {
 	if (custom) {
@@ -233,17 +221,9 @@ async function menuSelect(x) {
 			picoFlush();
 		}
 
-	// Reroll.
-/*	} else {
-		custom = false;
-		rolling = -1; // Reroll.
-		result = 0;
-		picoBeep(1.2, 0.1);*/
-
 	// Switch custom flag.
 	} else {
 		custom = custom ? false : true;
-		//darkmode(custom);
 		rolling = -1; // Reroll.
 		result = 0;
 		picoBeep(1.2, 0.1);
@@ -353,7 +333,6 @@ async function main() {
 						// Holding to enter custom mode.
 						if (holding > 60) {
 							custom = true;
-							darkmode(custom);
 							rolling = -1;
 							updateButtons();
 						}
