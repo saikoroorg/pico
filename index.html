@@ -510,6 +510,9 @@ async function main() {
 							// Paste and release.
 							if (animeflag == 2) {
 								console.log("Paste and release.");
+								if (buffers[frame]) {
+									sprite = buffers[frame];
+								}
 								frameselecting = frame = i;
 								updateIcons(); // Paste pixels to buffers.
 								animeflag = 1;
@@ -521,12 +524,15 @@ async function main() {
 
 						// Touched frameselecting after hovering.
 						} else {
-							console.log("Touched frameselecting after hovering:" + frameselected);
+							console.log("Touched frame after hovering:" + frameselected);
 							frameselected = -1;
 
 							// Paste and release.
 							if (animeflag == 2) {
 								console.log("Paste and release.");
+								if (buffers[frame]) {
+									sprite = buffers[frame];
+								}
 								frameselecting = frame = i;
 								updateIcons(); // Paste pixels to buffers.
 								animeflag = 1;
@@ -537,7 +543,7 @@ async function main() {
 						}
 
 						// Release holding frame.
-						if (anime >= 2) {
+						 if (anime >= 2) {
 							picoSprite(sprite, 0, x, y0, 0, w2 / picoSpriteSize(sprite));; // Selecting frame.
 						} else {
 							picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite));; // Only one frame.
@@ -551,19 +557,16 @@ async function main() {
 							console.log("Retouching frame.");
 							touching = 3; // Touch frames.
 							frametouching = 1;
-							frame = i;
 
 						// Start to touching another frame.
 						} else if (frametouching == 0) {
 							console.log("Touching frame.");
 							touching = 3; // Touch frames.
 							frametouching = 1;
-							frame = i;
 
 						// Hovering to another frame.
-						} else if (frame != i) {
+						} else if (frameselecting != i) {
 							console.log("Touching another frame.");
-							frame = i;
 							frameselected = -2;
 
 						// Continue touching frame.
@@ -573,7 +576,15 @@ async function main() {
 
 						// Reload to change buffer.
 						if (animeflag <= 1) {
+							console.log("Reload to change buffer.");
+							frame = i;
 							playing = -1;
+
+						// Hovering copyied frame.
+						} else if (animeflag == 2) {
+							if (buffers[frame]) {
+								sprite = buffers[frame];
+							}
 						}
 
 						// Cancel color editing.
@@ -587,17 +598,13 @@ async function main() {
 
 						// Touch holding frame.
 						if (animeflag == 2) {
-							if (buffers[frame]) {
-								picoSprite(buffers[frame], 0, x, y0, 0, w3 / picoSpriteSize(buffers[frame])); // Hovering frame.
-							} else {
-								picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Holding frame.
-							}
+							picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Holding frame.
 						} else {
 							picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Touching frame.
 						}
 
 					// Not touching but selecting color.
-					} else if (i == frame) {
+					} else if (frameselecting == i) {
 
 						// Touch holding frame.
 						if (animeflag == 2) {
