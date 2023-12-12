@@ -231,10 +231,17 @@ async function main() {
 	// Load params.
 	let keys = picoKeys();
 
-	// Load data and frames.
+	// Touching flags and states.
+	let pixeltouching = 0; // -1:invalid, 0:untouched, 1:touching.
+	let colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
+	let colorselecting = depth - 1; // Touching color index.
+	let colorselected = -1; // Previous touched color index.
 	let frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 	let frameselecting = -1; // Selecting frame index.
 	let frameselected = -1; // Previous touched frame index.
+	let bgindex = 0; // Background color index.
+
+	// Load data and frames.
 	for (let k = 0; k < keys.length; k++) {
 		console.log("Param" + k + ": " + keys[k] + " -> " + picoStrings(keys[k]));
 
@@ -245,7 +252,6 @@ async function main() {
 		// Load referenced url.
 		} else if (keys[k] == "u") {
 			appurl = picoStrings(keys[k]);
-			//darkmode(true);
 			updateButtons();
 
 		// Load pixels param.
@@ -323,21 +329,14 @@ async function main() {
 		}
 		updateIcons();
 
-		// Color touching flags and states.
-		let bgindex = 0; // Background color index.
-		let colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
-		let colorselecting = depth - 1; // Touching color index.
-		let colorselected = -1; // Previous touched color index.
-		let touching = 0; // Touching pixel(1) or color(2) or frame(3).
-
 		// Playing loop.
 		for (playing = 1; playing > 0; playing++) {
 			picoClear();
 
 			// Set touching state to avoid touching another area continuously.
 			if (picoAction()) {
-				console.log("Set touching state.");
-				touching = 0; // Touch nothing.
+				console.log("Reset touching state.");
+				pixeltouching = 0;
 				colortouching = 0;
 				frametouching = 0;
 				updateIcons();
@@ -355,7 +354,6 @@ async function main() {
 				// Release touching background.
 				if (colortouching >= 0 && picoAction(0, colorsposy, 100, h1) && !picoAction(0, colorsposy, w2, h1)) {
 					console.log("Release touching background.");
-					touching = 0; // Touch nothing.
 					colortouching = 0;
 
 					// Double touched background.
@@ -380,7 +378,6 @@ async function main() {
 						// Back to pixel mode.
 						} else {
 							console.log("Back to pixel mode.");
-							touching = 2; // Continue touching colors.
 							colorflag = 0;
 							colortouching = 0;
 							colorselected = -1;
@@ -397,6 +394,8 @@ async function main() {
 
 				// Touching background.
 				} else if (colortouching >= 0 && picoMotion(0, colorsposy, 100, h1) && !picoMotion(0, colorsposy, w2, h1)) {
+					pixeltouching = -1;
+					frametouching = -1;
 
 					if (colorflag <= 0) {
 						// Start to touching background.
@@ -416,7 +415,6 @@ async function main() {
 						}
 					}
 
-					touching = 2; // Touch colors.
 					colortouching = 1;
 
 					w1 += 1.25;
@@ -443,10 +441,11 @@ async function main() {
 					let y = (j - yoffset - (height - 1) / 2) * grid + pixelsposy;
 					for (let i = xoffset; i < xoffset + width; i++) {
 						let x = (i - xoffset - (width - 1) / 2) * grid;
-						if (touching != 2 && touching != 3 && picoMotion(x, y, grid/2)) {
+						if (pixeltouching >= 0 && picoMotion(x, y, grid/2)) {
 							console.log("Touch pixels.");
-							touching = 1; // Touch pixels.
+							pixeltouching = 1; // Touch pixels.
 							colortouching = -1;
+							frametouching = -1;
 
 							// Put pixel.
 							if (pixels[j][i] != colorselecting) {
@@ -456,9 +455,7 @@ async function main() {
 							// Cancel color editing.
 							if (colorflag) {
 								console.log("Cancel color editing.");
-								touching = 1; // Touch pixels.
 								colorflag = 0;
-								colortouching = 0;
 								colorselected = -1;
 								picoFlush();
 							}
@@ -551,17 +548,17 @@ async function main() {
 
 					// Touching frame.
 					} else if (frametouching >= 0 && picoMotion(x, y0, w0, w0)) {
+						pixeltouching = -1;
+						colortouching = -1;
 
 						// Start to touching frame.
 						if (frametouching == 0 && frameselected == frame) {
 							console.log("Retouching frame.");
-							touching = 3; // Touch frames.
 							frametouching = 1;
 
 						// Start to touching another frame.
 						} else if (frametouching == 0) {
 							console.log("Touching frame.");
-							touching = 3; // Touch frames.
 							frametouching = 1;
 
 						// Hovering to another frame.
@@ -590,9 +587,7 @@ async function main() {
 						// Cancel color editing.
 						if (colorflag) {
 							console.log("Cancel color editing.");
-							touching = 0; // Touch buffers.
 							colorflag = 0;
-							colortouching = 0;
 							colorselected = -1;
 						}
 
@@ -632,7 +627,6 @@ async function main() {
 					// Release touching color.
 					if (colortouching >= 0 && picoAction(x, colorsposy, 8, 12)) {
 						console.log("Release touching color.");
-						touching = 0; // Touch nothing.
 						colortouching = 0;
 
 						// Double touched color.
@@ -661,18 +655,18 @@ async function main() {
 
 					// Touching color.
 					} else if (colortouching >= 0 && picoMotion(x, colorsposy, 8, 12)) {
+						pixeltouching = -1;
+						frametouching = -1;
 
 						// Start to touching color.
 						if (colortouching == 0 && colorselected == colorselecting) {
 							console.log("Retouching color.");
-							touching = 2; // Touch colors.
 							colortouching = 1;
 							colorselecting = i;
 
 						// Start to touching another color.
 						} else if (colortouching == 0) {
 							console.log("Touching color.");
-							touching = 2; // Touch colors.
 							colortouching = 1;
 							colorselecting = i;
 
@@ -716,12 +710,14 @@ async function main() {
 						if (c > 0) {
 							let x = (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
 							let s = 4;
-							if (picoAction(x, colorsposy+6, 8, 6)) {
+							if (colortouching >= 0 && picoAction(x, colorsposy+6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed decrease.
 								c = c - 1 > 0 ? c - 1 : 0; // Decrease.
 								c = (c << compression) - 1; // Bit unshift.
 								c = c > 0 ? c : 0;
-							} else if (picoMotion(x, colorsposy+6, 8, 6)) {
+							} else if (colortouching >= 0 && picoMotion(x, colorsposy+6, 8, 6)) {
+								pixeltouching = -1;
+								frametouching = -1;
 								s = 3.5;
 							}
 
@@ -733,11 +729,13 @@ async function main() {
 						if (c < 255) {
 							let x = (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
 							let s = 4;
-							if (picoAction(x, colorsposy-6, 8, 6)) {
+							if (colortouching >= 0 && picoAction(x, colorsposy-6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed increase.
 								c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
 								c = (c << compression) - 1; // Bit unshift.
-							} else if (picoMotion(x, colorsposy-6, 8, 6)) {
+							} else if (colortouching >= 0 && picoMotion(x, colorsposy-6, 8, 6)) {
+								pixeltouching = -1;
+								frametouching = -1;
 								s = 3.5;
 							}
 							colors[colorselecting * 3 + i] = c;
