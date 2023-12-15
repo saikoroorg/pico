@@ -343,17 +343,25 @@ async function main() {
 				updateIcons();
 			}
 
+			// Positions.
+			let pixelswidth = !animeflag ? 168 : 168; // Size of pixels.
+			let pixelsposx = !animeflag ? 0 : -14; // Position x of pixels.
+			let pixelsposy = !animeflag ? -14 : -14; // Position y of pixels.
+			let colorsposx = !animeflag ? 0 : -14; // Position x of colors/coloreditor.
+			let colorsposy = pico.Image.height/2 - 14; // Position y of colors/coloreditor.
+			let framesposx = pico.Image.width/2 - 14; // Offset of buffer from right.
+
 			// Draw background.
 			picoColor(bgcolors);
-			picoPixel(1, 0, 0, 100, 100);
+			picoPixel(1, 0, pixelsposy, pixelswidth, pixelswidth);
 
 			// Touching background.
-			let colorsposy = pico.Image.height/2 - 14; // Position of colors/coloreditor.
 			{
-				let w1 = 82, w2 = 72, h1 = 14; // Background color selector width, touch width and height.
+				let w1 = 82, h1 = 14; // Background color selector width and height.
+				let w2 = 72, h2 = 14; // Background color selector width and height for touching.
 
 				// Release touching background.
-				if (colortouching >= 0 && picoAction(0, colorsposy, 100, h1) && !picoAction(0, colorsposy, w2, h1)) {
+				if (colortouching >= 0 && picoAction(colorsposx, colorsposy, 100, h2) && !picoAction(colorsposx, colorsposy, w2, h2)) {
 					console.log("Release touching background.");
 					colortouching = 0;
 
@@ -393,7 +401,7 @@ async function main() {
 					}*/
 
 				// Touching background.
-				} else if (colortouching >= 0 && picoMotion(0, colorsposy, 100, h1) && !picoMotion(0, colorsposy, w2, h1)) {
+				} else if (colortouching >= 0 && picoMotion(colorsposx, colorsposy, 100, h2) && !picoMotion(colorsposx, colorsposy, w2, h2)) {
 					frametouching = -1;
 					pixeltouching = -1;
 					colortouching = 1;
@@ -435,15 +443,13 @@ async function main() {
 				}
 
 				// Draw background color selector.
-				picoPixel(bgindex, 0, colorsposy, w1, h1);
+				picoPixel(bgindex, colorsposx, colorsposy, w1, h1);
 			}
 
 			// Set colors data.
 			picoColor(colors);
 
 			// Draw pixels.
-			let pixelswidth = !animeflag ? 168 : 140; // Size of pixels: 168,140 for size7(grid24,20) / 162,144 for size9(grid18,16)
-			let pixelsposy = !animeflag ? -14 : 0; // Position of pixels.
 			{
 				let size = width < height ? width : height;
 				let grid = pixelswidth / size;
@@ -453,7 +459,7 @@ async function main() {
 				for (let j = yoffset; j < yoffset + height; j++) {
 					let y = (j - yoffset - (height - 1) / 2) * grid + pixelsposy;
 					for (let i = xoffset; i < xoffset + width; i++) {
-						let x = (i - xoffset - (width - 1) / 2) * grid;
+						let x = (i - xoffset - (width - 1) / 2) * grid + pixelsposx;
 						if (pixeltouching >= 0 && picoMotion(x, y, grid/2)) {
 							console.log("Touch pixels.");
 							pixeltouching = 1; // Touch pixels.
@@ -489,14 +495,13 @@ async function main() {
 				let w2 = grid - 1; // Width for selecting.
 				let w3 = grid + margin; // Width for holding.
 				let w4 = grid - margin*2; // Width for copyed.
-				let y0 = -pico.Image.height/2 + 16; // Offset of buffer from top.
 				for (let i = 0; i < anime; i++) {
-					let x = (i - (anime - 1) / 2) * grid;
+					let y = pixelsposy + (i - (anime - 1) / 2) * grid;
 					let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
 					let w0 = grid/2 * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
 					// Release touching frame.
-					if (frametouching >= 0 && picoAction(x, y0, w0, w0)) {
+					if (frametouching >= 0 && picoAction(framesposx, y, w0, w0)) {
 						console.log("Release touching frame.");
 						frametouching = 0;
 
@@ -512,10 +517,10 @@ async function main() {
 						}
 
 						// Release holding frame.
-						picoSprite(sprite, 0, x, y0, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
+						picoSprite(sprite, 0, framesposx, y, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
 
 					// Touching frame.
-					} else if (frametouching >= 0 && picoMotion(x, y0, w0, w0)) {
+					} else if (frametouching >= 0 && picoMotion(framesposx, y, w0, w0)) {
 						pixeltouching = -1;
 						colortouching = -1;
 
@@ -542,23 +547,23 @@ async function main() {
 						}
 
 						// Touch holding frame.
-						picoSprite(sprite, 0, x, y0, 0, w3 / picoSpriteSize(sprite)); // Touching frame.
+						picoSprite(sprite, 0, framesposx, y, 0, w3 / picoSpriteSize(sprite)); // Touching frame.
 
 					// Not touching but selecting color.
 					} else if (frameselecting == i) {
 
 						// Touch holding frame.
 						if (frametouching >= 1) {
-							picoSprite(sprite, 0, x, y0, 0, w4 / picoSpriteSize(sprite)); // Copyed frame.
+							picoSprite(sprite, 0, framesposx, y, 0, w4 / picoSpriteSize(sprite)); // Copyed frame.
 						} else if (anime >= 2) {
-							picoSprite(sprite, 0, x, y0, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
+							picoSprite(sprite, 0, framesposx, y, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
 						} else {
-							picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite)); // Only one frame.
+							picoSprite(sprite, 0, framesposx, y, 0, w1 / picoSpriteSize(sprite)); // Only one frame.
 						}
 
 					// Other frames.
 					} else {
-						picoSprite(sprite, 0, x, y0, 0, w1 / picoSpriteSize(sprite)); // Unselecting frames.
+						picoSprite(sprite, 0, framesposx, y, 0, w1 / picoSpriteSize(sprite)); // Unselecting frames.
 					}
 				}
 			}
@@ -568,7 +573,7 @@ async function main() {
 				let grid = 16;
 
 				for (let i = 1; i < depth; i++) {
-					let x = (i-1 - (depth-1 - 1) / 2) * grid; // Margins for each color.
+					let x = colorsposx + (i-1 - (depth-1 - 1) / 2) * grid; // Margins for each color.
 
 					// Release touching color.
 					if (colortouching >= 0 && picoAction(x, colorsposy, 8, 12)) {
@@ -667,7 +672,7 @@ async function main() {
 
 						// Decrease color number.
 						if (c > 0) {
-							let x = (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
+							let x = colorsposx + (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
 							let s = 4;
 							if (colortouching >= 0 && picoAction(x, colorsposy+6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed decrease.
@@ -684,7 +689,7 @@ async function main() {
 
 						// Increase color number.
 						if (c < 255) {
-							let x = (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
+							let x = colorsposx + (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
 							let s = 4;
 							if (colortouching >= 0 && picoAction(x, colorsposy-6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed increase.
@@ -704,7 +709,7 @@ async function main() {
 						let c00 = c99 >= 99 ? "100" : c99 >= 9 ? " " + (c99 + 1) : c99 >= 1 ? " 0" + (c99 + 1) : " 00";
 
 						// Draw color numbers.
-						let x = (i*3+1 - (9 - 1) / 2) * grid; // Margins for each color number.
+						let x = colorsposx + (i*3+1 - (9 - 1) / 2) * grid; // Margins for each color number.
 						let s = 4;
 						picoChar(c00, colorselecting, x, colorsposy, 0, s);
 					}
