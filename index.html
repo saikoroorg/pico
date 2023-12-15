@@ -380,7 +380,6 @@ async function main() {
 						} else {
 							console.log("Back to pixel mode.");
 							colorflag = 0;
-							colortouching = 0;
 							colorselected = -1;
 							picoFlush(); // Update after action event.
 							picoBeep(1.2, 0.1);
@@ -397,6 +396,7 @@ async function main() {
 				} else if (colortouching >= 0 && picoMotion(0, colorsposy, 100, h1) && !picoMotion(0, colorsposy, w2, h1)) {
 					frametouching = -1;
 					pixeltouching = -1;
+					colortouching = 1;
 
 					if (colorflag <= 0) {
 						// Start to touching background.
@@ -417,19 +417,18 @@ async function main() {
 							console.log("Continue touching background.");//:" + colorselected);
 							colorholding++;
 
-							// Enter color edit mode.
+							// Change background color.
 							if (colorholding >= 30) {
-								// Change background color.
+								console.log("Change background color.");
 								let c = colors[0];
 								colors[0] = colors[1] = colors[2] = c > 0 ? 0 : 255;
 								bgindex = colors[0] != 0 ? 0 : -1;
 								picoBeep(1.2, 0.1);
+								colortouching = -1;
 								colorholding = 0;
 							}
 						}
 					}
-
-					colortouching = 1;
 
 					w1 += 1.25;
 					h1 += 1.25;
@@ -633,8 +632,10 @@ async function main() {
 
 							// Enter color edit mode.
 							if (colorholding >= 30) {
+								console.log("Enter color edit mode.");//:" + colorselected);
 								colorflag = 1;
 								picoBeep(1.2, 0.1);
+								colortouching = -1;
 								colorholding = 0;
 							}
 						}
@@ -668,12 +669,12 @@ async function main() {
 						if (c > 0) {
 							let x = (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
 							let s = 4;
-							if (picoAction(x, colorsposy+6, 8, 6)) {
+							if (colortouching >= 0 && picoAction(x, colorsposy+6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed decrease.
 								c = c - 1 > 0 ? c - 1 : 0; // Decrease.
 								c = (c << compression) - 1; // Bit unshift.
 								c = c > 0 ? c : 0;
-							} else if (picoMotion(x, colorsposy+6, 8, 6)) {
+							} else if (colortouching >= 0 && picoMotion(x, colorsposy+6, 8, 6)) {
 								s = 3.5;
 							}
 
@@ -685,11 +686,11 @@ async function main() {
 						if (c < 255) {
 							let x = (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
 							let s = 4;
-							if (picoAction(x, colorsposy-6, 8, 6)) {
+							if (colortouching >= 0 && picoAction(x, colorsposy-6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed increase.
 								c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
 								c = (c << compression) - 1; // Bit unshift.
-							} else if (picoMotion(x, colorsposy-6, 8, 6)) {
+							} else if (colortouching >= 0 && picoMotion(x, colorsposy-6, 8, 6)) {
 								s = 3.5;
 							}
 							colors[colorselecting * 3 + i] = c;
