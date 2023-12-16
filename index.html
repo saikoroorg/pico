@@ -498,7 +498,7 @@ async function main() {
 				for (let i = 0; i < anime; i++) {
 					let y = pixelsposy + (i - (anime - 1) / 2) * grid;
 					let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
-					let w0 = grid/2 * 7 / picoSpriteSize(sprite); // Width for toucharea.
+					let w0 = grid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
 					// Release touching frame.
 					if (frametouching >= 0 && picoAction(framesposx, y, w0, w0)) {
