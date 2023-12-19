@@ -157,21 +157,21 @@ async function menuAction() {
 			let key = 0;
 			for (; key < pixels.length; key++) {
 				if (pixels[key].length > 0) {
-					picoSetNumcode(pixels[key], key);
+					picoSetCode6(pixels[key], key);
 				}
 			}
-			picoSetColcode(colors, key);
+			picoSetCode8(colors, key);
 
 		// Enter to edit mode with dotted dice.
 		} else if (maximum <= 9) {
 			for (let i = 0; i < maximum; i++) {
-				picoSetNumcode(dots[i], i);
+				picoSetCode6(dots[i], i);
 			}
 
 		// Enter to edit mode with numbered dice.
 		} else if (maximum <= maxmaximum) {
 			for (let i = 0; i < maximum; i++) {
-				picoSetNumcode(nums[i], i);
+				picoSetCode6(nums[i], i);
 			}
 		}
 
@@ -188,10 +188,10 @@ async function menuAction() {
 		let key = 0;
 		for (; key < pixels.length; key++) {
 			if (pixels[key].length > 0) {
-				picoSetNumcode(pixels[key], key + 1);
+				picoSetCode6(pixels[key], key + 1);
 			}
 		}
-		picoSetColcode(colors, key + 1);
+		picoSetCode8(colors, key + 1);
 
 		// Start sharing.
 		if (appver > 0) {
@@ -263,12 +263,12 @@ async function main() {
 		// Load colors.
 		} else if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ||
 			(value[0] == "1" && value[1] == "1" && value[2] == "1")) {
-			colors = picoColcode(keys[k]);
+			colors = picoCode8(keys[k]);
 
 		// Load pixels.
 		} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
 			if (value.length >= 6) {
-				pixels[pixels.length] = picoNumcode(keys[k]);
+				pixels[pixels.length] = picoCode6(keys[k]);
 				maxmaximum = maximum = pixels.length;
 			}
 

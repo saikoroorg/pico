@@ -58,24 +58,24 @@ function picoSetNumbers(numbers, key=0, separator=".") {
 	return pico.param.setNumbers(numbers, key, separator);
 }
 
-// Get param as number code.
-function picoNumcode(key=0) {
-	return pico.param.numcode(key);
+// Get param as 6bit code.
+function picoCode6(key=0) {
+	return pico.param.code6(key);
 }
 
-// Set param as number code.
-function picoSetNumcode(numcode, key=0) {
-	return pico.param.setNumcode(numcode, key);
+// Set param as 6bit code.
+function picoSetCode6(code6, key=0) {
+	return pico.param.setCode6(code6, key);
 }
 
-// Get param as color code.
-function picoColcode(key=0) {
-	return pico.param.colcode(key);
+// Get param as 8bit compatible 6bit code.
+function picoCode8(key=0) {
+	return pico.param.code8(key);
 }
 
-// Set param as color code.
-function picoSetColcode(colcode, key=0) {
-	return pico.param.setColcode(colcode, key);
+// Set param as 8bit compatible 6bit code.
+function picoSetCode8(code8, key=0) {
+	return pico.param.setCode8(code8, key);
 }
 
 //************************************************************/
@@ -158,27 +158,27 @@ pico.Param = class {
 		this._setNumbers(numbers, key);
 	}
 
-	// Get param as number code.
-	numcode(key=0) {
-		return this._numcode(key);
+	// Get param as 6bit code.
+	code6(key=0) {
+		return this._code6(key);
 	}
 
-	// Set param as number code.
-	setNumcode(numcode, key=0) {
-		this._setNumcode(numcode, key);
+	// Set param as 6bit code.
+	setCode6(code6, key=0) {
+		this._setCode6(code6, key);
 	}
 
-	// Get param as color code.
-	colcode(key=0) {
-		let numcode = this._numcode(key)
-		return this._expandCode(numcode);
+	// Get param as 8bit compatible 6bit code.
+	code8(key=0) {
+		let code6 = this._code6(key)
+		return this._expandCode(code6);
 	}
 
-	// Set param as color code.
-	setColcode(colcode, key=0) {
+	// Set param as 8bit compatible 6bit code.
+	setCode8(code8, key=0) {
 		const compression = 2;
-		let numcode = this._compressCode(colcode, compression)
-		this._setNumcode(numcode, key);
+		let code6 = this._compressCode(code8, compression)
+		this._setCode6(code6, key);
 	}
 	
 	//*----------------------------------------------------------*/
@@ -334,7 +334,7 @@ pico.Param = class {
 	}
 
 	// Get number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
-	_numcode(key=0) {
+	_code6(key=0) {
 		let results = [];
 		if (this.context[key]) {
 			for (let i = 0; i < this.context[key].length; i++) {
@@ -358,18 +358,18 @@ pico.Param = class {
 	}
 
 	// Set number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
-	_setNumcode(numcode, key=0) {
+	_setCode6(code6, key=0) {
 		this.context[key] = "";
-		for (let i = 0; i < numcode.length; i++) {
-			if (0 <= numcode[i] && numcode[i] < 10) {
-				this.context[key] += numcode[i];
-			} else if (10 <= numcode[i] && numcode[i] < 36) {
-				this.context[key] += String.fromCharCode("a".charCodeAt(0) + numcode[i] - 10);
-			} else if (36 <= numcode[i] && numcode[i] < 62) {
-				this.context[key] += String.fromCharCode("A".charCodeAt(0) + numcode[i] - 36);
-			} else if (numcode[i] == 62) {
+		for (let i = 0; i < code6.length; i++) {
+			if (0 <= code6[i] && code6[i] < 10) {
+				this.context[key] += code6[i];
+			} else if (10 <= code6[i] && code6[i] < 36) {
+				this.context[key] += String.fromCharCode("a".charCodeAt(0) + code6[i] - 10);
+			} else if (36 <= code6[i] && code6[i] < 62) {
+				this.context[key] += String.fromCharCode("A".charCodeAt(0) + code6[i] - 36);
+			} else if (code6[i] == 62) {
 				this.context[key] += ".";
-			} else if (numcode[i] == 63) {
+			} else if (code6[i] == 63) {
 				this.context[key] += "-";
 			} else {
 				this.context[key] += "_";
@@ -383,7 +383,7 @@ pico.Param = class {
 		let results = [];
 		for (let i = 0; i < code.length; i++) {
 			let r = 0, x = code[i];
-			// Expand color code to number code.
+			// Expand 8bit compatible 6bit code to 6bit code.
 			let b = maxbit, a = (x - 1) & maxmask; // Minus 1 to reserve 0.
 			while (b--) { // Bit reverse.
 				r <<= 1;
@@ -404,7 +404,7 @@ pico.Param = class {
 		let results = [];
 		for (let i = 0; i < code.length; i++) {
 			let r = 0, x = code[i];
-			// Compress number code to color code.
+			// Compress 6bit code to 8bit compatible 6bit code.
 			let b = maxbit - compression, a = x ^ maxmask; // Bit flip.
 			a = a >> compression; // Compress.
 			while (b--) { // Bit reverse.

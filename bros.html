@@ -149,14 +149,14 @@ async function menuAction() {
 			let password = picoRandom(1000000, (level + 1));
 			picoSetStrings("" + (level + 1) + "@" + password, 0);
 		} else {
-			picoSetNumcode(levels[level], 0);
+			picoSetCode6(levels[level], 0);
 		}
 		await picoShare();
 
 	// Enter to edit mode.
 	} else {
-		picoSetNumcode(levels[level], 0);
-		picoSetColcode(colors, 1);
+		picoSetCode6(levels[level], 0);
+		picoSetCode8(colors, 1);
 		picoSetStrings("bros.html", "u");
 		await picoReload("index.html");
 	}
@@ -187,8 +187,8 @@ async function menuSelect(x) {
 
 	// Enter to edit mode.
 	/*} else {
-		picoSetNumcode(levels[level], 0);
-		picoSetColcode(colors, 1);
+		picoSetCode6(levels[level], 0);
+		picoSetCode8(colors, 1);
 		picoSetStrings("bros.html", "u");
 		await picoReload("index.html");*/
 	}
@@ -203,7 +203,7 @@ async function main() {
 
 		// Load extra level.
 		if (value[0] == "0") {
-			levels[levels.length - 1] = picoNumcode();
+			levels[levels.length - 1] = picoCode6();
 			level = levels.length - 1;
 			extra = true;
 

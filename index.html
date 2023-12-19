@@ -151,18 +151,18 @@ async function menuAction() {
 	let k = 0;
 	for (let p = 0; p < maxanime; p++) {
 		if (buffers[p]) {
-			picoSetNumcode(buffers[p], k);
+			picoSetCode6(buffers[p], k);
 			k++;
 		}
 	}
 	if (k == 0) {
-		picoSetNumcode([0,7,7], k);
+		picoSetCode6([0,7,7], k);
 		k++
 	}
 	if (
 		((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-		picoSetColcode(colors, k);
+		picoSetCode8(colors, k);
 	}
 
 	// Add app version.
@@ -257,12 +257,12 @@ async function main() {
 
 		// Load pixels param.
 		} else {
-			let numcode = picoNumcode(k);
+			let numcode = picoCode6(k);
 
 			// Load colors.
 			if ((numcode[0] == 0 && numcode[1] == 0 && numcode[2] == 0) ||
 				(numcode[0] == 1 && numcode[1] == 1 && numcode[2] == 1)) {
-				colors = picoColcode(k);
+				colors = picoCode8(k);
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
 				depth = colors.length / 3;
 				console.log("Load color: " + colors);
