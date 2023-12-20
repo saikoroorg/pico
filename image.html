@@ -5,28 +5,32 @@
 <script src="image.js"></script>
 <!--Main--><script>
 pico.Image.debug = true;
+//window.addEventListener("load", async (evt) => {
 
-//*/
+(async()=>{
+
+	let image = await picoLoadImage("image.svg");
+
 	picoColor(pico.Image.colors0);
-	picoRect(
-		[-22,-3,44,6], 2, 0,0, 0,   2);
+	for (let i = 0; i <= 360; i++) {
+		picoClear();
+		picoRect([-25,-25,50,50], 1, 0,0, 0,4);
+		picoRect([-24,-24,48,48], 2, 0,0, 0,4);
+		picoRect([-25,-25,50,50], 3, 0,0, 0,2);
+		picoRect([-25,-25,50,50], 4, 0,0, 0,1);
+		await picoDrawImage(image, 0,0, i*-12, 8);
+		await picoDrawImage(image, 0,0, i*12, 4, 1,40,40);
+		await picoDrawImage(image, 0,0, i*-12, 2, 2,40,40);
+		await picoFlip(20);
+	}
 
-	picoChar(":7       1:", 1, 0,0, 0-60,2);
-	picoChar(":8       2:", 1, 0,0, 0-30,2);
-	picoChar(":9       3:", 1, 0,0, 0,   2);
-	picoChar("10       4:", 1, 0,0, 0+30,2);
-	picoChar("11       5:", 1, 0,0, 0+60,2);
-	picoChar("12       6:", 1, 0,0, 0+90,2);
+})();
 
-	picoText(":9       3:", 
-		[-22,-3,44,6], 0, 0,0, 0,   2);
-
-	picoChar("+", 0, 0,0, 0,1);
-//*/
-
+//});
 document.addEventListener("click", async (evt) => {
 
 //*/
+	picoColor(pico.Image.colors0);
 	for (let i = 0; i <= 180; i++) {
 		picoClear();
 		picoRect([-24,-24,48,48], 0, 0,0, 0,2);

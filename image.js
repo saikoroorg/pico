@@ -113,6 +113,24 @@ async function picoSpriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
 	}
 }
 
+// Load image data.
+async function picoLoadImage(url) {
+	try {
+		return await pico.image.loadImage(url);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+// Draw image data.
+async function picoDrawImage(src, x=0, y=0, angle=0, scale=1, frame=0, width=0, height=0) {
+	try {
+		await pico.image.drawImage(src, x, y, angle, scale, frame, width, height);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 //************************************************************/
 
 // Namespace.
@@ -335,6 +353,29 @@ pico.Image = class {
 				await pico.image.offscreen._reset(0, 0, 0, scale);
 				await pico.image.offscreen._sprite(cells, 0);
 				resolve(pico.image.offscreen._data());
+			}); // end of new Promise.
+		}); // end of lock.
+	}
+
+	// Load file and get image data.
+	loadImage(url) {
+		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
+			return new Promise(async (resolve) => {
+				resolve(pico.image.offscreen._loadImage(url));
+				//await pico.image.offscreen._loadImage(url);
+				//resolve(pico.image.offscreen._imageData());
+			}); // end of new Promise.
+		}); // end of lock.
+	}
+
+	// Draw other image to this image.
+	drawImage(src, x=0, y=0, angle=0, scale=1, frame=0, width=0, height=0) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			return new Promise(async (resolve) => {
+				await this._ready();
+				await this._reset(x, y, angle, scale);
+				await this._drawImage(src, frame, width, height);
+				resolve();
 			}); // end of new Promise.
 		}); // end of lock.
 	}
@@ -581,6 +622,51 @@ pico.Image = class {
 	_data() {
 		return this.canvas[this.primary].toDataURL("image/png");
 	}
+
+	// Load image from data url.
+	_loadImage(url) {
+		return new Promise(async (resolve) => {
+			let image = new Image();
+			//image.crossOrigin = "anonymous";
+			image.onload = () => {
+				this.canvas[this.primary].width = image.width;
+				this.canvas[this.primary].height = image.height;
+			  this.context.drawImage(image, 0, 0);
+			  image.style.display = "none";
+			  //document.body.appendChild(image);
+				resolve(image);
+			};
+			image.src = url; // To avoid onload hook timing bug.
+		});
+	}
+
+	// Draw other image to this image.
+	_drawImage(src, frame=0, width=0, height=0) {
+		this._debug("DrawImage: " + frame + "@" + width + "," + height);
+		const ux = src.width/10, uy = src.height/10;//@todo: magicnumber?
+		const cx = (this.canvas[0].width - ux) / 2, cy = (this.canvas[0].height - uy) / 2;
+		this._debug("Center: " + cx + "," + cy + " / " + ux + "," + uy);
+		return new Promise((resolve) => {
+			if (width > 0) {
+				let nx = Math.floor(src.width / width);
+				let h = height > 0 ? height : width;
+				let sx = Math.floor(frame % nx) * width, sy = Math.floor(frame / nx) * height;
+				this._debug("DrawImage: " + sx + "+" + width  + "," + sy + "+" + height);
+				this.context.drawImage(src, sx, sy, width, height, cx-width/2, cy-height/2, width, height);
+			} else {
+				this.context.drawImage(src, cx-src.width/2, cy-src.height/2);
+			}
+			resolve();
+		}); // end of new Promise.
+	}
+
+	// Get image data.
+	/*_imageData() {
+		let w = this.canvas[this.primary].width;
+		let h = this.canvas[this.primary].height;
+		// @todo: Uncaught (in promise) DOMException: The operation is insecure.
+	  return this.context.getImageData(0, 0, w, h);
+	}*/
 
 	// Get image data file.
 	_file() {
