@@ -113,8 +113,8 @@ async function picoSpriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
 	}
 }
 
-// Load image data.
-async function picoLoadImage(url) {
+// Load image file.
+async function picoLoad(url) {
 	try {
 		return await pico.image.loadImage(url);
 	} catch (error) {
@@ -123,9 +123,27 @@ async function picoLoadImage(url) {
 }
 
 // Draw image data.
-async function picoDrawImage(src, x=0, y=0, angle=0, scale=1, frame=0, width=0, height=0) {
+async function picoImage(image, x=0, y=0, angle=0, scale=1, frame=0, width=0, height=0) {
 	try {
-		await pico.image.drawImage(src, x, y, angle, scale, frame, width, height);
+		await pico.image.drawImage(image, x, y, angle, scale, frame, width, height);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+// Get image size.
+function picoImageSize(image) {
+	try {
+		return image._size();
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+// Get image file.
+function picoImageFile(image) {
+	try {
+		return image._file();
 	} catch (error) {
 		console.error(error);
 	}
@@ -357,24 +375,22 @@ pico.Image = class {
 		}); // end of lock.
 	}
 
-	// Load file and get image data.
+	// Load image file and get image.
 	loadImage(url) {
 		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
 			return new Promise(async (resolve) => {
-				resolve(pico.image.offscreen._loadImage(url));
-				//await pico.image.offscreen._loadImage(url);
-				//resolve(pico.image.offscreen._imageData());
+				resolve(pico.image.offscreen._load(url));
 			}); // end of new Promise.
 		}); // end of lock.
 	}
 
 	// Draw other image to this image.
-	drawImage(src, x=0, y=0, angle=0, scale=1, frame=0, width=0, height=0) {
+	drawImage(image, x=0, y=0, angle=0, scale=1, frame=0, width=0, height=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
 				await this._reset(x, y, angle, scale);
-				await this._drawImage(src, frame, width, height);
+				await this._image(image, frame, width, height);
 				resolve();
 			}); // end of new Promise.
 		}); // end of lock.
@@ -618,55 +634,68 @@ pico.Image = class {
 		return 1;
 	}
 
-	// Get image data url.
-	_data() {
-		return this.canvas[this.primary].toDataURL("image/png");
-	}
-
 	// Load image from data url.
-	_loadImage(url) {
+	_load(url) {
 		return new Promise(async (resolve) => {
 			let image = new Image();
 			//image.crossOrigin = "anonymous";
 			image.onload = () => {
-				this.canvas[this.primary].width = image.width;
-				this.canvas[this.primary].height = image.height;
-			  this.context.drawImage(image, 0, 0);
-			  image.style.display = "none";
+				for (let i = 0; i < 2; i++) {
+					this.canvas[i].width = image.width;// * pico.Image.ratio;
+					this.canvas[i].height = image.height;// * pico.Image.ratio;
+				}
+			  this.context.drawImage(image, 0,0);/*
+			  	0, 0, image.width, image.height,
+			  	0, 0, this.canvas[0].width, this.canvas[0].height);*/
+			  //image.style.display = "none";
 			  //document.body.appendChild(image);
-				resolve(image);
+				resolve(this);
 			};
 			image.src = url; // To avoid onload hook timing bug.
 		});
 	}
 
 	// Draw other image to this image.
-	_drawImage(src, frame=0, width=0, height=0) {
-		this._debug("DrawImage: " + frame + "@" + width + "," + height);
-		const ux = src.width/10, uy = src.height/10;//@todo: magicnumber?
-		const cx = (this.canvas[0].width - ux) / 2, cy = (this.canvas[0].height - uy) / 2;
-		this._debug("Center: " + cx + "," + cy + " / " + ux + "," + uy);
+	_image(image, frame=0, width=0, height=0) {
+		const u = 0;//pico.Image.ratio * 4;
+		const cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
+		this._debug("Center: " + cx + "," + cy);
 		return new Promise((resolve) => {
 			if (width > 0) {
-				let nx = Math.floor(src.width / width);
-				let h = height > 0 ? height : width;
-				let sx = Math.floor(frame % nx) * width, sy = Math.floor(frame / nx) * height;
-				this._debug("DrawImage: " + sx + "+" + width  + "," + sy + "+" + height);
-				this.context.drawImage(src, sx, sy, width, height, cx-width/2, cy-height/2, width, height);
+				height = (height > 0 ? height : width);
+				let cx = (this.canvas[0].width - width) / 2;
+				let cy = (this.canvas[0].height - height) / 2;
+				let nx = image.canvas[0].width / width;
+				let x = Math.floor(frame % nx) * width;
+				let y = Math.floor(frame / nx) * height;
+				this._debug("DrawImage: " + cx + "," + cy + " " + x + "," + y + " " + width + "," + height);
+				this.context.drawImage(image.canvas[0], x, y, width, height, cx, cy, width, height);
 			} else {
-				this.context.drawImage(src, cx-src.width/2, cy-src.height/2);
+				let cx = (this.canvas[0].width - image.canvas[0].width) / 2;
+				let cy = (this.canvas[0].height - image.canvas[0].height) / 2;
+				this._debug("DrawImage: " + cx + "," + cy + " " + image.canvas[0].width + "," + image.canvas[0].height);
+				this.context.drawImage(image.canvas[0], cx, cy);
 			}
 			resolve();
 		}); // end of new Promise.
 	}
 
-	// Get image data.
-	/*_imageData() {
-		let w = this.canvas[this.primary].width;
-		let h = this.canvas[this.primary].height;
-		// @todo: Uncaught (in promise) DOMException: The operation is insecure.
-	  return this.context.getImageData(0, 0, w, h);
-	}*/
+	// Get image size.
+	_size() {
+		if (this.canvas[0].width > 0 && this.canvas[0].height > 0) {
+			if (this.canvas[0].width > this.canvas[0].height) {
+				return this.canvas[0].width;
+			} else {
+				return this.canvas[0].height;
+			}
+		}
+		return 0;
+	}
+
+	// Get image data url.
+	_data() {
+		return this.canvas[this.primary].toDataURL("image/png");
+	}
 
 	// Get image data file.
 	_file() {

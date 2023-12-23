@@ -5,28 +5,29 @@
 <script src="image.js"></script>
 <!--Main--><script>
 pico.Image.debug = true;
-//window.addEventListener("load", async (evt) => {
+window.addEventListener("load", async (evt) => {
 
-(async()=>{
+//(async()=>{
 
-	let image = await picoLoadImage("image.svg");
+	let image = await picoLoad("icon.png");
 
 	picoColor(pico.Image.colors0);
-	for (let i = 0; i <= 360; i++) {
+	for (let i = 0; i <= 180; i++) {
 		picoClear();
-		picoRect([-25,-25,50,50], 1, 0,0, 0,4);
-		picoRect([-24,-24,48,48], 2, 0,0, 0,4);
-		picoRect([-25,-25,50,50], 3, 0,0, 0,2);
-		picoRect([-25,-25,50,50], 4, 0,0, 0,1);
-		await picoDrawImage(image, 0,0, i*-12, 8);
-		await picoDrawImage(image, 0,0, i*12, 4, 1,40,40);
-		await picoDrawImage(image, 0,0, i*-12, 2, 2,40,40);
+		await picoRect([-25,-25,50,50], 1, 0,0, 0,4);
+		await picoRect([-24,-24,48,48], 2, 0,0, 0,4);
+		await picoRect([-25,-25,50,50], 3, 0,0, 0,2);
+		await picoRect([-25,-25,50,50], 4, 0,0, 0,1);
+		await picoImage(image, 0,0, 0, 1);
+		await picoImage(image, -50,-50, i*-10, 2, 5,48);
+		await picoImage(image, 50,-50, i*10, 2, 6,48);
+		await picoImage(image, 0,50, i*-10, 2, 0,48,48);
 		await picoFlip(20);
 	}
 
-})();
+//})();
 
-//});
+});
 document.addEventListener("click", async (evt) => {
 
 //*/
