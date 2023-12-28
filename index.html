@@ -344,12 +344,14 @@ async function main() {
 			}
 
 			// Positions.
-			let pixelswidth = !animeflag ? 168 : 168; // Size of pixels.
-			let pixelsposx = !animeflag ? 0 : -14; // Position x of pixels.
-			let pixelsposy = !animeflag ? -14 : -14; // Position y of pixels.
-			let colorsposx = !animeflag ? 0 : -14; // Position x of colors/coloreditor.
-			let colorsposy = pico.Image.height/2 - 14; // Position y of colors/coloreditor.
-			let framesposx = pico.Image.width/2 - 14; // Offset of buffer from right.
+			let pixelswidth = 168; // Size of pixels.
+			let pixelsposx = !animeflag ? 0 : 14; // Position x of pixels.
+			let pixelsposy = -14; // Position y of pixels.
+			let colorsposx = 0; // Position x of colors/coloreditor.
+			let colorsposy = pico.Image.height/2 - 16; // Position y of colors/coloreditor.
+			let fgcolorsposx = 0; // Position x of bgcolors/coloreditor.
+			let bgcolorsposx = -pico.Image.width/2 + 28; // Position x of bgcolors/coloreditor.
+			let framesposx = -pico.Image.width/2 + 14; // Offset of buffer.
 
 			// Draw background.
 			picoColor(bgcolors);
@@ -357,11 +359,12 @@ async function main() {
 
 			// Touching background.
 			{
-				let w1 = 82, h1 = 14; // Background color selector width and height.
-				let w2 = 72, h2 = 14; // Background color selector width and height for touching.
+				let w0 = 82, h0 = 12; // Foreground color selector width and height.
+				let w1 = 6, h1 = 6; // Background color selector width and height.
+				let w2 = 5.4, h2 = 5.4; // Background color selector width and height for touching.
 
 				// Release touching background.
-				if (colortouching >= 0 && picoAction(colorsposx, colorsposy, 100, h2) && !picoAction(colorsposx, colorsposy, w2, h2)) {
+				if (colortouching >= 0 && picoAction(bgcolorsposx, colorsposy, w1, h1)) {
 					console.log("Release touching background.");
 					colortouching = 0;
 
@@ -400,8 +403,11 @@ async function main() {
 						picoBeep(0, 0.1);
 					}*/
 
+					// Touching.
+					w1 = w2, h1 = h2;
+
 				// Touching background.
-				} else if (colortouching >= 0 && picoMotion(colorsposx, colorsposy, 100, h2) && !picoMotion(colorsposx, colorsposy, w2, h2)) {
+				} else if (colortouching >= 0 && picoMotion(bgcolorsposx, colorsposy, w1, h1)) {
 					frametouching = -1;
 					pixeltouching = -1;
 					colortouching = 1;
@@ -438,16 +444,19 @@ async function main() {
 						}
 					}
 
-					w1 += 1.25;
-					h1 += 1.25;
+					// Touching.
+					w1 = w2, h1 = h2;
 				}
 
-				// Draw background color selector.
-				picoPixel(bgindex, colorsposx, colorsposy, w1, h1);
-			}
+				// Draw foreground color selector.
+				picoPixel(bgindex ? 3 : 1, colorsposx, colorsposy, w0, h0);
 
-			// Set colors data.
-			picoColor(colors);
+				// Set colors data.
+				picoColor(colors);
+
+				// Draw background color selector.
+				picoPixel(colorselecting, bgcolorsposx, colorsposy, w1, h1);
+			}
 
 			// Draw pixels.
 			{
@@ -573,7 +582,7 @@ async function main() {
 				let grid = 16;
 
 				for (let i = 1; i < depth; i++) {
-					let x = colorsposx + (i-1 - (depth-1 - 1) / 2) * grid; // Margins for each color.
+					let x = fgcolorsposx + (i - (depth - 1) / 2) * grid; // Margins for each color.
 
 					// Release touching color.
 					if (colortouching >= 0 && picoAction(x, colorsposy, 8, 12)) {
@@ -672,7 +681,7 @@ async function main() {
 
 						// Decrease color number.
 						if (c > 0) {
-							let x = colorsposx + (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
+							let x = fgcolorsposx + (i*3+1 - 9 / 2) * grid; // Margins for each color number.
 							let s = 4;
 							if (colortouching >= 0 && picoAction(x, colorsposy+6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed decrease.
@@ -689,7 +698,7 @@ async function main() {
 
 						// Increase color number.
 						if (c < 255) {
-							let x = colorsposx + (i*3 - (9 - 1) / 2) * grid; // Margins for each color number.
+							let x = fgcolorsposx + (i*3+1 - 9 / 2) * grid; // Margins for each color number.
 							let s = 4;
 							if (colortouching >= 0 && picoAction(x, colorsposy-6, 8, 6)) {
 								c = (c + 1) >> compression; // Bit shift for compressed increase.
@@ -709,7 +718,7 @@ async function main() {
 						let c00 = c99 >= 99 ? "100" : c99 >= 9 ? " " + (c99 + 1) : c99 >= 1 ? " 0" + (c99 + 1) : " 00";
 
 						// Draw color numbers.
-						let x = colorsposx + (i*3+1 - (9 - 1) / 2) * grid; // Margins for each color number.
+						let x = fgcolorsposx + (i*3+2 - 9 / 2) * grid; // Margins for each color number.
 						let s = 4;
 						picoChar(c00, colorselecting, x, colorsposy, 0, s);
 					}
