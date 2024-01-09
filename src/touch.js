@@ -338,3 +338,4 @@ pico.touch = new pico.Touch(pico.Touch.parent);
 
 // Create allscreen touch class.
 pico.touch.allscreen = new pico.Touch("");
+

@@ -721,3 +721,4 @@ pico.image = new pico.Image(pico.Image.parent);
 
 // Create offscreen image class.
 pico.image.offscreen = new pico.Image("");
+

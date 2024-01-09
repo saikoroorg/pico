@@ -487,3 +487,4 @@ pico.Sound = class {
 
 // Master sound.
 pico.sound = new pico.Sound();
+
