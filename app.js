@@ -1,48 +1,8 @@
-<html>
-<head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-<title>Bros</title>
-<link rel="icon" type="image/svg" href="icon.svg" />
-<link rel="apple-touch-icon" href="icon.png" sizes="192x192" />
-<link rel="manifest" href="manifest.json" />
-<link rel="stylesheet" href="stylesheet.css" />
-</head>
-<body>
-<div id="container">
-	<h1 id="header">
-		<div class="logo">
-			<a id="title" href="./index.html">Bros</a>
-			<a id="subtitle" href="./pico.html">.</a>
-		</div>
-		<div class="menu center">
-			<a class="item light secret" id="action" href="javascript:menuAction();">
-				<span id="actionText"></span>
-				<img class="icon" id="actionIcon" src="" />
-			</a>
-		</div>
-		<div class="menu">
-			<a class="item clear" id="minus" href="javascript:menuSelect(-1);">-</a>
-			<a class="item light" id="select" href="javascript:menuSelect(0);">
-				<span id="selectText"></span>
-				<img class="icon" id="selectIcon" src="" />
-			</a>
-			<a class="item clear" id="plus" href="javascript:menuSelect(+1);">+</a>
-		</div>
-	</h1>
-	<div id="contents">
-		<div id="screen" class="picoImage picoTouch"></div>
-	</div>
-</div>
-<h6 id="footer">
-	<div id="author"></div>/
-	<div id="version"></div>
-</h6>
-<script>console.log = () => {};</script>
-<script src="daemon.js"></script>
-<script src="pico.js"></script>
-<!--Data--><script>
-var levels = [ // Level data.
+// App main script.
+
+// Level data.
+var levels = [
+[], //"Extra"
 [0,7,7,1,0,0,2,6,6], //"Bros",
 [0,7,7,1,0,0,2,6,6,4,6,0,4,0,6], //"Block",
 [0,7,7,1,0,0,2,6,6,4,1,1], //"Pole",
@@ -92,107 +52,76 @@ var levels = [ // Level data.
 [0,7,7,1,1,5,2,3,5,4,5,0,4,6,0,4,6,1,4,0,5,4,0,6], //"Trick",
 [0,7,7,1,2,4,2,4,4,4,0,0,4,1,0,4,4,0,4,5,0,4,6,0,4,0,1,4,5,1,4,6,1,4,6,2], //"Mountain",
 [0,7,7,1,2,2,2,4,2,4,3,4,4,2,5,4,3,5,4,4,5], //"Boss",
-[], //"Extra"
 ];
+
+// Color data.
 const colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23];
-var level = 0; // Playing level.
-var maxlevel = 0; // Cleared level.
+
+// Global variables.
+var level = 1; // Playing level.
+var maxlevel = 1; // Cleared level.
 var extra = false; // Playing only extra level flag.
 var playing = 1; // Playing count.
 var blocking = -1; // Blocking count.
-</script><!--/Data-->
-<!--Menu--><script>
 
-// Enable or disable menu.
-function updateMenu(id, enable, text=null, icon=null) {
-	let e = document.getElementById(id);
-	if (e) {
-		e.style.display = enable ? "flex" : "none";
-		let e1 = document.getElementById(id + "Text");
-		let e2 = document.getElementById(id + "Icon");
-		if (e1 && text) {
-			e1.style.display = "flex";
-			e1.innerText = text;
-			if (e2 && !icon) {
-				e2.style.display = "none";
-			}
-		} else if (e2 && icon) {
-			e2.style.display = "flex";
-			e2.src = icon;
-			if (e1 && !text) {
-				e1.style.display = "none";
-			}
-		} else if (text) {
-			e.innerText = text;
-		}
-	}
-}
-
-// Update buttons.
-function updateButtons() {
-	updateMenu("action", level >= levels.length - 1 || blocking == 0, blocking == 0 ? "^" : "*");
-	updateMenu("select", true, level >= levels.length - 1 ? "?" : "" + (level + 1));
-	updateMenu("minus", true, level > 0 && !extra ? "-" : " ");
-	updateMenu("plus", true, level < maxlevel && !extra ? "+" : " ");
-}
-
-// Action button for edit or share level.
-async function menuAction() {
+// Action button.
+async function appAction() {
+	picoResetParams();
 
 	// Share level.
-	if (blocking == 0) {
-		picoResetParams();
-		if (level < levels.length - 1) {
-			let password = picoRandom(1000000, (level + 1));
-			picoSetStrings("" + (level + 1) + "@" + password, 0);
-		} else {
-			picoSetCode6(levels[level], 0);
-		}
+	if (level >= 1 && level < levels.length) {
+		let password = picoRandom(1000000, (level + 1));
+		picoSetStrings("" + (level + 1) + "@" + password, 0);
 		await picoShare();
 
-	// Enter to edit mode.
+	// Share or edit level.
 	} else {
 		picoSetCode6(levels[level], 0);
-		picoSetCode8(colors, 1);
-		picoSetStrings("bros.html", "u");
-		await picoReload("index.html");
+		if (blocking == 0) {
+			await picoShare();
+		} else {
+			picoSetCode8(colors, 1);
+			await appEdit();
+		}
 	}
 }
 
-// Select button for change level.
-async function menuSelect(x) {
+// Select button.
+async function appSelect(x) {
 
 	// Change level.
 	if (x) {
 		if (((x > 0 && level + x <= maxlevel) || (x < 0 && level + x >= 0)) && !extra) {
-			level = level + x;
+			level = picoMod(level + x, maxlevel);
 			blocking = -1;
 			playing = -1; // Restart.
 			picoBeep(1.2, 0.1);
+
+			// Update select button.
+			appMenu("select", "" + (level));
+
 		} else {
 			picoBeep(0, 0.1);
 		}
-		updateButtons();
-		picoFlush();
 
 	// Restart level.
-	} else /*if (level < levels.length - 1)*/ {
+	} else {
 		blocking = -1;
 		playing = -1; // Restart.
 		picoBeep(1.2, 0.1);
-		updateButtons();
+	}
 
-	// Enter to edit mode.
-	/*} else {
-		picoSetCode6(levels[level], 0);
-		picoSetCode8(colors, 1);
-		picoSetStrings("bros.html", "u");
-		await picoReload("index.html");*/
+	// Update edit button.
+	if (level == 0) {
+		appMenu("action", "*");
+	} else {
+		appMenu("action");
 	}
 }
-</script><!--/Menu-->
-<!--Main--><script>
-async function main() {
+
+// Main.
+async function appMain() {
+	appMenu("title", "Bros"); // Title.
 
 	// Load query params.
 	let value = picoStrings();
@@ -200,21 +129,27 @@ async function main() {
 
 		// Load extra level.
 		if (value[0] == "0") {
-			levels[levels.length - 1] = picoCode6();
-			level = levels.length - 1;
+			levels[0] = picoCode6();
+			level = 0;
 			extra = true;
+			appMenu("select", "?");
+			appMenu("action", "*");
 
-		// Load max level.
+		// Load playing level.
 		} else {
 			let numbers = picoNumbers();
 			if (numbers[0] >= 0 && numbers[0] < levels.length &&
 			picoRandom(1000000, numbers[0]) == numbers[1]) {
-				maxlevel = numbers[0];
-				level = numbers[0] - 1;
+				maxlevel = numbers[0] + 1;
+				level = numbers[0];
 			}
 		}
 	}
-	updateButtons();
+
+	// Update select button.
+	if (!extra) {
+		appMenu("select", "" + (level));
+	}
 
 	// Load pallete data.
 	picoColor(colors);
@@ -320,7 +255,6 @@ async function main() {
 								}
 							}
 						}
-						//updateMenu("subtitle", true, "" + blocking);
 
 						// Clear level.
 						if (blocking == 0) {
@@ -328,7 +262,9 @@ async function main() {
 							maxlevel = level + 1 < levels.length ? level + 1 : levels.length;
 							picoBeep(1.2, 0.1);
 							picoBeep(1.2, 0.1, 0.2);
-							updateButtons();
+
+							// Update action button to share.
+							appMenu("action", "^");
 						}
 					}
 				}
@@ -374,8 +310,6 @@ async function main() {
 			await picoRead();
 		} // End of playing loop.
 	} // End of main loop.
-};
-main();
-</script><!--/Main-->
-</body>
-</html>
+}
+
+appMain();

@@ -9,7 +9,7 @@ window.addEventListener("load", async (evt) => {
 
 //(async()=>{
 
-	let image = await picoLoad("icon.png");
+	let image = await picoLoad("image.svg");
 
 	picoColor(pico.Image.colors0);
 	for (let i = 0; i <= 180; i++) {
@@ -19,9 +19,9 @@ window.addEventListener("load", async (evt) => {
 		await picoRect([-25,-25,50,50], 3, 0,0, 0,2);
 		await picoRect([-25,-25,50,50], 4, 0,0, 0,1);
 		await picoImage(image, 0,0, 0, 1);
-		await picoImage(image, -50,-50, i*-10, 2, 5,48);
-		await picoImage(image, 50,-50, i*10, 2, 6,48);
-		await picoImage(image, 0,50, i*-10, 2, 0,48,48);
+		await picoImage(image, -50,-50, i*-10, 2, 1,40);
+		await picoImage(image, 50,-50, i*10, 2, 2,40);
+		await picoImage(image, 0,50, i*-10, 2, 0,40,40);
 		await picoFlip(20);
 	}
 

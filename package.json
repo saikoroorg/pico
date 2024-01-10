@@ -5,9 +5,9 @@
   "scripts": {
     "install": "",
     "update": "",
-    "build": "mkdir build && cat src/version.js src/image.js src/sound.js src/param.js src/touch.js > build/pico.js && cp src/pico.html build/pico.html && cp src/*.css build && cp src/index.html build/index.html && cp src/daemon.js build && cp src/manifest.json build",
+    "build": "cat src/api.js src/image.js src/sound.js src/param.js src/touch.js > ./pico.js",
     "rebuild": "npm run clean && npm run build",
-    "clean": "rm -rf ./build",
+    "clean": "",
     "clobber": "rm -rf node_modules && rm -rf package-lock.json"
   },
   "license": "unlicensed",

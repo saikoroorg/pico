@@ -1,0 +1,81 @@
+<!--svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6 6" width="300" height="300">
+	<g strocke-width="2" stroke="none" fill="#000" transform="translate(2.5,2.5)">
+		<path d="M-3,-3h7v7h-7Z" stroke="#fff" fill="#fff"/>
+		<path d="M-2,-3h1v1h-1Z M0,-3h1v1h-1Z M2,-3h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-3,-2h1v1h-1Z M-3,0h1v1h-1Z M-3,2h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-1,-1h1v1h-1Z" fill="#0073ef"/>
+		<path d="M1,-1h1v1h-1Z" fill="#e7005b"/>
+		<path d="M-1,1h1v1h-1Z M0,1h1v1h-1Z M1,1h1v1h-1Z" fill="#003f17"/>
+		<path d="M3,-2h1v1h-1Z M3,0h1v1h-1Z M3,2h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-2,3h1v1h-1Z M0,3h1v1h-1Z M2,3h1v1h-1Z M4,3h1v1h-1Z" fill="#bfbfbf"/>
+	</g>
+</svg!-->
+
+<!-- qlmanage -t -s 192 -o ./ icon.svg -or- inkscape -z -o icon.png -w 192 -h 192 icon.svg -->
+<!--svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 8 8" width="384" height="384">
+	<g strocke-width="2" stroke="none" fill="#000" transform="translate(3.5,3.5)">
+		<path d="M-3,-3h7v7h-7Z" stroke="#fff" fill="#fff"/>
+		<path d="M-4,-3h1v1h-1Z M-4,-1h1v1h-1Z M-4,1h1v1h-1Z M-4,3h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-3,-4h1v1h-1Z M-1,-4h1v1h-1Z M1,-4h1v1h-1Z M3,-4h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-2,-3h1v1h-1Z M0,-3h1v1h-1Z M2,-3h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-3,-2h1v1h-1Z M-3,0h1v1h-1Z M-3,2h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-1,-1h1v1h-1Z" fill="#0073ef"/>
+		<path d="M1,-1h1v1h-1Z" fill="#e7005b"/>
+		<path d="M-1,1h1v1h-1Z M0,1h1v1h-1Z M1,1h1v1h-1Z" fill="#003f17"/>
+		<path d="M3,-2h1v1h-1Z M3,0h1v1h-1Z M3,2h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-2,3h1v1h-1Z M0,3h1v1h-1Z M2,3h1v1h-1Z M4,3h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M-3,4h1v1h-1Z M-1,4h1v1h-1Z M1,4h1v1h-1Z M3,4h1v1h-1Z" fill="#bfbfbf"/>
+		<path d="M4,-3h1v1h-1Z M4,-1h1v1h-1Z M4,1h1v1h-1Z" fill="#bfbfbf"/>
+	</g>
+</svg!-->
+
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" width="300" height="300">
+	<g stroke="none" fill="#bfbfbf" transform="translate(9,9)">
+		<path d="M-7,-7h16v16h-16Z" fill="#fff"/>
+
+		<path d="M -2, -2h2v2h-2Z" fill="#0073ef"/>
+		<path d="M  2, -2h2v2h-2Z" fill="#e7005b"/>
+		<path d="M -2,  2h2v2h-2Z M  0,  2h2v2h-2Z M  2,  2h2v2h-2Z" fill="#003f17"/>
+
+		<path d="M -4, -6h2v2h-2Z M  0, -6h2v2h-2Z M  4, -6h2v2h-2Z"/>
+		<path d="M -4,  6h2v2h-2Z M  0,  6h2v2h-2Z M  4,  6h2v2h-2Z"/>
+		<path d="M -6, -4h2v2h-2Z M -6,  0h2v2h-2Z M -6,  4h2v2h-2Z"/>
+		<path d="M  6, -4h2v2h-2Z M  6,  0h2v2h-2Z M  6,  4h2v2h-2Z"/>
+
+		<path d="M -8, -6h2v2h-2Z M -8, -2h2v2h-2Z M -8,  2h2v2h-2Z M -8,  6h2v2h-2Z"/>
+		<path d="M -6, -8h2v2h-2Z M -2, -8h2v2h-2Z M  2, -8h2v2h-2Z M  6, -8h2v2h-2Z"/>
+		<path d="M -6,  8h2v2h-2Z M -2,  8h2v2h-2Z M  2,  8h2v2h-2Z M  6,  8h2v2h-2Z"/>
+		<path d="M  8, -6h2v2h-2Z M  8, -2h2v2h-2Z M  8,  2h2v2h-2Z M  8,  6h2v2h-2Z"/>
+	</g>
+</svg>
+
+<!-- qlmanage -t -s 192 -o ./ icon.svg -or- inkscape -z -o icon.png -w 192 -h 192 icon.svg -->
+<!--svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="384" height="384">
+	<rect width="100%" height="100%" fill="#fff"/>
+	<g stroke="none" fill="#bfbfbf" transform="translate(15,15)">
+
+		<path d="M -2, -2h2v2h-2Z" fill="#0073ef"/>
+		<path d="M  2, -2h2v2h-2Z" fill="#e7005b"/>
+		<path d="M -2,  2h2v2h-2Z M  0,  2h2v2h-2Z M  2,  2h2v2h-2Z" fill="#003f17"/>
+
+		<path d="M -4, -6h2v2h-2Z M  0, -6h2v2h-2Z M  4, -6h2v2h-2Z"/>
+		<path d="M -4,  6h2v2h-2Z M  0,  6h2v2h-2Z M  4,  6h2v2h-2Z"/>
+		<path d="M -6, -4h2v2h-2Z M -6,  0h2v2h-2Z M -6,  4h2v2h-2Z"/>
+		<path d="M  6, -4h2v2h-2Z M  6,  0h2v2h-2Z M  6,  4h2v2h-2Z"/>
+
+		<path d="M -8, -6h2v2h-2Z M -8, -2h2v2h-2Z M -8,  2h2v2h-2Z M -8,  6h2v2h-2Z"/>
+		<path d="M -6, -8h2v2h-2Z M -2, -8h2v2h-2Z M  2, -8h2v2h-2Z M  6, -8h2v2h-2Z"/>
+		<path d="M -6,  8h2v2h-2Z M -2,  8h2v2h-2Z M  2,  8h2v2h-2Z M  6,  8h2v2h-2Z"/>
+		<path d="M  8, -6h2v2h-2Z M  8, -2h2v2h-2Z M  8,  2h2v2h-2Z M  8,  6h2v2h-2Z"/>
+
+		<path d="M -8,-10h2v2h-2Z M -4,-10h2v2h-2Z M  0,-10h2v2h-2Z M  4,-10h2v2h-2Z M  8,-10h2v2h-2Z"/>
+		<path d="M -8, 10h2v2h-2Z M -4, 10h2v2h-2Z M  0, 10h2v2h-2Z M  4, 10h2v2h-2Z M  8, 10h2v2h-2Z"/>
+		<path d="M-10, -8h2v2h-2Z M-10, -4h2v2h-2Z M-10,  0h2v2h-2Z M-10,  4h2v2h-2Z M-10,  8h2v2h-2Z"/>
+		<path d="M 10, -8h2v2h-2Z M 10, -4h2v2h-2Z M 10,  0h2v2h-2Z M 10,  4h2v2h-2Z M 10,  8h2v2h-2Z"/>
+
+		<path d="M-12,-10h2v2h-2Z M-12, -6h2v2h-2Z M-12, -2h2v2h-2Z M-12,  2h2v2h-2Z M-12,  6h2v2h-2Z M-12, 10h2v2h-2Z"/>
+		<path d="M 12,-10h2v2h-2Z M 12, -6h2v2h-2Z M 12, -2h2v2h-2Z M 12,  2h2v2h-2Z M 12,  6h2v2h-2Z M 12, 10h2v2h-2Z"/>
+		<path d="M-10,-12h2v2h-2Z M -6,-12h2v2h-2Z M -2,-12h2v2h-2Z M  2,-12h2v2h-2Z M  6,-12h2v2h-2Z M 10,-12h2v2h-2Z"/>
+		<path d="M-10, 12h2v2h-2Z M -6, 12h2v2h-2Z M -2, 12h2v2h-2Z M  2, 12h2v2h-2Z M  6, 12h2v2h-2Z M 10, 12h2v2h-2Z"/>
+	</g>
+</svg!-->
