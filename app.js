@@ -1,4 +1,4 @@
-// App main script.
+picoLabel("title", "Pico"); // Title.
 
 // Level data.
 var levels = [
@@ -60,7 +60,6 @@ const colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23];
 // Global variables.
 var level = 1; // Playing level.
 var maxlevel = 1; // Cleared level.
-var extra = false; // Playing only extra level flag.
 var playing = 1; // Playing count.
 var blocking = -1; // Blocking count.
 
@@ -70,20 +69,22 @@ async function appAction() {
 
 	// Share level.
 	if (level >= 1 && level < levels.length) {
-		let password = picoRandom(1000000, (level + 1));
-		picoSetStrings("" + (level + 1) + "@" + password, 0);
-		await picoShare();
+		let password = picoRandom(1000000, level);
+		picoSetStrings("" + level + "@" + password, 0);
+		return 1; // Return 1 to share.
 
 	// Share or edit level.
 	} else {
 		picoSetCode6(levels[level], 0);
 		if (blocking == 0) {
-			await picoShare();
+			return 1; // Return 1 to share.
 		} else {
 			picoSetCode8(colors, 1);
-			await appEdit();
+			return -1; // Return -1 to edit.
 		}
 	}
+
+	return 0; // Do nothing.
 }
 
 // Select button.
@@ -91,14 +92,14 @@ async function appSelect(x) {
 
 	// Change level.
 	if (x) {
-		if (((x > 0 && level + x <= maxlevel) || (x < 0 && level + x >= 0)) && !extra) {
-			level = picoMod(level + x, maxlevel);
+		if (level + x <= maxlevel && level + x >= 0) {
+			level = level + x < levels.length ? level + x : 0;
 			blocking = -1;
 			playing = -1; // Restart.
 			picoBeep(1.2, 0.1);
 
 			// Update select button.
-			appMenu("select", "" + (level));
+			picoLabel("select", "" + level);
 
 		} else {
 			picoBeep(0, 0.1);
@@ -113,15 +114,16 @@ async function appSelect(x) {
 
 	// Update edit button.
 	if (level == 0) {
-		appMenu("action", "*");
+		picoLabel("action", "*");
 	} else {
-		appMenu("action");
+		picoLabel("action");
 	}
+
+	return 0; // Do nothing.
 }
 
 // Main.
 async function appMain() {
-	appMenu("title", "Bros"); // Title.
 
 	// Load query params.
 	let value = picoStrings();
@@ -131,9 +133,7 @@ async function appMain() {
 		if (value[0] == "0") {
 			levels[0] = picoCode6();
 			level = 0;
-			extra = true;
-			appMenu("select", "?");
-			appMenu("action", "*");
+			picoLabel("action", "*");
 
 		// Load playing level.
 		} else {
@@ -147,9 +147,7 @@ async function appMain() {
 	}
 
 	// Update select button.
-	if (!extra) {
-		appMenu("select", "" + (level));
-	}
+	picoLabel("select", "" + level);
 
 	// Load pallete data.
 	picoColor(colors);
@@ -259,12 +257,12 @@ async function appMain() {
 						// Clear level.
 						if (blocking == 0) {
 							players = [[], []];
-							maxlevel = level + 1 < levels.length ? level + 1 : levels.length;
+							maxlevel = level + 1;
 							picoBeep(1.2, 0.1);
 							picoBeep(1.2, 0.1, 0.2);
 
 							// Update action button to share.
-							appMenu("action", "^");
+							picoLabel("action", "^");
 						}
 					}
 				}
@@ -311,5 +309,3 @@ async function appMain() {
 		} // End of playing loop.
 	} // End of main loop.
 }
-
-appMain();
