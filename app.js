@@ -1,4 +1,4 @@
-picoLabel("title", "Pico"); // Title.
+picoTitle("Pico"); // Title.
 
 // Level data.
 var levels = [
