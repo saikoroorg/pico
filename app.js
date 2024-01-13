@@ -162,6 +162,9 @@ async function appLoad() {
 async function appInit() {
 
 	// Init level data.
+	width = 7, height = 7;
+	pixels = [[],[],[],[],[],[],[]];
+	players = [[], []];
 	if (levels[level]) {
 		for (let k = 0; k < levels[level].length / 3; k++) {
 			let w = levels[level][k * 3];
