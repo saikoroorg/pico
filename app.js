@@ -60,7 +60,7 @@ const colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23];
 // Global variables.
 var level = 1; // Playing level.
 var maxlevel = 1; // Cleared level.
-var playing = 1; // Playing count.
+var playing = 0; // Playing count.
 var blocking = -1; // Blocking count.
 const maxsize = 20; // Max field size.
 var width = 7, height = 7; // Field size.
@@ -158,57 +158,57 @@ async function appLoad() {
 	picoColor(colors);
 }
 
-// Init.
-async function appInit() {
-
-	// Init level data.
-	width = 7, height = 7;
-	pixels = [[],[],[],[],[],[],[]];
-	players = [[], []];
-	if (levels[level]) {
-		for (let k = 0; k < levels[level].length / 3; k++) {
-			let w = levels[level][k * 3];
-			let x = levels[level][k * 3 + 1];
-			let y = levels[level][k * 3 + 2];
-			if (w == 0) {
-				width = x >= 0 && x <= maxsize ? x : 7;
-				height = y >= 0 && y <= maxsize ? y : 7;
-				grid = 168 / width;
-				margin = width <= 9 ? 2 : 1;
-				players = [[0, 0], [width - 1, height - 1]];
-				for (let j = 0; j < height; j++) {
-					pixels[j] = [];
-					for (let i = 0; i < width; i++) {
-						pixels[j][i] = 0;
-					}
-				}
-				blocking = width * height;
-			} else if (w >= 1 && w <= 4 && x >= 0 && x < width && y >= 0 && y < height) {
-				if (w >= 1 && w <= 2) {
-					if (pixels[players[w - 1][1]][players[w - 1][0]] >= 3) {
-						pixels[players[w - 1][1]][players[w - 1][0]] -= w;
-					} else {
-						pixels[players[w - 1][1]][players[w - 1][0]] = 0;
-					}
-					players[w - 1] = [x, y];
-				} else if (w == 3) {
-					pixels[players[0][1]][players[0][0]] = 0;
-					pixels[players[1][1]][players[1][0]] = 0;
-					players[0] = [x, y];
-					players[1] = [x, y];
-				}
-				pixels[y][x] = w;
-				blocking -= 1;
-			}
-		}
-	}
-
-	// Reset playing count.
-	playing = 1;
-}
-
 // Main.
 async function appMain() {
+
+	// Initialize.
+	if (playing <= 0) {
+
+		// Init level data.
+		width = 7, height = 7;
+		pixels = [[],[],[],[],[],[],[]];
+		players = [[], []];
+		if (levels[level]) {
+			for (let k = 0; k < levels[level].length / 3; k++) {
+				let w = levels[level][k * 3];
+				let x = levels[level][k * 3 + 1];
+				let y = levels[level][k * 3 + 2];
+				if (w == 0) {
+					width = x >= 0 && x <= maxsize ? x : 7;
+					height = y >= 0 && y <= maxsize ? y : 7;
+					grid = 168 / width;
+					margin = width <= 9 ? 2 : 1;
+					players = [[0, 0], [width - 1, height - 1]];
+					for (let j = 0; j < height; j++) {
+						pixels[j] = [];
+						for (let i = 0; i < width; i++) {
+							pixels[j][i] = 0;
+						}
+					}
+					blocking = width * height;
+				} else if (w >= 1 && w <= 4 && x >= 0 && x < width && y >= 0 && y < height) {
+					if (w >= 1 && w <= 2) {
+						if (pixels[players[w - 1][1]][players[w - 1][0]] >= 3) {
+							pixels[players[w - 1][1]][players[w - 1][0]] -= w;
+						} else {
+							pixels[players[w - 1][1]][players[w - 1][0]] = 0;
+						}
+						players[w - 1] = [x, y];
+					} else if (w == 3) {
+						pixels[players[0][1]][players[0][0]] = 0;
+						pixels[players[1][1]][players[1][0]] = 0;
+						players[0] = [x, y];
+						players[1] = [x, y];
+					}
+					pixels[y][x] = w;
+					blocking -= 1;
+				}
+			}
+		}
+
+		// Reset playing count.
+		playing = 1;
+	}
 
 	// Move player.
 	for (let j = 0; j < height; j++) {
