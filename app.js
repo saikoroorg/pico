@@ -72,24 +72,22 @@ var players = [[], []];
 async function appAction() {
 	picoResetParams();
 
-	// Share level.
+	// Share cleared level.
 	if (level >= 1 && level < levels.length) {
 		let password = picoRandom(1000000, level);
 		picoSetStrings("" + level + "@" + password, 0);
 		return 1; // Return 1 to share.
 
-	// Share or edit level.
+	// Share or edit custom level.
 	} else {
 		picoSetCode6(levels[level], 0);
 		if (blocking == 0) {
-			return 1; // Return 1 to share.
+			await picoSwitch(); // Share or back.
 		} else {
 			picoSetCode8(colors, 1);
-			return -1; // Return -1 to edit.
+			await picoSwitch("edit.js"); // Open editor.
 		}
 	}
-
-	return 0; // Do nothing.
 }
 
 // Select button.
@@ -123,8 +121,6 @@ async function appSelect(x) {
 	} else {
 		picoLabel("action");
 	}
-
-	return 0; // Do nothing.
 }
 
 // Load.
@@ -310,5 +306,5 @@ async function appMain() {
 	}
 
 	// Increment playing count.
-	return playing++;
+	playing++;
 }
