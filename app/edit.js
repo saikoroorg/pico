@@ -1,6 +1,10 @@
-/* PICO Editor app module */
 picoTitle("Pico", "Edit"); // Title.
 
+// Data and settings.
+var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
+var bgcolors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // Background colors.
+
+// Global variables.
 var maxwidth = 20, maxheight = 20; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
@@ -12,8 +16,6 @@ var buffers = []; // Pixels buffers.
 var animeflag = 0; // Anime editing flag.
 var playing = 0; // Playing count.
 var pixels = []; // Canvas pixels.
-var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
-var bgcolors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // Background colors.
 var depth = 10; // Color count.
 const maxcolor = 10; // Color max size.
 var colorflag = 0; // Color editing flag.
@@ -56,6 +58,8 @@ async function appUpdate(force = true) {
 	} else {
 		picoLabel("select", "x" + width);
 	}
+	picoLabel("minus", "-");
+	picoLabel("plus", "+");
 }
 
 // Action button.

@@ -12,22 +12,22 @@
 <div id="container">
 	<h1 id="header">
 		<div class="logo">
-			<a id="title" href="javascript:picoOnTitle();">
+			<a id="title" href="javascript:pico.app.onReset();">
 			<a id="subtitle" href="javascript:top.location.reload();"></a>
 		</div>
 		<div class="menu center">
-			<a class="item light secret" id="action" href="javascript:picoOnAction();">
+			<a class="item light secret" id="action" href="javascript:pico.app.onAction();">
 				<span id="actionText"></span>
 				<img class="icon" id="actionIcon" src="" />
 			</a>
 		</div>
 		<div class="menu">
-			<a class="item clear" id="minus" href="javascript:picoOnSelect(-1);">-</a>
-			<a class="item light" id="select" href="javascript:picoOnSelect(0);">
+			<a class="item clear secret" id="minus" href="javascript:pico.app.onSelect(-1);">-</a>
+			<a class="item light secret" id="select" href="javascript:pico.app.onSelect(0);">
 				<span id="selectText"></span>
 				<img class="icon" id="selectIcon" src="" />
 			</a>
-			<a class="item clear" id="plus" href="javascript:picoOnSelect(+1);">+</a>
+			<a class="item clear secret" id="plus" href="javascript:pico.app.onSelect(+1);">+</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -42,146 +42,183 @@
 <script src="pico.js"></script>
 <script src="picod.js"></script>
 <!--Event--><script>
-pico.apppath = "./index.html"; // App file path.
-pico.apprefer = null; // Refer script.
-pico.appscript = null; // App script.
-pico.apptitle = ""; // App title.
-pico.appurl = null; // Referenced url.
-pico.appver = 0; // App version.
 
 // Change label.
 function picoLabel(id, text=null, icon=null) {
-	let e = document.getElementById(id);
-	if (e) {
-		e.style.display = (text || icon) ? "flex" : "none";
-		let e1 = document.getElementById(id + "Text");
-		let e2 = document.getElementById(id + "Icon");
-		if (e1 && text) {
-			e1.style.display = "flex";
-			e1.innerText = text;
-			if (e2 && !icon) {
-				e2.style.display = "none";
-			}
-		} else if (e2 && icon) {
-			e2.style.display = "flex";
-			e2.src = icon;
-			if (e1 && !text) {
-				e1.style.display = "none";
-			}
-		} else if (text) {
-			e.innerText = text;
-		}
-	}
-	picoFlush();
+	pico.app.setLabel(id, text, icon);
 }
 
 // Change title.
 function picoTitle(text=null, subtext=null) {
-	let e = document.getElementsByTagName("title");
-	if (e && e[0]) {
-		if (text) {
-			e[0].style.display = "flex";
-			e[0].innerText = text;
-		} else {
-			e[0].style.display = "none";
-			e[0].innerText = "";
-		}
-	}
-	if (text) {
-		pico.apptitle = text;
-		picoLabel("title", text);
-	}
-	if (subtext) {
-		picoLabel("subtitle", subtext)
-	}
+	pico.app.setTitle(text, subtext);
 }
 
 // Switch script or share.
 async function picoSwitch(script=null) {
-	if (pico.appver > 0) {
-		picoSetStrings(pico.appver, "v");
+	await pico.app.switchScript(script);
+}
+
+//************************************************************/
+
+// Namespace.
+var pico = pico || {};
+
+// App class.
+pico.App = class {
+	static script = "app.js"; // Default script.
+
+	// constructor.
+	constructor() {
+		this.path = "./index.html"; // App html path.
+		this.url = null; // Referenced url.
+		this.script = null; // App script.
+		this.refer = null; // Referenced script.
+		this.title = ""; // App title.
+		this.ver = 0; // App version.
+
+		this.onLoad(); // Load.
+		window.addEventListener("load", () => {
+			this.onMain()
+		}); // Main.
 	}
 
-	// Change and reload script.
-	if (script) {
-		picoSetStrings(pico.apppath, "u");
-		if (pico.apptitle) {
-			picoSetStrings(pico.apptitle, "t");
-		}
-		picoSetStrings(script, "s");
-		if (pico.appscript) {
-			picoSetStrings(pico.appscript, "r");
+	// On reset button.
+	async onReset() {
+		picoResetParams();
+		if (this.ver > 0) {
+			picoSetStrings(this.ver, "v");
 		}
 		await picoReload();
+	}
 
-	// Back or jump to next app.
-	} else if (pico.appurl) {
-		if (pico.apprefer) {
-			picoSetStrings(pico.apprefer, "s");
+	// On acction button.
+	async onAction() {
+		await appAction();
+	}
+
+	// On select button.
+	async onSelect(x) {
+		await appSelect(x);
+	}
+
+	// On load event.
+	async onLoad() {
+		let script = picoStrings("s");
+		if (script) {
+			this.script = script;
 		}
-		await picoReload(pico.appurl);
+		var e = document.createElement('script');
+		e.src = this.script ? this.script : pico.App.script;
+		document.body.appendChild(e);
+	}
 
-	// Share.
-	} else {
-		await picoShare();
+	// On main loop.
+	async onMain() {
+		let refer = picoStrings("r");
+		if (refer) {
+			this.refer = refer;
+		}
+		let title = picoStrings("t");
+		if (title) {
+			this.title = title;
+			picoTitle(this.title);
+		}
+		this.url = picoStrings("u");
+		this.ver = picoStrings("v");
+		await appLoad();
+		picoFlush(); // Flush to skip first read.
+		for (;;) {
+			await picoRead();
+			picoClear();
+			await appMain();
+			await picoFlip(0);
+		}
+	}
+
+	// Change label.
+	setLabel(id, text=null, icon=null) {
+		let e = document.getElementById(id);
+		if (e) {
+			e.style.display = (text || icon) ? "flex" : "none";
+			let e1 = document.getElementById(id + "Text");
+			let e2 = document.getElementById(id + "Icon");
+			if (e1 && text) {
+				e1.style.display = "flex";
+				e1.innerText = text;
+				if (e2 && !icon) {
+					e2.style.display = "none";
+				}
+			} else if (e2 && icon) {
+				e2.style.display = "flex";
+				e2.src = icon;
+				if (e1 && !text) {
+					e1.style.display = "none";
+				}
+			} else if (text) {
+				e.innerText = text;
+			}
+		}
+		picoFlush();
+	}
+
+	// Change title.
+	setTitle(text=null, subtext=null) {
+		let e = document.getElementsByTagName("title");
+		if (e && e[0]) {
+			if (text) {
+				e[0].style.display = "flex";
+				e[0].innerText = text;
+			} else {
+				e[0].style.display = "none";
+				e[0].innerText = "";
+			}
+		}
+		if (text) {
+			this.title = text;
+			picoLabel("title", text);
+		}
+		if (subtext) {
+			picoLabel("subtitle", subtext)
+		}
+	}
+
+	// Switch script or share.
+	async switchScript(script=null) {
+		if (this.ver > 0) {
+			picoSetStrings(this.ver, "v");
+		}
+
+		// Change and reload script.
+		if (script) {
+			picoSetStrings(this.path, "u");
+			if (this.title) {
+				picoSetStrings(this.title, "t");
+			}
+			picoSetStrings(script, "s");
+			if (this.script) {
+				picoSetStrings(this.script, "r");
+			}
+			await picoReload();
+
+		// Back or jump to next app.
+		} else if (this.url) {
+			if (this.refer) {
+				picoSetStrings(this.refer, "s");
+			}
+			await picoReload(this.url);
+
+		// Share.
+		} else {
+			if (this.script) {
+				picoSetStrings(this.script, "s");
+			}
+			await picoShare();
+		}
 	}
 }
 
-// On title label.
-async function picoOnTitle() {
-	picoResetParams();
-	if (pico.appver > 0) {
-		picoSetStrings(pico.appver, "v");
-	}
-	await picoReload();
-}
-
-// On acction button.
-async function picoOnAction() {
-	await appAction();
-}
-
-// On select button.
-async function picoOnSelect(x) {
-	await appSelect(x);
-}
-
-// On load event.
-async function picoOnLoad() {
-	let script = picoStrings("s");
-	if (script) {
-		pico.appscript = script;
-	}
-	var e = document.createElement('script');
-	e.src = pico.appscript ? pico.appscript : "app.js";
-	document.body.appendChild(e);
-}
-
-// On main loop.
-async function picoOnMain() {
-	let refer = picoStrings("r");
-	if (refer) {
-		pico.apprefer = refer;
-	}
-	let title = picoStrings("t");
-	if (title) {
-		pico.apptitle = title;
-		picoTitle(pico.apptitle);
-	}
-	pico.appurl = picoStrings("u");
-	pico.appver = picoStrings("v");
-	await appLoad();
-	picoFlush(); // Flush to skip first read.
-	for (;;) {
-		await picoRead();
-		picoClear();
-		await appMain();
-		await picoFlip(0);
-	}
-}
-
-picoOnLoad(); // Load.
-window.onload = picoOnMain; // Main.
+// Master app.
+pico.app = new pico.App();
 </script><!--/Event-->
 </body>
 </html>

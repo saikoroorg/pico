@@ -1,158 +1,43 @@
 picoTitle("Pico"); // Title.
 
-// Level data.
-var levels = [
-[], //"Extra"
-[0,7,7,1,0,0,2,6,6], //"Bros",
-[0,7,7,1,0,0,2,6,6,4,6,0,4,0,6], //"Block",
-[0,7,7,1,0,0,2,6,6,4,1,1], //"Pole",
-[0,7,7,1,0,0,2,6,6,4,5,1,4,5,2,4,5,3,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5], //"Wall",
-[0,7,7,1,2,2,2,4,4,4,2,3,4,2,4,4,3,4], //"Boomerang",
-[0,7,7,1,0,6,2,6,6,4,3,2], //"Cracker",
-[0,7,7,1,0,0,2,4,4,4,2,2,4,3,2,4,5,2,4,6,2,4,2,3,4,6,3,4,2,4,4,6,4,4,2,5,4,6,5,4,2,6,4,3,6,4,4,6,4,5,6,4,6,6], //"Room",
-[0,7,7,1,0,0,2,4,4,4,1,1,4,5,1,4,5,2,4,5,3,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5], //"Inside",
-[0,7,7,1,1,1,2,5,1,4,3,3], //"Belly",
-[0,7,7,1,1,3,2,5,3,4,3,5], //"Baby",
-[0,7,7,1,2,3,2,4,3,4,0,0,4,6,0,4,0,3,4,6,3,4,0,6,4,3,6,4,6,6], //"Urchin",
-[0,7,7,1,2,3,2,4,3,4,0,0,4,6,0,4,0,5,4,3,5,4,6,5,4,0,6,4,3,6,4,6,6], //"Shaggy",
-[0,7,7,1,2,6,2,4,6,4,0,0,4,6,0,4,0,5,4,6,5,4,0,6,4,1,6,4,5,6,4,6,6], //"Crab",
-[0,7,7,1,0,0,2,6,6,4,1,2,4,5,2], //"Asymmetry",
-[0,7,7,1,1,1,2,5,1], //"Eyes",
-[0,7,7,1,1,1,2,5,1,4,2,3,4,3,3,4,4,3], //"Raise",
-[0,7,7,1,2,2,2,4,2,4,3,2,4,2,3,4,4,3,4,2,6,4,4,6], //"Horseshoe",
-[0,7,7,1,2,2,2,4,2,4,2,4,4,3,4,4,4,4], //"Face",
-[0,7,7,1,1,1,2,5,1,4,1,3,4,2,3,4,3,3,4,4,3,4,5,3], //"Teeth",
-[0,7,7,1,1,1,2,5,1,4,1,4,4,5,4,4,1,5,4,2,5,4,3,5,4,4,5,4,5,5], //"Smile",
-[0,7,7,1,1,2,2,5,2,4,1,1,4,5,1,4,1,5,4,5,5], //"Mask",
-[0,7,7,1,3,2,2,2,3,4,2,0,4,0,2,4,2,2], //"Scissor",
-[0,7,7,1,6,4,2,4,6,4,3,0,4,3,2,4,4,2,4,0,3,4,2,3,4,3,3,4,4,3,4,2,4,4,3,4,4,4,4], //"Turtle",
-[0,7,7,1,2,1,2,1,2,4,2,2,4,4,2,4,2,4,4,4,4], //"Cross",
-[0,7,7,1,1,1,2,5,5,4,3,1,4,3,2,4,1,3,4,2,3,4,3,3], //"Sling",
-[0,7,7,3,1,5,4,1,3,4,3,5], //"Unite",
-[0,7,7,1,1,5,2,5,1,4,2,1,4,1,2,4,2,2], //"Balance",
-[0,7,7,3,3,2,4,3,4], //"Jump",
-[0,7,7,3,3,3,4,3,4], //"Ignition",
-[0,7,7,1,1,1,2,5,1,4,1,2,4,2,2,4,4,2,4,5,2,4,2,4,4,4,4], //"Duel",
-[0,7,7,1,2,3,2,4,3,4,1,1,4,2,1,4,3,1,4,1,2,4,2,2,4,1,3], //"Salute",
-[0,7,7,1,2,0,2,6,4,4,3,0,4,4,0,4,5,0,4,6,0,4,4,1,4,5,1,4,6,1,4,5,2,4,6,2,4,6,3], //"Stairs",
-[0,7,7,1,2,2,2,4,2,4,0,0,4,6,0,4,0,1,4,2,1,4,4,1,4,6,1,4,0,2,4,6,2,4,0,3,4,2,3,4,4,3,4,6,3,4,0,4,4,2,4,4,4,4,4,6,4,4,0,5,4,6,5,4,0,6,4,6,6], //"River",
-[0,7,7,3,0,6,4,3,0,4,1,1,4,5,1,4,0,3,4,2,3,4,4,3,4,6,3,4,1,5,4,3,5,4,5,5,4,3,6], //"Firework",
-[0,7,7,3,3,3,4,2,0,4,3,0,4,4,0,4,2,1,4,4,1,4,4,2,4,3,5], //"Question",
-[0,7,7,3,2,3,4,0,0,4,1,0,4,2,0,4,3,0,4,0,1,4,1,1,4,0,2,4,0,3,4,0,4,4,0,5,4,1,5,4,0,6,4,1,6,4,2,6,4,3,6], //"Crescent",
-[0,7,7,1,1,2,2,2,1,4,1,1,4,4,1,4,5,1,4,1,4,4,1,5,4,5,5], //"Umbrella",
-[0,7,7,1,3,2,2,3,0,4,0,0,4,1,0,4,2,0,4,4,0,4,5,0,4,6,0,4,1,2,4,5,2,4,1,5,4,5,5], //"Throne",
-[0,7,7,1,2,2,2,4,2,4,1,1,4,5,1,4,2,3,4,4,3], //"Fountain",
-[0,7,7,1,2,3,2,4,3,4,3,1], //"Triangle",
-[0,7,7,1,2,5,2,4,5,4,1,4,4,5,4,4,1,5,4,5,5], //"Devil",
-[0,7,7,1,1,4,2,2,5,4,3,1,4,5,1,4,3,3,4,0,5,4,1,5,4,0,6,4,1,6], //"Meteorite",
-[0,7,7,1,1,4,2,5,4,4,2,3,4,3,3,4,4,3], //"Sunset",
-[0,7,7,1,1,2,2,3,2,4,5,1,4,5,2,4,5,3], //"Password",
-[0,7,7,1,1,5,2,5,5,4,1,1,4,2,1,4,3,1,4,4,1,4,5,1,4,1,2,4,5,2,4,1,3,4,5,3], //"Bridge",
-[0,7,7,3,3,2,4,3,0], //"Drop",
-[0,7,7,1,1,5,2,3,5,4,5,0,4,6,0,4,6,1,4,0,5,4,0,6], //"Trick",
-[0,7,7,1,2,4,2,4,4,4,0,0,4,1,0,4,4,0,4,5,0,4,6,0,4,0,1,4,5,1,4,6,1,4,6,2], //"Mountain",
-[0,7,7,1,2,2,2,4,2,4,3,4,4,2,5,4,3,5,4,4,5], //"Boss",
+// Data and settings.
+const dots = [ // Dotted design pixels.
+	[0,7,7, 9,3,3],
+	[0,7,7, 9,1,5, 9,5,1],
+	[0,7,7, 9,3,3, 9,1,5, 9,5,1],
+	[0,7,7, 9,1,1, 9,1,5, 9,5,1, 9,5,5],
+	[0,7,7, 9,3,3, 9,1,1, 9,1,5, 9,5,1, 9,5,5],
+	[0,7,7, 9,1,1, 9,1,3, 9,1,5, 9,5,1, 9,5,3, 9,5,5],
 ];
-
-// Color data.
-const colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23];
+var colors = [255,255,255, 0,0,0]; // Colors.
+const kcents = [-1.0,
+	-0.9,-0.7,-0.5, -0.4,-0.2, 0.0, 0.2, // 1:Do,2:Re,3:Mi, 4:Fa,5:So,6:La,7:Ti
+	 0.3, 0.5, 0.7,  0.8, 1.0, 1.2, 1.4,
+	 1.5, 1.7, 1.9,  2.0, 2.2];
 
 // Global variables.
-var level = 1; // Playing level.
-var maxlevel = 1; // Cleared level.
-var playing = 0; // Playing count.
-var blocking = -1; // Blocking count.
-const maxsize = 20; // Max field size.
-var width = 7, height = 7; // Field size.
-var grid = 24, margin = 2, primary = 0;
-var pixels = [[],[],[],[],[],[],[]];
-var players = [[], []];
+var count = 1; // Count of dice.
+var maximum = 6; // Maximum of dice faces.
+var playing = 0; // Rolling count.
+var result = 0; // Result.
 
 // Action button.
 async function appAction() {
-	picoResetParams();
-
-	// Share cleared level.
-	if (level >= 1 && level < levels.length) {
-		let password = picoRandom(1000000, level);
-		picoSetStrings("" + level + "@" + password, 0);
-		return 1; // Return 1 to share.
-
-	// Share or edit custom level.
-	} else {
-		picoSetCode6(levels[level], 0);
-		if (blocking == 0) {
-			await picoSwitch(); // Share or back.
-		} else {
-			picoSetCode8(colors, 1);
-			await picoSwitch("edit.js"); // Open editor.
-		}
-	}
 }
 
 // Select button.
 async function appSelect(x) {
-
-	// Change level.
-	if (x) {
-		if (level + x <= maxlevel && level + x >= 0) {
-			level = level + x < levels.length ? level + x : 0;
-			blocking = -1;
-			playing = -1; // Restart.
-			picoBeep(1.2, 0.1);
-
-			// Update select button.
-			picoLabel("select", "" + level);
-
-		} else {
-			picoBeep(0, 0.1);
-		}
-
-	// Restart level.
-	} else {
-		blocking = -1;
-		playing = -1; // Restart.
-		picoBeep(1.2, 0.1);
-	}
-
-	// Update edit button.
-	if (level == 0) {
-		picoLabel("action", "*");
-	} else {
-		picoLabel("action");
-	}
 }
 
 // Load.
 async function appLoad() {
-
-	// Load query params.
-	let value = picoStrings();
-	if (value) {
-
-		// Load extra level.
-		if (value[0] == "0") {
-			levels[0] = picoCode6();
-			level = 0;
-			picoLabel("action", "*");
-
-		// Load playing level.
-		} else {
-			let numbers = picoNumbers();
-			if (numbers[0] >= 0 && numbers[0] < levels.length &&
-			picoRandom(1000000, numbers[0]) == numbers[1]) {
-				maxlevel = numbers[0] + 1;
-				level = numbers[0];
-			}
-		}
-	}
-
-	// Update select button.
-	picoLabel("select", "" + level);
-
-	// Load pallete data.
-	picoColor(colors);
 }
+
+var posx = [], posy = []; // Rolling position.
+var angle = 0; // Rolling angle.
+var scale = 0; // Rolling scale.
+var randoms = []; // Result number.
+var number = 0; // Rolled number.
 
 // Main.
 async function appMain() {
@@ -160,151 +45,98 @@ async function appMain() {
 	// Initialize.
 	if (playing <= 0) {
 
-		// Init level data.
-		width = 7, height = 7;
-		pixels = [[],[],[],[],[],[],[]];
-		players = [[], []];
-		if (levels[level]) {
-			for (let k = 0; k < levels[level].length / 3; k++) {
-				let w = levels[level][k * 3];
-				let x = levels[level][k * 3 + 1];
-				let y = levels[level][k * 3 + 2];
-				if (w == 0) {
-					width = x >= 0 && x <= maxsize ? x : 7;
-					height = y >= 0 && y <= maxsize ? y : 7;
-					grid = 168 / width;
-					margin = width <= 9 ? 2 : 1;
-					players = [[0, 0], [width - 1, height - 1]];
-					for (let j = 0; j < height; j++) {
-						pixels[j] = [];
-						for (let i = 0; i < width; i++) {
-							pixels[j][i] = 0;
-						}
-					}
-					blocking = width * height;
-				} else if (w >= 1 && w <= 4 && x >= 0 && x < width && y >= 0 && y < height) {
-					if (w >= 1 && w <= 2) {
-						if (pixels[players[w - 1][1]][players[w - 1][0]] >= 3) {
-							pixels[players[w - 1][1]][players[w - 1][0]] -= w;
-						} else {
-							pixels[players[w - 1][1]][players[w - 1][0]] = 0;
-						}
-						players[w - 1] = [x, y];
-					} else if (w == 3) {
-						pixels[players[0][1]][players[0][0]] = 0;
-						pixels[players[1][1]][players[1][0]] = 0;
-						players[0] = [x, y];
-						players[1] = [x, y];
-					}
-					pixels[y][x] = w;
-					blocking -= 1;
-				}
+		// Sprite lines and rows.
+		const colMax = 5;//picoSqrt(count - 1) + 1;
+		let row = picoDiv(count - 1, colMax) + 1; // Row count.
+		let col = picoDiv(count - 1, row) + 1; // Column count.
+		let colMod = picoMod(count - 1, col) + 1; // Extra column count.
+
+		const size = 200;
+		for (let i = 0; i < count; i++) {
+			let x = picoMod(i, col) + 1, y = picoDiv(i, col) + 1;
+			if (y < row) {
+				posx[i] = (x / (col + 1) - 0.5) * size;
+				posy[i] = (y / (row + 1) - 0.5) * size;
+			} else {
+				posx[i] = (x / (colMod + 1) - 0.5) * size;
+				posy[i] = (y / (row + 1) - 0.5) * size;
 			}
+			//console.log("" + x + "," + y + " -> " + posx[i] + "," + posy[i]);
 		}
+
+		// Sprite scale.
+		let c0 = count < 1 ? 1 : count < col ? count : row >= col ? row : col;
+		scale = 20 / (c0 + 1);
+
+		// Rolling dice.
+		result = 0;
 
 		// Reset playing count.
 		playing = 1;
 	}
 
-	// Move player.
-	for (let j = 0; j < height; j++) {
-		let y = (j - (height - 1) / 2) * grid;
-		for (let i = 0; i < width; i++) {
-			let x = (i - (width - 1) / 2) * grid;
+	// Update rolling dice.
+	if (result > 0) {
 
-			// Touch blank cell to move player.
-			if (pixels[j][i] == 0) {
-				if (picoMotion(x, y, grid/2)) {
-					// Check cell next to player.
-					let next = [false, false];
-					for (let k = 0; k < 2; k++) {
-						let dx = i - players[k][0], dy = j - players[k][1];
-						if (dx * dy == 0 && (dx + dy == -1 || dx + dy == 1)) {
-							next[k] = true;
-						}
-					}
-					// Check facing cell between 2 players.
-					let dx = players[0][0] - players[1][0], dy = players[0][1] - players[1][1];
-					let next2 = dx * dy == 0 && (dx + dy == 2 || dx + dy == -2) ? true : false;
-					// P1 and P2 move into same cell.
-					if (next[0] && next[1] && next2) {
-						pixels[j][i] = 3;
-						players[0] = players[1] = [i, j];
-						blocking -= 1;
-					} else {
-						// Move primary player first.
-						for (let k = 0; k < 2; k++) {
-							let k1 = primary == 0 ? k : k ? 0 : 1, k2 = k1 ? 0 : 1;
-							// Player A moves forward and another player B moves backward.
-							if (next[k1]) {
-								pixels[j][i] = k1 == 0 ? 1 : 2;
-								let i2 = players[k2][0] + players[k1][0] - i;
-								let j2 = players[k2][1] + players[k1][1] - j;
-								if (i2 >= 0 && i2 < width && j2 >= 0 && j2 < height) {
-									if (pixels[j2][i2] == 0) {
-										pixels[j2][i2] = k2 == 0 ? 1 : 2;
-										players[k2] = [i2, j2];
-										blocking -= 1;
-									}
-								}
-								players[k1] = [i, j];
-								blocking -= 1;
-								break; // Only one player moves forward.
-							}
-						}
-					}
-				}
+		// Restart to roll dice.
+		if (picoMotion()) {
+			result = 0;
+			playing = -1;
+		}
 
-				// Clear level.
-				if (blocking == 0) {
-					players = [[], []];
-					maxlevel = level + 1;
-					picoBeep(1.2, 0.1);
-					picoBeep(1.2, 0.1, 0.2);
+	} else {
 
-					// Update action button to share.
-					picoLabel("action", "^");
-				}
+		// Hold to playing dice.
+		if (picoMotion()) {
+			playing = 1;
+
+		// Timeout and show result.
+		} else if (playing > 60) {
+			result = picoSeed(); // Set result seed.
+			for (let i = 0; i < count; i++) {
+				randoms[i] = picoRandom(maximum);
+			}
+			angle = 0;
+			playing = 1;
+			number++;
+
+			// Number matched beeps on show result.
+			const timing = count <= 2 ? 0.2 : 0.5/count;
+			for (let i = 0; i < count; i++) {
+				let k = randoms[i] < 10 ? randoms[i] : randoms[i] - 10;
+				let j = k >= 0 && k < kcents.length ? k : 0;
+				picoBeep(kcents[j], timing/2, timing * i);
 			}
 		}
 	}
 
-	// Draw player.
-	for (let j = 0; j < height; j++) {
-		let y = (j - (height - 1) / 2) * grid;
-		for (let i = 0; i < width; i++) {
-			let x = (i - (width - 1) / 2) * grid;
-			let expand = false;
-
-			// Touch color cell to update primary player.
-			if (pixels[j][i] != 0) {
-				if (picoMotion(x, y, (grid+margin)/2)) {
-					if (pixels[j][i] == 1) {
-						primary = 0;
-					} else if (pixels[j][i] == 2) {
-						primary = 1;
-					}
-
-				// Set scale for touching or not touching player.
-				} else {
-					for (let k = 0; k < 2; k++) {
-						if (i == players[k][0] && j == players[k][1]) {
-							expand = true;
-							break;
-						}
-					}
-				}
-			}
-
-			// Draw cell.
-			if (expand) {
-				picoPixel(pixels[j][i], x, y, (grid+margin)/2, (grid+margin)/2);
-			} else {
-				picoPixel(pixels[j][i], x, y, (grid-margin)/2-1, (grid-margin)/2-1);
-			}
+	// Update angle.
+	if (result <= 0) {
+		angle = picoMod(angle + 20, 360);
+		for (let i = 0; i < count; i++) {
+			randoms[i] = picoMod(picoTime(), maximum);
 		}
+	}
+
+	// Clear screen.
+	picoClear();
+
+	// Draw number sprite.
+	let n = result <= 0 ? number : number - 1;
+	picoChar(n, 0, 0, -80);
+
+	let s = playing < 5 ? scale * (0.8 + 0.04 * playing) : scale;
+
+	picoColor(colors);
+	for (let i = 0; i < count; i++) {
+		picoSprite(dots[randoms[i]], 0, posx[i], posy[i], angle, s);
+	}
+
+	// Update animation if rolling.
+	if (result == 0 || playing < 5) {
+		picoFlush();
 	}
 
 	// Increment playing count.
 	playing++;
-}
+};

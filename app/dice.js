@@ -1,5 +1,7 @@
 picoTitle("Dice"); // Title.
 
+// Data and settings.
+const editjs = "app/edit.js"; // Editor script.
 const dots = [ // Dotted design pixels.
 	[0,7,7, 9,3,3],
 	[0,7,7, 9,1,5, 9,5,1],
@@ -34,6 +36,8 @@ const nums = [ // Numbered design pixels.
 	[0,7,7, 9,1,1,0,0,4, 9,3,1,0,2,0, 9,3,1,0,0,2, 9,5,1,0,0,4, 9,3,3,0,2,0, 9,3,5,0,2,0], // 19
 	[0,7,7, 9,0,1,0,2,0, 9,2,1,0,0,2, 9,0,3,0,2,0, 9,0,3,0,0,2, 9,0,5,0,2,0, 9,4,1,0,1,0, 9,4,1,0,0,4, 9,6,1,0,0,4, 9,4,5,0,2,0], // 20
 ];
+
+// Global variables.
 var colors = [255,255,255, 0,0,0]; // Original design colors.
 var pixels = []; // Original design pixels.
 var count = 1; // Count of dice.
@@ -70,6 +74,8 @@ async function appUpdate() {
 	} else {
 		picoLabel("select", "?");
 	}
+	picoLabel("minus", "-");
+	picoLabel("plus", "+");
 }
 
 // Action button.
@@ -101,7 +107,7 @@ async function appAction() {
 		}
 
 		// Enter to edit mode.
-		await picoSwitch("edit.js"); // Open editor.
+		await picoSwitch(editjs); // Open editor.
 
 	// Start sharing.
 	} else if (result > 0) {

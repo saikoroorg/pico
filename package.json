@@ -5,7 +5,7 @@
   "scripts": {
     "install": "",
     "update": "",
-    "build": "cat src/api.js src/image.js src/sound.js src/param.js src/touch.js > ./pico.js",
+    "build": "cat src/version.js src/image.js src/sound.js src/param.js src/touch.js > ./pico.js",
     "rebuild": "npm run clean && npm run build",
     "clean": "",
     "clobber": "rm -rf node_modules && rm -rf package-lock.json"
