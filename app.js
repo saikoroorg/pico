@@ -16,57 +16,45 @@ const kcents = [-1.0,
 	 1.5, 1.7, 1.9,  2.0, 2.2];
 
 // Global variables.
-var count = 1; // Count of dice.
+var count = 3; // Count of dice.
 var maximum = 6; // Maximum of dice faces.
 var playing = 0; // Rolling count.
 var result = 0; // Result.
-
-// Action button.
-async function appAction() {
-}
-
-// Select button.
-async function appSelect(x) {
-}
-
-// Load.
-async function appLoad() {
-}
-
 var posx = [], posy = []; // Rolling position.
 var angle = 0; // Rolling angle.
-var scale = 0; // Rolling scale.
+var scale = 1; // Rolling scale.
 var randoms = []; // Result number.
 var number = 0; // Rolled number.
+
+// Resize.
+async function appResize() {
+
+	// Set sprite lines and rows.
+	let wide = picoWidescreen();
+	const size = 200;
+	for (let i = 0; i < count; i++) {
+		if (wide) {
+			posx[i] = (i - count/2 + 0.5) / count * size;
+			posy[i] = 0;
+		} else {
+			posx[i] = 0;
+			posy[i] = (i - count/2 + 0.5) / count * size;
+		}
+		//console.log("" + wide + ":" + posx[i] + "," + posy[i]);
+	}
+
+	picoFlush();
+}
 
 // Main.
 async function appMain() {
 
 	// Initialize.
 	if (playing <= 0) {
-
-		// Sprite lines and rows.
-		const colMax = 5;//picoSqrt(count - 1) + 1;
-		let row = picoDiv(count - 1, colMax) + 1; // Row count.
-		let col = picoDiv(count - 1, row) + 1; // Column count.
-		let colMod = picoMod(count - 1, col) + 1; // Extra column count.
-
-		const size = 200;
-		for (let i = 0; i < count; i++) {
-			let x = picoMod(i, col) + 1, y = picoDiv(i, col) + 1;
-			if (y < row) {
-				posx[i] = (x / (col + 1) - 0.5) * size;
-				posy[i] = (y / (row + 1) - 0.5) * size;
-			} else {
-				posx[i] = (x / (colMod + 1) - 0.5) * size;
-				posy[i] = (y / (row + 1) - 0.5) * size;
-			}
-			//console.log("" + x + "," + y + " -> " + posx[i] + "," + posy[i]);
-		}
+		appResize();
 
 		// Sprite scale.
-		let c0 = count < 1 ? 1 : count < col ? count : row >= col ? row : col;
-		scale = 20 / (c0 + 1);
+		scale = 20 / (count + 1);
 
 		// Rolling dice.
 		result = 0;

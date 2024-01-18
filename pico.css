@@ -37,6 +37,9 @@ a {
 #screen {
 	aspect-ratio: 1;
 }
+#widescreen {
+	aspect-ratio: 1;
+}
 .offscreen {
 	display: none;
 }
@@ -149,13 +152,19 @@ a {
 		}
 	}
 }
-@media (orientation: landscape) {
+@media (max-aspect-ratio: 0.8) {
 	#screen {
+		width: 100%;
+	}
+	#widescreen {
 		height: 100%;
 	}
 }
-@media (orientation: portrait) {
+@media (min-aspect-ratio: 0.8) {
 	#screen {
+		height: 100%;
+	}
+	#widescreen {
 		width: 100%;
 	}
 }

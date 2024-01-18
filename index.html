@@ -63,6 +63,11 @@ function picoWakelock() {
 	pico.app.wakelock();
 }
 
+// Enable wide screen and return true if landscape mode.
+function picoWidescreen(enable=true) {
+	return pico.app.widescreen(enable);
+}
+
 //************************************************************/
 
 // Namespace.
@@ -254,6 +259,17 @@ pico.App = class {
 		} catch (error) {
 			console.error(error.name, error.message);
 		}
+	}
+
+	// Enable wide screen and return true if landscape mode.
+	widescreen(enable) {
+		let e = document.getElementById(enable ? "screen" : "widescreen");
+		if (e) {
+			e.id = enable ? "widescreen" : "screen";
+		}
+
+		// True if landscape mode.
+		return window.matchMedia("(min-aspect-ratio: 0.8)").matches;
 	}
 }
 
