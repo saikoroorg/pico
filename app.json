@@ -17,5 +17,5 @@
 	}],
 	"display": "standalone",
 	"start_url": "./?v=1",
-	"contents": ["./", "./pico.css", "./pico.js", "./picod.js", "./app.js"]
+	"contents": ["./", "./pico.css", "./pico.js", "./app.js", "./index.js"]
 }

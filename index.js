@@ -8,7 +8,7 @@ var pico = pico || {};
 // Worker class.
 pico.Worker = class {
 	static debug = true; // Debug print.
-	static script = "./picod.js"; // This script file.
+	static script = "./index.js"; // This script file.
 	static manifest = "./app.json"; // Manifest file.
 
 	//*----------------------------------------------------------*/
@@ -18,6 +18,61 @@ pico.Worker = class {
 		this.replacing = {}; // Replacing table by manifest json.
 		this.cacheKey = null; // Cache key.
 		this.cacheName = null; // Cache key without version.
+
+		// Script for worker.
+		if (self && self.registration) {
+			self.addEventListener("install", (event) => {
+				this.onInstall(event);
+			}); // Install.
+			self.addEventListener("activate", (event) => {
+				this.onActivate(event);
+			}); // Activate.
+			self.addEventListener("fetch", (event) => {
+				this.onFetch(event);
+			}); // Fetch.
+
+		// Script for client to register worker.
+		} else {
+			window.addEventListener("load", async () => {
+				await this.onLoad()
+			}); // Load.
+		}
+	}
+
+	// On installing worker event.
+	onInstall(event) {
+		this._debug("Install worker: " + pico.Worker.script);
+		event.waitUntil(this.install());
+	}
+
+	// On activating worker event.
+	onActivate(event) {
+		this._debug("Activate worker: " + pico.Worker.script);
+		event.waitUntil(this.activate());
+	}
+
+	// On fetching network request event.
+	onFetch(event) {
+		this._debug("Fetch by worker: " + event.request.url);
+		event.respondWith(this.fetch(event.request.url));
+	}
+
+	// On load event.
+	async onLoad() {
+		try {
+
+			// Register worker.
+			if (pico.Worker.script) {
+				if (navigator.serviceWorker) {
+					console.log("Register worker: " + pico.Worker.script);
+					await navigator.serviceWorker.register(pico.Worker.script);
+				} else {
+					console.log("No worker.");
+				}
+			}
+		} catch (error) {
+			console.error(error.name, error.message);
+		}
 	}
 
 	// Debug print.
@@ -406,55 +461,3 @@ pico.Worker = class {
 
 // Master worker.
 pico.worker = new pico.Worker();
-
-// Script for client to register worker.
-if (!self || !self.registration) {
-	try {
-
-		// Register worker.
-		if (pico.Worker.script) {
-			if (navigator.serviceWorker) {
-				pico.worker._debug("Register worker: " + pico.Worker.script);
-				(async()=>{
-					await navigator.serviceWorker.register(pico.Worker.script);
-				})();
-			} else {
-				pico.worker._debug("No worker.");
-			}
-		}
-
-		// Wake lock.
-		// Not work on iOS 16 PWA.
-		// https://bugs.webkit.org/show_bug.cgi?id=254545
-		if (navigator.wakeLock) {
-			pico.worker._debug("Request wake lock.");
-			navigator.wakeLock.request("screen");
-		} else {
-			pico.worker._debug("No wake lock.");
-		}
-
-	} catch (error) {
-		console.error(error.name, error.message);
-	}
-
-// Script for worker.
-} else {
-
-	// Event on installing worker.
-	self.addEventListener("install", (event) => {
-		pico.worker._debug("Install worker: " + pico.Worker.script);
-		event.waitUntil(pico.worker.install());
-	});
-
-	// Event on activating worker.
-	self.addEventListener("activate", (event) => {
-		pico.worker._debug("Activate worker: " + pico.Worker.script);
-		event.waitUntil(pico.worker.activate());
-	});
-
-	// Event on fetching network request.
-	self.addEventListener("fetch", (event) => {
-		pico.worker._debug("Fetch by worker: " + event.request.url);
-		event.respondWith(pico.worker.fetch(event.request.url));
-	});
-}
