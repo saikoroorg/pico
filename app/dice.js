@@ -218,10 +218,11 @@ var angle = 0; // Rolling angle.
 var scale = 0; // Rolling scale.
 var randoms = []; // Result number.
 var number = 0; // Rolled number.
+var landscape = false; // landscape mode.
 
 // Resize.
 async function appResize() {
-	let wide = picoWidescreen();
+	landscape = picoWidescreen();
 
 	// Set sprite lines and rows.
 	const colMax = 5;//picoSqrt(count - 1) + 1;
@@ -232,7 +233,7 @@ async function appResize() {
 	const width = 200, height = 150;
 	for (let i = 0; i < count; i++) {
 		let x = picoMod(i, col) + 1, y = picoDiv(i, col) + 1;
-		if (wide) {
+		if (landscape) {
 			if (y < row) {
 				posx[i] = (x / (col + 1) - 0.5) * width;
 				posy[i] = (y / (row + 1) - 0.5) * height;
@@ -395,7 +396,7 @@ async function appMain() {
 
 		// Draw number sprite.
 		let n = result <= 0 ? number : number - 1;
-		picoChar(n, 0, 0, -80);
+		picoChar(n, 0, 0, landscape ? -40 : -80);
 
 		let s = playing < 5 ? scale * (0.8 + 0.04 * playing) : scale;
 
