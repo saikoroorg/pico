@@ -219,34 +219,52 @@ var scale = 0; // Rolling scale.
 var randoms = []; // Result number.
 var number = 0; // Rolled number.
 
+// Resize.
+async function appResize() {
+	let wide = picoWidescreen();
+
+	// Set sprite lines and rows.
+	const colMax = 5;//picoSqrt(count - 1) + 1;
+	let row = picoDiv(count - 1, colMax) + 1; // Row count.
+	let col = picoDiv(count - 1, row) + 1; // Column count.
+	let colMod = picoMod(count - 1, col) + 1; // Extra column count.
+
+	const width = 200, height = 150;
+	for (let i = 0; i < count; i++) {
+		let x = picoMod(i, col) + 1, y = picoDiv(i, col) + 1;
+		if (wide) {
+			if (y < row) {
+				posx[i] = (x / (col + 1) - 0.5) * width;
+				posy[i] = (y / (row + 1) - 0.5) * height;
+			} else {
+				posx[i] = (x / (colMod + 1) - 0.5) * width;
+				posy[i] = (y / (row + 1) - 0.5) * height;
+			}
+		} else {
+			if (y < row) {
+				posy[i] = (x / (col + 1) - 0.5) * width;
+				posx[i] = (y / (row + 1) - 0.5) * height;
+			} else {
+				posy[i] = (x / (colMod + 1) - 0.5) * width;
+				posx[i] = (y / (row + 1) - 0.5) * height;
+			}
+		}
+		//console.log("" + x + "," + y + " -> " + posx[i] + "," + posy[i]);
+	}
+
+	// Sprite scale.
+	let c0 = count < 1 ? 1 : count < col ? count : row >= col ? row : col;
+	scale = 20 / (c0 + 1);
+
+	picoFlush();
+}
+
 // Main.
 async function appMain() {
 
 	// Initialize.
 	if (playing <= 0) {
-
-		// Sprite lines and rows.
-		const colMax = 5;//picoSqrt(count - 1) + 1;
-		let row = picoDiv(count - 1, colMax) + 1; // Row count.
-		let col = picoDiv(count - 1, row) + 1; // Column count.
-		let colMod = picoMod(count - 1, col) + 1; // Extra column count.
-
-		const size = 200;
-		for (let i = 0; i < count; i++) {
-			let x = picoMod(i, col) + 1, y = picoDiv(i, col) + 1;
-			if (y < row) {
-				posx[i] = (x / (col + 1) - 0.5) * size;
-				posy[i] = (y / (row + 1) - 0.5) * size;
-			} else {
-				posx[i] = (x / (colMod + 1) - 0.5) * size;
-				posy[i] = (y / (row + 1) - 0.5) * size;
-			}
-			//console.log("" + x + "," + y + " -> " + posx[i] + "," + posy[i]);
-		}
-
-		// Sprite scale.
-		let c0 = count < 1 ? 1 : count < col ? count : row >= col ? row : col;
-		scale = 20 / (c0 + 1);
+		appResize();
 
 		// Rolling dice.
 		result = 0;
