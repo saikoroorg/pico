@@ -33,8 +33,8 @@
 	<g stroke="none" fill="#bfbfbf" transform="translate(9,9)">
 		<path d="M-8,-8h18v18h-18Z" fill="#fff"/>
 
-		<path d="M -2, -2h2v2h-2Z" fill="#0073ef"/>
-		<path d="M  2, -2h2v2h-2Z" fill="#e7005b"/>
+		<path d="M -2, -2h2v2h-2Z" fill="#e7005b"/>
+		<path d="M  2, -2h2v2h-2Z" fill="#0073ef"/>
 		<path d="M -2,  2h2v2h-2Z M  0,  2h2v2h-2Z M  2,  2h2v2h-2Z" fill="#003f17"/>
 
 		<path d="M -4, -6h2v2h-2Z M  0, -6h2v2h-2Z M  4, -6h2v2h-2Z"/>
@@ -54,8 +54,8 @@
 	<g stroke="none" fill="#bfbfbf" transform="translate(7,7)">
 		<path d="M-7,-7h16v16h-16Z" fill="#fff"/>
 
-		<path d="M -2, -2h2v2h-2Z" fill="#0073ef"/>
-		<path d="M  2, -2h2v2h-2Z" fill="#e7005b"/>
+		<path d="M -2, -2h2v2h-2Z" fill="#e7005b"/>
+		<path d="M  2, -2h2v2h-2Z" fill="#0073ef"/>
 		<path d="M -2,  2h2v2h-2Z M  0,  2h2v2h-2Z M  2,  2h2v2h-2Z" fill="#003f17"/>
 
 		<path d="M -4, -6h2v2h-2Z M  0, -6h2v2h-2Z M  4, -6h2v2h-2Z"/>
