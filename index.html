@@ -58,9 +58,20 @@ async function picoSwitch(script=null) {
 	await pico.app.switchScript(script);
 }
 
+// Share screen image.
+async function picoShareScreen() {
+	let file = await pico.image._file();
+	await picoShare(null, file);
+}
+
 // Enable wake lock.
 function picoWakelock() {
 	pico.app.wakelock();
+}
+
+// Enable wide screen and return true if landscape mode.
+function picoWidescreen(enable=true) {
+	return pico.app.widescreen(enable);
 }
 
 // Enable wide screen and return true if landscape mode.

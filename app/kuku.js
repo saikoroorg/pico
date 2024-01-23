@@ -44,6 +44,12 @@ async function appSelect(x) {
 	picoBeep(1.2, 0.1);
 }
 
+// Action button.
+async function appAction() {
+	picoResetParams();
+	await picoShareScreen();
+}
+
 // Load.
 async function appLoad() {
 
@@ -58,6 +64,17 @@ async function appLoad() {
 
 // Title loop.
 async function appTitle() {
+
+	// Initialize.
+	if (playing <= 0) {
+
+		// Disable share button.
+		picoLabel("action");
+
+		// Reset playing count.
+		playing = 1;
+	}
+
 	await picoClear();
 
 	// Draw probrem sample.
@@ -304,6 +321,9 @@ async function appResult() {
 		let f = picoMod(t, 100); // Fractional part.
 		let i = picoDiv(t, 100); // Integer part.
 		totalTime = "" + i + "." + (f < 10 ? "0" : "") + f;
+
+		// Enable share button.
+		picoLabel("action", "^");
 
 		// Reset playing count.
 		playing = 1;
