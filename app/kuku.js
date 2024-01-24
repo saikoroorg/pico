@@ -23,7 +23,7 @@ var operator = "*";
 var answer = 0;
 var correct = 0;
 var choices = [0, 0, 0];
-var choose = 0;
+var choose = -1;
 var angle = 0;
 var scale = 8, scale2 = 24;
 var startTime = 0;
@@ -217,6 +217,13 @@ async function appProbrem() {
 		choose = -1;
 	}
 
+	// Roll and update animation.
+	if (playing <= 36) {
+		angle = (angle + 20) % 360;
+		picoFlush();
+		playing++;
+	}
+
 	await picoClear();
 
 	// Draw number.
@@ -229,24 +236,15 @@ async function appProbrem() {
 	for (let i = 0; i < 3; i++) {
 		let x = (i-1)*60, y = 35;
 		let s = picoMotion(x, y, scale2, scale2) ? 0.8 : 1;
+
+		// Choose answer.
 		if (picoAction(x, y, scale2, scale2)) {
 			choose = i;
+			state = "answer";
+			playing = 0;
 		}
 		await picoRect([-1,-1,2,2], 3, x,y, angle,scale2 * s);
 		await picoChar("" + choices[i], 0, x,y, 0,scale * s);
-	}
-
-	// Roll and update animation.
-	if (playing <= 36) {
-		angle = (angle + 20) % 360;
-		picoFlush();
-		playing++;
-	}
-
-	// Wait for answer.
-	if (choose >= 0) {
-		state = "answer";
-		playing = 0;
 	}
 }
 
@@ -257,12 +255,11 @@ async function appAnswer() {
 	if (playing <= 0) {
 
 		// Correct sound.
-		if (choose >= 0 && choose == correct) {
+		if (choose == correct) {
 			picoBeep(kcents[number - 1], 0.1);
-			number++; // Go next probrem.
 
 		// Wrong sound.
-		} else if (choose >= 0 && choose != correct) {
+		} else {
 			picoBeep(-1.2, 0.1);
 		}
 
@@ -280,7 +277,7 @@ async function appAnswer() {
 	await picoChar("" + probrem1 + operator + probrem2, -1, 0,-50, 0,scale);
 
 	// Draw choose answer.
-	if (choose >= 0 && choose != correct) {
+	if (choose != correct) {
 		let i = choose;
 		let x = (i-1)*60, y = 35;
 		await picoChar("*", -1, x,y, 0,scale);
@@ -291,20 +288,26 @@ async function appAnswer() {
 	let x = (i-1)*60, y = 35;
 	let s = picoMotion(x, y, scale2, scale2) ? 0.8 : 1;
 	if (picoAction(x, y, scale2, scale2)) {
-		choose = -1;
-	}
-	await picoRect([-1,-1,2,2], 0, x,y, 0,scale2 * s);
-	await picoChar("" + choices[i], -1, x,y, 0,scale * s);
 
-	// Go next probrem or show result.
-	if (choose < 0) {
-		if (number > numberMax) {
-			state = "result";
+		// Go next probrem or show result.
+		if (choose == correct) {
+			number++;
+			if (number > numberMax) {
+				state = "result";
+			} else {
+				state = "probrem";
+			}
+
+		// Retry this probrem.
 		} else {
 			state = "probrem";
 		}
+
+		choose = -1;
 		playing = 0;
 	}
+	await picoRect([-1,-1,2,2], 0, x,y, 0,scale2 * s);
+	await picoChar("" + choices[i], -1, x,y, 0,scale * s);
 }
 
 // Result loop.
