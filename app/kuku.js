@@ -1,5 +1,5 @@
 picoTitle("Kuku"); // Title.
-picoWatermark("xxxxxxx.xxx/kuku", 2); // Watermark.
+picoBackground("saikoro.org/kuku", [223,223,223, 255,255,255]); // Watermark.
 
 // Data and settings.
 var colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // 5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000
@@ -57,9 +57,6 @@ async function appLoad() {
 	picoLabel("select", "" + levels[level]);
 	picoLabel("minus", "-");
 	picoLabel("plus", "+");
-
-	// Load pallete data.
-	picoColor(colors);
 }
 
 // Title loop.
@@ -252,7 +249,7 @@ async function appAnswer() {
 
 		// Correct sound.
 		if (choose == correct) {
-			picoBeep(kcents[number - 1], 0.1);
+			picoBeep(kcents[number], 0.1);
 
 		// Wrong sound.
 		} else {
@@ -349,6 +346,8 @@ async function appResult() {
 
 // Main.
 async function appMain() {
+	picoColor(colors);
+
 	if (state == "probrem") {
 		await appProbrem();
 
