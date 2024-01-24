@@ -1,4 +1,5 @@
 picoTitle("Kuku"); // Title.
+picoWatermark("xxxxxxx.xxx/kuku", 2); // Watermark.
 
 // Data and settings.
 var colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // 5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000
@@ -73,8 +74,6 @@ async function appTitle() {
 		// Reset playing count.
 		playing = 1;
 	}
-
-	await picoClear();
 
 	// Draw probrem sample.
 	await picoChar(samples[level], -1, 0,0, 0,8);
@@ -223,8 +222,6 @@ async function appProbrem() {
 		playing++;
 	}
 
-	await picoClear();
-
 	// Draw number.
 	await picoChar("" + number + "/" + numberMax, 0, 0,-85, 0,2);
 
@@ -266,8 +263,6 @@ async function appAnswer() {
 		playing = 1;
 		angle = 0;
 	}
-
-	await picoClear();
 
 	// Draw number.
 	await picoChar("" + number + "/" + numberMax, 0, 0,-85, 0,2);
@@ -330,8 +325,6 @@ async function appResult() {
 		// Reset playing count.
 		playing = 1;
 	}
-
-	await picoClear();
 
 	// Draw probrem sample.
 	await picoChar(samples[level], -1, 0,-85, 0,2);

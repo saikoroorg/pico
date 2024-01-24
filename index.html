@@ -35,7 +35,6 @@
 	</div>
 </div>
 <h6 id="footer">
-	<div id="author"></div>/
 	<div id="version"></div>
 </h6>
 <!--script>console.log = () => {};</script!-->
@@ -53,6 +52,10 @@ function picoTitle(text=null, subtext=null) {
 	pico.app.setTitle(text, subtext);
 }
 
+// Change watermark.
+function picoWatermark(watermark=null, color=-1) {
+	pico.app.setWatermark(watermark, color);
+}
 // Switch script or share.
 async function picoSwitch(script=null) {
 	await pico.app.switchScript(script);
@@ -97,6 +100,8 @@ pico.App = class {
 		this.refer = null; // Referenced script.
 		this.title = ""; // App title.
 		this.ver = 0; // App version.
+		this.watermark = ""; // Watermark.
+		this.watercolor = -1; // Watermark color.
 
 		// Load app script.
 		let script = picoStrings("s");
@@ -167,6 +172,11 @@ pico.App = class {
 				await picoRead();
 				picoClear();
 				await appMain();
+				if (this.watermark) {
+					let x = 100 - (this.watermark.length * 2 + 1);
+					let y = 100 - 3;
+					picoChar(this.watermark, this.watercolor, x, y);
+				}
 				await picoFlip(0);
 			}
 		} catch (error) {
@@ -219,6 +229,12 @@ pico.App = class {
 		if (subtext) {
 			picoLabel("subtitle", subtext)
 		}
+	}
+
+	// Change watermark.
+	setWatermark(watermark=null, color=-1) {
+		this.watermark = watermark;
+		this.watercolor = color;
 	}
 
 	// Switch script or share.
