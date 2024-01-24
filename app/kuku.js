@@ -46,7 +46,6 @@ async function appSelect(x) {
 
 // Action button.
 async function appAction() {
-	picoResetParams();
 	await picoShareScreen();
 }
 

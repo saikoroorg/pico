@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40101";
+pico.version = "0.9.40124";
 
 /* PICO Image module */
 
@@ -1236,12 +1236,20 @@ function picoTime() {
 
 // Reload with param.
 async function picoReload(url=null) {
-	await pico.param.reload(url);
+	try {
+		await pico.param.reload(url);
+	} catch (error) {
+		console.error(error);
+	}
 }
 
 // Share params.
-async function picoShare(url=null, file=null) {
-	await pico.param.share(url, file);
+async function picoShare(url=null, files=null) {
+	try {
+		await pico.param.share(url, files);
+	} catch (error) {
+		console.error(error);
+	}
 }
 
 // Get all params by one strings.
@@ -1476,7 +1484,7 @@ pico.Param = class {
 					let query = text ? separator + text : "";
 					this._debug("Share query: " + query);
 					data.url = url + query;
-				} else {
+				} else if (!files) {
 					let query = text ? "?" + text : "";
 					this._debug("Flush query: " + query);
 					window.history.replaceState(null, "", query);
