@@ -1267,13 +1267,27 @@ pico.sound = new pico.Sound();
 function picoRandom(max, seed=0) {
 	return pico.param.random(max, seed);
 }
+
 // Random seed.
 function picoSeed() {
 	return pico.param.seed();
 }
+
 // Time.
 function picoTime() {
 	return Date.now();
+}
+
+// Date (yymmddhhmmss).
+function picoDate() {
+	let date = new Date();
+	let year = ("" + date.getYear()).slice(-2);
+	let mon = ("0" + (date.getMonth() + 1)).slice(-2);
+	let day = ("0" + date.getDate()).slice(-2);
+	let hour = ("0" + date.getHours()).slice(-2);
+	let min = ("0" + date.getMinutes()).slice(-2);
+	let sec = ("0" + date.getSeconds()).slice(-2);
+	return parseInt(year + mon + day + hour + min + sec, 10);
 }
 
 // Reload with param.
@@ -1530,7 +1544,7 @@ pico.Param = class {
 					let query = text ? "?" + text : "";
 					this._debug("Flush query: " + query);
 					window.history.replaceState(null, "", query);
-					data.url = window.location.href.replace(/[\?\#].*$/, '') + query;
+					data.url = window.location.href.replace(/[\?\#].*$/, "") + query;
 				}
 				if (files) {
 					data.files = files;

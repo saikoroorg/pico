@@ -8,6 +8,8 @@
 pico.Param.debug = true;
 
 // Calculate random numbers.
+console.log("Time: " + picoTime());
+console.log("Date: " + picoDate());
 console.log("Seed: " + picoSeed());
 console.log("Random: " + picoRandom(100));
 console.log("NewSeed: " + picoSeed());
@@ -42,6 +44,7 @@ console.log("Code6: " + picoCode6());
 console.log("Code8: " + picoCode8());
 */
 
+/*
 // Compress and expand 8bit code.
 let code = [];
 for (let i = 0; i <= 255; i++) {
@@ -83,6 +86,7 @@ for (let i = 0; i < code.length; i++) {
 		("000"+code1[i]).slice(-3) + ":" + ("00000000"+code1[i].toString(2)).slice(-8) + " -> " + 
 		("000"+code2[i]).slice(-3) + ":" + ("00000000"+code2[i].toString(2)).slice(-8));
 }
+*/
 
 document.addEventListener("click", async (evt) => {
 pico.Param.debug = false;
