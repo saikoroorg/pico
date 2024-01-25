@@ -93,23 +93,22 @@ async function appProbrem() {
 			if (level == 0) {
 				operator = "+";
 				if (picoRandom(2)) { // Add up to 5.
-					probrem1 = picoRandom(4) + 1;
-					probrem2 = picoRandom(5 - probrem1) + 1;
+					answer = picoRandom(3) + 2; // Over 2.
 				} else { // Add up to 10.
-					probrem1 = picoRandom(9) + 1;
-					probrem2 = picoRandom(10 - probrem1) + 1;
+					answer = picoRandom(8) + 2; // Over 2.
 				}
-				answer = probrem1 + probrem2;
+				probrem1 = picoRandom(answer - 1) + 1; // Not 0.
+				probrem2 = answer - probrem1;
 
 			// Add/Sub up to 10.
 			} else if (level == 1) {
 				operator = picoRandom(2) ? "+" : "-";
 				if (operator == "+") { // Add up to 10.
-					probrem1 = picoRandom(9);
-					probrem2 = picoRandom(10 - probrem1);
-					answer = probrem1 + probrem2;
+					answer = picoRandom(10);
+					probrem1 = picoRandom(answer);
+					probrem2 = answer - probrem1;
 				} else { // Sub up to 10.
-					probrem1 = picoRandom(10);
+					probrem1 = picoRandom(9) + 1;// Not 0.
 					probrem2 = picoRandom(probrem1);
 					answer = probrem1 - probrem2;
 				}
@@ -118,12 +117,12 @@ async function appProbrem() {
 			} else if (level == 2) {
 				operator = picoRandom(2) ? "+" : "-";
 				if (operator == "+") { // Add up to 20.
-					probrem1 = picoRandom(19) + 1;
-					probrem2 = picoRandom(19 - probrem1) + 1;
-					answer = probrem1 + probrem2;
+					answer = picoRandom(20);
+					probrem1 = picoRandom(answer);
+					probrem2 = answer - probrem1;
 				} else { // Sub up to 20.
-					probrem1 = picoRandom(19) + 1;
-					probrem2 = picoRandom(probrem1 - 1) + 1;
+					probrem1 = picoRandom(19) + 1;// Not 0.
+					probrem2 = picoRandom(probrem1);
 					answer = probrem1 - probrem2;
 				}
 			}
