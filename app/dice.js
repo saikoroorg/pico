@@ -38,6 +38,7 @@ const nums = [ // Numbered design pixels.
 ];
 
 // Global variables.
+var subcolors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // Count colors.
 var colors = [255,255,255, 0,0,0]; // Original design colors.
 var pixels = []; // Original design pixels.
 var count = 1; // Count of dice.
@@ -46,6 +47,7 @@ var maximum = 6; // Maximum of dice faces.
 var maxmaximum = 20; // Maximum of numbered dice.
 var custom = false; // Custom flag.
 var playing = 0; // Rolling count.
+var seed = 0; // Random seed.
 var result = 0; // Result.
 
 // Update buttons.
@@ -177,7 +179,8 @@ async function appLoad() {
 				} else {
 					maximum = numbers[1] < maxmaximum ? numbers[1] : maxmaximum;
 				}
-				picoRandom(0, numbers[2]);
+				seed = numbers[2];
+				picoRandom(0, seed);
 			}
 		}
 	}
@@ -190,7 +193,6 @@ var posx = [], posy = []; // Rolling position.
 var angle = 0; // Rolling angle.
 var scale = 0; // Rolling scale.
 var randoms = []; // Result number.
-var number = 0; // Rolled number.
 var landscape = false; // landscape mode.
 
 // Resize.
@@ -241,6 +243,8 @@ async function appMain() {
 		appResize();
 
 		// Rolling dice.
+		seed = picoDate();
+		picoRandom(0, seed);
 		result = 0;
 
 		// Reset playing count.
@@ -253,9 +257,13 @@ async function appMain() {
 
 			// Restart to roll dice.
 			if (picoMotion()) {
+				seed = picoDate();
+				picoRandom(0, seed);
 				result = 0;
+
+				// Reset playing count.
 				playing = -1;
-				appUpdate();
+				//appUpdate();
 			}
 
 		} else {
@@ -272,7 +280,6 @@ async function appMain() {
 				}
 				angle = 0;
 				playing = 1;
-				number++;
 				appUpdate();
 
 				// Number matched beeps on show result.
@@ -306,6 +313,7 @@ async function appMain() {
 
 		// Draw maximum count.
 		let x0 = 0, y0 = 50, c0 = -1, s0 = 2;
+		picoColor(subcolors);
 		picoChar("*" + count, c0, x0, y0, 0, s0);
 
 		// Draw icon.
@@ -318,10 +326,14 @@ async function appMain() {
 		} else if (picoMotion(x1, y1, w1, w1)) {
 			s1 = 8;
 		}
+
+		// Draw original design sprite.
+		picoColor(colors);
 		if (pixels.length > 0) {
-			picoColor(colors);
 			s1 = s1 * 7 / picoSpriteSize(pixels[maximum - 1]);
 			picoSprite(pixels[maximum - 1], 0, x1, y1, 0, s1);
+
+		// Draw dotted design sprite.	
 		} else if (maximum <= 9) {
 			picoSprite(dots[maximum - 1], 0, x1, y1, 0, s1);
 		} else if (maximum <= maxmaximum) {
@@ -331,15 +343,18 @@ async function appMain() {
 	// Draw rolling dice.
 	} else {
 
-		// Draw number sprite.
-		let n = result <= 0 ? number : number - 1;
-		picoChar(n, 0, 0, landscape ? -40 : -80);
+		// Draw seed count.
+		let x0 = 0, y0 = landscape ? -50 : -90, c0 = 2, s0 = 1;
+		picoColor(subcolors);
+		picoChar(seed, c0, x0, y0, 0, s0);
+
+		// Set color for sprite.
+		picoColor(colors);
 
 		let s = playing < 5 ? scale * (0.8 + 0.04 * playing) : scale;
 
 		// Draw original design sprite.
 		if (pixels.length > 0) {
-			picoColor(colors);
 			for (let i = 0; i < count; i++) {
 				let s1 = s * 7 / picoSpriteSize(pixels[randoms[i]]);
 				picoSprite(pixels[randoms[i]], 0, posx[i], posy[i], angle, s1);
@@ -347,14 +362,12 @@ async function appMain() {
 
 		// Draw dotted design sprite.
 		} else if (maximum <= 9) {
-			picoColor(colors);
 			for (let i = 0; i < count; i++) {
 				picoSprite(dots[randoms[i]], 0, posx[i], posy[i], angle, s);
 			}
 
 		// Draw numbered design sprite.
 		} else if (maximum <= maxmaximum) {
-			picoColor(colors);
 			for (let i = 0; i < count; i++) {
 				picoSprite(nums[randoms[i]], 0, posx[i], posy[i], angle, s);
 			}
