@@ -3,5 +3,5 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40124";
+pico.version = "0.9.40125";
 

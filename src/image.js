@@ -113,6 +113,15 @@ async function picoSpriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
 	}
 }
 
+// Get screen data file.
+async function picoScreenFile(bgcolors=null,  watermark=null) {
+	try {
+		return await pico.image.screenFile(bgcolors,  watermark);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 // Load image file.
 async function picoLoad(url) {
 	try {
@@ -364,13 +373,46 @@ pico.Image = class {
 	spriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
 		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
 			return new Promise(async (resolve) => {
-				await pico.image.offscreen._color(colors);
 				let size = pico.image.offscreen._spriteSize(cells);
 				await pico.image.offscreen._resize(size * scale, size * scale);
 				await pico.image.offscreen._ready();
 				await pico.image.offscreen._reset(0, 0, 0, scale);
+				await pico.image.offscreen._color(colors);
 				await pico.image.offscreen._sprite(cells, 0);
 				resolve(pico.image.offscreen._data());
+			}); // end of new Promise.
+		}); // end of lock.
+	}
+
+	// Draw bg/watermark and get screen data file.
+	async screenFile(bgcolors=null,  watermark=null) {
+		if (!bgcolors && !watermark) {
+			return await pico.image._file();
+		}
+		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
+			return new Promise(async (resolve) => {
+				await pico.image.offscreen._resize(
+					pico.image.canvas[0].width/pico.Image.ratio,
+					pico.image.canvas[0].height/pico.Image.ratio);
+				await pico.image.offscreen._ready();
+				await pico.image.offscreen._reset(0, 0, 0, 1);
+				if (bgcolors) {
+					await pico.image.offscreen._color(bgcolors);
+					await pico.image.offscreen._draw(0, -100, -100, 200, 200);
+				}
+				await pico.image.offscreen._image(pico.image);
+				if (watermark && watermark.length >= 2) {
+					const w = pico.Image.charWidth;
+					let x = 100 - (pico.Image.charWidth * (watermark.length + 1) / 2);
+					let y = 100 - pico.Image.charHeight;
+					await pico.image.offscreen._move(x, y);
+					await pico.image.offscreen._move(-(watermark.length-1)/2 * w, 0);
+					for (let i = 0; i < watermark.length; i++) {
+						await pico.image.offscreen._char(watermark.charCodeAt(i), -1);
+						await pico.image.offscreen._move(w, 0);
+					}
+				}
+				resolve(pico.image.offscreen._file());
 			}); // end of new Promise.
 		}); // end of lock.
 	}

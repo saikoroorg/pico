@@ -267,7 +267,7 @@ pico.Param = class {
 					let query = text ? "?" + text : "";
 					this._debug("Flush query: " + query);
 					window.history.replaceState(null, "", query);
-					data.url = window.location.href.replace(/[\?\#].*$/, '') + query;
+					data.url = window.location.href.replace(/[\?\#].*$/, "") + query;
 				}
 				if (files) {
 					data.files = files;

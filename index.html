@@ -35,6 +35,7 @@
 	</div>
 </div>
 <h6 id="footer">
+	<div id="author"></div>/
 	<div id="version"></div>
 </h6>
 <!--script>console.log = () => {};</script!-->
@@ -52,20 +53,14 @@ function picoTitle(text=null, subtext=null) {
 	pico.app.setTitle(text, subtext);
 }
 
-// Change background.
-function picoBackground(watermark=null, color=-1) {
-	pico.app.setBackground(watermark, color);
-}
 // Switch script or share.
 async function picoSwitch(script=null) {
 	await pico.app.switchScript(script);
 }
 
 // Share screen image.
-async function picoShareScreen() {
-	let file = await pico.image._file();
-	let files = [file];
-	await picoShare(null, files);
+async function picoShareScreen(bgcolors=null, watermark=null) {
+	await pico.app.shareScreen(bgcolors, watermark);
 }
 
 // Enable wake lock.
@@ -99,16 +94,43 @@ pico.App = class {
 		this.script = null; // App script.
 		this.refer = null; // Referenced script.
 		this.title = ""; // App title.
-		this.ver = 0; // App version.
-		this.watermark = ""; // Background.
-		this.backcolor = null; // Background color.
+		this.ver = 0; // Protocol version.
+		this.author = "*"; // App author.
+		this.idver = ""; // App identifier and version.
+
+		// Load app version.
+		let e = document.getElementById("author");
+		if (e && e.innerText) {
+			this.author = e.innerText;
+		} else {
+			if (window.location.hostname) {
+				this.author = window.location.hostname;
+			}
+			if (e) {
+				e.innerText = this.author;
+			}
+		}
+		e = document.getElementById("version");
+		if (e && e.innerText) {
+			this.idver = e.innerText;
+		} else {
+			if (window.location.pathname) {
+				this.idver = window.location.pathname.replace(/[\?\#].*$/, "");
+				if (this.idver.length > 32) {
+					this.idver = ".." + this.idver.slice(-30);
+				}
+			}
+			if (e) {
+				e.innerText = this.idver;
+			}
+		}
 
 		// Load app script.
 		let script = picoStrings("s");
 		if (script) {
 			this.script = script;
 		}
-		var e = document.createElement('script');
+		e = document.createElement('script');
 		e.src = this.script ? this.script : pico.App.script;
 		document.body.appendChild(e);
 
@@ -171,15 +193,6 @@ pico.App = class {
 			for (;;) {
 				await picoRead();
 				picoClear();
-				if (this.backcolor) {
-					picoColor(this.backcolor);
-				}
-				if (this.watermark) {
-					picoPixel(0, 0, 0, 100, 100);
-					let x = 100 - (this.watermark.length * 2 + 1);
-					let y = 100 - 3;
-					picoChar(this.watermark, -1, x, y);
-				}
 				await appMain();
 				await picoFlip(0);
 			}
@@ -233,12 +246,6 @@ pico.App = class {
 		if (subtext) {
 			picoLabel("subtitle", subtext)
 		}
-	}
-
-	// Change background.
-	setBackground(watermark=null, colors=null) {
-		this.watermark = watermark;
-		this.backcolor = colors;
 	}
 
 	// Switch script or share.
@@ -302,6 +309,19 @@ pico.App = class {
 
 		// True if landscape mode.
 		return window.matchMedia("(min-aspect-ratio: 0.8)").matches;
+	}
+
+	// Share screen image.
+	async shareScreen(bgcolors=null, watermark=null) {
+		if (bgcolors == null) {
+			bgcolors = [223,223,223, 255,255,255];
+		}
+		if (watermark == null) {
+			watermark = this.author + "/" + this.idver;
+		}
+		let file = await picoScreenFile(bgcolors, watermark);
+		let files = [file];
+		await picoShare(null, files);
 	}
 }
 
