@@ -11,8 +11,8 @@ const kcents = [-1.0,
 var playing = 0; // Playing count.
 var number = 1;
 const numberMax = 20;
-var levels = ["+1", "-5", "+10", "x5", "x9", "x12", "x16", "x19"];
-var samples = ["1 + 1", "5 - 5", "10+10", "5 * 5", "9 * 9", "12*12", "16* 9", "19*19"];
+var levels = ["+1", "-2", "+10", "x5", "x9", "x12", "x16", "x19"];
+var samples = ["1 + 1", "2 - 2", "10+10", "5 * 5", "9 * 9", "12*12", "16* 9", "19*19"];
 var level = 4;
 var state = "";
 
@@ -108,12 +108,12 @@ async function appProbrem() {
 					probrem1 = picoRandom(answer);
 					probrem2 = answer - probrem1;
 				} else { // Sub up to 10.
-					probrem1 = picoRandom(9) + 1;// Not 0.
-					probrem2 = picoRandom(probrem1);
+					probrem1 = picoRandom(9) + 1; // Not 0.
+					probrem2 = picoRandom(probrem1 + 1);
 					answer = probrem1 - probrem2;
 				}
 
-			// Add/Sub up to 20 not including 0.
+			// Add/Sub up to 20.
 			} else if (level == 2) {
 				operator = picoRandom(2) ? "+" : "-";
 				if (operator == "+") { // Add up to 20.
@@ -121,8 +121,8 @@ async function appProbrem() {
 					probrem1 = picoRandom(answer);
 					probrem2 = answer - probrem1;
 				} else { // Sub up to 20.
-					probrem1 = picoRandom(19) + 1;// Not 0.
-					probrem2 = picoRandom(probrem1);
+					probrem1 = picoRandom(19) + 1; // Not 0.
+					probrem2 = picoRandom(probrem1 + 1);
 					answer = probrem1 - probrem2;
 				}
 			}
