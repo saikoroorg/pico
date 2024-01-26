@@ -28,6 +28,8 @@ var angle = 0;
 var scale = 8, scale2 = 24;
 var startTime = 0;
 var totalTime = 0;
+var resultDate = 0;
+
 
 // Select button.
 async function appSelect(x) {
@@ -313,6 +315,7 @@ async function appResult() {
 		let f = picoMod(t, 100); // Fractional part.
 		let i = picoDiv(t, 100); // Integer part.
 		totalTime = "" + i + "." + (f < 10 ? "0" : "") + f;
+		resultDate = picoDate();
 
 		// Enable share button.
 		picoLabel("action", "^");
@@ -323,9 +326,10 @@ async function appResult() {
 
 	// Draw probrem sample.
 	await picoChar(samples[level], -1, 0,-85, 0,2);
+	await picoChar(resultDate, 2, 0,-75, 0,1);
 
 	// Draw result.
-	await picoChar("" + totalTime, -1, 0,0, 0,8);
+	await picoChar(totalTime, -1, 0,0, 0,8);
 
 	// Wait result.
 	if (playing <= 72) {
