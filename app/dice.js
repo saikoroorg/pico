@@ -361,11 +361,12 @@ async function appMain() {
 	// Draw rolling dice.
 	} else {
 
-		// Draw seed count.
+		// Draw result.
 		if (result > 0) {
 			picoColor(subcolors);
-			picoChar(result, -1, 0,landscape?-50:-85, 0,2);
-			picoChar(seed, 2, 0,landscape?-40:-75, 0,1);
+			let param = "" + count + "d" + maximum;
+			picoChar(param, -1, 0,landscape?-50:-85, 0,2);
+			picoChar(seed, 0, 0,landscape?-40:-75, 0,1);
 		}
 
 		// Set color for sprite.
