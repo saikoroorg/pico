@@ -11,11 +11,16 @@ const kcents = [-1.0,
 var playing = 0; // Playing count.
 var number = 1;
 const numberMax = 20;
-var levels = ["+1", "-2", "+10", "x5", "x9", "x12", "x16", "x19"];
+var levels = ["+10", "-10", "-20", "x5", "x9", "x12", "x16", "x19"];
 var samples = ["1 + 1", "2 - 2", "10+10", "5 * 5", "9 * 9", "12*12", "16* 9", "19*19"];
 var level = 4;
 var state = "";
 var seed = 0; // Random seed.
+
+// Probrem generate parameters.
+var param0 = "x";
+var param1 = 9;
+var param2 = 9;
 
 // Probrem and answer.
 var probrem1 = 0;
@@ -32,9 +37,37 @@ var totalTime = 0;
 
 // Select button.
 async function appSelect(x) {
-	if (x) {
+	if (level < 0) {
+		picoBeep(-1.2, 0.1);
+	} else if (x) {
 		level = picoMod(level + x + levels.length, levels.length);
 		picoLabel("select", levels[level]);
+		picoBeep(1.2, 0.1);
+	}
+
+	// Load level.
+	if (level == 0) {
+		param0 = "+", param1 = param2 = 10; // Add up to 10.
+	} else if (level == 1) {
+		param0 = "-", param1 = param2 = 10; // Add/Sub up to 10.
+	} else if (level == 2) {
+		param0 = "-", param1 = param2 = 20; // Add/Sub up to 20.
+	} else if (level == 3) {
+		param0 = "*", param1 = param2 = 5; // Mul 1x1 to 5x5.
+	} else if (level == 4) {
+		param0 = "*", param1 = param2 = 5; // Mul 1x1 to 5x5.
+	} else if (level == 4) {
+		param0 = "*", param1 = param2 = 9; // Mul 1x1 to 9x9.
+	} else if (level == 5) {
+		param0 = "*", param1 = param2 = 12; // Mul 2x2 to 12x12.
+	} else if (level == 6) {
+		param0 = "*", param1 = 16, param2 = 9; // Mul 11x2 to 16x9.
+	} else if (level == 7) {
+		param0 = "*", param1 = 19, param2 = 19; // Mul 11x2 to 19x19.
+	} else if (level == 8) {
+		param0 = "*", param1 = 31, param2 = 31; // Mul 11x2 to 31x31.
+	} else {
+		param0 = "*", param1 = 99, param2 = 99; // Mul 11x2 to 99x99.
 	}
 
 	// Restart.
@@ -53,8 +86,33 @@ async function appAction() {
 // Load.
 async function appLoad() {
 
+	// Load query params.
+	let keys = picoKeys();
+	for (let k = 0; k < keys.length; k++) {
+		let value = picoStrings(k);
+		if (value) {
+			if (value.match(/x/i)) {
+				param0 = "*"; // Mul probrem.
+			} else if (value[0] == "1") {
+				param0 = "+"; // Add probrem.
+			} else {
+				param0 = "-"; // Add/Sub probrem.
+			}
+			let numbers = picoNumbers(keys[k]);
+			param1 = numbers[0];
+			param2 = numbers[1];
+			seed = numbers[2];
+			picoRandom(0, seed);
+			level = -1; // Customi level.
+		}
+	}
+
 	// Update select button.
-	picoLabel("select", "" + levels[level]);
+	if (level < 0) {
+		picoLabel("select", param0  + param1);
+	} else {
+		picoLabel("select", "" + levels[level]);
+	}
 	picoLabel("minus", "-");
 	picoLabel("plus", "+");
 }
@@ -73,7 +131,11 @@ async function appTitle() {
 	}
 
 	// Draw probrem sample.
-	await picoChar(samples[level], -1, 0,0, 0,8);
+	if (level < 0) {
+		await picoChar("" + param1 + param0 + param2, -1, 0,0, 0,8);
+	} else {
+		await picoChar(samples[level], -1, 0,0, 0,8);
+	}
 
 	// Wait for input.
 	if (picoAction()) {
@@ -93,44 +155,39 @@ async function appProbrem() {
 		seed = picoDate();
 		picoRandom(0, seed);
 
-		if (level <= 2) {
+		// Add probrem (under 100).
+		if (param0 == "+") {
+			operator = "+";
+			if (picoRandom(2)) { // Add probrem (half size).
+				answer = picoRandom(param1/2-2) + 2; // Over 2.
+			} else { // Add probrem.
+				answer = picoRandom(param1-2) + 2; // Over 2.
+			}
+			probrem1 = picoRandom(answer - 1) + 1; // Not 0.
+			probrem2 = answer - probrem1;
+			scale = 6, scale2 = 18;
 
-			// Add up to 10.
-			if (level == 0) {
-				operator = "+";
-				if (picoRandom(2)) { // Add up to 5.
-					answer = picoRandom(3) + 2; // Over 2.
-				} else { // Add up to 10.
-					answer = picoRandom(8) + 2; // Over 2.
-				}
-				probrem1 = picoRandom(answer - 1) + 1; // Not 0.
+			// Generate wrong answer.
+			correct = answer > 2 ? picoRandom(3) : answer > 1 ? picoRandom(2) : 0;
+			if (correct == 0) {
+				choices = [answer, answer+1, answer+2];
+			} else if (correct == 1) {
+				choices = [answer-1, answer, answer+1];
+			} else if (correct == 2) {
+				choices = [answer-2, answer-1, answer];
+			}
+
+		// Add/Sub probrem (under 100).
+		} else if (param0 == "-") {
+			operator = picoRandom(2) ? "+" : "-";
+			if (operator == "+") { // Add probrem.
+				answer = picoRandom(param1);
+				probrem1 = picoRandom(answer);
 				probrem2 = answer - probrem1;
-
-			// Add/Sub up to 10.
-			} else if (level == 1) {
-				operator = picoRandom(2) ? "+" : "-";
-				if (operator == "+") { // Add up to 10.
-					answer = picoRandom(10);
-					probrem1 = picoRandom(answer);
-					probrem2 = answer - probrem1;
-				} else { // Sub up to 10.
-					probrem1 = picoRandom(9) + 1; // Not 0.
-					probrem2 = picoRandom(probrem1 + 1);
-					answer = probrem1 - probrem2;
-				}
-
-			// Add/Sub up to 20.
-			} else if (level == 2) {
-				operator = picoRandom(2) ? "+" : "-";
-				if (operator == "+") { // Add up to 20.
-					answer = picoRandom(20);
-					probrem1 = picoRandom(answer);
-					probrem2 = answer - probrem1;
-				} else { // Sub up to 20.
-					probrem1 = picoRandom(19) + 1; // Not 0.
-					probrem2 = picoRandom(probrem1 + 1);
-					answer = probrem1 - probrem2;
-				}
+			} else { // Sub probrem.
+				probrem1 = picoRandom(param1-1) + 1; // Not 0.
+				probrem2 = picoRandom(probrem1 + 1);
+				answer = probrem1 - probrem2;
 			}
 			scale = 6, scale2 = 18;
 
@@ -144,18 +201,10 @@ async function appProbrem() {
 				choices = [answer-2, answer-1, answer];
 			}
 
-		} else if (level <= 4) {
-
-			// Mul 1x1 to 5x5.
-			if (level == 3) {
-				probrem1 = picoRandom(5) + 1;
-				probrem2 = picoRandom(5) + 1;
-
-			// Mul 1x1 to 9x9.
-			} else if (level == 4) {
-				probrem1 = picoRandom(9) + 1;
-				probrem2 = picoRandom(9) + 1;
-			}
+		// Mul probrem (under 100).
+		} else if (param1 * param2 < 100) {
+			probrem1 = picoRandom(param1) + 1;
+			probrem2 = picoRandom(param2) + 1;
 			operator = "*";
 			answer = probrem1 * probrem2;
 			scale = 6, scale2 = 18;
@@ -170,26 +219,21 @@ async function appProbrem() {
 				choices = [probrem1 * (probrem2-2), probrem1 * (probrem2-1), answer];
 			}
 
+		// Mul probrem (over 100).
 		} else {
-
-			// Mul 2x2 to 12x12.
-			if (level == 5) {
-				probrem1 = picoRandom(11) + 2;
-				probrem2 = picoRandom(11) + 2;
-
-			// Mul 11x2 to 16x9.
-			} else if (level == 6) {
-				probrem1 = picoRandom(6) + 11;
-				probrem2 = picoRandom(8) + 2;
-
-			// Mul 11x2 to 19x19.
-			} else if (level == 7) {
-				probrem1 = picoRandom(9) + 11;
-				probrem2 = picoRandom(18) + 2;
-			}
+			probrem1 = picoRandom(param1-10) + 11;
+			probrem2 = picoRandom(param2-1) + 2;
 			operator = "*";
 			answer = probrem1 * probrem2;
-			scale = 4, scale2 = 16;
+
+			// Mul probrem (under 1000).
+			if (param1 * param2 < 1000) {
+				scale = 4, scale2 = 16;
+
+			// Mul probrem (over 1000).
+			} else {
+				scale = 3, scale2 = 16;
+			}
 
 			// Generate wrong answer.
 			correct = answer >= 20 ? picoRandom(3) : answer >= 10 ? picoRandom(2) : 0;
