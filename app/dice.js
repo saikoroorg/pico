@@ -50,9 +50,10 @@ const maxcount = 20; // Maximum count of dice
 var maximum = 6; // Maximum of dice faces.
 var maxmaximum = 20; // Maximum of numbered dice.
 var custom = false; // Custom flag.
-var playing = 0; // Rolling count.
+var playing = 0; // Playing count.
 var seed = 0; // Random seed.
 var result = 0; // Result.
+var sharing = 0; // Sharing flag.
 
 // Update buttons.
 async function appUpdate() {
@@ -114,7 +115,7 @@ async function appAction() {
 
 	// Share screen.
 	} else if (result > 0) {
-		await picoShareScreen();
+		sharing = 1;
 	}
 }
 
@@ -364,8 +365,10 @@ async function appMain() {
 		// Draw result.
 		if (result > 0) {
 			picoColor(subcolors);
-			let param = "" + count + "d" + maximum;
-			await picoChar(param, -1, 0,landscape?-50:-85, 0,2);
+			if (pixels.length <= 0) {
+				let param = "" + count + "d" + maximum;
+				await picoChar(param, -1, 0,landscape?-50:-85, 0,2);
+			}
 			await picoChar(seed, 0, 0,landscape?-40:-75, 0,1);
 		}
 
@@ -394,6 +397,12 @@ async function appMain() {
 				await picoSprite(nums[randoms[i]], 0, posx[i], posy[i], angle, s);
 			}
 		}
+	}
+
+	// Start sharing screen.
+	if (sharing) {
+		await picoShareScreen();
+		sharing = 0;
 	}
 
 	// Update animation if rolling.
