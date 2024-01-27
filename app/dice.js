@@ -64,13 +64,13 @@ async function appUpdate() {
 		picoLabel("action");
 	}
 	if (pixels.length > 0) {
-		let data = await picoSpriteData(pixels[maximum - 1], colors);
+		let data = await await picoSpriteData(pixels[maximum - 1], colors);
 		picoLabel("select", null, data);
 	} else if (maximum <= 9) {
-		let data = await picoSpriteData(dots[maximum - 1], colors);
+		let data = await await picoSpriteData(dots[maximum - 1], colors);
 		picoLabel("select", null, data);
 	} else if (maximum <= maxmaximum) {
-		let data = await picoSpriteData(nums[maximum], colors);
+		let data = await await picoSpriteData(nums[maximum], colors);
 		picoLabel("select", null, data);
 	} else {
 		picoLabel("select", "?");
@@ -332,7 +332,7 @@ async function appMain() {
 		// Draw maximum count.
 		let x0 = 0, y0 = 50, c0 = -1, s0 = 2;
 		picoColor(subcolors);
-		picoChar("*" + count, c0, x0, y0, 0, s0);
+		await picoChar("*" + count, c0, x0, y0, 0, s0);
 
 		// Draw icon.
 		let x1 = 0, y1 = 0, s1 = 10, w1 = 32;
@@ -349,13 +349,13 @@ async function appMain() {
 		picoColor(colors);
 		if (pixels.length > 0) {
 			s1 = s1 * 7 / picoSpriteSize(pixels[maximum - 1]);
-			picoSprite(pixels[maximum - 1], 0, x1, y1, 0, s1);
+			await picoSprite(pixels[maximum - 1], 0, x1, y1, 0, s1);
 
 		// Draw dotted design sprite.	
 		} else if (maximum <= 9) {
-			picoSprite(dots[maximum - 1], 0, x1, y1, 0, s1);
+			await picoSprite(dots[maximum - 1], 0, x1, y1, 0, s1);
 		} else if (maximum <= maxmaximum) {
-			picoSprite(nums[maximum], 0, x1, y1, 0, s1);
+			await picoSprite(nums[maximum], 0, x1, y1, 0, s1);
 		}
 
 	// Draw rolling dice.
@@ -365,8 +365,8 @@ async function appMain() {
 		if (result > 0) {
 			picoColor(subcolors);
 			let param = "" + count + "d" + maximum;
-			picoChar(param, -1, 0,landscape?-50:-85, 0,2);
-			picoChar(seed, 0, 0,landscape?-40:-75, 0,1);
+			await picoChar(param, -1, 0,landscape?-50:-85, 0,2);
+			await picoChar(seed, 0, 0,landscape?-40:-75, 0,1);
 		}
 
 		// Set color for sprite.
@@ -379,19 +379,19 @@ async function appMain() {
 		if (pixels.length > 0) {
 			for (let i = 0; i < count; i++) {
 				let s1 = s * 7 / picoSpriteSize(pixels[randoms[i]]);
-				picoSprite(pixels[randoms[i]], 0, posx[i], posy[i], angle, s1);
+				await picoSprite(pixels[randoms[i]], 0, posx[i], posy[i], angle, s1);
 			}
 
 		// Draw dotted design sprite.
 		} else if (maximum <= 9) {
 			for (let i = 0; i < count; i++) {
-				picoSprite(dots[randoms[i]], 0, posx[i], posy[i], angle, s);
+				await picoSprite(dots[randoms[i]], 0, posx[i], posy[i], angle, s);
 			}
 
 		// Draw numbered design sprite.
 		} else if (maximum <= maxmaximum) {
 			for (let i = 0; i < count; i++) {
-				picoSprite(nums[randoms[i]], 0, posx[i], posy[i], angle, s);
+				await picoSprite(nums[randoms[i]], 0, posx[i], posy[i], angle, s);
 			}
 		}
 	}
