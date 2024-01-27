@@ -115,7 +115,7 @@ pico.App = class {
 			this.name = e.innerText.replace(/[\?\#].*$/, "");
 		} else {
 			if (window.location.pathname) {
-				this.name = window.location.pathname.replace(/[\?\#].*$/, "");
+				this.name = window.location.pathname.replace(/(^\/|[\?\#].*$|\/$)/g, "");
 				if (this.name.length > 32) {
 					this.name = ".." + this.name.slice(-30);
 				}
