@@ -9,6 +9,27 @@ window.addEventListener("load", async (evt) => {
 
 //(async()=>{
 
+	picoColor(pico.Image.colors0);
+	for (let i = 0; i <= 180; i++) {
+		picoClear();
+
+		await picoRect([-1,-1,2,2], 2, 0,-60, 0,18);
+		await picoChar("00", 0, 0,-60, 0,6);
+
+		await picoRect([-1,-1,2,2], 2, 0,0, 0,17);
+		await picoChar("000", 0, 0,0, 0,4);
+
+		await picoRect([-1,-1,2,2], 2, 0,60, 0,17);
+		await picoChar("0000", 0, 0,60, 0,3);
+
+		await picoFlip(20);
+	}
+
+//})();
+
+});
+document.addEventListener("click", async (evt) => {
+
 	let image = await picoLoad("image.svg");
 
 	picoColor(pico.Image.colors0);
@@ -24,11 +45,6 @@ window.addEventListener("load", async (evt) => {
 		await picoImage(image, 0,50, i*-10, 2, 0,40,40);
 		await picoFlip(20);
 	}
-
-//})();
-
-});
-document.addEventListener("click", async (evt) => {
 
 //*/
 	picoColor(pico.Image.colors0);
