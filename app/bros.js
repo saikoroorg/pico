@@ -265,8 +265,8 @@ async function appMain() {
 					maxlevel = level + 1;
 
 					// Play clear sound.
-					picoBeep(1.2, 0.1);
-					picoBeep(1.2, 0.1, 0.2);
+					picoBeep(2.7, 0.1);
+					picoBeep(2.7, 0.1, 0.2);
 
 					// Update action button to share.
 					picoLabel("action", "^");

@@ -2,10 +2,11 @@ picoTitle("Kuku"); // Title.
 
 // Data and settings.
 var colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // 5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000
-const kcents = [-1.0,
-	-0.9,-0.7,-0.5, -0.4,-0.2, 0.0, 0.2, // 1:Do,2:Re,3:Mi, 4:Fa,5:So,6:La,7:Ti
-	 0.3, 0.5, 0.7,  0.8, 1.0, 1.2, 1.4,
-	 1.5, 1.7, 1.9,  2.0, 2.2, 2.4];
+const kcents = [
+	     -0.7,-0.5, -0.4,-0.2, 0.0, 0.2, //        0,    1:Mi, 2:Fa, 3:So, 4:La, 5:Ti
+	 0.3, 0.5, 0.7,  0.8, 1.0, 1.2, 1.4, //  6:Do, 7:Re, 8:Mi, 9:Fa,10:So,11:La,12:Ti
+	 1.5, 1.7, 1.9,  2.0, 2.2, 2.4, 2.6, // 13:Do,14:Re,15:Mi,16:Fa,17:So,18:La,19:Ti, 20:Do
+	 2.7];
 
 // Global variables.
 var state = ""; // Playing state.
@@ -396,8 +397,8 @@ async function appResult() {
 			picoLabel("select", appProbremText(levels[level][0], levels[level][1]));
 
 			// Play clear sound.
-			picoBeep(1.2, 0.1);
-			picoBeep(1.2, 0.1, 0.2);
+			picoBeep(2.7, 0.1);
+			picoBeep(2.7, 0.1, 0.2);
 		} else {
 
 			// Play sound.
