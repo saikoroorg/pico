@@ -13,14 +13,14 @@ window.addEventListener("load", async (evt) => {
 	for (let i = 0; i <= 180; i++) {
 		picoClear();
 
-		await picoRect([-1,-1,2,2], 2, 0,-60, 0,18);
-		await picoChar("00", 0, 0,-60, 0,6);
+		await picoRect([-27,-27,27*2-1,27*2-1], 2, 0,-60); // width: 54
+		await picoChar("00", 0, 0,-60, 0,6); // width: (4*2+1) x6 = 54
 
-		await picoRect([-1,-1,2,2], 2, 0,0, 0,17);
-		await picoChar("000", 0, 0,0, 0,4);
+		await picoRect([-27,-27,27*2-1,27*2-1], 2, 0,0); // width: 54
+		await picoChar("000", 0, 0,0, 0,4); // width: (4*3+1) x4 = 52
 
-		await picoRect([-1,-1,2,2], 2, 0,60, 0,17);
-		await picoChar("0000", 0, 0,60, 0,3);
+		await picoRect([-27,-27,27*2-1,27*2-1], 2, 0,60); // width: 54
+		await picoChar("0000", 0, 0,60, 0,3); // width: (4*4+1) x3 = 51
 
 		await picoFlip(20);
 	}

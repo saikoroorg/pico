@@ -31,24 +31,35 @@ function appProbremText(p0, p1, p2) {
 	}
 }
 
+// Result text.
+function appResultText(t) {
+	let f = picoMod(picoDiv(t, 10), 100); // Fractional part.
+	let i = picoDiv(t, 1000); // Integer part.
+	return "" + i + "." + (f < 10 ? "0" : "") + f;
+}
+
 // Probrem and answer.
-var probrem1 = 0;
-var probrem2 = 0;
-var operator = "*";
-var answer = 0;
-var correct = 0;
-var choices = [0, 0, 0];
-var choose = -1;
-var angle = 0;
-var scale = 8, scale2 = 24;
-var startTime = 0;
-var totalTime = 0;
+var probrem1 = 0; // Number to the left.
+var probrem2 = 0; // Number to the right.
+var operator = "*"; // Probrem type.
+var answer = 0; // Answer number.
+var correct = 0; // Correct choice of answer.
+var choices = [0, 0, 0]; // Choices of answer.
+var choose = -1; // Answer you chose.
+var angle = 0; // Angle of number.
+var scale = 6; // Scale of number.
+const square = 27; // Width of base square.
+var startTime = 0; // Start time of the problem.
+var resultTime = 0; // Result time of the problem.
+const clearTime = 60 * 1000; // Clear time of the problem.
 
 // Select button.
 async function appSelect(x) {
 	if (level <= 0) {
 		picoBeep(-1.2, 0.1);
 	} else if (x) {
+
+		// Change level.
 		let maxlevel = levels.length-1 - maxextra + extra;
 		level = picoMod(level-1 + x + maxlevel, maxlevel) + 1;
 		picoLabel("select", appProbremText(levels[level][0], levels[level][1]));
@@ -64,8 +75,6 @@ async function appSelect(x) {
 	state = "";
 	playing = -1;
 	number = 1;
-
-	picoBeep(1.2, 0.1);
 }
 
 // Action button.
@@ -82,18 +91,18 @@ async function appLoad() {
 		let value = picoStrings(k);
 		if (value) {
 			let numbers = picoNumbers(keys[k]);
+			let date = picoDate();
 			if (value.match(/x/i)) {
 				levels[0][0] = "x"; // Mul probrem.
 				levels[0][1] = numbers[0];
 				levels[0][2] = numbers[1];
-				seed = numbers[2];
+				seed = numbers[2] < date ? numbers[2] : 0;
 			} else {
 				levels[0][0] = "+"; // Add/Sub probrem.
 				levels[0][1] = numbers[0];
 				levels[0][2] = null;
-				seed = numbers[1];
+				seed = numbers[1] < date ? numbers[1] : 0;
 			}
-			picoRandom(0, seed);
 			level = 0; // Custom level.
 		}
 	}
@@ -113,6 +122,11 @@ async function appTitle() {
 		// Disable share button.
 		picoLabel("action");
 
+		// Set random seed.
+		if (seed) {
+			picoRandom(0, seed);
+		}
+
 		// Reset playing count.
 		playing = 1;
 	}
@@ -120,6 +134,9 @@ async function appTitle() {
 	// Draw probrem title.
 	let probrem = appProbremText(levels[level][0], levels[level][1], levels[level][2]);
 	await picoChar(probrem, -1, 0,0, 0,8);
+	if (seed) {
+		await picoChar(seed, 0, 0,-75, 0,1);
+	}
 
 	// Wait for input.
 	if (picoAction()) {
@@ -166,7 +183,7 @@ async function appProbrem() {
 			}
 
 			// Add/Sub probrem (under 99).
-			scale = 6, scale2 = 18;
+			scale = 6;
 
 			// Generate wrong answer.
 			correct = answer > 2 ? picoRandom(3) : answer > 1 ? picoRandom(2) : 0;
@@ -187,11 +204,11 @@ async function appProbrem() {
 
 			// Mul probrem (under 99).
 			if (levels[level][1] * levels[level][2] <= 99) {
-				scale = 6, scale2 = 18;
+				scale = 6;
 
 			// Mul probrem (over 100).
 			} else {
-				scale = 4, scale2 = 17;
+				scale = 4;
 			}
 
 			// Generate wrong answer.
@@ -204,7 +221,7 @@ async function appProbrem() {
 				choices = [probrem1 * (probrem2-2), probrem1 * (probrem2-1), answer];
 			}
 
-		// Mul probrem (over 12).
+		// Mul probrem (over 12x12).
 		} else {
 			probrem1 = picoRandom(levels[level][1]-10) + 11; // Over 11.
 			probrem2 = picoRandom(levels[level][2]-1) + 2;
@@ -213,11 +230,11 @@ async function appProbrem() {
 
 			// Mul probrem (under 999).
 			if (levels[level][1] * levels[level][2] <= 999) {
-				scale = 4, scale2 = 17;
+				scale = 4;
 
 			// Mul probrem (over 1000).
 			} else {
-				scale = 3, scale2 = 17;
+				scale = 3;
 			}
 
 			// Generate wrong answer.
@@ -254,15 +271,15 @@ async function appProbrem() {
 	// Draw answer.
 	for (let i = 0; i < 3; i++) {
 		let x = (i-1)*60, y = 35;
-		let s = picoMotion(x, y, scale2, scale2) ? 0.8 : 1;
+		let s = picoMotion(x, y, square, square) ? 0.8 : 1;
 
 		// Choose answer.
-		if (picoAction(x, y, scale2, scale2)) {
+		if (picoAction(x, y, square, square)) {
 			choose = i;
 			state = "answer";
 			playing = 0;
 		}
-		await picoRect([-1,-1,2,2], 3, x,y, angle,scale2 * s);
+		await picoRect([-square,-square,square*2-1,square*2-1], 3, x,y, angle,s);
 		await picoChar("" + choices[i], 0, x,y, 0,scale * s);
 	}
 }
@@ -304,8 +321,8 @@ async function appAnswer() {
 	// Draw correct answer.
 	let i = correct;
 	let x = (i-1)*60, y = 35;
-	let s = picoMotion(x, y, scale2, scale2) ? 0.8 : 1;
-	if (picoAction(x, y, scale2, scale2)) {
+	let s = picoMotion(x, y, square, square) ? 0.8 : 1;
+	if (picoAction(x, y, square, square)) {
 
 		// Go next probrem or show result.
 		if (choose == correct) {
@@ -324,7 +341,7 @@ async function appAnswer() {
 		choose = -1;
 		playing = 0;
 	}
-	await picoRect([-1,-1,2,2], 0, x,y, 0,scale2 * s);
+	await picoRect([-square,-square,square*2-1,square*2-1], 0, x,y, angle,s);
 	await picoChar("" + choices[i], -1, x,y, 0,scale * s);
 }
 
@@ -334,23 +351,14 @@ async function appResult() {
 	// Initialize.
 	if (playing <= 0) {
 
-		// Total time.
-		let t = picoDiv(picoTime() - startTime, 10);
-		if (t > 100000) {
-			t = 99999;
+		// Result time.
+		resultTime = picoTime() - startTime;
+		if (resultTime > 1000000) {
+			resultTime = 999999;
 		}
-		let f = picoMod(t, 100); // Fractional part.
-		let i = picoDiv(t, 100); // Integer part.
-		totalTime = "" + i + "." + (f < 10 ? "0" : "") + f;
 
 		// Enable share button.
 		picoLabel("action", "^");
-
-		// Unlock extra levels.
-		let maxlevel = levels.length-1 - maxextra + extra;
-		if (level == maxlevel) {
-			extra = extra + 1 < maxextra ? extra + 1 : maxextra;
-		}
 
 		// Reset playing count.
 		playing = 1;
@@ -362,7 +370,8 @@ async function appResult() {
 	await picoChar(seed, 0, 0,-75, 0,1);
 
 	// Draw result.
-	await picoChar(totalTime, -1, 0,0, 0,8);
+	let result = appResultText(resultTime);
+	await picoChar(result, -1, 0,0, 0,8);
 
 	// Wait result.
 	if (playing <= 72) {
@@ -371,6 +380,29 @@ async function appResult() {
 
 	// Wait for input.
 	} else if (picoAction()) {
+
+		// Clear time.
+		if (level > 0 && resultTime <= clearTime) {
+
+			// Unlock extra levels.
+			let maxlevel = levels.length-1 - maxextra + extra;
+			if (level == maxlevel) {
+				extra = extra + 1 < maxextra ? extra + 1 : maxextra;
+				maxlevel = levels.length-1 - maxextra + extra;
+			}
+
+			// Go next level.
+			level = level + 1 < maxlevel ? level + 1 : maxlevel;
+			picoLabel("select", appProbremText(levels[level][0], levels[level][1]));
+
+			// Play clear sound.
+			picoBeep(1.2, 0.1);
+			picoBeep(1.2, 0.1, 0.2);
+		} else {
+
+			// Play sound.
+			picoBeep(1.2, 0.1);
+		}
 
 		// Restart.
 		state = "";

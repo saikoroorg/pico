@@ -205,6 +205,9 @@ async function appMain() {
 
 		// Reset playing count.
 		playing = 1;
+
+		// Reset action button.
+		picoLabel("action");
 	}
 
 	// Move player.
@@ -215,7 +218,7 @@ async function appMain() {
 
 			// Touch blank cell to move player.
 			if (pixels[j][i] == 0) {
-				if (picoMotion(x, y, grid/2)) {
+				if (picoMotion(x, y, grid/2, grid/2)) {
 					// Check cell next to player.
 					let next = [false, false];
 					for (let k = 0; k < 2; k++) {
@@ -258,8 +261,10 @@ async function appMain() {
 
 				// Clear level.
 				if (blocking == 0) {
-					players = [[], []];
+					//players = [[], []];
 					maxlevel = level + 1;
+
+					// Play clear sound.
 					picoBeep(1.2, 0.1);
 					picoBeep(1.2, 0.1, 0.2);
 
@@ -279,7 +284,7 @@ async function appMain() {
 
 			// Touch color cell to update primary player.
 			if (pixels[j][i] != 0) {
-				if (picoMotion(x, y, (grid+margin)/2)) {
+				if (picoMotion(x, y, (grid+margin)/2, (grid+margin)/2)) {
 					if (pixels[j][i] == 1) {
 						primary = 0;
 					} else if (pixels[j][i] == 2) {
@@ -307,5 +312,22 @@ async function appMain() {
 	}
 
 	// Increment playing count.
-	playing++;
+	if (blocking > 0) {
+		playing++;
+
+	// Wait for input.
+	} else if (picoAction()) {
+		if (playing <= 1) {
+
+			// Go next level.
+			level = level + 1 < maxlevel ? level + 1 : maxlevel;
+
+			// Restart.
+			playing = 0;
+
+		// Wait for touch off.
+		} else {
+			playing = 1;
+		}
+	}
 }
