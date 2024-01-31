@@ -76,11 +76,12 @@ async function appSelect(x) {
 	state = "";
 	playing = -1;
 	number = 1;
+	seed = 0;
 }
 
 // Action button.
 async function appAction() {
-	await picoShareScreen();
+	picoShareScreen();
 }
 
 // Load.
@@ -134,9 +135,9 @@ async function appTitle() {
 
 	// Draw probrem title.
 	let probrem = appProbremText(levels[level][0], levels[level][1], levels[level][2]);
-	await picoChar(probrem, -1, 0,0, 0,8);
+	picoChar(probrem, -1, 0,0, 0,8);
 	if (seed) {
-		await picoChar(seed, 0, 0,-75, 0,1);
+		picoChar(seed, 0, 0,-75, 0,1);
 	}
 
 	// Wait for input.
@@ -263,11 +264,11 @@ async function appProbrem() {
 	}
 
 	// Draw number.
-	await picoChar("" + number + "/" + maxnumber, 0, 0,-85, 0,2);
+	picoChar("" + number + "/" + maxnumber, 0, 0,-85, 0,2);
 
 	// Draw probrem.
 	let probrem = appProbremText(operator, probrem1, probrem2);
-	await picoChar(probrem, -1, 0,-50, 0,scale);
+	picoChar(probrem, -1, 0,-50, 0,scale);
 
 	// Draw answer.
 	for (let i = 0; i < 3; i++) {
@@ -280,8 +281,8 @@ async function appProbrem() {
 			state = "answer";
 			playing = 0;
 		}
-		await picoRect([-square,-square,square*2-1,square*2-1], 3, x,y, angle,s);
-		await picoChar("" + choices[i], 0, x,y, 0,scale * s);
+		picoRect([-square,-square,square*2-1,square*2-1], 3, x,y, angle,s);
+		picoChar("" + choices[i], 0, x,y, 0,scale * s);
 	}
 }
 
@@ -306,17 +307,17 @@ async function appAnswer() {
 	}
 
 	// Draw number.
-	await picoChar("" + number + "/" + maxnumber, 0, 0,-85, 0,2);
+	picoChar("" + number + "/" + maxnumber, 0, 0,-85, 0,2);
 
 	// Draw probrem.
 	let probrem = appProbremText(operator, probrem1, probrem2);
-	await picoChar(probrem, -1, 0,-50, 0,scale);
+	picoChar(probrem, -1, 0,-50, 0,scale);
 
 	// Draw choose answer.
 	if (choose != correct) {
 		let i = choose;
 		let x = (i-1)*60, y = 35;
-		await picoChar("*", -1, x,y, 0,scale);
+		picoChar("*", -1, x,y, 0,scale);
 	}
 
 	// Draw correct answer.
@@ -342,8 +343,8 @@ async function appAnswer() {
 		choose = -1;
 		playing = 0;
 	}
-	await picoRect([-square,-square,square*2-1,square*2-1], 0, x,y, angle,s);
-	await picoChar("" + choices[i], -1, x,y, 0,scale * s);
+	picoRect([-square,-square,square*2-1,square*2-1], 0, x,y, angle,s);
+	picoChar("" + choices[i], -1, x,y, 0,scale * s);
 }
 
 // Result loop.
@@ -367,12 +368,12 @@ async function appResult() {
 
 	// Draw probrem title.
 	let probrem = appProbremText(levels[level][0], levels[level][1], levels[level][2]);
-	await picoChar(probrem, -1, 0,-85, 0,2);
-	await picoChar(seed, 0, 0,-75, 0,1);
+	picoChar(probrem, -1, 0,-85, 0,2);
+	picoChar(seed, 0, 0,-75, 0,1);
 
 	// Draw result.
 	let result = appResultText(resultTime);
-	await picoChar(result, -1, 0,0, 0,8);
+	picoChar(result, -1, 0,0, 0,8);
 
 	// Wait result.
 	if (playing <= 72) {
@@ -409,6 +410,7 @@ async function appResult() {
 		state = "";
 		playing = 0;
 		number = 1;
+		seed = 0;
 	}
 }
 
@@ -417,15 +419,15 @@ async function appMain() {
 	picoColor(colors);
 
 	if (state == "probrem") {
-		await appProbrem();
+		appProbrem();
 
 	} else if (state == "answer") {
-		await appAnswer();
+		appAnswer();
 
 	} else if (state == "result") {
-		await appResult();
+		appResult();
 
 	} else {
-		await appTitle();
+		appTitle();
 	}
 }

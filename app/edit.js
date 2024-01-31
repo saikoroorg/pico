@@ -83,7 +83,7 @@ async function appAction() {
 		picoSetCode8(colors, k);
 	}
 
-	await picoSwitch(); // Share or back.
+	picoSwitch(); // Share or back.
 }
 
 // Select button.

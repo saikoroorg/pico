@@ -97,6 +97,7 @@ pico.App = class {
 		this.ver = 0; // Protocol version.
 		this.author = "*"; // App author.
 		this.name = ""; // App name.
+		this.lock = "picoAppLock" + Date.now(); // Lock object identifier.
 
 		// Load app version.
 		let e = document.getElementById("author");
@@ -134,41 +135,49 @@ pico.App = class {
 		e.src = this.script ? this.script : pico.App.script;
 		document.body.appendChild(e);
 
-		window.addEventListener("resize", () => {
-			this.onResize()
+		window.addEventListener("resize", async () => {
+			await this.onResize()
 		}); // Resize.
-		window.addEventListener("load", () => {
-			this.onLoad();
+		window.addEventListener("load", async () => {
+			await this.onLoad();
 		}); // Load.
 	}
 
 	// On reset button.
 	async onReset() {
-		picoResetParams();
-		if (this.ver > 0) {
-			picoSetStrings(this.ver, "v");
-		}
-		await picoReload();
+		await navigator.locks.request(this.lock, async (lock) => {
+			picoResetParams();
+			if (this.ver > 0) {
+				picoSetStrings(this.ver, "v");
+			}
+			await picoReload();
+		}); // end of lock.
 	}
 
 	// On acction button.
 	async onAction() {
 		if (typeof appAction === "function") {
-			await appAction();
+			await navigator.locks.request(this.lock, async (lock) => {
+				await appAction();
+			}); // end of lock.
 		}
 	}
 
 	// On select button.
 	async onSelect(x) {
 		if (typeof appSelect === "function") {
-			await appSelect(x);
+			await navigator.locks.request(this.lock, async (lock) => {
+				await appSelect(x);
+			}); // end of lock.
 		}
 	}
 
 	// On resize event.
 	async onResize() {
 		if (typeof appResize === "function") {
-			await appResize();
+			await navigator.locks.request(this.lock, async (lock) => {
+				await appResize();
+			}); // end of lock.
 		}
 	}
 
@@ -187,14 +196,18 @@ pico.App = class {
 			this.url = picoStrings("u");
 			this.ver = picoStrings("v");
 			if (typeof appLoad === "function") {
-				await appLoad();
+				await navigator.locks.request(this.lock, async (lock) => {
+					await appLoad();
+				}); // end of lock.
 			}
 			picoFlush(); // Flush to skip first read.
 			for (;;) {
-				await picoRead();
-				picoClear();
-				await appMain();
-				await picoFlip(0);
+				await navigator.locks.request(this.lock, async (lock) => {
+					await picoRead();
+					picoClear();
+					await appMain();
+					await picoFlip(0);
+				}); // end of lock.
 			}
 		} catch (error) {
 			console.error(error.name, error.message);

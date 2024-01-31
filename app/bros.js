@@ -81,10 +81,10 @@ async function appAction() {
 	} else {
 		picoSetCode6(levels[level], 0);
 		if (blocking == 0) {
-			await picoSwitch(); // Share or back.
+			picoSwitch(); // Share or back.
 		} else {
 			picoSetCode8(colors, 1);
-			await picoSwitch(editjs); // Open editor.
+			picoSwitch(editjs); // Open editor.
 		}
 	}
 }
