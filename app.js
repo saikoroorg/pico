@@ -1,8 +1,8 @@
-picoTitle(""); // Title.
+//picoTitle(""); // Title.
 
 // Data and settings.
 const colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // 5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000
-const labels = ["bros", "dice", "kuku", "edit"];
+const labels = ["bros", "clock", "dice", "kuku", "edit"];
 
 // Main.
 async function appMain() {
