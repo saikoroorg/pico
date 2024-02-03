@@ -321,6 +321,7 @@ async function appMain() {
 
 			// Go next level.
 			level = level + 1 < maxlevel ? level + 1 : maxlevel;
+			picoLabel("select", "" + level);
 
 			// Restart.
 			playing = 0;

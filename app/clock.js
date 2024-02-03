@@ -254,7 +254,7 @@ async function appResize() {
 		if (landscape) {
 			screens[0].centerx = clockPosX;
 			screens[0].centery = 0;
-			screens[1].centerx = -clockPosX;
+			screens[1].centerx = clockPosX;
 			screens[1].centery = 0;
 			screens[0].width  = screens[1].width  = 50;
 			screens[0].height = screens[1].height = 200;
@@ -822,10 +822,10 @@ async function appMain() {
 
 	// Wakelock and flush on playing.
 	if (!waiting || playing < 6) {
-		//picoWakelock(true);
+		picoWakelock(true);
 		picoFlush();
 	} else if (playing < 7) {
-		//picoWakelock(false);
+		picoWakelock(false);
 	}
 
 	// Increment playing count.
