@@ -20,7 +20,7 @@ async function appUpdate(c, a=0, b=0, p=0) {
 	count = c > countMax ? countMax : c > 0 ? c : 0;
 	addition = a > countMax ? countMax : a > 0 ? a : 0;
 	bonus = b > 99 ? 99 : b; // Hourglass mode if b < 0.
-	player = p > playerMax ? playerMax : p > 0 ? p : 1;
+	player = p > playerMax ? playerMax : p > 0 ? p : 2;
 
 	picoLabel("minus", "x" + player);
 	if (count > 0) {
@@ -191,7 +191,7 @@ async function appLoad() {
 	// Load query params.
 	let value = picoStrings();
 	if (value) {
-		let numbers = picoNumbers(keys[k]);
+		let numbers = picoNumbers();
 
 		// Additional time mode. (Byoyomi)
 		if (value.match(/a/i)) {
