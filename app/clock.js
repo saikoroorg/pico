@@ -746,7 +746,7 @@ async function appMain() {
 					players[playerIndex].consumed = 0;
 
 				// Add bonus time.
-				} else {
+				} else if (!waiting) {
 					let c = players[playerIndex].count - players[playerIndex].consumed + players[playerIndex].bonus;
 					players[playerIndex].current = players[playerIndex].count = c > countMax ? countMax : c > 0 ? c : 0;
 					players[playerIndex].consumed = 0;
