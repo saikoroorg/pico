@@ -107,9 +107,10 @@ const screenWidth = 200, screenHeight = 50;
 // Screen class.
 Screen = class {
 	constructor() {
-		this.enable = true;
 		this.centerx = 0; // Center position X.
 		this.centery = 0; // Center position Y.
+		this.width = 200;
+		this.height = 50;
 	}
 };
 var screens = [];
@@ -232,9 +233,10 @@ async function appResize() {
 	// Reset layouts.
 	// 1 Screen for solo player.
 	if (playerCount <= 1) {
-		screens[1].enable = false;
-		screens[0].centerx = 0;
-		screens[0].centery = 0;
+		screens[0].centerx = screens[1].centerx = 0;
+		screens[0].centery = screens[1].centery = 0;
+		screens[0].width  = screens[1].width  = 200;
+		screens[0].height = screens[1].height = 50;
 
 		// 1 Screen for solo player.
 		for (let j = 0; j < 1; j++) {
@@ -246,7 +248,6 @@ async function appResize() {
 
 	// 2 Screens for 2 players.
 	} else {
-		screens[1].enable = true;
 
 		// Set sprite positions and scale for landscape mode.
 		if (landscape) {
@@ -254,6 +255,8 @@ async function appResize() {
 			screens[0].centery = 0;
 			screens[1].centerx = clockPosX;
 			screens[1].centery = 0;
+			screens[0].width  = screens[1].width  = 50;
+			screens[0].height = screens[1].height = 200;
 
 		// Set sprite positions and scale for portrait mode.
 		} else {
@@ -261,6 +264,8 @@ async function appResize() {
 			screens[0].centery = clockPosY;
 			screens[1].centerx = 0;
 			screens[1].centery = -clockPosY;
+			screens[0].width  = screens[1].width  = 200;
+			screens[0].height = screens[1].height = 50;
 		}
 
 		// 2 Screens for 2 players.
@@ -659,11 +664,11 @@ async function appMain() {
 
 	// Read input.
 	let actions = [
-		picoAction(screens[0].centerx, screens[0].centery, screenWidth, screenHeight),
-		picoAction(screens[1].centerx, screens[1].centery, screenWidth, screenHeight)];
+		picoAction(screens[0].centerx, screens[0].centery, screens[0].width, screens[0].height),
+		picoAction(screens[1].centerx, screens[1].centery, screens[1].width, screens[1].height)];
 	let motions = [
-		picoMotion(screens[0].centerx, screens[0].centery, screenWidth, screenHeight),
-		picoMotion(screens[1].centerx, screens[1].centery, screenWidth, screenHeight)];
+		picoMotion(screens[0].centerx, screens[0].centery, screens[0].width, screens[0].height),
+		picoMotion(screens[1].centerx, screens[1].centery, screens[1].width, screens[1].height)];
 
 	let action = (playerCount == 2 && !waiting) ? actions[playerIndex] : (actions[0] || actions[1]);
 	let motion = (playerCount == 2 && !waiting) ? motions[playerIndex] : (motions[0] || motions[1]);
