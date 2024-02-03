@@ -555,7 +555,7 @@ async function appMain() {
 
 		// For 3+ players.
 		} else if (playerCount >= 3) {
-			for (let k = 0; k < clockMax; k++) {
+			for (let k = 1; k < clockMax; k++) {
 				if (k != playerIndex + 1) {
 					clocks[k].angle = 180;
 				} else {
