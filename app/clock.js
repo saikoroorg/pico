@@ -252,9 +252,9 @@ async function appResize() {
 
 		// Set sprite positions and scale for landscape mode.
 		if (landscape) {
-			screens[0].centerx = -clockPosX;
+			screens[0].centerx = clockPosX;
 			screens[0].centery = 0;
-			screens[1].centerx = clockPosX;
+			screens[1].centerx = -clockPosX;
 			screens[1].centery = 0;
 			screens[0].width  = screens[1].width  = 50;
 			screens[0].height = screens[1].height = 200;
