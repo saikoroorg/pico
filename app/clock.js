@@ -480,30 +480,32 @@ async function appMain() {
 	for (let j = 0; j < playerCount; j++) {
 
 		// Show delay about 1 second for count down on main time count.
-		let s = 0; // Second part.
+		let sec = "00"; // Second part.
 		if (players[j].count > 0 && !(hourglass && j != playerIndex)) {
-			s = picoMod(players[j].current + 0.9999, 60); // Round up decimal to integer.
-		} else {
-			s = picoMod(players[j].current, 60);
+			let s = picoMod(players[j].current + 0.9999, 60); // Round up decimal to integer.
+			sec = s < 10 ? "0" + s : s;
+		} else if (players[j].current >= 1) {
+			let s = picoMod(players[j].current, 60);
+			sec = s < 10 ? "0" + s : s;
 		}
-		s = s < 10 ? "0" + s : s;
 
 		// Colon mark.
-		let c = ":";
+		let colon = ":";
 		if (!waiting && !pausing && !timeout && j == playerIndex) {
-			c = counting ? " " : ":";
+			colon = counting ? " " : ":";
 		}
 
 		// Show delay about 1 second for count down on main time count.
-		let m = 0; // Minute part.
+		let min = "  "; // Minute part.
 		if (players[j].count > 0) {
-			m = picoDiv(players[j].current + 0.9999, 60); // Round up decimal to integer.
-		} else {
-			m = picoDiv(players[j].current, 60);
+			let m = picoDiv(players[j].current + 0.9999, 60); // Round up decimal to integer.
+			min = m < 10 ? "0" + m : m;
+		} else if (players[j].current >= 60) {
+			let m = picoDiv(players[j].current, 60);
+			min = m < 10 ? " " + m : m;
 		}
-		m = m < 10 ? "0" + m : m;
 
-		players[j].number = "" + m + c + s;
+		players[j].number = min + colon + sec;
 	}
 
 	// Update angle by screen orientation.
