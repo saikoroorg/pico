@@ -202,8 +202,8 @@ pico.App = class {
 			}
 			picoFlush(); // Flush to skip first read.
 			for (;;) {
+				await picoRead();
 				await navigator.locks.request(this.lock, async (lock) => {
-					await picoRead();
 					picoClear();
 					await appMain();
 					await picoFlip(0);

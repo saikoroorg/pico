@@ -138,12 +138,14 @@ var players = [];
 const clockMax = playerMax + 1; // Maximum clock count.
 //const numberMax = 6; // Maximum number of digits.
 var clockCount = 2; // Clock count.
-const clockScale = 8; // Clock scale.
+const clockScale = 6; // Clock scale.
 const numberScale = 0.5; // Number scale.
-const clockPosX = 70; // Clock position X on landscape mode.
-const clockPosY = 70; // Clock position Y on portrait mode.
+const clockPosX = 50; // Clock position X on landscape mode.
+const clockPosY = 50; // Clock position Y on portrait mode.
+const clockGridX = 125; // Clock position grid base width for 3+ players.
+const clockGridY = [-15, 15]; // Clock position grid base height for 3+ players.
 const buttonWidth = numberWidth = 40;
-const clockRects = [-7,-5,14,10, -5,-7,10,10]; // Clock base sprite.
+const clockRects = [-7,-4,14,8, -5,-6,10,10]; // Clock base sprite.
 
 // Clock class.
 Clock = class {
@@ -227,12 +229,85 @@ async function appLoad() {
 async function appResize() {
 	landscape = picoWidescreen();
 
-	// Set sprite positions and scale for landscape mode.
-	if (landscape) {
+	// Reset layouts.
+	// 1 Screen for solo player.
+	if (playerCount <= 1) {
+		screens[1].enable = false;
+		screens[0].centerx = 0;
+		screens[0].centery = 0;
 
-	// Set sprite positions and scale for portrait mode.
+		// 1 Screen for solo player.
+		for (let j = 0; j < 1; j++) {
+			clocks[j].centerx = 0;
+			clocks[j].centery = 0;
+			clocks[j].scale = clockScale;
+			clocks[j].angle = 0;
+		}
+
+	// 2 Screens for 2 players.
 	} else {
+		screens[1].enable = true;
 
+		// Set sprite positions and scale for landscape mode.
+		if (landscape) {
+			screens[0].centerx = -clockPosX;
+			screens[0].centery = 0;
+			screens[1].centerx = clockPosX;
+			screens[1].centery = 0;
+
+		// Set sprite positions and scale for portrait mode.
+		} else {
+			screens[0].centerx = 0;
+			screens[0].centery = clockPosY;
+			screens[1].centerx = 0;
+			screens[1].centery = -clockPosY;
+		}
+
+		// 2 Screens for 2 players.
+		if (playerCount <= 2) {
+			for (let j = 0; j < 2; j++) {
+				clocks[j].centerx = 0;
+				clocks[j].centery = 0;
+				clocks[j].scale = clockScale;
+				clocks[j].angle = 0;
+			}
+
+			// Upsidedown for portrait mode.
+			if (!landscape) {
+				clocks[1].angle = 180;
+			}
+
+		// 2 Screens for 3+ players.
+		} else {
+			clocks[0].centerx = 0;
+			clocks[0].centery = 0;
+			clocks[0].scale = clockScale;
+			clocks[0].angle = 0;
+
+			if (playerCount <= 4) {
+				for (let j = 0; j < playerCount; j++) {
+					clocks[j + 1].centerx = clockGridX * (j - playerCount/2 + 0.5) / (playerCount + 1);
+					clocks[j + 1].centery = 0;
+					clocks[j + 1].scale = clockScale / playerCount;
+					clocks[j + 1].angle = 0;
+				}
+			} else {
+				let playerCount2 = picoDiv(playerCount, 2);
+				let playerCount1 = playerCount - playerCount2;
+				for (let j = 0; j < playerCount1; j++) {
+					clocks[j + 1].centerx = clockGridX * (j - playerCount1/2 + 0.5) / (playerCount1 + 1);
+					clocks[j + 1].centery = clockGridY[0];
+					clocks[j + 1].scale = clockScale / playerCount1;
+					clocks[j + 1].angle = 0;
+				}
+				for (let j = playerCount1; j < playerCount; j++) {
+					clocks[j + 1].centerx = clockGridX * (j - playerCount2/2 - playerCount1 + 0.5) / (playerCount2 + 1);
+					clocks[j + 1].centery = clockGridY[1];
+					clocks[j + 1].scale = clockScale / playerCount1;
+					clocks[j + 1].angle = 0;
+				}
+			}
+		}
 	}
 
 	picoFlush();
@@ -265,70 +340,7 @@ async function appMain() {
 			players[j].starting = false;
 		}
 
-		// Reset layouts.
-		// 1 Screen for solo player.
-		if (playerCount <= 1) {
-			screens[0].centerx = 0;
-			screens[0].centery = 0;
-			screens[1].enable = false;
-			for (let j = 0; j < 1; j++) {
-				clocks[j].centerx = 0;
-				clocks[j].centery = 0;
-				clocks[j].scale = clockScale;
-				clocks[j].angle = 0;
-			}
-
-		// 2 Screens for 2 players.
-		} else if (playerCount <= 2) {
-			screens[0].centerx = 0;
-			screens[0].centery = clockPosY;
-			screens[1].centerx = 0;
-			screens[1].centery = -clockPosY;
-			screens[1].enable = true;
-			for (let j = 0; j < 2; j++) {
-				clocks[j].centerx = 0;
-				clocks[j].centery = 0;
-				clocks[j].scale = clockScale;
-				clocks[j].angle = 0;
-			}
-
-		// 2 Screens for 3+ players.
-		} else {
-			screens[0].centerx = 0;
-			screens[0].centery = clockPosY;
-			screens[1].centerx = 0;
-			screens[1].centery = -clockPosY;
-			screens[1].enable = true;
-
-			clocks[0].centerx = 0;
-			clocks[0].centery = 0;
-			clocks[0].scale = clockScale;
-			clocks[0].angle = 0;
-
-			if (playerCount <= 4) {
-				for (let j = 0; j < playerCount; j++) {
-					clocks[j + 1].centerx = screenWidth * (j - playerCount/2 + 0.5) / (playerCount + 1);
-					clocks[j + 1].centery = 0;
-					clocks[j + 1].scale = clockScale / playerCount;
-					clocks[j + 1].angle = 0;
-				}
-			} else {
-				let playerCount2 = picoDiv(playerCount, 2);
-				let playerCount1 = playerCount - playerCount2;
-				for (let j = 0; j < playerCount1; j++) {
-					clocks[j + 1].centerx = screenWidth * (j - playerCount1/2 + 0.5) / (playerCount1 + 1);
-					clocks[j + 1].centery = screenHeight * -0.25;
-					clocks[j + 1].scale = clockScale / playerCount1;
-					clocks[j + 1].angle = 0;
-				}
-				for (let j = playerCount1; j < playerCount; j++) {
-					clocks[j + 1].centerx = screenWidth * (j - playerCount2/2 - playerCount1 + 0.5) / (playerCount2 + 1);
-					clocks[j + 1].centery = screenHeight * 0.75;
-					clocks[j + 1].scale = clockScale / playerCount1;
-					clocks[j + 1].angle = 0;
-				}
-			}
-		}
+		appResize();
 
 		// Reset playing count.
 		playing = 1;
@@ -495,7 +507,7 @@ async function appMain() {
 	}
 
 	// Update angle by screen orientation.
-	if (playerCount >= 2) {
+	/*if (playerCount >= 2) {
 		clocks[0].angle = 0;
 		if (!landscape) {
 			screens[0].centerx = 0;
@@ -508,38 +520,38 @@ async function appMain() {
 			screens[1].centerx = clockPosX;
 			screens[1].centery = 0;
 		}
-	}
+	}*/
 
 	// Update angle for hourglass mode.
 	if (hourglass) {
 
 		// For solo player.
 		if (playerCount <= 1) {
-			for (let j = 0; j < playerCountMin2; j++) {
-				if (waiting != 1 && j != playerIndex) {
-					clocks[j].angle = 180;
+			for (let k = 0; k < playerCountMin2; k++) {
+				if (waiting != 1 && k != playerIndex) {
+					clocks[k].angle = 180;
 				} else {
-					clocks[j].angle = 0;
+					clocks[k].angle = 0;
 				}
 			}
 
 		// For 2 players without portrait mode.
 		} else if (playerCount <= 2 && landscape) {
-			for (let j = 0; j < playerCountMin2; j++) {
-				if (waiting != 1 && j != playerIndex) {
-					clocks[j].angle = 180;
+			for (let k = 0; k < playerCountMin2; k++) {
+				if (waiting != 1 && k != playerIndex) {
+					clocks[k].angle = 180;
 				} else {
-					clocks[j].angle = 0;
+					clocks[k].angle = 0;
 				}
 			}
 
 		// For 3+ players.
 		} else if (playerCount >= 3) {
-			for (let j = 1; j < clockMax; j++) {
-				if (j != playerIndex + 1) {
-					clocks[j].angle = 180;
+			for (let k = 0; k < clockMax; k++) {
+				if (k != playerIndex + 1) {
+					clocks[k].angle = 180;
 				} else {
-					clocks[j].angle = 0;
+					clocks[k].angle = 0;
 				}
 			}
 		}
@@ -558,23 +570,23 @@ async function appMain() {
 				// Waiting.
 				if (waiting) {
 					if (waiting >= 2 && !pausing) { // Wait to restart.
-						await picoRect(clockRects, 3, x, y, clocks[k].angle,clocks[k].scale);
+						await picoRect(clockRects, 4, x, y, clocks[k].angle, clocks[k].scale);
 					} else if (pausing && k == playerIndex) { // Just starting.
-						await picoRect(clockRects, 3, x, y, clocks[k].angle,clocks[k].scale * p);
+						await picoRect(clockRects, 4, x, y, clocks[k].angle, clocks[k].scale * p);
 					} else if (playerIndex < 0) { // Waiting.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle,clocks[k].scale);
+						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
 					} else { // Opposite player.
-						await picoRect(clockRects, 4, x, y, clocks[k].angle,clocks[k].scale);
+						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
 					}
 
 				// Playing.
 				} else {
 					if (k == playerIndex) { // Playing.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle,clocks[k].scale * p);
+						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
 					} else if (hourglass && playerCount <= 1) { // Reversed hourglass solo player.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle,clocks[k].scale * p);
+						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
 					} else { // Opposite player.
-						await picoRect(clockRects, 4, x, y, clocks[k].angle,clocks[k].scale);
+						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
 					}
 				}
 			}
@@ -589,28 +601,28 @@ async function appMain() {
 				if (waiting == 1) {
 					if (k == 0) { // Playing.
 						if (pausing) { // Just starting.
-							await picoRect(clockRects, 0, x, y, clocks[k].angle,clocks[k].scale * p);
+							await picoRect(clockRects, 4, x, y, clocks[k].angle, clocks[k].scale * p);
 						} else { // Waiting.
-							await picoRect(clockRects, 0, x, y, clocks[k].angle,clocks[k].scale);
+							await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
 						}
 					} else { // Another players.
-						await picoRect(clockRects, 4, x, y, clocks[k].angle,clocks[k].scale * p);
+						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
 					}
 
 				// Playing.
 				} else {
 					if (k == 0 || k == playerIndex + 1) { // Playing or target player.
 						if (waiting >= 2 && !pausing) { // Wait to restart.
-							await picoRect(clockRects, 0, x, y, clocks[k].angle,clocks[k].scale);
+							await picoRect(clockRects, 4, x, y, clocks[k].angle, clocks[k].scale);
 						} else {
 							if (k == 0) { // Playing
-								await picoRect(clockRects, 0, x, y, clocks[k].angle,clocks[k].scale * p);
+								await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
 							} else if (k == playerIndex + 1) { // Target player.
-								await picoRect(clockRects, 0, x, y, clocks[k].angle,clocks[k].scale * p);
+								await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
 							}
 						}
 					} else { // Another players.
-						await picoRect(clockRects, 4, x, y, clocks[k].angle,clocks[k].scale);
+						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
 					}
 				}
 			}
@@ -631,7 +643,7 @@ async function appMain() {
 			let y = clocks[k].centery + screens[k == 0 ? 0 : 1].centery;
 
 			// Draw clock number.
-			await picoChar(players[j].number, -1, x, y, clocks[k].angle,clocks[k].scale*numberScale);
+			await picoChar(players[j].number, -1, x, y, clocks[k].angle, clocks[k].scale*numberScale);
 
 		} else if (playerCount <= 2 && k < clockCount) {
 
@@ -639,7 +651,7 @@ async function appMain() {
 			let y = clocks[k].centery + screens[k].centery;
 
 			// Draw clock number.
-			await picoChar(players[j].number, -1, x, y, clocks[k].angle,clocks[k].scale*numberScale);
+			await picoChar(players[j].number, -1, x, y, clocks[k].angle, clocks[k].scale*numberScale);
 		}
 	}
 
@@ -661,6 +673,8 @@ async function appMain() {
 		// Reset timeout or starting.
 		if (timeout || waiting == 1) {
 			timeout = false;
+
+			// Pressing.
 			playing = -2;
 
 		// Pause playing.
@@ -688,11 +702,11 @@ async function appMain() {
 			}
 
 			// Pause.
-			pausing = false;
-		}
+			pausing = true;
 
-		// Pressing.
-		playing = 1;
+			// Pressing.
+			playing = 1;
+		}
 
 		// Reset waiting state.
 		/*if (!waiting) {
@@ -796,11 +810,11 @@ async function appMain() {
 	}
 
 	// Wakelock and flush on playing.
-	if (!waiting) {
-		//picoWakelock(true);
+	if (!waiting || playing < 6) {
+		picoWakelock(true);
 		picoFlush();
-	} else {
-		//picoWakelock(false);
+	} else if (playing < 7) {
+		picoWakelock(false);
 	}
 
 	// Increment playing count.
