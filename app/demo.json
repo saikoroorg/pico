@@ -1,6 +1,6 @@
 {
-	"name": "pico",
-	"short_name": "Pico",
+	"name": "demo",
+	"short_name": "Demo",
 	"version": "0.9.40205a",
 	"author": "saikoro.org",
 	"background_color": "#fff",
