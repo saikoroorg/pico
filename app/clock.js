@@ -216,7 +216,7 @@ async function appLoad() {
 
 // Resize.
 async function appResize() {
-	landscape = picoWidescreen();
+	landscape = picoWideScreen();
 
 	// Reset layouts for 1 screen.
 	if (playerCount <= 1) {

@@ -1,6 +1,6 @@
 {
-	"name": "clock",
-	"short_name": "Clock",
+	"name": "dice",
+	"short_name": "Dice",
 	"version": "0.9.40206a",
 	"author": "saikoro.org",
 	"background_color": "#dfdfdf",
@@ -15,7 +15,7 @@
 		"sizes": "300x300",
 		"type": "image/svg"
 	}],
-	"display": "minimal-ui",
+	"display": "standalone",
 	"start_url": "./?v=1",
 	"contents": ["./", "./pico.css", "./pico.js", "./app.js", "./index.js"]
 }
