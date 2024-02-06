@@ -519,7 +519,7 @@ async function appMain() {
 	}
 
 	// Update button sprites.
-	let p = playing >= 0 && playing < 6 ? 1 - 0.025 * (6 - playing) : 1;
+	let s = playing < 5 ? 0.8 + 0.04 * playing : 1;
 	for (let k = 0; k < clockMax; k++) {
 
 		// Switching clocks for 1-2 players.
@@ -532,11 +532,11 @@ async function appMain() {
 				// Waiting.
 				if (waiting) {
 					if (waiting >= 2 && k == playerIndex) { // Wait to restart.
-						await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * p);
+						await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else if (pausing && k == playerIndex) { // Just starting.
-						await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * p);
+						await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else if (playerIndex < 0) { // Waiting.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
+						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else { // Opposite player.
 						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
 					}
@@ -544,9 +544,9 @@ async function appMain() {
 				// Playing.
 				} else {
 					if (k == playerIndex) { // Playing.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
+						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else if (bonus < 0 && playerCount <= 1) { // Reversed hourglass solo player.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
+						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else { // Opposite player.
 						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
 					}
@@ -564,9 +564,9 @@ async function appMain() {
 				if (waiting == 1) {
 					if (k == 0) { // Playing.
 						if (pausing) { // Just starting.
-							await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * p);
+							await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * s);
 						} else { // Waiting.
-							await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
+							await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
 						}
 					} else { // Another players.
 						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
@@ -576,12 +576,12 @@ async function appMain() {
 				} else {
 					if (k == 0 || k == playerIndex + 1) { // Playing or target player.
 						if (waiting >= 2) { // Wait to restart.
-							await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * p);
+							await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * s);
 						} else {
 							if (k == 0) { // Playing
-								await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
+								await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
 							} else if (k == playerIndex + 1) { // Target player.
-								await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * p);
+								await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
 							}
 						}
 					} else { // Another players.
@@ -634,7 +634,7 @@ async function appMain() {
 
 	// Cancel/Reset on pressed.
 	if (motion && holding >= 60) {
-		console.log("Holding Motion:" + motions[0] + "," + motions[1] + " Action:" + actions[0] + "," + actions[1]);
+		console.log("Holding m:" + motions[0] + "," + motions[1] + " a:" + actions[0] + "," + actions[1]);
 
 		// Reset timeout or starting.
 		if (timeout || waiting == 1) {
@@ -677,6 +677,10 @@ async function appMain() {
 			picoBeep(1.2, 0.1);
 			picoBeep(1.2, 0.1, 0.2);
 			picoBeep(1.2, 0.1, 0.4);
+
+			// Unlock.
+			console.log("Unlock screen.");
+			picoLockScreen(false);
 		}
 
 	// Check user action on timeout.
@@ -685,9 +689,13 @@ async function appMain() {
 		// Low beep on timeout.
 		picoBeep(-1.2, 0.1);
 
+		// Unlock.
+		console.log("Unlock screen.");
+		picoLockScreen(false);
+
 	// Check user action on tapping.
 	} else if (action && holding < 60) {
-		console.log("Action Motion:" + motions[0] + "," + motions[1] + " Action:" + actions[0] + "," + actions[1]);
+		console.log("Action m:" + motions[0] + "," + motions[1] + " a:" + actions[0] + "," + actions[1]);
 		holding = 0;
 
 		if (playerIndex >= 0) {
@@ -738,6 +746,10 @@ async function appMain() {
 			picoBeep(1.2, 0.1);
 			picoBeep(1.2, 0.1, 0.2);
 
+			// Lock.
+			console.log("Lock screen.");
+			picoLockScreen(true);
+
 		} else {
 
 			// Switch players.
@@ -753,7 +765,7 @@ async function appMain() {
 
 	// Check user motion.
 	} else if (motion && holding < 60) {
-		console.log("Motion Motion:" + motions[0] + "," + motions[1] + " Action:" + actions[0] + "," + actions[1]);
+		console.log("Motion m:" + motions[0] + "," + motions[1] + " a:" + actions[0] + "," + actions[1]);
 		holding++;
 
 		// Start pausing.
@@ -778,12 +790,9 @@ async function appMain() {
 		holding = 0;
 	}
 
-	// Wakelock and flush on playing.
-	if (!waiting || playing < 6) {
-		picoWakelock(true);
+	// Update animation if playing.
+	if (!waiting || playing < 5) {
 		picoFlush();
-	} else if (playing < 7) {
-		picoWakelock(false);
 	}
 
 	// Increment playing count.
