@@ -125,9 +125,10 @@ async function appTitle() {
 		picoLabel("action");
 
 		// Set random seed.
-		if (seed) {
-			picoRandom(0, seed);
+		if (!seed) {
+			seed = picoDate();
 		}
+		picoRandom(0, seed);
 
 		// Reset playing count.
 		playing = 1;
@@ -153,10 +154,6 @@ async function appProbrem() {
 
 	// Initialize.
 	if (playing <= 0) {
-
-		// Random seed.
-		seed = picoDate();
-		picoRandom(0, seed);
 
 		// Add/Sub probrem.
 		if (levels[level][0] != "x") {
