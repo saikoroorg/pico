@@ -49,7 +49,7 @@ var choices = [0, 0, 0]; // Choices of answer.
 var choose = -1; // Answer you chose.
 var angle = 0; // Angle of number.
 var scale = 6; // Scale of number.
-const square = 27; // Width of base square.
+const square = 54; // Width of base square.
 var startTime = 0; // Start time of the problem.
 var resultTime = 0; // Result time of the problem.
 const clearTime = 60 * 1000; // Clear time of the problem.
@@ -273,16 +273,16 @@ async function appProbrem() {
 	// Draw answer.
 	for (let i = 0; i < 3; i++) {
 		let x = (i-1)*60, y = 35;
-		let s = picoMotion(x, y, square, square) ? 0.8 : 1;
+		let s = picoMotion(x, y, square/2, square/2) ? 0.8 : 1;
 
 		// Choose answer.
-		if (picoAction(x, y, square, square)) {
+		if (picoAction(x, y, square/2, square/2)) {
 			choose = i;
 			state = "answer";
 			playing = 0;
 		}
-		picoRect([-square,-square,square*2,square*2], 3, x,y, angle,s);
-		picoChar("" + choices[i], 0, x,y, 0,scale * s);
+		picoRect([0,0,0,0], 3, x,y, angle,square*s);
+		picoChar("" + choices[i], 0, x,y, 0,scale*s);
 	}
 }
 
@@ -323,8 +323,8 @@ async function appAnswer() {
 	// Draw correct answer.
 	let i = correct;
 	let x = (i-1)*60, y = 35;
-	let s = picoMotion(x, y, square, square) ? 0.8 : 1;
-	if (picoAction(x, y, square, square)) {
+	let s = picoMotion(x, y, square/2, square/2) ? 0.8 : 1;
+	if (picoAction(x, y, square/2, square/2)) {
 
 		// Go next probrem or show result.
 		if (choose == correct) {
@@ -343,8 +343,8 @@ async function appAnswer() {
 		choose = -1;
 		playing = 0;
 	}
-	picoRect([-square,-square,square*2,square*2], 0, x,y, angle,s);
-	picoChar("" + choices[i], -1, x,y, 0,scale * s);
+	picoRect([0,0,0,0], 0, x,y, angle,square*s);
+	picoChar("" + choices[i], -1, x,y, 0,scale*s);
 }
 
 // Result loop.
