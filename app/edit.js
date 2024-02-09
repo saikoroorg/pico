@@ -255,13 +255,13 @@ async function appMain() {
 
 	// Draw background.
 	picoColor(bgcolors);
-	picoPixel(1, 0, pixelsposy, pixelswidth, pixelswidth);
+	picoRect(1, 0, pixelsposy, 0, pixelswidth);
 
 	// Touching background.
 	{
-		let w0 = 82, h0 = 12; // Foreground color selector width and height.
-		let w1 = 6, h1 = 6; // Background color selector width and height.
-		let w2 = 5.4, h2 = 5.4; // Background color selector width and height for touching.
+		let w0 = 165, h0 = 25; // Foreground color selector width and height.
+		let w1 = 12, h1 = 12; // Background color selector width and height.
+		let w2 = 10, h2 = 10; // Background color selector width and height for touching.
 
 		// Release touching background.
 		if (colortouching >= 0 && picoAction(bgcolorsposx, colorsposy, w1, h1)) {
@@ -349,13 +349,13 @@ async function appMain() {
 		}
 
 		// Draw foreground color selector.
-		picoPixel(bgindex ? 3 : 1, colorsposx, colorsposy, w0, h0);
+		picoRect(bgindex ? 3 : 1, colorsposx, colorsposy, 0, w0, h0);
 
 		// Set colors data.
 		picoColor(colors);
 
 		// Draw background color selector.
-		picoPixel(colorselecting, bgcolorsposx, colorsposy, w1, h1);
+		picoRect(colorselecting, bgcolorsposx, colorsposy, 0, w1, h1);
 	}
 
 	// Draw pixels.
@@ -363,8 +363,8 @@ async function appMain() {
 		let size = width < height ? width : height;
 		let grid = pixelswidth / size;
 		let margin = size <= 9 ? 2 : 1;
-		let w1 = (grid - margin) / 2 - 1; // Width/2.
-		let w2 = grid / 2 - 1; // Width/2 for touching.
+		let w1 = (grid - margin) - 1; // Width.
+		let w2 = grid - 1; // Width for touching.
 		for (let j = yoffset; j < yoffset + height; j++) {
 			let y = (j - yoffset - (height - 1) / 2) * grid + pixelsposy;
 			for (let i = xoffset; i < xoffset + width; i++) {
@@ -387,9 +387,9 @@ async function appMain() {
 						//colorselected = -1;
 						picoFlush();
 					}
-					picoPixel(pixels[j][i], x, y, w2, w2);
+					picoRect(pixels[j][i], x, y, 0, w2, w2);
 				} else {
-					picoPixel(pixels[j][i], x, y, w1, w1);
+					picoRect(pixels[j][i], x, y, 0, w1, w1);
 				}
 			}
 		}

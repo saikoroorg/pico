@@ -41,7 +41,9 @@ var players = []; // Player.
 // Clock.
 const clockMax = playerMax + 1; // Maximum clock count.
 var clockCount = 2; // Clock count.
-const clockRects = [-7,-4,14,8, -5,-6,10,10]; // Clock base sprite.
+const clockRects0 = [0,17,17, 0,1,4,0,14,8, 0,3,2,0,10,10]; // Clock base sprite.
+const clockRects2 = [0,17,17, 2,1,4,0,14,8, 2,3,2,0,10,10]; // Clock base sprite.
+const clockRects3 = [0,17,17, 3,1,4,0,14,8, 3,3,2,0,10,10]; // Clock base sprite.
 const clockScale = 6; // Clock base scale.
 const numberScale = 0.5; // Clock number scale.
 const bonusScale = 0.25; // Clock adiitional/bonus number scale.
@@ -534,23 +536,23 @@ async function appMain() {
 				// Waiting.
 				if (waiting) {
 					if (restart && k == playerIndex) { // Wait to restart.
-						await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * s);
+						await picoSprite(clockRects2, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else if (pausing && k == playerIndex) { // Just starting.
-						await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * s);
+						await picoSprite(clockRects2, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else if (playerIndex < 0) { // Waiting.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
+						await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else { // Opposite player.
-						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
+						await picoSprite(clockRects3, -1, x, y, clocks[k].angle, clocks[k].scale);
 					}
 
 				// Playing.
 				} else {
 					if (k == playerIndex) { // Playing.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
+						await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else if (bonus < 0 && playerCount <= 1) { // Reversed hourglass solo player.
-						await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
+						await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else { // Opposite player.
-						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
+						await picoSprite(clockRects3, -1, x, y, clocks[k].angle, clocks[k].scale);
 					}
 				}
 			}
@@ -566,28 +568,28 @@ async function appMain() {
 				if (waiting && !restart) {
 					if (k == 0) { // Playing.
 						if (pausing) { // Just starting.
-							await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * s);
+							await picoSprite(clockRects2, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 						} else { // Waiting.
-							await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
+							await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 						}
 					} else { // Another players.
-						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
+						await picoSprite(clockRects3, -1, x, y, clocks[k].angle, clocks[k].scale);
 					}
 
 				// Playing.
 				} else {
 					if (k == 0 || k == playerIndex + 1) { // Playing or target player.
 						if (restart) { // Wait to restart.
-							await picoRect(clockRects, 2, x, y, clocks[k].angle, clocks[k].scale * s);
+							await picoSprite(clockRects2, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 						} else {
 							if (k == 0) { // Playing
-								await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
+								await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 							} else if (k == playerIndex + 1) { // Target player.
-								await picoRect(clockRects, 0, x, y, clocks[k].angle, clocks[k].scale * s);
+								await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 							}
 						}
 					} else { // Another players.
-						await picoRect(clockRects, 3, x, y, clocks[k].angle, clocks[k].scale);
+						await picoSprite(clockRects3, -1, x, y, clocks[k].angle, clocks[k].scale);
 					}
 				}
 			}
