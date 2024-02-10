@@ -124,12 +124,6 @@ async function appTitle() {
 		// Disable share button.
 		picoLabel("action");
 
-		// Set random seed.
-		if (!seed) {
-			seed = picoDate();
-		}
-		picoRandom(0, seed);
-
 		// Reset playing count.
 		playing = 1;
 	}
@@ -143,6 +137,14 @@ async function appTitle() {
 
 	// Wait for input.
 	if (picoAction()) {
+
+		// Set random seed.
+		if (!seed) {
+			seed = picoDate();
+		}
+		picoRandom(0, seed);
+
+		// Start probrem.
 		state = "probrem";
 		playing = 0;
 		startTime = picoTime();
