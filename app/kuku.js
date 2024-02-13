@@ -279,7 +279,7 @@ async function appProbrem() {
 			state = "answer";
 			playing = 0;
 		}
-		picoRect(3, x,y, angle,square*s);
+		picoRect(3, x,y,square,square, angle,s);
 		picoChar("" + choices[i], 0, x,y, 0,scale*s);
 	}
 }
@@ -341,7 +341,7 @@ async function appAnswer() {
 		choose = -1;
 		playing = 0;
 	}
-	picoRect(0, x,y, angle,square*s);
+	picoRect(0, x,y,square,square, angle,s);
 	picoChar("" + choices[i], -1, x,y, 0,scale*s);
 }
 

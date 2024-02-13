@@ -15,7 +15,7 @@ async function appMain() {
 		if (picoAction(x, y, square/2, square/2)) {
 			picoSwitch("app/" + labels[i] + ".js");
 		}
-		picoRect(3, x,y, 0, square*s,square*s);
+		picoRect(3, x,y, square,square, 0,s);
 		picoChar(labels[i], 0, x,y, 0,number*s);
 	}
 }

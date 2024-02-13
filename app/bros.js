@@ -304,9 +304,9 @@ async function appMain() {
 
 			// Draw cell.
 			if (expand) {
-				picoRect(pixels[j][i], x, y, 0, grid+margin+1);
+				picoRect(pixels[j][i], x, y, grid+margin+1, grid+margin+1);
 			} else {
-				picoRect(pixels[j][i], x, y, 0, grid-margin-1);
+				picoRect(pixels[j][i], x, y, grid-margin-1, grid-margin-1);
 			}
 		}
 	}

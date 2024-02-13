@@ -254,7 +254,7 @@ async function appMain() {
 
 	// Draw background.
 	picoColor();
-	picoRect(1, 0, pixelsposy, 0, pixelswidth);
+	picoRect(1, 0, pixelsposy, pixelswidth, pixelswidth);
 
 	// Touching background.
 	{
@@ -348,13 +348,13 @@ async function appMain() {
 		}
 
 		// Draw foreground color selector.
-		picoRect(bgindex ? 3 : 1, colorsposx, colorsposy, 0, w0, h0);
+		picoRect(bgindex ? 3 : 1, colorsposx, colorsposy, w0, h0);
 
 		// Set colors data.
 		picoColor(colors);
 
 		// Draw background color selector.
-		picoRect(colorselecting, bgcolorsposx, colorsposy, 0, w1, h1);
+		picoRect(colorselecting, bgcolorsposx, colorsposy, w1, h1);
 	}
 
 	// Draw pixels.
@@ -386,9 +386,9 @@ async function appMain() {
 						//colorselected = -1;
 						picoFlush();
 					}
-					picoRect(pixels[j][i], x, y, 0, w2, w2);
+					picoRect(pixels[j][i], x, y, w2, w2);
 				} else {
-					picoRect(pixels[j][i], x, y, 0, w1, w1);
+					picoRect(pixels[j][i], x, y, w1, w1);
 				}
 			}
 		}

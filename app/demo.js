@@ -25,7 +25,7 @@ async function appMain() {
 	} else {
 		angle = 0;
 	}
-	picoRect(3, x,y, angle, square*scale);
-	picoChar(random, 0, x,y, angle, number*scale);
+	picoRect(3, x,y,square,square, angle,scale);
+	picoChar(random, 0, x,y, angle,number*scale);
 	playing++;
 }
