@@ -1,7 +1,6 @@
 picoTitle("Clock"); // Title.
 
 // Data and settings.
-var colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // Count colors.
 const countMax = 999 * 60; // Maximum count.
 const bonusMax = 99; // Maximum bonus time count.
 
@@ -212,9 +211,6 @@ async function appLoad() {
 
 	appResize(); // Initialize positions.
 	appUpdate(); // Initialize buttons.
-
-	// Load pallete data.
-	picoColor(colors);
 }
 
 // Resize.

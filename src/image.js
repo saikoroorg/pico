@@ -42,9 +42,9 @@ async function picoClear() {
 }
 
 // Set image color pallete.
-async function picoColor(palls=[0,0,0]) {
+async function picoColor(colors=null) {
 	try {
-		pico.image.color(palls);
+		pico.image.color(colors);
 	} catch (error) {
 		console.error(error);
 	}
@@ -240,9 +240,9 @@ pico.Image = class {
 	}
 
 	// Set image color pallete.
-	color(palls=null) {
+	color(colors=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			this._color(palls);
+			this._color(colors);
 		}); // end of lock.
 	}
 
@@ -399,7 +399,7 @@ pico.Image = class {
 		this.canvas = []; // Double buffered canvas elements.
 		this.primary = 0; // Primary canvas index.
 		this.context = null; // Canvas 2d context.
-		this.palls = pico.Image.colors; // Master image color. 
+		this.colors = pico.Image.colors; // Master image color. 
 
 		// Setup canvas.
 		this._setup(parent, width, height);
@@ -548,8 +548,8 @@ pico.Image = class {
 	}
 
 	// Set image color pallete.
-	_color(palls=null) {
-		this.palls = palls && palls.length > 0 ? palls : pico.Image.colors;
+	_color(colors=null) {
+		this.colors = colors && colors.length > 0 ? colors : pico.Image.colors;
 	}
 
 	// Draw pixel to image.
@@ -558,8 +558,8 @@ pico.Image = class {
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
 		this._debug("Center: " + cx + "," + cy + " / " + u);
 		return new Promise((resolve) => {
-			let k = c >= 0 && c < this.palls.length/3 ? c : this.palls.length/3 - 1;
-			let r = this.palls[k*3], g = this.palls[k*3+1], b = this.palls[k*3+2];
+			let k = c >= 0 && c < this.colors.length/3 ? c : this.colors.length/3 - 1;
+			let r = this.colors[k*3], g = this.colors[k*3+1], b = this.colors[k*3+2];
 			this._debug("Color: " + r + "," + g + "," + b);
 			this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
 			this.context.fillRect(cx + u * x, cy + u * y, u * (w + 1), u * (h + 1));

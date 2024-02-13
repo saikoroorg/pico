@@ -1,7 +1,6 @@
 picoTitle("Kuku"); // Title.
 
 // Data and settings.
-var colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // 5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000
 const kcents = [
 	     -0.7,-0.5, -0.4,-0.2, 0.0, 0.2, //        0,    1:Mi, 2:Fa, 3:So, 4:La, 5:Ti
 	 0.3, 0.5, 0.7,  0.8, 1.0, 1.2, 1.4, //  6:Do, 7:Re, 8:Mi, 9:Fa,10:So,11:La,12:Ti
@@ -415,8 +414,6 @@ async function appResult() {
 
 // Main.
 async function appMain() {
-	picoColor(colors);
-
 	if (state == "probrem") {
 		appProbrem();
 

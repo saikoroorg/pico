@@ -2,7 +2,6 @@ picoTitle("Pico", "Edit"); // Title.
 
 // Data and settings.
 var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
-var bgcolors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // Background colors.
 
 // Global variables.
 var maxwidth = 20, maxheight = 20; // Canvas max size.
@@ -254,7 +253,7 @@ async function appMain() {
 	let framesposx = -pico.Image.width/2 + 14; // Offset of buffer.
 
 	// Draw background.
-	picoColor(bgcolors);
+	picoColor();
 	picoRect(1, 0, pixelsposy, 0, pixelswidth);
 
 	// Touching background.
