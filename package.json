@@ -5,7 +5,8 @@
 	"scripts": {
 		"install": "",
 		"update": "",
-		"buildlib": "cat src/version.js src/image.js src/sound.js src/param.js src/touch.js > ./pico.js",
+		"buildver": "sed -i '' \"s#version *= *\".*\" *;#version = \\\"${npm_package_version}\\\";#\" src/version.js",
+		"buildlib": "npm run buildver && cat src/version.js src/image.js src/sound.js src/param.js src/touch.js > ./pico.js",
 		"buildapp": "mkdir -p ../${npm_config_name} && cp pico.* ../${npm_config_name} && cp index.* ../${npm_config_name} && cp app/${npm_config_name}.js ../${npm_config_name}/app.js && cp app/${npm_config_name}.json ../${npm_config_name}/app.json",
 		"build": "npm run buildlib && npm run buildapp --name=${npm_config_name}",
 		"clean": "",
