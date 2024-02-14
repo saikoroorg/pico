@@ -1,15 +1,16 @@
 {
 	"name": "pico",
-	"version": "0.9.40213",
+	"version": "0.9.40214",
 	"description": "pico",
 	"scripts": {
 		"install": "",
 		"update": "",
 		"buildver": "sed -i '' \"s#version *= *\".*\" *;#version = \\\"${npm_package_version}\\\";#\" src/version.js",
-		"buildlib": "npm run buildver && cat src/version.js src/image.js src/sound.js src/param.js src/touch.js > ./pico.js",
-		"buildapp": "mkdir -p ../${npm_config_name} && cp pico.* ../${npm_config_name} && cp index.* ../${npm_config_name} && cp app/${npm_config_name}.js ../${npm_config_name}/app.js && cp app/${npm_config_name}.json ../${npm_config_name}/app.json",
-		"build": "npm run buildlib && npm run buildapp --name=${npm_config_name}",
-		"clean": "",
+		"buildsrc": "npm run buildver && cat src/version.js src/image.js src/sound.js src/param.js src/touch.js > ./pico.js",
+		"buildapp": "if [ -n \"${npm_config_name}\" ]; then mkdir -p ../${npm_config_name} && cp pico.* ../${npm_config_name} && cp index.* ../${npm_config_name} && cp app/${npm_config_name}.js ../${npm_config_name}/app.js && cp app/${npm_config_name}.json ../${npm_config_name}/app.json; fi",
+		"build": "npm run buildsrc && npm run buildapp --name=${npm_config_name}",
+		"cleanapp": "if [ -n \"${npm_config_name}\" ]; then rm ../${npm_config_name}/pico.* && rm ../${npm_config_name}/index.* && rm ../${npm_config_name}/app.js && rm ../${npm_config_name}/app.json && rmdir ../${npm_config_name}; fi",
+		"clean": "npm run cleanapp --name=${npm_config_name}",
 		"clobber": "rm -rf node_modules && rm -rf package-lock.json"
 	},
 	"license": "unlicensed",
