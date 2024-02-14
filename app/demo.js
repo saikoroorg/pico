@@ -1,13 +1,10 @@
 picoTitle("demo"); // Title.
-
-// Data and settings.
-const square = 34; // Square size.
-const number = 2; // Number size.
-
+const square = 34; // Square base scale.
+const number = 2; // Number base scale.
 var playing = 0; // Playing count.
 var angle = 0; // Rolling angle.
 var scale = 1; // Rolling scale.
-var random = 1; // Random.
+var random = 1; // Random number.
 
 // Main.
 async function appMain() {
@@ -21,7 +18,7 @@ async function appMain() {
 	if (playing <= 60) {
 		angle = picoMod(angle + 20, 360);
 		random = picoRandom(10000);
-		picoFlush(); // Update animation.
+		picoFlush(); // Update animation without input.
 	} else {
 		angle = 0;
 	}
