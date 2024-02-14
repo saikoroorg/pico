@@ -63,24 +63,21 @@ Clock = class {
 var clocks = []; // Clock.
 
 // Global variables.
+var state = ""; // Playing state.
 var playing = -1; // Playing count.
 var count = 10 * 60; // Time count.
 var addition = 0; // Additional time count.
 var bonus = 0; // Bonus time count.
 
-var waiting = true; // Waiting flag.
-var restart = false; // Restart flag.
-var pausing = false; // Pausing on pressing.
-var timeout = false; // Timeout flag.
 var counting = false; // Counting up/down flag.
-var holding = 0; // Holding count.
+var touching = 0; // Touching count.
 
 var startTime = 0; // Start time.
 var landscape = false; // landscape mode.
 
 // Update buttons.
 async function appUpdate() {
-	if (!waiting && !restart && !timeout) {
+	if (state != "waiting" && state != "restart" && state != "timeout") {
 		picoTitle();
 		picoLabel("select");
 		picoLabel("minus");
@@ -108,7 +105,7 @@ async function appSelect(x) {
 	if (x != 0) {
 
 		// Change count of total time.
-		if (waiting && !restart) {
+		if (state == "waiting") {
 			if ((x > 0 && count + x <= 999 * 60) || (x < 0 && count + x > 0)) {
 				count = picoDiv(count + x * 60, 60) * 60;
 				playing = -1; // Restart.
@@ -120,7 +117,7 @@ async function appSelect(x) {
 			}
 
 		// Change count of each player time.
-		} else if (pausing) {
+		} else if (state == "restart") {
 			let c = players[playerIndex].count > 0 ? players[playerIndex].current : 0;
 			if ((x > 0 && c + x <= 999 * 60) || (x < 0 && c + x > 0)) {
 				players[playerIndex].count = players[playerIndex].current = picoDiv(c + x * 60, 60) * 60;
@@ -136,7 +133,7 @@ async function appSelect(x) {
 	// Change option.
 	} else {
 
-		if (waiting || pausing) {
+		if (state == "waiting" || state == "restart") {
 			if (bonus == 0 && addition < 10) {
 				addition = 10; // -10s additional time (Byoyomi)
 			} else if (bonus == 0 && addition < 30) {
@@ -217,6 +214,7 @@ async function appLoad() {
 	playerCountMin2 = playerCount > 2 ? playerCount : 2; // Minimum 2 players for hourglass mode.
 	clockCount = playerCount <= 2 ? playerCount : playerCount + 1; // Add playing button on 3+ players mode.
 
+	state = "waiting";
 	appResize(); // Initialize positions.
 	appUpdate(); // Initialize buttons.
 }
@@ -312,12 +310,10 @@ async function appMain() {
 
 	// Initialize.
 	if (playing < 0) {
+		console.log("Initialize playing states.");
 
 		// Reset playing states.
-		waiting = true;
-		restart = false;
-		pausing = false;
-		timeout = false;
+		state = "waiting";
 		counting = false;
 
 		// Reset player states.
@@ -340,7 +336,7 @@ async function appMain() {
 	startTime = currentTime;
 
 	// Update time count.
-	if (!waiting && !pausing && !timeout) {
+	if (state == "playing" && touching <= 0) {
 		players[playerIndex].consumed += spendTime / 1000; // Chessclock style.
 		// players[playerIndex].consumed += picoDiv(spendTime, 1000); // Stopwatch style.
 
@@ -373,6 +369,7 @@ async function appMain() {
 				// Time out.
 				} else {
 					players[playerIndex].current = players[playerIndex].count = players[playerIndex].consumed = 0;
+					state = "timeout";
 					timeout = true;
 					appUpdate();
 
@@ -393,6 +390,7 @@ async function appMain() {
 			// Time out.
 			if (addition > 0 && players[playerIndex].current >= addition) {
 				players[playerIndex].current = addition;
+				state = "timeout";
 				timeout = true;
 
 				// Long beep on timeout.
@@ -403,7 +401,7 @@ async function appMain() {
 
 	// Beep timing.
 	let counter = -1;
-	if (!waiting && !pausing && !timeout && playerIndex >= 0) {
+	if (state != "waiting" && touching <= 0 && state != "timeout" && playerIndex >= 0) {
 
 		// Starting count.
 		if (players[playerIndex].starting) {
@@ -479,7 +477,7 @@ async function appMain() {
 
 		// Colon mark.
 		let colon = ":";
-		if (!waiting && !pausing && !timeout && j == playerIndex) {
+		if (state != "waiting" && touching <= 0 && state != "timeout" && j == playerIndex) {
 			colon = counting ? " " : ":";
 		}
 
@@ -502,7 +500,7 @@ async function appMain() {
 		// For solo player.
 		if (playerCount <= 1) {
 			for (let k = 0; k < playerCountMin2; k++) {
-				if ((!waiting || restart) && k != playerIndex) {
+				if ((state != "waiting" || state == "restart") && k != playerIndex) {
 					clocks[k].angle = 180;
 				} else {
 					clocks[k].angle = 0;
@@ -512,7 +510,7 @@ async function appMain() {
 		// For 2 players without portrait mode.
 		} else if (playerCount <= 2 && landscape) {
 			for (let k = 0; k < playerCountMin2; k++) {
-				if ((!waiting || restart) && k != playerIndex) {
+				if ((state != "waiting" || state == "restart") && k != playerIndex) {
 					clocks[k].angle = 180;
 				} else {
 					clocks[k].angle = 0;
@@ -543,10 +541,10 @@ async function appMain() {
 				let y = clocks[k].centery + screens[i].centery;
 
 				// Waiting.
-				if (waiting) {
-					if (restart && k == playerIndex) { // Wait to restart.
+				if (state == "waiting" || state == "restart") {
+					if (state == "restart" && k == playerIndex) { // Wait to restart.
 						await picoSprite(clockRects2, -1, x, y, clocks[k].angle, clocks[k].scale * s);
-					} else if (pausing && k == playerIndex) { // Just starting.
+					} else if (touching > 0 && k == playerIndex) { // Just starting.
 						await picoSprite(clockRects2, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 					} else if (playerIndex < 0) { // Waiting.
 						await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale * s);
@@ -574,9 +572,9 @@ async function appMain() {
 				let y = clocks[k].centery + screens[i].centery;
 
 				// Waiting to start.
-				if (waiting && !restart) {
+				if (state == "waiting") {
 					if (k == 0) { // Playing.
-						if (pausing) { // Just starting.
+						if (touching > 0) { // Just starting.
 							await picoSprite(clockRects2, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 						} else { // Waiting.
 							await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale * s);
@@ -588,7 +586,7 @@ async function appMain() {
 				// Playing.
 				} else {
 					if (k == 0 || k == playerIndex + 1) { // Playing or target player.
-						if (restart) { // Wait to restart.
+						if (state == "restart") { // Wait to restart.
 							await picoSprite(clockRects2, -1, x, y, clocks[k].angle, clocks[k].scale * s);
 						} else {
 							if (k == 0) { // Playing
@@ -642,20 +640,37 @@ async function appMain() {
 		picoMotion(screens[0].centerx, screens[0].centery, screens[0].width, screens[0].height),
 		picoMotion(screens[1].centerx, screens[1].centery, screens[1].width, screens[1].height)];
 
-	let action = (playerCount == 2 && !waiting) ? actions[playerIndex] : (actions[0] || actions[1]);
-	let motion = (playerCount == 2 && !waiting) ? motions[playerIndex] : (motions[0] || motions[1]);
+	let action = (playerCount == 2 && state != "waiting" && state != "restart") ? actions[playerIndex] : (actions[0] || actions[1]);
+	let motion = (playerCount == 2 && state != "waiting" && state != "restart") ? motions[playerIndex] : (motions[0] || motions[1]);
 
 	// Cancel/Reset on pressed.
-	if (motion && holding >= 60) {
-		console.log("Holding m:" + motions[0] + "," + motions[1] + " a:" + actions[0] + "," + actions[1]);
+	if (motion && touching >= 60) {
+		console.log("Holding " + touching + ": motion=" + motions[0] + "," + motions[1] + " action=" + actions[0] + "," + actions[1]);
 
 		// Reset timeout or starting.
-		if (timeout || (waiting && !restart)) {
-			timeout = false;
+		if (state == "timeout") {
+			console.log("Reset timeout or starting.");
+
+			state = "waiting";
 			playing = -2;
+			appUpdate()
+
+			// High 3 beeps on pause.
+			picoBeep(1.2, 0.1);
+			picoBeep(1.2, 0.1, 0.2);
+			picoBeep(1.2, 0.1, 0.4);
+
+			// Unlock.
+			console.log("Unlock screen.");
+			picoLockScreen(false);
 
 		// Pause playing.
-		} else if (!pausing) {
+		} else if (state != "waiting" && state != "restart") {
+			console.log("Pause playing.");
+
+			state = "restart";
+			appUpdate()
+
 			if (playerIndex >= 0) {
 
 				// Update time count.
@@ -678,15 +693,6 @@ async function appMain() {
 				}
 			}
 
-			// Pause.
-			pausing = true;
-		}
-
-		// Reset waiting state.
-		if (!restart) {
-			restart = true;
-			appUpdate()
-
 			// High 3 beeps on pause.
 			picoBeep(1.2, 0.1);
 			picoBeep(1.2, 0.1, 0.2);
@@ -698,17 +704,18 @@ async function appMain() {
 		}
 
 	// Check user action on timeout.
-	} else if (action && timeout) {
+	} else if (action && state == "timeout") {
 
 		// Low beep on timeout.
 		picoBeep(-1.2, 0.1);
 
 	// Check user action on tapping.
-	} else if (action && holding < 60) {
-		console.log("Action m:" + motions[0] + "," + motions[1] + " a:" + actions[0] + "," + actions[1]);
-		holding = 0;
+	} else if (action && touching < 60) {
+		console.log("Touched " + touching + ": motion=" + motions[0] + "," + motions[1] + " action=" + actions[0] + "," + actions[1]);
+		touching = 0;
 
 		if (playerIndex >= 0) {
+			console.log("Update time count on turn end.");
 
 			// Update time count on turn end.
 			if (players[playerIndex].count > 0) {
@@ -722,7 +729,7 @@ async function appMain() {
 					players[playerIndex].consumed = 0;
 
 				// Add bonus time.
-				} else if (!waiting && !restart) {
+				} else if (state != "waiting" && state != "restart") {
 					let c = players[playerIndex].count - players[playerIndex].consumed + bonus;
 					players[playerIndex].current = players[playerIndex].count = c > countMax ? countMax : c > 0 ? c : 0;
 					players[playerIndex].consumed = 0;
@@ -735,10 +742,11 @@ async function appMain() {
 		}
 
 		// Start or restart.
-		if (waiting || restart) {
+		if (state == "waiting" || state == "restart") {
+			console.log("Start or restart.");
 
 			// Restart from opposite side on 2 players mode.
-			if (playerCount == 2 && !restart) {
+			if (playerCount == 2 && state == "waiting") {
 				if (actions[0]) {
 					playerIndex = 1;
 				} else {
@@ -749,8 +757,7 @@ async function appMain() {
 			}
 
 			// Start.
-			waiting = false;
-			restart = false;
+			state = "playing";
 			players[playerIndex].starting = true;
 			appUpdate();
 
@@ -763,6 +770,7 @@ async function appMain() {
 			picoLockScreen(true);
 
 		} else {
+			console.log("Switch players.");
 
 			// Switch players.
 			playerIndex = picoMod(playerIndex + 1, playerCount > 2 ? playerCount : 2);
@@ -772,21 +780,19 @@ async function appMain() {
 			picoBeep(1.2, 0.1);
 		}
 
-		pausing = false;
 		playing = -1; // No reset.
 
 	// Check user motion.
-	} else if (motion && holding < 60) {
-		console.log("Motion m:" + motions[0] + "," + motions[1] + " a:" + actions[0] + "," + actions[1]);
-		holding++;
+	} else if (motion && touching < 60) {
+		console.log("Touching " + touching + ": motion=" + motions[0] + "," + motions[1] + " action=" + actions[0] + "," + actions[1]);
 
-		// Start pausing.
-		pausing = true;
+		touching++;
 		playing = 1;
 
 		// Waiting to restart from opposite side on 2 players mode.
-		if (waiting && !timeout) {
-			if (playerCount == 2 && !restart) {
+		if (state == "waiting" || state == "timeout") {
+			console.log("Waiting to restart from opposite side on 2 players mode.");
+			if (playerCount == 2 && state == "waiting") {
 				if (motions[0]) {
 					playerIndex = 0;
 				} else {
@@ -798,11 +804,11 @@ async function appMain() {
 		}
 
 	} else {
-		holding = 0;
+		touching = 0;
 	}
 
 	// Update animation if playing.
-	if (!waiting || playing < 5) {
+	if (state != "waiting" || playing < 5) {
 		picoFlush();
 	}
 
