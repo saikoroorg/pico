@@ -80,13 +80,21 @@ var landscape = false; // landscape mode.
 
 // Update buttons.
 async function appUpdate() {
-	if (count > 0) {
-		picoLabel("select", "" + picoDiv(count, 60));
+	if (!waiting && !restart && !timeout) {
+		picoTitle();
+		picoLabel("select");
+		picoLabel("minus");
+		picoLabel("plus");
 	} else {
-		picoLabel("select", "0");
+		picoTitle("Clock");
+		if (count > 0) {
+			picoLabel("select", "" + picoDiv(count, 60));
+		} else {
+			picoLabel("select", "0");
+		}
+		picoLabel("minus", "-");
+		picoLabel("plus", "+");
 	}
-	picoLabel("minus", "-");
-	picoLabel("plus", "+");
 }
 
 // Action button.
@@ -366,9 +374,14 @@ async function appMain() {
 				} else {
 					players[playerIndex].current = players[playerIndex].count = players[playerIndex].consumed = 0;
 					timeout = true;
+					appUpdate();
 
 					// Long beep on timeout.
 					picoBeep(0, 4);
+
+					// Unlock.
+					console.log("Unlock screen.");
+					picoLockScreen(false);
 				}
 			}
 
@@ -672,6 +685,7 @@ async function appMain() {
 		// Reset waiting state.
 		if (!restart) {
 			restart = true;
+			appUpdate()
 
 			// High 3 beeps on pause.
 			picoBeep(1.2, 0.1);
@@ -688,10 +702,6 @@ async function appMain() {
 
 		// Low beep on timeout.
 		picoBeep(-1.2, 0.1);
-
-		// Unlock.
-		console.log("Unlock screen.");
-		picoLockScreen(false);
 
 	// Check user action on tapping.
 	} else if (action && holding < 60) {
@@ -742,6 +752,7 @@ async function appMain() {
 			waiting = false;
 			restart = false;
 			players[playerIndex].starting = true;
+			appUpdate();
 
 			// High 2 beeps on starting.
 			picoBeep(1.2, 0.1);

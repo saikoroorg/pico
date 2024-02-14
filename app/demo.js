@@ -1,4 +1,4 @@
-//picoTitle("demo"); // Title.
+picoTitle("demo"); // Title.
 
 // Data and settings.
 const square = 34; // Square size.
