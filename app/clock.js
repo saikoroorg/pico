@@ -477,7 +477,7 @@ async function appMain() {
 
 		// Colon mark.
 		let colon = ":";
-		if (state != "waiting" && touching <= 0 && state != "timeout" && j == playerIndex) {
+		if (state != "waiting" && state != "restart" && touching <= 0 && state != "timeout" && j == playerIndex) {
 			colon = counting ? " " : ":";
 		}
 
