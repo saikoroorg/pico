@@ -35,7 +35,7 @@
 	</div>
 </div>
 <h6 id="footer">
-	<div id="author"></div>/
+	<div id="author"></div>#
 	<div id="version"></div>
 </h6>
 <!--script>console.log = () => {};</script!-->
@@ -92,34 +92,34 @@ pico.App = class {
 		this.subtitle = ""; // App subtitle.
 		this.ver = 0; // Protocol version.
 		this.author = "*"; // App author.
-		this.name = ""; // App name.
+		this.timestamp = ""; // Timestamp (App version).
 		this.wakeLock = null; // Wake lock object.
 		this.lock = "picoAppLock" + Date.now(); // Lock object identifier.
 
-		// Load app version.
+		// Load app information.
 		let e = document.getElementById("author");
 		if (e && e.innerText) {
 			this.author = e.innerText;
 		} else {
-			if (window.location.hostname) {
-				this.author = window.location.hostname;
+			let path = window.location.pathname.replace(/(^\/|[\?\#].*$|\.\w+$|\/$)/g, "");
+			if (path.length > 32) {
+				path = ".." + path.slice(-30);
 			}
+			this.author = window.location.hostname + "/" + path;
 			if (e) {
 				e.innerText = this.author;
 			}
 		}
 		e = document.getElementById("version");
 		if (e && e.innerText) {
-			this.name = e.innerText.replace(/[\?\#].*$/, "");
+			this.timestamp = e.innerText;
 		} else {
-			if (window.location.pathname) {
-				this.name = window.location.pathname.replace(/(^\/|[\?\#].*$|\/$)/g, "");
-				if (this.name.length > 32) {
-					this.name = ".." + this.name.slice(-30);
-				}
-			}
+			let date = new Date(document.lastModified);
+			let mon = ("0" + (date.getMonth() + 1)).slice(-2);
+			let day = ("0" + date.getDate()).slice(-2);
+			this.timestamp = mon + day;
 			if (e) {
-				e.innerText = this.name;
+				e.innerText = this.timestamp;
 			}
 		}
 
@@ -330,7 +330,7 @@ pico.App = class {
 			bgcolors = [223,223,223, 255,255,255];
 		}
 		if (watermark == null) {
-			watermark = this.author + "/" + this.name;
+			watermark = this.author + "#" + this.timestamp;
 		}
 		let file = await picoScreenFile(bgcolors, watermark);
 		let files = [file];

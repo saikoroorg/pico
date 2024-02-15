@@ -1,4 +1,4 @@
-//picoTitle(""); // Title.
+picoTitle("Pico"); // Title.
 
 // Data and settings.
 const labels = ["bros", "clock", "demo", "dice", "edit", "kuku"];

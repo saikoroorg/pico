@@ -1,4 +1,4 @@
-picoTitle("demo"); // Title.
+picoTitle("Demo"); // Title.
 const square = 34; // Square base scale.
 const number = 2; // Number base scale.
 var playing = 0; // Playing count.

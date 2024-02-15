@@ -1,8 +1,8 @@
 {
-	"name": "demo",
+	"name": "Demo",
 	"short_name": "Demo",
 	"version": "0.9.40214a",
-	"author": "saikoro.org",
+	"author": "saikoro.org/demo",
 	"background_color": "#fff",
 	"theme_color": "#fff",
 	"icons": [{
