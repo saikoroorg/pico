@@ -24,21 +24,21 @@
 		<div class="menu center">
 			<a class="item light secret" id="action" href="javascript:pico.app.onAction();">
 				<span id="actionText"></span>
-				<div class="icon"><img class="iconimg" id="actionIcon" src="" /></div>
+				<div class="icon"><img id="actionIcon" src="" /></div>
 			</a>
 		</div>
 		<div class="menu">
 			<a class="item clear secret" id="minus" href="javascript:pico.app.onSelect(-1);">
 				<span id="minusText">-</span>
-				<div class="icon"><img class="iconimg" id="minusIcon" src="" /></div>
+				<div class="icon"><img id="minusIcon" src="" /></div>
 			</a>
 			<a class="item light secret" id="select" href="javascript:pico.app.onSelect(0);">
 				<span id="selectText"></span>
-				<div class="icon"><img class="iconimg" id="selectIcon" src="" /></div>
+				<div class="icon"><img id="selectIcon" src="" /></div>
 			</a>
 			<a class="item clear secret" id="plus" href="javascript:pico.app.onSelect(+1);">
 				<span id="plusText">+</span>
-				<div class="icon"><img class="iconimg" id="plusIcon" src="" /></div>
+				<div class="icon"><img id="plusIcon" src="" /></div>
 			</a>
 		</div>
 	</h1>
@@ -74,8 +74,8 @@ async function picoTitle(text=null, subtext=null) {
 }
 
 // Switch script or share.
-async function picoSwitch(script=null) {
-	await pico.app.switchScript(script);
+async function picoSwitch(script=null, returnable=true) {
+	await pico.app.switchScript(script, returnable);
 }
 
 // Lock screen with wakelock.
@@ -283,21 +283,23 @@ pico.App = class {
 	}
 
 	// Switch script or share.
-	async switchScript(script=null) {
+	async switchScript(script=null, returnable=true) {
 		if (this.ver > 0) {
 			picoSetStrings(this.ver, "v");
 		}
 
 		// Change and reload script.
 		if (script) {
-			picoSetStrings(this.path, "u");
-			if (this.title) {
-				picoSetStrings(this.title, "t");
+			if (returnable) {
+				picoSetStrings(this.path, "u");
+				if (this.title) {
+					picoSetStrings(this.title, "t");
+				}
+				if (this.script) {
+					picoSetStrings(this.script, "r");
+				}
 			}
 			picoSetStrings(script, "s");
-			if (this.script) {
-				picoSetStrings(this.script, "r");
-			}
 			await picoReload();
 
 		// Back or jump to next app.

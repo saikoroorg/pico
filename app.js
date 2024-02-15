@@ -13,7 +13,7 @@ async function appMain() {
 		let y = (picoDiv(i, column) - (row - 1) / 2) * grid;
 		let s = picoMotion(x, y, square/2, square/2) ? 0.8 : 1;
 		if (picoAction(x, y, square/2, square/2)) {
-			picoSwitch("app/" + labels[i] + ".js");
+			picoSwitch("app/" + labels[i] + ".js", false);
 		}
 		picoRect(3, x,y, square,square, 0,s);
 		picoChar(labels[i], 0, x,y, 0,number*s);
