@@ -1,21 +1,22 @@
 {
 	"name": "pico",
-	"version": "0.9.40214",
+	"version": "0.9.40215",
 	"description": "pico",
 	"scripts": {
 		"install": "",
 		"update": "",
-		"buildver": "sed -i '' \"s#version *= *\".*\" *;#version = \\\"${npm_package_version}\\\";#\" src/version.js",
-		"buildsrc": "npm run buildver && cat src/version.js src/image.js src/sound.js src/param.js src/touch.js > ./pico.js",
-		"buildsub": "if [ -n \"${npm_config_main}\" ] && [ -n  \"${npm_config_sub}\" ]; then mkdir -p ../${npm_config_main}/app && cp app/${npm_config_sub}.js ../${npm_config_main}/app/${npm_config_sub}.js; fi",
-		"buildsubs": "subs=(${npm_config_sub//,/ }) && for sub in \"${subs[@]}\"; do npm run buildsub --main=${npm_config_main} --sub=$sub; done;",
-		"buildapp": "if [ -n \"${npm_config_main}\" ]; then mkdir -p ../${npm_config_main} && cp pico.* ../${npm_config_main} && cp index.* ../${npm_config_main} && cp app/${npm_config_main}.js ../${npm_config_main}/app.js && cp app/${npm_config_main}.json ../${npm_config_main}/app.json; fi",
-		"build": "npm run buildsrc && npm run buildapp --main=${npm_config_main} && npm run buildsubs --sub=${npm_config_sub}",
-		"cleansub": "if [ -n \"${npm_config_main}\" ] && [ -n  \"${npm_config_sub}\" ]; then rm ../${npm_config_main}/app/${npm_config_sub}.js; rmdir ../${npm_config_main}/app; fi",
-		"cleansubs": "subs=(${npm_config_sub//,/ }); for sub in \"${subs[@]}\"; do npm run cleansub --main=${npm_config_main} --sub=$sub; done;",
-		"cleanapp": "if [ -n \"${npm_config_main}\" ]; then rm ../${npm_config_main}/pico.*; rm ../${npm_config_main}/index.*; rm ../${npm_config_main}/app.js; rm ../${npm_config_main}/app.json; rmdir ../${npm_config_main}; fi",
-		"clean": "npm run cleansubs --sub=${npm_config_sub}; npm run cleanapp --main=${npm_config_main}",
-		"clobber": "rm -rf node_modules && rm -rf package-lock.json"
+
+		"build:ver": "sed -i '' \"s#version *= *\".*\" *;#version = \\\"${npm_package_version}\\\";#\" src/api.js",
+		"build:api": "npm run build:ver; find src -name \"*.js\" | sort | xargs cat > ./pico.js",
+		"build:app": "if [ -n \"${npm_config_main}\" ]; then mkdir -p ../${npm_config_main}; cp pico.* index.* ../${npm_config_main}; for app in app/${npm_config_main}.js*; do cp $app ../${npm_config_main}/app.${app##*.}; done; fi",
+		"build:sub": "if [ -n \"${npm_config_main}\" ] && [ -n  \"${npm_config_sub}\" ]; then mkdir -p ../${npm_config_main}/app; for sub in ${npm_config_sub//,/ }; do cp app/$sub.js ../${npm_config_main}/app/; done; fi;",
+		"build": "npm run build:api; npm run build:app; npm run build:sub",
+
+		"clean:sub": "if [ -n \"${npm_config_main}\" ] && [ -n  \"${npm_config_sub}\" ]; then for sub in ${npm_config_sub//,/ }; do rm ../${npm_config_main}/app/${sub}.js; done; rmdir ../${npm_config_main}/app; fi",
+		"clean:app": "if [ -n \"${npm_config_main}\" ]; then rm ../${npm_config_main}/pico.*; rm ../${npm_config_main}/index.*; rm ../${npm_config_main}/app.js*; rmdir ../${npm_config_main}; fi",
+		"clean": "npm run clean:sub; npm run clean:app",
+
+		"clobber": "rm -rf node_modules; rm -rf package-lock.json"
 	},
 	"license": "unlicensed",
 	"private": true
