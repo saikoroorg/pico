@@ -25,6 +25,7 @@ var scale = 1;
 async function appSelect(x) {
 	state = !state ? "menu" : "";
 	playing = 0;
+	picoFlush();
 }
 
 // Load.
