@@ -2,17 +2,35 @@
 <head>
 <meta charset="utf-8">
 <body>
+<img id="image1" src="" />
+<img id="image2" src="" />
 <script src="image.js"></script>
 <!--Main--><script>
 pico.Image.debug = true;
 window.addEventListener("load", async (evt) => {
+	const scale = 4, width = 4*10, height = 6*7, frame = 32;
+
+	let image1 = await picoSpriteData(
+		[0,7,7, 6,3,3, 6,1,5, 6,5,1],
+		[255,255,255, 0,0,0], 2);
+	let e1 = document.getElementById("image1");
+	if (e1) {
+		e1.src = image1;
+	}
+
+	let image2 = await picoTextData(
+		"0123456789ab",
+		[0,0,0], 0,0,width,6, 0,2);
+	let e2 = document.getElementById("image2");
+	if (e2) {
+		e2.src = image2;
+	}
 
 //(async()=>{
 
 //*/
 	//for (let i = 0; i <= 360; i++) {
 	//	picoClear();
-		const scale = 4, width = 10*4, height = 7*6, frame = 32;
 		picoRect(1, 0,0,width+frame,height+frame, 0,scale);
 		picoRect(2, 0,0,width,height, 0,scale);
 		picoText(

@@ -13,21 +13,33 @@
 	<h1 id="header">
 		<div class="logo">
 			<a id="title" href="javascript:pico.app.onReset();">
-			<a id="subtitle" href="javascript:top.location.reload();"></a>
+				<span id="titleText"></span>
+				<img id="titleIcon" src="" />
+			</a>
+			<a id="subtitle" href="javascript:top.location.reload();">
+				<span id="subtitleText"></span>
+				<img id="subtitleIcon" src="" />
+			</a>
 		</div>
 		<div class="menu center">
 			<a class="item light secret" id="action" href="javascript:pico.app.onAction();">
 				<span id="actionText"></span>
-				<img class="icon" id="actionIcon" src="" />
+				<div class="icon"><img class="iconimg" id="actionIcon" src="" /></div>
 			</a>
 		</div>
 		<div class="menu">
-			<a class="item clear secret" id="minus" href="javascript:pico.app.onSelect(-1);">-</a>
+			<a class="item clear secret" id="minus" href="javascript:pico.app.onSelect(-1);">
+				<span id="minusText">-</span>
+				<div class="icon"><img class="iconimg" id="minusIcon" src="" /></div>
+			</a>
 			<a class="item light secret" id="select" href="javascript:pico.app.onSelect(0);">
 				<span id="selectText"></span>
-				<img class="icon" id="selectIcon" src="" />
+				<div class="icon"><img class="iconimg" id="selectIcon" src="" /></div>
 			</a>
-			<a class="item clear secret" id="plus" href="javascript:pico.app.onSelect(+1);">+</a>
+			<a class="item clear secret" id="plus" href="javascript:pico.app.onSelect(+1);">
+				<span id="plusText">+</span>
+				<div class="icon"><img class="iconimg" id="plusIcon" src="" /></div>
+			</a>
 		</div>
 	</h1>
 	<div id="contents">
@@ -44,13 +56,21 @@
 <!--Event--><script>
 
 // Change label.
-function picoLabel(id, text=null, icon=null) {
-	pico.app.setLabel(id, text, icon);
+async function picoLabel(id, text=null, icon=null, scale=0) {
+	if (icon) {
+		pico.app.setLabel(id, text, icon, 1);
+	} else if (text) {
+		let data = await picoTextData(text, [0,0,0], 0,0,4*text.length,6, 0, 1);
+		pico.app.setLabel(id, null, data);
+		//pico.app.setLabel(id, text);
+	} else {
+		pico.app.setLabel(id);
+	}
 }
 
 // Change title.
-function picoTitle(text=null, subtext=null) {
-	pico.app.setTitle(text, subtext);
+async function picoTitle(text=null, subtext=null) {
+	await pico.app.setTitle(text, subtext);
 }
 
 // Switch script or share.
@@ -188,7 +208,7 @@ pico.App = class {
 			let title = picoStrings("t");
 			if (title) {
 				this.title = title;
-				picoTitle(this.title, this.subtitle);
+				await picoTitle(this.title, this.subtitle);
 			}
 			this.url = picoStrings("u");
 			this.ver = picoStrings("v");
@@ -238,7 +258,7 @@ pico.App = class {
 	}
 
 	// Change title.
-	setTitle(text=null, subtext=null) {
+	async setTitle(text=null, subtext=null) {
 		let e = document.getElementsByTagName("title");
 		if (e && e[0]) {
 			if (text) {
@@ -250,9 +270,16 @@ pico.App = class {
 			}
 		}
 		this.title = text;
-		picoLabel("title", text);
 		this.subtitle = subtext;
-		picoLabel("subtitle", subtext)
+		if (text) {
+			await picoLabel("title", text, null, 1);
+			if (subtext) {
+				await picoLabel("subtitle", subtext, null, 1)
+			}
+		} else {
+			await picoLabel("title");
+			await picoLabel("subtitle")
+		}
 	}
 
 	// Switch script or share.

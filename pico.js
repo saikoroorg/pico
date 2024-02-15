@@ -84,6 +84,15 @@ async function picoText(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1
 	}
 }
 
+// Get multiple lines of text image data.
+async function picoTextData(text, color=null, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+	try {
+		return await pico.image.textData("" + text, color, x, y, width, height, angle, scale);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 // Draw sprite.
 async function picoSprite(cells=[0,9,9,1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
 	try {
@@ -102,7 +111,7 @@ function picoSpriteSize(cells=[0,9,9,1,0,0]) {
 	}
 }
 
-// Get sprite data.
+// Get sprite image data.
 async function picoSpriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
 	try {
 		return await pico.image.spriteData(cells, colors, scale);
@@ -112,9 +121,9 @@ async function picoSpriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
 }
 
 // Get screen data file.
-async function picoScreenFile(bgcolors=null,  watermark=null) {
+async function picoScreenFile(bgcolors=null, watermark=null) {
 	try {
-		return await pico.image.screenFile(bgcolors,  watermark);
+		return await pico.image.screenFile(bgcolors, watermark);
 	} catch (error) {
 		console.error(error);
 	}
@@ -287,35 +296,24 @@ pico.Image = class {
 
 	// Draw multiple lines of text to image.
 	drawText(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1) {
-		const u = pico.Image.ratio, ux = pico.Image.charWidth, uy = pico.Image.charHeight;
-		let mx = width > 0 ? width / ux - 1 : this.canvas[0].width / (ux * u * scale) - 1;
-		let my = height > 0 ? height / uy - 1 : this.canvas[0].height / (uy * u * scale) - 1;
-
-		this._debug("Textarea: " + mx + "," + my + " / " + ux + "," + uy);
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
-				await this._reset(x, y, angle, scale);
-				await this._move((-ux * mx) / 2 , (-uy * my) / 2);
-				for (let i = 0, ix = 0, iy = 0; i < text.length && iy <= my; i++) {
-					let char = text.charCodeAt(i);
-					this._debug("char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
-					if (char == "\r".charCodeAt(0) || char == "\n".charCodeAt(0)) {
-						await this._move(-ux * ix, uy);
-						ix = 0;
-						iy++;
-					} else if (ix <= mx) {
-						await this._char(char, c);
-						await this._move(ux, 0);
-						ix++;
-						if (ix > mx) {
-							await this._move(-ux * ix, uy);
-							ix = 0;
-							iy++;
-						}
-					}
-				}
+				await this._text(text, c, x, y, width, height, angle, scale);
 				resolve();
+			}); // end of new Promise.
+		}); // end of lock.
+	}
+
+	// Draw offscreen and get multiple lines of text image data.
+	textData(text, color=null, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
+			return new Promise(async (resolve) => {
+				await pico.image.offscreen._resize(width * scale, height * scale);
+				await pico.image.offscreen._ready();
+				await pico.image.offscreen._color(color);
+				await pico.image.offscreen._text(text, -1, x, y, width, height, angle, scale);
+				resolve(pico.image.offscreen._data());
 			}); // end of new Promise.
 		}); // end of lock.
 	}
@@ -332,7 +330,7 @@ pico.Image = class {
 		}); // end of lock.
 	}
 
-	// Draw offscreen and get sprite data.
+	// Draw offscreen and get sprite image data.
 	spriteData(cells=[0,9,9,1,0,0], colors=null, scale=10) {
 		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
 			return new Promise(async (resolve) => {
@@ -509,24 +507,24 @@ pico.Image = class {
 	}
 
 	// Reset image transform (scale, rotate, move).
-	_reset(x=0, y=0, angle=0, scale=1, h=0) {
+	_reset(x=0, y=0, angle=0, scale=1, hscale=0) {
 		this._debug("Reset transform matrix.");
 		return new Promise(async (resolve) => {
 			this.context.setTransform(1, 0, 0, 1, 0, 0);
 			await this._move(x, y);
 			await this._rotate(angle);
-			await this._scale(scale, h);
+			await this._scale(scale, hscale);
 			resolve();
 		}); // end of new Promise.
 	}
 
 	// Scale image.
-	_scale(scale=1, h=0) {
-		this._debug("Scale: " + scale + "," + h);
+	_scale(scale=1, hscale=0) {
+		this._debug("Scale: " + scale + "," + hscale);
 		return new Promise((resolve) => {
 			if (scale != 1) {
 				this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
-				this.context.scale(scale, h > 0 ? h : scale);
+				this.context.scale(scale, hscale > 0 ? hscale : scale);
 				this.context.translate(-this.canvas[0].width / 2, -this.canvas[0].height / 2);
 			}
 			resolve();
@@ -598,6 +596,37 @@ pico.Image = class {
 		return new Promise(async (resolve) => {
 			for (let i = 0; i < rects.length; i += 4) {
 				await this._draw(c, rects[i], rects[i+1], rects[i+2], rects[i+3]);
+			}
+			resolve();
+		}); // end of new Promise.
+	}
+
+	// Draw multiple lines of text.
+	_text(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+		const u = pico.Image.ratio, ux = pico.Image.charWidth, uy = pico.Image.charHeight;
+		let mx = width > 0 ? width / ux - 1 : this.canvas[0].width / (ux * u * scale) - 1;
+		let my = height > 0 ? height / uy - 1 : this.canvas[0].height / (uy * u * scale) - 1;
+		this._debug("Textarea: " + mx + "," + my + " / " + ux + "," + uy);
+		return new Promise(async (resolve) => {
+			await this._reset(x, y, angle, scale);
+			await this._move((-ux * mx) / 2 , (-uy * my) / 2);
+			for (let i = 0, ix = 0, iy = 0; i < text.length && iy <= my; i++) {
+				let char = text.charCodeAt(i);
+				this._debug("char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
+				if (char == "\r".charCodeAt(0) || char == "\n".charCodeAt(0)) {
+					await this._move(-ux * ix, uy);
+					ix = 0;
+					iy++;
+				} else if (ix <= mx) {
+					await this._char(char, c);
+					await this._move(ux, 0);
+					ix++;
+					if (ix > mx) {
+						await this._move(-ux * ix, uy);
+						ix = 0;
+						iy++;
+					}
+				}
 			}
 			resolve();
 		}); // end of new Promise.

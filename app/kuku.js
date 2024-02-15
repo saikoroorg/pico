@@ -15,8 +15,8 @@ const maxnumber = 20; // Maximum number for one play.
 const levels = [ // Parameters for each level.
 	["",0], // Custom level.
 	["+",5], ["+",10], ["+",20], // Add/Sub levels.
-	["x",5,5], ["x",9,9], ["x",12,12], ["x",16,9], ["x",19,19], // Mul levels.
-	["x",90,9], ["x",99,99]]; // Extra levels.
+	["*",5,5], ["*",9,9], ["*",12,12], ["*",16,9], ["*",19,19], // Mul levels.
+	["*",90,9], ["*",99,99]]; // Extra levels.
 var level = 5; // Level index.
 var extra = 0; // Enable extra levels.
 const maxextra = 2; // Maximum extra levels.
@@ -25,7 +25,7 @@ var seed = 0; // Random seed.
 // Probrem text.
 function appProbremText(p0, p1, p2) {
 	if (p2 != null) {
-		return (p1 < 10 ? p1 + " " : p1) + (p0 == "x" ? "*" : p0) + (p2 < 10 ? " " + p2 : p2);
+		return (p1 < 10 ? p1 + " " : p1) + p0 + (p2 < 10 ? " " + p2 : p2);
 	} else {
 		return p0 + p1;
 	}
@@ -94,7 +94,7 @@ async function appLoad() {
 			let numbers = picoNumbers(keys[k]);
 			let date = picoDate();
 			if (value.match(/x/i)) {
-				levels[0][0] = "x"; // Mul probrem.
+				levels[0][0] = "*"; // Mul probrem.
 				levels[0][1] = numbers[0];
 				levels[0][2] = numbers[1];
 				seed = numbers[2] < date ? numbers[2] : 0;
@@ -157,7 +157,7 @@ async function appProbrem() {
 	if (playing <= 0) {
 
 		// Add/Sub probrem.
-		if (levels[level][0] != "x") {
+		if (levels[level][0] != "*") {
 			if (levels[level][1] < 10) {
 				let n = levels[level][1] > 0 ? levels[level][1] : 1;
 				operator = "+";
