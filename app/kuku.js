@@ -15,12 +15,21 @@ const maxnumber = 20; // Maximum number for one play.
 const levels = [ // Parameters for each level.
 	["",0], // Custom level.
 	["+",5], ["+",10], ["+",20], // Add/Sub levels.
-	["*",5,5], ["*",9,9], ["*",12,12], ["*",16,9], ["*",19,19], // Mul levels.
-	["*",90,9], ["*",99,99]]; // Extra levels.
+	["*",5,5], ["*",9,9], ["*",12,12], ["*",9,16], ["*",19,19], // Mul levels.
+	["*",19,91], ["*",99,99]]; // Extra levels.
 var level = 5; // Level index.
 var extra = 0; // Enable extra levels.
 const maxextra = 2; // Maximum extra levels.
 var seed = 0; // Random seed.
+
+// Label text.
+function appLabelText(p0, p1, p2) {
+	if (p2 != null) {
+		return p0 + p2;
+	} else {
+		return p0 + p1;
+	}
+}
 
 // Probrem text.
 function appProbremText(p0, p1, p2) {
@@ -62,7 +71,7 @@ async function appSelect(x) {
 		// Change level.
 		let maxlevel = levels.length-1 - maxextra + extra;
 		level = picoMod(level-1 + x + maxlevel, maxlevel) + 1;
-		picoLabel("select", appProbremText(levels[level][0], levels[level][1]));
+		picoLabel("select", appLabelText(levels[level][0], levels[level][1], levels[level][2]));
 		picoBeep(1.2, 0.1);
 
 		// Unlock extra levels.
