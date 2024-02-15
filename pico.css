@@ -119,7 +119,7 @@ a {
 		width: 100%; height: 95%;
 	}
 	#header {
-		order: 1; height: 100%;
+		order: 1; height: 95%;
 		display: flex; display: -webkit-flex;
 		flex-direction: column; -webkit-flex-direction: column;
 		justify-content: space-between; -webkit-justify-content: space-between;
@@ -169,21 +169,13 @@ a {
 }
 @media (prefers-color-scheme: dark) {
 	body {
-		background-color: #7f7f7f;
-		color: #ffffff;
+		background-color: #bfbfbf;
+		color: #3f3f3f;
 	}
 	a {
 		color: #dfdfdf;
 	}
 	.logo {
-		color: #dfdfdf;
-	}
-	.item.dark {
-		background-color: #dfdfdf;
-		color: #3f3f3f;
-	}
-	.light {
-		background-color: #3f3f3f;
 		color: #dfdfdf;
 	}
 }

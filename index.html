@@ -56,16 +56,8 @@
 <!--Event--><script>
 
 // Change label.
-async function picoLabel(id, text=null, icon=null, scale=0) {
-	if (icon) {
-		pico.app.setLabel(id, text, icon, 1);
-	} else if (text) {
-		let data = await picoTextData(text, [0,0,0], 0,0,4*text.length,6, 0, 1);
-		pico.app.setLabel(id, null, data);
-		//pico.app.setLabel(id, text);
-	} else {
-		pico.app.setLabel(id);
-	}
+async function picoLabel(id, text=null, icon=null) {
+	pico.app.setLabel(id, text, icon);
 }
 
 // Change title.
@@ -232,23 +224,23 @@ pico.App = class {
 	}
 
 	// Change label.
-	setLabel(id, text=null, icon=null) {
+	async setLabel(id, text=null, icon=null) {
 		let e = document.getElementById(id);
 		if (e) {
 			e.style.display = (text || icon) ? "flex" : "none";
 			let e1 = document.getElementById(id + "Text");
 			let e2 = document.getElementById(id + "Icon");
-			if (e1 && text) {
+			if (e2 && (text || icon)) {
+				e2.style.display = "flex";
+				e2.src = icon ? icon : await picoTextData(text, [0,0,0], 0,0,4*text.length,6, 0);
+				if (e1) {
+					e1.style.display = "none";
+				}
+			} else if (e1 && text) {
 				e1.style.display = "flex";
 				e1.innerText = text;
-				if (e2 && !icon) {
+				if (e2) {
 					e2.style.display = "none";
-				}
-			} else if (e2 && icon) {
-				e2.style.display = "flex";
-				e2.src = icon;
-				if (e1 && !text) {
-					e1.style.display = "none";
 				}
 			} else if (text) {
 				e.innerText = text;
@@ -272,9 +264,9 @@ pico.App = class {
 		this.title = text;
 		this.subtitle = subtext;
 		if (text) {
-			await picoLabel("title", text, null, 1);
+			await picoLabel("title", text, null);
 			if (subtext) {
-				await picoLabel("subtitle", subtext, null, 1)
+				await picoLabel("subtitle", subtext, null)
 			}
 		} else {
 			await picoLabel("title");
