@@ -205,9 +205,6 @@ async function appMain() {
 
 		// Reset playing count.
 		playing = 1;
-
-		// Reset action button.
-		picoLabel("action");
 	}
 
 	// Move player.

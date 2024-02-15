@@ -57,7 +57,7 @@
 
 // Change label.
 async function picoLabel(id, text=null, icon=null) {
-	pico.app.setLabel(id, text, icon);
+	await pico.app.setLabel(id, text, icon);
 }
 
 // Change title.
