@@ -82,7 +82,20 @@ async function appUpdate() {
 		picoLabel("select");
 		picoLabel("minus");
 		picoLabel("plus");
-	} else {
+	} else if (state == "pausing") {
+		picoTitle("Clock");
+		if (addition > 0) {
+			picoLabel("select", "-" + addition);
+		} else if (bonus > 0) {
+			picoLabel("select", "+" + bonus);
+		} else if (bonus < 0) {
+			picoLabel("select", "+");
+		} else {
+			picoLabel("select", "-");
+		}
+		picoLabel("minus", "-");
+		picoLabel("plus", "+");
+	} else  {
 		picoTitle("Clock");
 		if (count > 0) {
 			picoLabel("select", "" + picoDiv(count, 60));
@@ -153,6 +166,7 @@ async function appSelect(x) {
 			}
 			picoBeep(1.2, 0.1);
 			appResize();
+			appUpdate();
 		} else {
 			picoBeep(-1.2, 0.1);
 		}
