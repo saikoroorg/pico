@@ -60,7 +60,9 @@ async function appLoad() {
 	}
 	for (let i = 0; i < items.length; i++) {
 		if (items[i][1]) {
-			images[i] = await picoLoad(items[i][1]);
+			picoLoad(items[i][1]).then((result) => {
+		    images[i] = result; // Lazy loading.
+		  });
 		}
 	}
 	await appSelect(); // Switch to dice.
