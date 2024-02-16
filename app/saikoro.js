@@ -1,4 +1,4 @@
-picoTitle("Saikoro.org"); // Title.
+//picoTitle("Saikoro.org"); // Title.
 
 // Data and settings.
 const dots = [ // Dotted design pixels.
@@ -12,49 +12,62 @@ const dots = [ // Dotted design pixels.
 	[0,7,7, 1,1,1, 1,1,3, 1,3,1, 1,3,5, 1,1,5, 1,5,1, 1,5,3, 1,5,5],
 	[0,7,7, 3,3,3, 3,1,1, 3,1,3, 3,3,1, 3,3,5, 3,1,5, 3,5,1, 3,5,3, 3,5,5],
 ];
-const path = "../", file = "/index.html";
-const labels = ["dice", "clock", "kuku"];
+const items0 = [ // Menu items for dev.
+	["dice", "app/dice.svg", null, "app/dice.js"],
+	["clock", "app/clock.svg", null, "app/clock.js"],
+	["kuku", "app/kuku.svg", null, "app/kuku.js"],
+	["bros", "app/bros.svg", null, "app/bros.js"],
+	["edit", "app/edit.svg", null, "app/edit.js"],
+	["demo", "app/demo.svg", null, "app/demo.js"],
+];
+const items1 = [ // Menu items for app.
+	["dice", "dice/icon.svg", null, "dice/app.js"],
+	["clock", "clock/icon.svg", null, "clock/app.js"],
+	["kuku", "kuku/icon.svg",  null, "kuku/app.js"],
+];
+var items = [ // Menu items for web.
+	["dice", "dice/icon.svg", "dice/"],
+	["clock", "clock/icon.svg", "clock/"],
+	["kuku", "kuku/icon.svg", "kuku/"],
+	[" "],
+	[" "],
+	[" xxxxxxx.xxx"],
+];
+var images = []; // Menu images.
 
 // Global variables.
-var state = "";
+var rolling = false;
 var playing = 0;
 var angle = 0;
 var scale = 1;
 
 // Select button.
 async function appSelect(x) {
-	state = !state ? "menu" : "";
+	rolling = !rolling;
 	playing = 0;
+	let data = await picoSpriteData(dots[rolling ? 8 : 5]);
+	picoLabel("select", null, data);
 	picoFlush();
 }
 
 // Load.
 async function appLoad() {
-	let data = await picoSpriteData(dots[5]);
-	picoLabel("select", null, data);
-}
-
-// Menu.
-async function appMenu() {
-	const square = 42, number = 2, grid = 45;
-	let column = picoSqrt(labels.length - 1) + 1;
-	column = column >= 3 ? column : 3;
-	let row = picoDiv(labels.length - 1, column) + 1;
-	for (let i = 0; i < labels.length; i++) {
-		let x = (picoMod(i, column) - (column - 1) / 2) * grid;
-		let y = (picoDiv(i, column) - (row - 1) / 2) * grid;
-		let s = picoMotion(x,y, square/2, square/2) ? 0.8 : 1;
-		if (picoAction(x,y, square/2, square/2)) {
-			picoResetParams();
-			picoReload(path + labels[i] + file);
-		}
-		picoRect(3, x,y, square,square, 0,s);
-		picoChar(labels[i], 0, x,y, 0,number*s);
+	if (pico.app.ver < 0) {
+		rolling = true; // Ready to switch to menu on dev mode.
+		items = items0;
+	} else if (pico.app.ver >= 1) {
+		items = items1;
 	}
+	for (let i = 0; i < items.length; i++) {
+		if (items[i][1]) {
+			images[i] = await picoLoad(items[i][1]);
+		}
+	}
+	await appSelect(); // Switch to dice.
 }
 
-// Title.
-async function appTitle() {
+// Dice.
+async function appDice() {
 	const square = 42, rect = 12, maximum = 6;
 	if (picoMotion()) {
 		if (playing <= 60) {
@@ -71,18 +84,50 @@ async function appTitle() {
 	} else {
 		angle = 0;
 		if (picoAction()) {
-			state = "menu";
+			appSelect(); // Switch to menu.
 		}
 	}
 	picoSprite(dots[random], 0, 0,0, angle,rect*scale);
 	playing++;
 }
 
+// Menu.
+async function appMenu() {
+	const square = 42, title0 = 1, title1 = 2, image0 = 0.5, grid = 64;
+	let column = picoSqrt(items.length - 1) + 1;
+	column = column >= 3 ? column : 3;
+	let row = picoDiv(items.length - 1, column) + 1;
+	for (let i = 0; i < items.length; i++) {
+		let x = (picoMod(i, column) - (column - 1) / 2) * grid;
+		let y = (picoDiv(i, column) - (row - 1) / 2) * grid;
+		let s = picoMotion(x,y, square/2, square/2) ? 0.9 : 1;
+		if (picoAction(x,y, square/2, square/2)) {
+			if (items[i][2]) { // Jump to url.
+				//picoResetParams();
+				picoReload(items[i][2]);
+			} else if (items[i][3]) { // Switch script.
+				picoSwitch(items[i][3]);
+			}
+		}
+		picoRect(3, x,y, square,square, 0,s);
+		if (images[i]) {
+			picoImage(images[i], x,y, 0,image0*s)
+			picoChar(items[i][0], -1, x,y+square/2+6, 0,title0);
+		} else if (items[i][0].length <= 5) {
+			picoChar(items[i][0], 0, x,y, 0,title1*s);
+		} else if (items[i][0].length <= 8) {
+			picoText(items[i][0], 0, x,y,4*4,6*2, 0,title1*s);
+		} else {
+			picoText(items[i][0], 0, x,y,4*4,6*3, 0,title1*s);
+		}
+	}
+}
+
 // Main.
 async function appMain() {
-	if (state == "menu") {
-		appMenu();
+	if (rolling) {
+		appDice();
 	} else {
-		appTitle();
+		appMenu();
 	}
 }
