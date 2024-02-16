@@ -373,11 +373,10 @@ pico.Image = class {
 
 	// Load image file and get image.
 	loadImage(url) {
-		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				resolve(pico.image.offscreen._load(url));
-			}); // end of new Promise.
-		}); // end of lock.
+		return new Promise(async (resolve) => {
+			let image = new pico.Image("");
+			resolve(image._load(url));
+		}); // end of new Promise.
 	}
 
 	// Draw other image to this image.
