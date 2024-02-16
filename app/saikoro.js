@@ -1,4 +1,4 @@
-//picoTitle("Saikoro.org"); // Title.
+picoTitle("Saikoro.org"); // Title.
 
 // Data and settings.
 const dots = [ // Dotted design pixels.
@@ -29,9 +29,6 @@ var items = [ // Menu items for web.
 	["dice", "dice/icon.svg", "dice/"],
 	["clock", "clock/icon.svg", "clock/"],
 	["kuku", "kuku/icon.svg", "kuku/"],
-	[" "],
-	[" "],
-	[" xxxxxxx.xxx"],
 ];
 var images = []; // Menu images.
 
@@ -56,6 +53,7 @@ async function appLoad() {
 		rolling = true; // Ready to switch to menu on dev mode.
 		items = items0;
 	} else if (pico.app.ver >= 1) {
+		rolling = true; // Ready to switch to menu on dev mode.
 		items = items1;
 	}
 	for (let i = 0; i < items.length; i++) {
@@ -105,13 +103,14 @@ async function appMenu() {
 		let s = picoMotion(x,y, square/2, square/2) ? 0.9 : 1;
 		if (picoAction(x,y, square/2, square/2)) {
 			if (items[i][2]) { // Jump to url.
-				//picoResetParams();
+				picoResetParams();
 				picoReload(items[i][2]);
 			} else if (items[i][3]) { // Switch script.
-				picoSwitch(items[i][3]);
+				picoResetParams();
+				picoSwitch(items[i][3], false);
 			}
 		}
-		picoRect(3, x,y, square,square, 0,s);
+		picoRect(2, x,y, square,square, 0,s);
 		if (images[i]) {
 			picoImage(images[i], x,y, 0,image0*s)
 			picoChar(items[i][0], -1, x,y+square/2+6, 0,title0);
