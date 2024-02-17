@@ -59,8 +59,9 @@ async function appLoad() {
 	for (let i = 0; i < items.length; i++) {
 		if (items[i][1]) {
 			picoLoad(items[i][1]).then((result) => {
-		    images[i] = result; // Lazy loading.
-		  });
+				images[i] = result; // Lazy loading.
+				picoFlush();
+			});
 		}
 	}
 	await appSelect(); // Switch to dice.
@@ -93,7 +94,7 @@ async function appDice() {
 
 // Menu.
 async function appMenu() {
-	const square = 42, title0 = 1, title1 = 2, image0 = 0.5, grid = 64;
+	const square = 42, title0 = 2, title1 = 2, image0 = 0.5, grid = 64;
 	let column = picoSqrt(items.length - 1) + 1;
 	column = column >= 3 ? column : 3;
 	let row = picoDiv(items.length - 1, column) + 1;
@@ -113,7 +114,7 @@ async function appMenu() {
 		picoRect(2, x,y, square,square, 0,s);
 		if (images[i]) {
 			picoImage(images[i], x,y, 0,image0*s)
-			picoChar(items[i][0], -1, x,y+square/2+6, 0,title0);
+			picoChar(items[i][0], 2, x,y+square/2+8, 0,title0);
 		} else if (items[i][0].length <= 5) {
 			picoChar(items[i][0], 0, x,y, 0,title1*s);
 		} else if (items[i][0].length <= 8) {

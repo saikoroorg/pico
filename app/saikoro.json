@@ -1,10 +1,10 @@
 {
 	"name": "Saikoro.org",
 	"short_name": "Saikoro.org",
-	"version": "0.9.40216a",
+	"version": "0.9.40216b",
 	"author": "saikoro.org",
-	"background_color": "#000",
-	"theme_color": "#000",
+	"background_color": "#fff",
+	"theme_color": "#fff",
 	"icons": [{
 		"src": "./icon.png",
 		"sizes": "192x192",
