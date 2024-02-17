@@ -205,7 +205,7 @@ async function appProbrem() {
 			}
 
 		// Mul probrem (under 12x12).
-		} else if (levels[level][1] <= 12 && levels[level][2] <= 12) {
+		} else if (levels[level][1] <= 12 || levels[level][2] <= 12) {
 			probrem1 = picoRandom(levels[level][1]) + 1;
 			probrem2 = picoRandom(levels[level][2]) + 1;
 			operator = "*";
@@ -232,8 +232,8 @@ async function appProbrem() {
 
 		// Mul probrem (over 12x12).
 		} else {
-			probrem1 = picoRandom(levels[level][1]-10) + 11; // Over 11.
-			probrem2 = picoRandom(levels[level][2]-1) + 2;
+			probrem1 = levels[level][1] > 12 ? picoRandom(levels[level][1]-10) + 11 : picoRandom(levels[level][1]-1) + 2; // Over 11 or 1.
+			probrem2 = levels[level][2] > 12 ? picoRandom(levels[level][2]-10) + 11 : picoRandom(levels[level][2]-1) + 2; // Over 11 or 1.
 			operator = "*";
 			answer = probrem1 * probrem2;
 
