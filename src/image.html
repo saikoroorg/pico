@@ -42,7 +42,8 @@ window.addEventListener("load", async (evt) => {
 	for (let i = "ぁ".charCodeAt(0); i <= "ん".charCodeAt(0); i++) {
 		text += String.fromCharCode(i);
 	}
-	picoText(text, 1, 0,0,0,0, 0,2, 6,6);
+	picoRect(1, 0,0,150,150, 0,1);
+	picoText(text, -1, 0,0,120,120, 0,1, 8,8);
 
 /*/
 	const scale = 4, width = 4*10, height = 6*7, frame = 32;

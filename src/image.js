@@ -132,9 +132,9 @@ async function picoLoad(url) {
 }
 
 // Draw image data.
-async function picoImage(image, x=0, y=0, angle=0, scale=1, frame=0, width=0, height=0) {
+async function picoImage(image, x=0, y=0, angle=0, scale=1, width=0, height=0, frame=0, yframe=-1) {
 	try {
-		await pico.image.drawImage(image, x, y, angle, scale, frame, width, height);
+		await pico.image.drawImage(image, x, y, angle, scale, width, height, frame, yframe);
 	} catch (error) {
 		console.error(error);
 	}
@@ -174,7 +174,7 @@ pico.Image = class {
 	static charWidth = 4;
 	static charHeight = 6;
 
-	static markChars = "./?!:-+=<>_^*#";
+	static markChars = "./?!:-+=<>_^*#@";
 	static markShapes = [
 		[0,2,0,0], // .
 		[-1,2,0,0, 0,-1,0,2, 1,-2,0,0], // /
@@ -190,6 +190,7 @@ pico.Image = class {
 		[-1,-1,0,0, 0,-2,0,0, 1,-1,0,0], // ^
 		[-1,-1,0,0, -1,1,0,0, 0,0,0,0, 1,-1,0,0, 1,1,0,0], // *
 		[-1,-1,2,0, -1,-1,0,2, 1,-1,0,2, -1,1,2,0], // #
+		[-1,-1,2,2], // @
 	];
 
 	static numberShapes = [
@@ -558,12 +559,27 @@ pico.Image = class {
 	}
 
 	// Draw other image to this image.
-	drawImage(image, x=0, y=0, angle=0, scale=1, frame=0, width=0, height=0) {
+	drawImage(image, x=0, y=0, angle=0, scale=1, width=0, height=0, frame=0, yframe=-1) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			return new Promise(async (resolve) => {
 				await this._ready();
 				await this._reset(x, y, angle, scale);
-				await this._image(image, frame, width, height);
+				if (width > 0 && yframe < 0) {
+					let nx = image.canvas[0].width / width;
+					if (frame < 0) {
+						let sx = image.canvas[0].width - (Math.floor((-frame - 1) % nx) + 1) * width;
+						let sy = image.canvas[0].height - (Math.floor((-frame - 1) / nx) + 1) * height;
+						await this._image(image, sx, sy, width, height);
+					} else {
+						let sx = Math.floor(frame % nx) * width;
+						let sy = Math.floor(frame / nx) * height;
+						await this._image(image, sx, sy, width, height);
+					}
+				} else {
+					let sx = frame * width;
+					let sy = yframe * height;
+					await this._image(image, sx, sy, width, height);
+				}
 				resolve();
 			}); // end of new Promise.
 		}); // end of lock.
@@ -863,7 +879,7 @@ pico.Image = class {
 	}
 
 	// Draw other image to this image.
-	_image(image, frame=0, width=0, height=0) {
+	_image(image, sx=0, sy=0, width=0, height=0) {
 		const u = 0;//pico.Image.ratio * 4;
 		const cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
 		this._debug("Center: " + cx + "," + cy);
@@ -872,11 +888,8 @@ pico.Image = class {
 				height = (height > 0 ? height : width);
 				let cx = (this.canvas[0].width - width) / 2;
 				let cy = (this.canvas[0].height - height) / 2;
-				let nx = image.canvas[0].width / width;
-				let x = Math.floor(frame % nx) * width;
-				let y = Math.floor(frame / nx) * height;
-				this._debug("DrawImage: " + cx + "," + cy + " " + x + "," + y + " " + width + "," + height);
-				this.context.drawImage(image.canvas[0], x, y, width, height, cx, cy, width, height);
+				this._debug("DrawImage: " + cx + "," + cy + " " + sx + "," + sy + " " + width + "," + height);
+				this.context.drawImage(image.canvas[0], sx, sy, width, height, cx, cy, width, height);
 			} else {
 				let cx = (this.canvas[0].width - image.canvas[0].width) / 2;
 				let cy = (this.canvas[0].height - image.canvas[0].height) / 2;
