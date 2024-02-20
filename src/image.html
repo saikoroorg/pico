@@ -8,8 +8,8 @@
 <!--Main--><script>
 pico.Image.debug = true;
 window.addEventListener("load", async (evt) => {
-	const scale = 4, width = 4*10, height = 6*7, frame = 32;
 
+/*
 	let image1 = await picoSpriteData(
 		[0,7,7, 6,3,3, 6,1,5, 6,5,1],
 		[255,255,255, 0,0,0], 2);
@@ -25,25 +25,31 @@ window.addEventListener("load", async (evt) => {
 	if (e2) {
 		e2.src = image2;
 	}
+*/
 
 //(async()=>{
 
 //*/
+	const scale = 4, width = 4*10, height = 6*7, frame = 32;
 	//for (let i = 0; i <= 360; i++) {
 	//	picoClear();
-		picoRect(1, 0,0,width+frame,height+frame, 0,scale);
+		//picoRect(1, 0,0,width+frame,height+frame, 0,scale);
 		picoRect(2, 0,0,width,height, 0,scale);
 		picoText(
-			"0123456789ab" +
-			"cdefghijklmn" +
-			"opqrstuvwxyz" +
-			"./?:-+=<>_^*" +
-			"0123456789ab" +
-			"cdefghijklmn" +
-			"opqrstuvwxyz" +
-			"./?:-+=<>_^*",
+			"0123456789\n" +
+			"abcdefghij\n" +
+			"klmnopqrst\n" +
+			"uvwxyz./?:\n",
+//			"-+=<>_^*\n",
 			1, 0,0,width,height, 0,scale);
 			//1, 4,4,0,0, 0,scale);
+		picoText(
+			"\n\n\n\n" +
+			"アイウエオ" +
+			"ャュョ" +
+			"パピプペポ" +
+			"ワヲン",
+			1, 0,0,width,height, 0,scale, 8);
 
 		//picoChar("Hello+World", 1, 0,0, i)
 
