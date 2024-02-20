@@ -29,7 +29,22 @@ window.addEventListener("load", async (evt) => {
 
 //(async()=>{
 
-//*/
+	let text = pico.Image.markChars;
+	for (let i = "0".charCodeAt(0); i <= "9".charCodeAt(0); i++) {
+		text += String.fromCharCode(i);
+	}
+	for (let i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
+		text += String.fromCharCode(i);
+	}
+	for (let i = "ァ".charCodeAt(0); i <= "ン".charCodeAt(0); i++) {
+		text += String.fromCharCode(i);
+	}
+	for (let i = "ぁ".charCodeAt(0); i <= "ん".charCodeAt(0); i++) {
+		text += String.fromCharCode(i);
+	}
+	picoText(text, 1, 0,0,0,0, 0,2, 6,6);
+
+/*/
 	const scale = 4, width = 4*10, height = 6*7, frame = 32;
 	//for (let i = 0; i <= 360; i++) {
 	//	picoClear();
