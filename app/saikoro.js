@@ -20,11 +20,6 @@ const items0 = [ // Menu items for dev.
 	["edit", "app/edit.svg", null, "app/edit.js"],
 	["demo", "app/demo.svg", null, "app/demo.js"],
 ];
-const items1 = [ // Menu items for app.
-	["dice", "dice/icon.svg", null, "dice/app.js"],
-	["clock", "clock/icon.svg", null, "clock/app.js"],
-	["kuku", "kuku/icon.svg",  null, "kuku/app.js"],
-];
 var items = [ // Menu items for web.
 	["dice", "dice/icon.svg", "dice/"],
 	["clock", "clock/icon.svg", "clock/"],
@@ -41,8 +36,6 @@ var scale = 1;
 async function appLoad() {
 	if (pico.app.ver < 0) {
 		items = items0;
-	} else if (pico.app.ver >= 1) {
-		items = items1;
 	}
 	for (let i = 0; i < items.length; i++) {
 		if (items[i][1]) {
@@ -92,6 +85,9 @@ async function appMain() {
 		if (picoAction(x,y, square/2,square/2)) {
 			if (items[i][2]) { // Jump to url.
 				picoResetParams();
+				if (pico.app.ver > 0) {
+					picoSetStrings(pico.app.path, "u");
+				}
 				picoReload(items[i][2]);
 			} else if (items[i][3]) { // Switch script.
 				picoResetParams();
