@@ -33,27 +33,15 @@ var items = [ // Menu items for web.
 var images = []; // Menu images.
 
 // Global variables.
-var rolling = false;
 var playing = 0;
 var angle = 0;
 var scale = 1;
 
-// Select button.
-async function appSelect(x) {
-	rolling = !rolling;
-	playing = 0;
-	let data = await picoSpriteData(dots[rolling ? 8 : 5]);
-	picoLabel("select", null, data);
-	picoFlush();
-}
-
 // Load.
 async function appLoad() {
 	if (pico.app.ver < 0) {
-		rolling = true; // Ready to switch to menu on dev mode.
 		items = items0;
 	} else if (pico.app.ver >= 1) {
-		rolling = true; // Ready to switch to menu on dev mode.
 		items = items1;
 	}
 	for (let i = 0; i < items.length; i++) {
@@ -64,13 +52,15 @@ async function appLoad() {
 			});
 		}
 	}
-	await appSelect(); // Switch to dice.
 }
 
-// Dice.
-async function appDice() {
-	const square = 42, rect = 12, maximum = 6;
-	if (picoMotion()) {
+// Main.
+async function appMain() {
+
+	// Dice.
+	const x = 0, rect = 8, maximum = 6;
+	let y = items.length > 3 ? -55 : -40;
+	if (picoMotion(x,y, rect*4,rect*4)) {
 		if (playing <= 60) {
 			playing = 0;
 		}
@@ -84,25 +74,22 @@ async function appDice() {
 		picoFlush(); // Update animation without input.
 	} else {
 		angle = 0;
-		if (picoAction()) {
-			appSelect(); // Switch to menu.
+		if (picoAction(x,y, rect*4,rect*4)) {
+			playing = -1; // Reroll.
 		}
 	}
-	picoSprite(dots[random], 0, 0,0, angle,rect*scale);
-	playing++;
-}
+	picoSprite(dots[random], 0, x,y, angle,rect*scale);
 
-// Menu.
-async function appMenu() {
-	const square = 42, title0 = 2, title1 = 2, image0 = 0.5, grid = 64;
+	// Menu.
+	const square = 42, title0 = 2, title1 = 2, image0 = 0.5, grid = 50, offset = 36;
 	let column = picoSqrt(items.length - 1) + 1;
 	column = column >= 3 ? column : 3;
 	let row = picoDiv(items.length - 1, column) + 1;
 	for (let i = 0; i < items.length; i++) {
 		let x = (picoMod(i, column) - (column - 1) / 2) * grid;
-		let y = (picoDiv(i, column) - (row - 1) / 2) * grid;
-		let s = picoMotion(x,y, square/2, square/2) ? 0.9 : 1;
-		if (picoAction(x,y, square/2, square/2)) {
+		let y = (picoDiv(i, column) - (row - 1) / 2) * grid + offset;
+		let s = picoMotion(x,y, square/2,square/2) ? 0.9 : 1;
+		if (picoAction(x,y, square/2,square/2)) {
 			if (items[i][2]) { // Jump to url.
 				picoResetParams();
 				picoReload(items[i][2]);
@@ -123,13 +110,6 @@ async function appMenu() {
 			picoText(items[i][0], 0, x,y,4*4,6*3, 0,title1*s);
 		}
 	}
-}
 
-// Main.
-async function appMain() {
-	if (rolling) {
-		appDice();
-	} else {
-		appMenu();
-	}
+	playing++;
 }
