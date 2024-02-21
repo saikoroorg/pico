@@ -55,7 +55,7 @@ const katakana = [
 "099961981932962982933934944954935965936",
 //ナニヌネノ
 "077931912922932942952933934925",
-"077921931941915925935945955",
+"077922932942915925935945955",
 "077911921931941951952923933943934944915925955",
 "077931912922932942952943924934944915935955",
 "077951952943934915925",
@@ -107,7 +107,7 @@ const katakana = [
 const hiragana = [
 //あいうえお
 "",
-"077911921931941922952913923933943914924944954915925935955",
+"077911921931941922913923933943914924944954915925935955",
 "",
 "077911912952913953914934954925",
 "",
@@ -238,17 +238,23 @@ for (let i = 0; i < result.length; i++) {
 	}
 }
 
-/*
-for (let i = 0; i <= ("ン".charCodeAt(0) - "ァ".charCodeAt(0)); i++) {
-	console.log("" + i + "," + String.fromCharCode("ァ".charCodeAt(0) + i) + ":" +
-		pico.Image.katakanaShapes[i].toString());
+let text = "";
+for (let i = "0".charCodeAt(0); i <= "9".charCodeAt(0); i++) {
+	text += String.fromCharCode(i);
 }
-
-for (let i = 0; i <= ("ん".charCodeAt(0) - "ぁ".charCodeAt(0)); i++) {
-	console.log("" + i + "," + String.fromCharCode("ぁ".charCodeAt(0) + i) + ":" +
-		pico.Image.hiraganaShapes[i].toString());
+for (let i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
+	text += String.fromCharCode(i);
 }
-*/
+text += pico.Image.markChars;
+for (let i = "ァ".charCodeAt(0); i <= "ン".charCodeAt(0); i++) {
+	text += String.fromCharCode(i);
+}
+for (let i = "ぁ".charCodeAt(0); i <= "ん".charCodeAt(0); i++) {
+	text += String.fromCharCode(i);
+}
+text += pico.Image.mark2Chars;
+picoRect(1, 0,0,150,150, 0,1);
+picoText(text, -1, 0,0,120,120, 0,1, 8,8);
 </script><!--/Main-->
 </body>
 </html>
