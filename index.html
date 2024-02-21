@@ -66,8 +66,8 @@ async function picoTitle(text=null, subtext=null) {
 }
 
 // Switch script or share.
-async function picoSwitch(script=null, returnable=true) {
-	await pico.app.switchScript(script, returnable);
+async function picoSwitch(script=null) {
+	await pico.app.switchScript(script);
 }
 
 // Lock screen with wakelock.
@@ -83,6 +83,19 @@ function picoWideScreen(enable=true) {
 // Share screen image.
 async function picoShareScreen(bgcolors=null, watermark=null) {
 	await pico.app.shareScreen(bgcolors, watermark);
+}
+
+// App mode.
+function picoAppMode() {
+	return pico.app.ver > 0;
+}
+
+// Dev mode.
+function picoDevMode(enable=false) {
+	if (enable) {
+		pico.app.ver = -1;
+	}
+	return pico.app.ver < 0;
 }
 
 //************************************************************/
@@ -275,14 +288,16 @@ pico.App = class {
 	}
 
 	// Switch script or share.
-	async switchScript(script=null, returnable=true) {
-		if (this.ver > 0 && !picoStrings("v")) {
+	async switchScript(target=null) {
+		if (picoDevMode()) {
+			picoSetStrings(-1, "v");
+		} else if (this.ver > 0 && !picoStrings("v")) {
 			picoSetStrings(this.ver, "v");
 		}
 
 		// Change and reload script.
-		if (script) {
-			if (returnable) {
+		if (target.match(/js$/)) {
+			if (!picoDevMode()) {
 				if (!picoStrings("u")) {
 					picoSetStrings(this.path, "u");
 				}
@@ -293,16 +308,22 @@ pico.App = class {
 					picoSetStrings(this.script, "r");
 				}
 			}
-			if (!picoStrings("s")) {
-				picoSetStrings(script, "s");
-			}
+			picoSetStrings(target, "s");
 			await picoReload();
 
-		// Back or jump to next app.
-		} else if (this.url) {
-			if (this.refer && !picoStrings("s")) {
-				picoSetStrings(this.refer, "s");
+		// Jump to next page.
+		} else if (target) {
+			if (!picoDevMode()) {
+				if (!picoStrings("u")) {
+					picoSetStrings(this.path, "u");
+				}
 			}
+			picoSetStrings("", "s");
+			await picoReload(target);
+
+		// Back to previous page.
+		} else if (this.url) {
+			picoSetStrings("", "s");
 			await picoReload(this.url);
 
 		// Share.

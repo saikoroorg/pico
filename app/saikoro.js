@@ -1,4 +1,4 @@
-picoTitle("Saikoro.org"); // Title.
+//picoTitle("Saikoro.org"); // Title.
 
 // Data and settings.
 const dots = [ // Dotted design pixels.
@@ -12,15 +12,15 @@ const dots = [ // Dotted design pixels.
 	[0,7,7, 1,1,1, 1,1,3, 1,3,1, 1,3,5, 1,1,5, 1,5,1, 1,5,3, 1,5,5],
 	[0,7,7, 3,3,3, 3,1,1, 3,1,3, 3,3,1, 3,3,5, 3,1,5, 3,5,1, 3,5,3, 3,5,5],
 ];
-const items0 = [ // Menu items for dev.
-	["dice", "app/dice.svg", null, "app/dice.js"],
-	["clock", "app/clock.svg", null, "app/clock.js"],
-	["kuku", "app/kuku.svg", null, "app/kuku.js"],
-	["bros", "app/bros.svg", null, "app/bros.js"],
-	["edit", "app/edit.svg", null, "app/edit.js"],
-	["demo", "app/demo.svg", null, "app/demo.js"],
+const devitems = [ // Menu items for dev.
+	["dice", "app/dice.svg", "app/dice.js"],
+	["clock", "app/clock.svg", "app/clock.js"],
+	["kuku", "app/kuku.svg", "app/kuku.js"],
+	["bros", "app/bros.svg", "app/bros.js"],
+	["edit", "app/edit.svg", "app/edit.js"],
+	["demo", "app/demo.svg", "app/demo.js"],
 ];
-var items = [ // Menu items for web.
+var items = [ // Menu items.
 	["dice", "dice/icon.svg", "dice/"],
 	["clock", "clock/icon.svg", "clock/"],
 	["kuku", "kuku/icon.svg", "kuku/"],
@@ -34,8 +34,8 @@ var scale = 1;
 
 // Load.
 async function appLoad() {
-	if (pico.app.ver < 0) {
-		items = items0;
+	if (picoDevMode()) {
+		items = devitems;
 	}
 	for (let i = 0; i < items.length; i++) {
 		if (items[i][1]) {
@@ -83,15 +83,8 @@ async function appMain() {
 		let y = (picoDiv(i, column) - (row - 1) / 2) * grid + offset;
 		let s = picoMotion(x,y, square/2,square/2) ? 0.9 : 1;
 		if (picoAction(x,y, square/2,square/2)) {
-			if (items[i][2]) { // Jump to url.
-				picoResetParams();
-				if (pico.app.ver > 0) {
-					picoSetStrings(pico.app.path, "u");
-				}
-				picoReload(items[i][2]);
-			} else if (items[i][3]) { // Switch script.
-				picoResetParams();
-				picoSwitch(items[i][3], false);
+			if (items[i][2]) {
+				picoSwitch(items[i][2]);
 			}
 		}
 		picoRect(2, x,y, square,square, 0,s);
