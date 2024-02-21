@@ -193,6 +193,15 @@ pico.Image = class {
 		[-1,-1,2,2], // @
 	];
 
+	static mark2Chars = "ー゛゜、。";
+	static mark2Shapes = [
+		[-2,0,4,0], // ー
+		[-2,-2,0,1, 0,-2,0,1], // ゛
+		[-2,-2,2,0, -2,-2,0,2, 0,-2,0,2, -2,0,2,0], // ゜
+		[-2,1,0,0, -1,2,0,0], // 、
+		[-2,0,2,0, -2,0,0,2, 0,0,0,2, -2,2,2,0], // 。
+	];
+
 	static numberShapes = [
 		[-1,-2,2,0, -1,-2,0,4, 1,-2,0,4, -1,2,2,0], // 0
 		[0,-2,0,4], // 1
@@ -764,25 +773,43 @@ pico.Image = class {
 	// Draw char as string or number to image.
 	_char(char, c=0) {
 		let rects = [];
-		if (char >= "0".charCodeAt(0) && char <= "9".charCodeAt(0)) {
-			let a = char - "0".charCodeAt(0);
-			rects = pico.Image.numberShapes[a];
-		} else if (char >= "a".charCodeAt(0) && char <= "z".charCodeAt(0)) {
-			let a = char - "a".charCodeAt(0);
-			rects = pico.Image.alphabetShapes[a];
-		} else if (char >= "A".charCodeAt(0) && char <= "Z".charCodeAt(0)) {
-			let a = char - "A".charCodeAt(0);
-			rects = pico.Image.alphabetShapes[a];
-		} else if (char >= "ァ".charCodeAt(0) && char <= "ン".charCodeAt(0)) {
-			let a = char - "ァ".charCodeAt(0);
-			rects = pico.Image.katakanaShapes[a];
-		} else if (char >= "ぁ".charCodeAt(0) && char <= "ん".charCodeAt(0)) {
-			let a = char - "ぁ".charCodeAt(0);
-			rects = pico.Image.hiraganaShapes[a];
+		if (char <= 0xFF) {
+			if (char >= "0".charCodeAt(0) && char <= "9".charCodeAt(0)) {
+				let a = char - "0".charCodeAt(0);
+				rects = pico.Image.numberShapes[a];
+			} else if (char >= "a".charCodeAt(0) && char <= "z".charCodeAt(0)) {
+				let a = char - "a".charCodeAt(0);
+				rects = pico.Image.alphabetShapes[a];
+			} else if (char >= "A".charCodeAt(0) && char <= "Z".charCodeAt(0)) {
+				let a = char - "A".charCodeAt(0);
+				rects = pico.Image.alphabetShapes[a];
+			} else {
+				let a = pico.Image.markChars.indexOf(String.fromCharCode(char));
+				if (a >= 0 && a < pico.Image.markShapes.length) {
+					rects = pico.Image.markShapes[a];
+				}
+			}
 		} else {
-			let a = pico.Image.markChars.indexOf(String.fromCharCode(char));
-			if (a >= 0 && a < pico.Image.markShapes.length) {
-				rects = pico.Image.markShapes[a];
+			if (char >= "ァ".charCodeAt(0) && char <= "ン".charCodeAt(0)) {
+				let a = char - "ァ".charCodeAt(0);
+				rects = pico.Image.katakanaShapes[a];
+			} else if (char >= "ぁ".charCodeAt(0) && char <= "ん".charCodeAt(0)) {
+				let a = char - "ぁ".charCodeAt(0);
+				rects = pico.Image.hiraganaShapes[a];
+			} else if (char >= "０".charCodeAt(0) && char <= "９".charCodeAt(0)) {
+				let a = char - "０".charCodeAt(0);
+				rects = pico.Image.numberShapes[a];
+			} else if (char >= "ａ".charCodeAt(0) && char <= "ｚ".charCodeAt(0)) {
+				let a = char - "ａ".charCodeAt(0);
+				rects = pico.Image.alphabetShapes[a];
+			} else if (char >= "Ａ".charCodeAt(0) && char <= "Ｚ".charCodeAt(0)) {
+				let a = char - "Ａ".charCodeAt(0);
+				rects = pico.Image.alphabetShapes[a];
+			} else {
+				let a = pico.Image.mark2Chars.indexOf(String.fromCharCode(char));
+				if (a >= 0 && a < pico.Image.mark2Shapes.length) {
+					rects = pico.Image.mark2Shapes[a];
+				}
 			}
 		}
 		return new Promise(async (resolve) => {

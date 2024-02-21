@@ -19,31 +19,68 @@ window.addEventListener("load", async (evt) => {
 	}
 
 	let image2 = await picoTextData(
-		"0123456789ab",
-		[0,0,0], 0,0,width,6, 0,2);
+		"イメーシ゛2",
+		-1, 0,0,36,6, 0,1, 6,6);
 	let e2 = document.getElementById("image2");
 	if (e2) {
 		e2.src = image2;
 	}
-*/
+//*/
 
 //(async()=>{
 
-	let text = pico.Image.markChars;
+	let text = "";
+
+//*
 	for (let i = "0".charCodeAt(0); i <= "9".charCodeAt(0); i++) {
 		text += String.fromCharCode(i);
 	}
 	for (let i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
 		text += String.fromCharCode(i);
 	}
+	text += pico.Image.markChars;
 	for (let i = "ァ".charCodeAt(0); i <= "ン".charCodeAt(0); i++) {
 		text += String.fromCharCode(i);
 	}
 	for (let i = "ぁ".charCodeAt(0); i <= "ん".charCodeAt(0); i++) {
 		text += String.fromCharCode(i);
 	}
+	text += pico.Image.mark2Chars;
 	picoRect(1, 0,0,150,150, 0,1);
 	picoText(text, -1, 0,0,120,120, 0,1, 8,8);
+//*/
+
+/*
+	text = 
+"--------\n"+
+"--------\n"+
+"--------\n"+
+"---#@---\n"+
+"---@#---\n"+
+"--------\n"+
+"--------\n"+
+"--------\n";
+	picoText(text, -1, 0,0,32,32, 0,6, 4,4);
+//*/
+
+/*
+	text = 
+" ------                      \n"+
+" 1....1      ############    \n"+
+" 1....1      #          #    \n"+
+" 1.S..+########         #    \n"+
+" 1....1       #      ---+--- \n"+
+" ------       #      1.....1 \n"+
+"              #      1.!...1 \n"+
+"              #      1.....1 \n"+
+"              #      1..@..1 \n"+
+"   ----       #      1.....1 \n"+
+"   1..1       #######+..D..1 \n"+
+"   1<.+###    #      1.....1 \n"+
+"   ----  #    #      1.?...1 \n"+
+"         ######      ------- \n";
+	picoText(text, -1, 0,0,128,128, 0,1);
+//*/
 
 /*/
 	const scale = 4, width = 4*10, height = 6*7, frame = 32;
