@@ -89,7 +89,7 @@ async function appUpdate() {
 		} else if (bonus < 0) {
 			picoLabel("select", "*");
 		} else {
-			picoLabel("select", " ");
+			picoLabel("select", "#");
 		}
 		picoLabel("minus", "-");
 		picoLabel("plus", "+");
