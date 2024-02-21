@@ -1,10 +1,15 @@
-picoTitle("Demo"); // Title.
+const title = "Demo"; // Title.
 const square = 34; // Square base scale.
 const number = 2; // Number base scale.
 var playing = 0; // Playing count.
 var angle = 0; // Rolling angle.
 var scale = 1; // Rolling scale.
 var random = 1; // Random number.
+
+// Load.
+async function appLoad() {
+	picoTitle(title);
+}
 
 // Main.
 async function appMain() {

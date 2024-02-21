@@ -1,13 +1,9 @@
-picoTitle("Kuku"); // Title.
-
-// Data and settings.
+const title = "Kuku"; // Title.
 const kcents = [
 	     -0.7,-0.5, -0.4,-0.2, 0.0, 0.2, //        0,    1:Mi, 2:Fa, 3:So, 4:La, 5:Ti
 	 0.3, 0.5, 0.7,  0.8, 1.0, 1.2, 1.4, //  6:Do, 7:Re, 8:Mi, 9:Fa,10:So,11:La,12:Ti
 	 1.5, 1.7, 1.9,  2.0, 2.2, 2.4, 2.6, // 13:Do,14:Re,15:Mi,16:Fa,17:So,18:La,19:Ti, 20:Do
 	 2.7];
-
-// Global variables.
 var state = ""; // Playing state.
 var playing = 0; // Playing count.
 var number = 1; // Probrem number.
@@ -94,6 +90,7 @@ async function appAction() {
 
 // Load.
 async function appLoad() {
+	picoTitle(title);
 
 	// Load query levels.
 	let keys = picoKeys();

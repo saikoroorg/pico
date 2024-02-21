@@ -1,6 +1,4 @@
-picoTitle("Bros"); // Title.
-
-// Data and settings.
+const title = "Bros"; // Title.
 const editjs = "app/edit.js"; // Editor script.
 var levels = [ // Level data.
 	[], //"Extra"
@@ -55,8 +53,6 @@ var levels = [ // Level data.
 	[0,7,7,1,2,2,2,4,2,4,3,4,4,2,5,4,3,5,4,4,5], //"Boss",
 ];
 const colors = [255,255,255, 231,0,91, 0,115,239, 143,0,119, 0,63,23]; // Color data.
-
-// Global variables.
 var level = 1; // Playing level.
 var maxlevel = 1; // Cleared level.
 var playing = 0; // Playing count.
@@ -124,6 +120,7 @@ async function appSelect(x) {
 
 // Load.
 async function appLoad() {
+	picoTitle(title);
 
 	// Load query params.
 	let value = picoStrings();

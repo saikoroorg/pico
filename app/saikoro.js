@@ -1,6 +1,4 @@
-//picoTitle("Saikoro.org"); // Title.
-
-// Data and settings.
+const title = "";//"Saikoro.org"; // Title.
 const dots = [ // Dotted design pixels.
 	[0,7,7, 5,3,3],
 	[0,7,7, 4,1,5, 4,5,1],
@@ -26,14 +24,14 @@ var items = [ // Menu items.
 	["kuku", "kuku/icon.svg", "kuku/"],
 ];
 var images = []; // Menu images.
-
-// Global variables.
-var playing = 0;
-var angle = 0;
-var scale = 1;
+var playing = 0; // Playing count.
+var angle = 0; // Rolling angle.
+var scale = 1; // Rolling scale.
 
 // Load.
 async function appLoad() {
+	picoTitle(title);
+
 	if (picoDevMode()) {
 		items = devitems;
 	}
@@ -84,7 +82,8 @@ async function appMain() {
 		let s = picoMotion(x,y, square/2,square/2) ? 0.9 : 1;
 		if (picoAction(x,y, square/2,square/2)) {
 			if (items[i][2]) {
-				picoSwitch(items[i][2]);
+				picoTitle(""); // Clear this title for starting each apps.
+				picoSwitch(items[i][2], picoAppMode() ? ".." : null);
 			}
 		}
 		picoRect(2, x,y, square,square, 0,s);
