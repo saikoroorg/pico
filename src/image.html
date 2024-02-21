@@ -127,9 +127,9 @@ document.addEventListener("click", async (evt) => {
 		picoRect(3, 0,0, 0, 100,100);
 
 		await picoImage(image, 0,0, 0, 1);
-		await picoImage(image, -50,-50, i*-10, 2, 1,40);
-		await picoImage(image, 50,-50, i*10, 2, 2,40);
-		await picoImage(image, 0,50, i*-10, 2, 0,40,40);
+		await picoImage(image, -50,-50, i*-10, 2, 40,40,1);
+		await picoImage(image, 50,-50, i*10, 2, 40,40,2);
+		await picoImage(image, 0,50, i*-10, 2, 40,40,0);
 
 		await picoFlip(20);
 	}
