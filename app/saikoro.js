@@ -18,11 +18,13 @@ const devitems = [ // Menu items for dev.
 	["edit", "app/edit.svg", "app/edit.js"],
 	["demo", "app/demo.svg", "app/demo.js"],
 ];
+var devreturl = null; // Return url for dev.
 var items = [ // Menu items.
 	["dice", "dice/icon.svg", "dice/"],
 	["clock", "clock/icon.svg", "clock/"],
 	["kuku", "kuku/icon.svg", "kuku/"],
 ];
+var returl = "../"; // Return url.
 var images = []; // Menu images.
 var playing = 0; // Playing count.
 var angle = 0; // Rolling angle.
@@ -34,6 +36,7 @@ async function appLoad() {
 
 	if (picoDevMode()) {
 		items = devitems;
+		returl = devreturl;
 	}
 	for (let i = 0; i < items.length; i++) {
 		if (items[i][1]) {
@@ -83,7 +86,7 @@ async function appMain() {
 		if (picoAction(x,y, square/2,square/2)) {
 			if (items[i][2]) {
 				picoTitle(""); // Clear this title for starting each apps.
-				picoSwitch(items[i][2], picoAppMode() ? ".." : null);
+				picoSwitch(items[i][2], returl);
 			}
 		}
 		picoRect(2, x,y, square,square, 0,s);

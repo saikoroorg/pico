@@ -66,8 +66,8 @@ async function picoTitle(text=null) {
 }
 
 // Switch script or share.
-async function picoSwitch(target=null, refer=null) {
-	await pico.app.switchScript(target, refer);
+async function picoSwitch(target=null, returl=null) {
+	await pico.app.switchScript(target, returl);
 }
 
 // Lock screen with wakelock.
@@ -109,11 +109,11 @@ pico.App = class {
 
 	// constructor.
 	constructor() {
-		this.url = null; // Referenced url.
-		this.script = null; // App script.
-		this.refscript = null; // Referenced script.
-		this.title = ""; // App title.
-		this.reftitle = ""; // Referenced title.
+		this.returl = null; // Return url.
+		this.script = pico.App.script; // App script.
+		this.retscript = null; // Return script.
+		this.title = ""; // Page title.
+		this.apptitle = ""; // App title.
 		this.ver = 0; // Protocol version.
 		this.author = "*"; // App author.
 		this.timestamp = ""; // Timestamp (App version).
@@ -153,7 +153,7 @@ pico.App = class {
 			this.script = script;
 		}
 		e = document.createElement('script');
-		e.src = this.script ? this.script : pico.App.script;
+		e.src = this.script;
 		document.body.appendChild(e);
 
 		window.addEventListener("resize", async () => {
@@ -169,12 +169,12 @@ pico.App = class {
 		await navigator.locks.request(this.lock, async (lock) => {
 
 			// Back to previous page.
-			if (this.url) {
+			if (this.returl) {
 				picoResetParams();
 				if (this.ver > 0) {
 					picoSetStrings(this.ver, "v");
 				}
-				await picoReload(this.url);
+				await picoReload(this.returl);
 
 			// Reload this page.
 			} else {
@@ -217,16 +217,16 @@ pico.App = class {
 	// On load event.
 	async onLoad() {
 		try {
-			let refscript = picoStrings("r");
-			if (refscript) {
-				this.refscript = refscript;
+			let retscript = picoStrings("r");
+			if (retscript) {
+				this.retscript = retscript;
 			}
 			let title = picoStrings("t");
 			if (title) {
-				this.reftitle = title;
-				await picoTitle(this.reftitle);
+				this.apptitle = title;
+				await picoTitle(this.apptitle);
 			}
-			this.url = picoStrings("u");
+			this.returl = picoStrings("u");
 			this.ver = picoNumbers("v")[0];
 			if (typeof appLoad === "function") {
 				await navigator.locks.request(this.lock, async (lock) => {
@@ -286,8 +286,8 @@ pico.App = class {
 			}
 		}
 		this.title = text;
-		if (this.reftitle) {
-			await picoLabel("title", this.reftitle);
+		if (this.apptitle) {
+			await picoLabel("title", this.apptitle);
 			await picoLabel("subtitle", this.title);
 		} else {
 			await picoLabel("title", this.title);
@@ -296,7 +296,7 @@ pico.App = class {
 	}
 
 	// Switch script or share.
-	async switchScript(target=null, refer=null) {
+	async switchScript(target=null, returl=null) {
 		if (picoDevMode()) {
 			picoSetStrings(-1, "v");
 		} else if (this.ver > 0) {
@@ -305,6 +305,9 @@ pico.App = class {
 
 		// Change and reload script.
 		if (target && target.match(/js$/)) {
+			if (this.returl && !picoStrings("u")) {
+				picoSetStrings(this.returl, "u");
+			}
 			if (this.title && !picoStrings("t")) {
 				picoSetStrings(this.title, "t");
 			}
@@ -316,28 +319,39 @@ pico.App = class {
 
 		// Jump to next page.
 		} else if (target) {
-			if (refer && !picoStrings("u")) {
-				picoSetStrings(refer, "u");
+			if (returl && !picoStrings("u")) {
+				picoSetStrings(returl, "u");
+			} else if (this.returl && !picoStrings("u")) {
+				picoSetStrings(this.returl, "u");
 			}
 			if (this.title && !picoStrings("t")) {
 				picoSetStrings(this.title, "t");
 			}
 			picoSetStrings("", "s");
+			picoSetStrings("", "r");
 			await picoReload(target);
 
 		// Back to previous script.
-		} else if (this.refscript) {
-			picoSetStrings(this.refscript, "s");
+		} else if (this.retscript) {
+			if (this.returl && !picoStrings("u")) {
+				picoSetStrings(this.returl, "u");
+			}
+			picoSetStrings("", "t");
+			picoSetStrings(this.retscript, "s");
+			picoSetStrings("", "r");
 			await picoReload();
 
 		// Back to previous page.
-		} else if (this.url) {
+		} else if (this.returl) {
+			picoSetStrings("", "u");
+			picoSetStrings("", "t");
 			picoSetStrings("", "s");
-			await picoReload(this.url);
+			picoSetStrings("", "r");
+			await picoReload(this.returl);
 
 		// Share.
 		} else {
-			if (this.script) {
+			if (this.script && this.script != pico.App.script) {
 				picoSetStrings(this.script, "s");
 			}
 			await picoShare();
