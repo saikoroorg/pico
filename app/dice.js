@@ -54,7 +54,7 @@ async function appUpdate() {
 	if (custom) {
 		picoLabel("action", "*");
 	} else if (count > 0 && result > 0) {
-		picoLabel("action", "^");
+		picoLabel("action", "&");
 	} else {
 		picoLabel("action");
 	}
@@ -68,7 +68,7 @@ async function appUpdate() {
 		let data = await picoSpriteData(nums[maximum], colors);
 		picoLabel("select", null, data);
 	} else {
-		picoLabel("select", "?");
+		picoLabel("select", "#");
 	}
 	picoLabel("minus", "-");
 	picoLabel("plus", "+");

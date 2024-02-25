@@ -263,7 +263,7 @@ async function appMain() {
 					picoBeep(2.7, 0.1, 0.2);
 
 					// Update action button to share.
-					picoLabel("action", "^");
+					picoLabel("action", "&");
 				}
 			}
 		}

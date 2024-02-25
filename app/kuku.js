@@ -364,7 +364,7 @@ async function appResult() {
 		}
 
 		// Enable share button.
-		picoLabel("action", "^");
+		picoLabel("action", "&");
 
 		// Reset playing count.
 		playing = 1;

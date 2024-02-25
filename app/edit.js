@@ -44,7 +44,7 @@ async function appUpdate(force = true) {
 		let data = await picoSpriteData(buffers[frame], colors);
 		picoLabel("action", null, data);
 	} else {
-		picoLabel("action", "^");
+		picoLabel("action", "&");
 	}
 
 	// Update select button.
@@ -589,7 +589,7 @@ async function appMain() {
 					}
 
 					// Draw decrease button.
-					picoChar("_", colorselecting, x, colorsposy, 0, s);
+					picoChar("&", colorselecting, x, colorsposy+8, 180, s);
 				}
 
 				// Increase color number.
@@ -606,7 +606,7 @@ async function appMain() {
 					colors[colorselecting * 3 + i] = c;
 
 					// Draw increase button.
-					picoChar("^", colorselecting, x, colorsposy, 0, s);
+					picoChar("&", colorselecting, x, colorsposy-8, 0, s);
 				}
 
 				// Convert range 0-255 to 0-100.
