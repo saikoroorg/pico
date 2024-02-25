@@ -3,5 +3,5 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40222"; // Updatable by package.json.
+pico.version = "0.9.40225"; // Updatable by package.json.
 
