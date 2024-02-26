@@ -57,6 +57,15 @@ async function picoColor(colors=null) {
 	}
 }
 
+// Set extra char sprite.
+async function picoSetChar(char, sprite) {
+	try {
+		pico.image.setChar(char, sprite);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 // Draw rect.
 async function picoRect(c=0, x=0, y=0, width=1, height=1, angle=0, scale=1) {
 	try {
@@ -423,6 +432,9 @@ pico.Image = class {
 		[-1,-2,0,0,2,0,-1,-2,0,0,0,2,-1,0,0,0,0,2,-1,-2,2,0,2,0], // 。
 	];
 
+	static extraChars = ""; // Extra char chars.
+	static extraSprites = []; // Extra char sprites.
+
 	// Master image color. (5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000)
 	static colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0];
 
@@ -446,6 +458,14 @@ pico.Image = class {
 	color(colors=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			this._color(colors);
+		}); // end of lock.
+	}
+
+	// Set extra char sprite.
+	setChar(char, sprite) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			pico.Image.extraChars += char;
+			pico.Image.extraSprites.push(sprite);
 		}); // end of lock.
 	}
 
@@ -780,7 +800,10 @@ pico.Image = class {
 	// Draw char as string or number to image.
 	_char(char, c=0) {
 		let sprite = [];
-		if (char <= 0xFF) {
+		let e = pico.Image.extraChars.indexOf(String.fromCharCode(char));
+		if (e >= 0) {
+				sprite = pico.Image.extraSprites[e];
+		} else if (char <= 0xFF) {
 			if (char >= "0".charCodeAt(0) && char <= "9".charCodeAt(0)) {
 				let a = char - "0".charCodeAt(0);
 				sprite = pico.Image.numberSprites[a];

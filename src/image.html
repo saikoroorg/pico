@@ -51,27 +51,24 @@ window.addEventListener("load", async (evt) => {
 });
 document.addEventListener("click", async (evt) => {
 
-/*/
+await picoSetChar("＊", [-1,-2,-2,-1,-2,2,-1,-1,-1,-1,-1,1,-1,0,0,-1,1,-1,-1,1,1,-1,2,-2,-1,2,2]); // ＊
+await picoSetChar("○", [-1,-2,-1,0,0,2,-1,-1,-2,0,2,0,-1,-1,2,0,2,0,-1,2,-1,0,0,2]); // ○
+await picoSetChar("△", [-1,-2,2,0,4,0,-1,-2,1,0,0,1,-1,-1,-1,0,0,1,-1,0,-2,-1,1,-1,0,0,1,-1,2,1,0,0,1]); // △
+await picoSetChar("□", [-1,-2,-2,0,4,0,-1,-2,-2,0,0,4,-1,2,-2,0,0,4,-1,-2,2,0,4,0]); // □
+await picoSetChar("●", [-1,-2,-1,0,4,2,-1,-1,-2,0,2,4]); // ●
+await picoSetChar("▲", [-1,-2,1,0,4,1,-1,-1,-1,0,2,1,-1,0,-2]); // ▲
+await picoSetChar("■", [-1,-2,-2,0,4,4]); // ■
+await picoSetChar("A", [-1,-2,0,0,4,1,-1,-1,-1,0,2,3,-1,0,-2,0,0,2]); // SPADE
+await picoSetChar("B", [-1,-2,-1,0,4,1,-1,-1,-2,0,0,1,-1,-1,0,0,2,1,-1,0,1,0,0,1,-1,1,-2,0,0,1]); // HEART
+await picoSetChar("C", [-1,-2,0,0,4,0,-1,-1,-1,0,2,2,-1,0,-2,0,0,4]); // DIAM
+await picoSetChar("D", [-1,-2,0,0,4,1,-1,-1,-2,0,2,3,-1,0,1,0,0,1]); // CLUB
+
+//*/
 	for (let i = 0; i <= 30; i++) {
 		picoClear();
 
-		let text = "";
-		for (let i = "0".charCodeAt(0); i <= "9".charCodeAt(0); i++) {
-			text += String.fromCharCode(i);
-		}
-		for (let i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
-			text += String.fromCharCode(i);
-		}
-		text += pico.Image.mark1Chars;
-		for (let i = "ァ".charCodeAt(0); i <= "ン".charCodeAt(0); i++) {
-			text += String.fromCharCode(i);
-		}
-		for (let i = "ぁ".charCodeAt(0); i <= "ん".charCodeAt(0); i++) {
-			text += String.fromCharCode(i);
-		}
-		text += pico.Image.mark2Chars;
 		picoRect(1, 0,0,150,150, 0,1);
-		picoText(text, -1, 0,0,120,120, 0,1, 8,8);
+		picoText("＊○△□●▲■ABCDEFGH", -1, 0,0,120,120, 0,1, 8,8);
 
 		await picoFlip(20);
 	}
