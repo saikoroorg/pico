@@ -9,7 +9,7 @@
 pico.Image.debug = true;
 window.addEventListener("load", async (evt) => {
 
-//*
+//*/
 	let image1 = await picoSpriteData(
 		[0,7,7, 6,3,3, 6,1,5, 6,5,1],
 		[255,255,255, 0,0,0], 2);
@@ -28,86 +28,6 @@ window.addEventListener("load", async (evt) => {
 //*/
 
 //(async()=>{
-
-/*
-	let text = "";
-	for (let i = "0".charCodeAt(0); i <= "9".charCodeAt(0); i++) {
-		text += String.fromCharCode(i);
-	}
-	for (let i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
-		text += String.fromCharCode(i);
-	}
-	text += pico.Image.markChars;
-	for (let i = "ァ".charCodeAt(0); i <= "ン".charCodeAt(0); i++) {
-		text += String.fromCharCode(i);
-	}
-	for (let i = "ぁ".charCodeAt(0); i <= "ん".charCodeAt(0); i++) {
-		text += String.fromCharCode(i);
-	}
-	text += pico.Image.mark2Chars;
-	picoRect(1, 0,0,150,150, 0,1);
-	picoText(text, -1, 0,0,120,120, 0,1, 8,8);
-//*/
-
-/*
-	text = 
-"--------\n"+
-"--------\n"+
-"--------\n"+
-"---#@---\n"+
-"---@#---\n"+
-"--------\n"+
-"--------\n"+
-"--------\n";
-	picoText(text, -1, 0,0,32,32, 0,6, 4,4);
-//*/
-
-/*
-	text = 
-" ------                      \n"+
-" 1....1      ############    \n"+
-" 1....1      #          #    \n"+
-" 1.S..+########         #    \n"+
-" 1....1       #      ---+--- \n"+
-" ------       #      1.....1 \n"+
-"              #      1.!...1 \n"+
-"              #      1.....1 \n"+
-"              #      1..@..1 \n"+
-"   ----       #      1.....1 \n"+
-"   1..1       #######+..D..1 \n"+
-"   1<.+###    #      1.....1 \n"+
-"   ----  #    #      1.?...1 \n"+
-"         ######      ------- \n";
-	picoText(text, -1, 0,0,128,128, 0,1);
-//*/
-
-/*/
-	const scale = 4, width = 4*10, height = 6*7, frame = 32;
-	//for (let i = 0; i <= 360; i++) {
-	//	picoClear();
-		//picoRect(1, 0,0,width+frame,height+frame, 0,scale);
-		picoRect(2, 0,0,width,height, 0,scale);
-		picoText(
-			"0123456789\n" +
-			"abcdefghij\n" +
-			"klmnopqrst\n" +
-			"uvwxyz./?:\n",
-//			"-+=<>_^*\n",
-			1, 0,0,width,height, 0,scale);
-			//1, 4,4,0,0, 0,scale);
-		picoText(
-			"\n\n\n\n" +
-			"アイウエオ" +
-			"あいうえお" +
-			"パピプペポ" +
-			"ぱぴぷぺぽ",
-			1, 0,0,width,height, 0,scale, 8);
-
-		//picoChar("Hello+World", 1, 0,0, i)
-
-	//	await picoFlip(20);
-	//}
-//*/
 
 //*/
 	//for (let i = 0; i <= 180; i++) {
@@ -130,6 +50,32 @@ window.addEventListener("load", async (evt) => {
 
 });
 document.addEventListener("click", async (evt) => {
+
+/*/
+	for (let i = 0; i <= 30; i++) {
+		picoClear();
+
+		let text = "";
+		for (let i = "0".charCodeAt(0); i <= "9".charCodeAt(0); i++) {
+			text += String.fromCharCode(i);
+		}
+		for (let i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
+			text += String.fromCharCode(i);
+		}
+		text += pico.Image.mark1Chars;
+		for (let i = "ァ".charCodeAt(0); i <= "ン".charCodeAt(0); i++) {
+			text += String.fromCharCode(i);
+		}
+		for (let i = "ぁ".charCodeAt(0); i <= "ん".charCodeAt(0); i++) {
+			text += String.fromCharCode(i);
+		}
+		text += pico.Image.mark2Chars;
+		picoRect(1, 0,0,150,150, 0,1);
+		picoText(text, -1, 0,0,120,120, 0,1, 8,8);
+
+		await picoFlip(20);
+	}
+//*/
 
 	const colors64 = [
 		 255,255,255, 171,231,255, 199,215,255, 215,203,255, // 30-33
@@ -230,7 +176,7 @@ document.addEventListener("click", async (evt) => {
 
 //*/
 	picoClear();
-	picoPixel(1, 0,0, 2,2);
+	picoRect(1, 0,0, 2,2);
 	await picoFlip(20);
 //*/
 
