@@ -11,16 +11,14 @@ window.addEventListener("load", async (evt) => {
 
 //*/
 	let image1 = await picoSpriteData(
-		[0,7,7, 6,3,3, 6,1,5, 6,5,1],
-		[255,255,255, 0,0,0], 2);
+		[0,7,7, 6,3,3, 6,1,5, 6,5,1], [255,255,255, 0,0,0], 2);
 	let e1 = document.getElementById("image1");
 	if (e1) {
 		e1.src = image1;
 	}
 
 	let image2 = await picoTextData(
-		"イメーシ゛123",
-		-1, 0,0,48,6, 0,1, 6,6);
+		"イメーシ゛123", null, 6,6, 48,6, 1);
 	let e2 = document.getElementById("image2");
 	if (e2) {
 		e2.src = image2;
@@ -52,7 +50,7 @@ window.addEventListener("load", async (evt) => {
 document.addEventListener("click", async (evt) => {
 
 //*/
-	const extraChars = {
+	const extraCharSprites = {
 		"＊": [-1,-2,-2,-1,-2,2,-1,-1,-1,-1,-1,1,-1,0,0,-1,1,-1,-1,1,1,-1,2,-2,-1,2,2],
 		"○": [-1,-2,-1,0,0,2,-1,-1,-2,0,2,0,-1,-1,2,0,2,0,-1,2,-1,0,0,2],
 		"△": [-1,-2,2,0,4,0,-1,-2,1,0,0,1,-1,-1,-1,0,0,1,-1,0,-2,-1,1,-1,0,0,1,-1,2,1,0,0,1],
@@ -66,15 +64,16 @@ document.addEventListener("click", async (evt) => {
 		"＃": [-1,-2,0,0,4,1,-1,-1,-2,0,2,3,-1,0,1,0,0,1],
 	};
 
-	for (let key in extraChars) {
-		picoSetChar(key, extraChars[key]);
+	for (let key in extraCharSprites) {
+		picoCharSprite(key, extraCharSprites[key]);
 	}
+	picoCharLeading(8,8);
 
-	for (let i = 0; i <= 120; i++) {
+	for (let i = 0; i <= 180; i++) {
 		picoClear();
 
 		picoRect(1, 0,0,150,150, 0,1);
-		picoText("＊○△□●▲■＆％＄＃".substr(0, i/10), -1, 0,0,120,120, 0,1, 8,8);
+		picoText("＊○△□●▲■＆％＄＃".substr(0, i/10), -1, 0,0,120,120, 0,1);
 
 		await picoFlip(20);
 	}
@@ -122,6 +121,7 @@ document.addEventListener("click", async (evt) => {
 
 //*/
 	picoColor(colors);
+	picoCharLeading(4,6);
 
 	for (let i = 0; i <= 180; i++) {
 		picoClear();
@@ -178,6 +178,7 @@ document.addEventListener("click", async (evt) => {
 //*/
 
 //*/
+	picoColor(colors);
 	picoClear();
 	picoRect(1, 0,0, 2,2);
 	await picoFlip(20);
