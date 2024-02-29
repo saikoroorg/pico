@@ -40,9 +40,12 @@ for (let i = 0; i < numberRects.length; i++) {
 }
 for (let i = 0; i < numberSprites.length; i++) {
 	if (numberSprites[i]) {
-		console.log("[" + numberSprites[i].join(",") + "], // " + i + "\n");
+		let numberChar = "" + i;
+		let numberChar2 = String.fromCharCode("０".charCodeAt(0) + i);
+		console.log("\"" + numberChar + numberChar2 + "\": [" + numberSprites[i].join(",") + "],");
+		picoCharSprite(numberChar, numberSprites[i]);
 	} else {
-		console.log("[],\n");
+		console.log("\"" + numberChar + "\": [],\n");
 	}
 }
 
@@ -95,33 +98,36 @@ for (let i = 0; i < alphabetRects.length; i++) {
 }
 for (let i = 0; i < alphabetSprites.length; i++) {
 	if (alphabetSprites[i]) {
-		console.log("[" + alphabetSprites[i].join(",") + "], // " + String.fromCharCode("A".charCodeAt(0) + i) + "\n");
+		let alphabetChar = String.fromCharCode("A".charCodeAt(0) + i);
+		let alphabetChar2 = String.fromCharCode("Ａ".charCodeAt(0) + i);
+		console.log("\"" + alphabetChar + alphabetChar2 + "\": [" + alphabetSprites[i].join(",") + "],");
+		picoCharSprite(alphabetChar, alphabetSprites[i]);
 	} else {
-		console.log("[],\n");
+		console.log("\"" + alphabetChar + "\": [],\n");
 	}
 }
 
-const mark1Chars = "./?:-+*=<>&%$#@" + "_^!";
+const mark1Chars = ".?/:-+=*&%$#";
 const mark1Rects = [
 	[0,2,0,0], // .
-	[-1,2,0,0, 0,-1,0,2, 1,-2,0,0], // /
 	[-1,-2,2,0, 1,-2,0,1, 0,0,0,0, 0,2,0,0], // ?
+	[-1,2,0,0, 0,-1,0,2, 1,-2,0,0], // /
 	[0,-1,0,0, 0,1,0,0], // :
 	[-1,0,2,0], // -
 	[-1,0,2,0, 0,-1,0,2], // +
-	[-1,-1,0,0, -1,1,0,0, 0,0,0,0, 1,-1,0,0, 1,1,0,0], // *
 	[-1,-1,2,0, -1,1,2,0], // =
-	[-1,0,0,0, 0,-1,0,0, 0,1,0,0, 1,-2,0,0, 1,2,0,0], // <
-	[-1,-2,0,0, -1,2,0,0, 0,-1,0,0, 0,1,0,0, 1,0,0,0], // >
+	[-1,-1,0,0, -1,1,0,0, 0,0,0,0, 1,-1,0,0, 1,1,0,0], // *
 	[-1,0,0,1, 0,-1,0,0, 1,0,0,1, -1,1,2,0], // SPADE(&)
 	[-1,-1,2,0, -1,-1,0,1, 0,1,0,0, 1,-1,0,1], // HEART(%)
 	[-1,0,0,0, 0,-1,0,0, 0,1,0,0, 1,0,0,0], // DIAM($)
 	[-1,-1,2,0, -1,-1,0,2, -1,1,2,0, 1,-1,0,2], // CLUB(#)
-	[-1,-1,2,2], // JOKER(@)
 
-	[-1,1,0,0, 0,2,0,0, 1,1,0,0], // _
-	[-1,-1,0,0, 0,-2,0,0, 1,-1,0,0], // ^
-	[0,-2,0,2, 0,2,0,0], // !
+//	[-1,-1,2,2], // JOKER(@)
+//	[-1,0,0,0, 0,-1,0,0, 0,1,0,0, 1,-2,0,0, 1,2,0,0], // <
+//	[-1,-2,0,0, -1,2,0,0, 0,-1,0,0, 0,1,0,0, 1,0,0,0], // >
+//	[-1,1,0,0, 0,2,0,0, 1,1,0,0], // _
+//	[-1,-1,0,0, 0,-2,0,0, 1,-1,0,0], // ^
+//	[0,-2,0,2, 0,2,0,0], // !
 ];
 
 let mark1Sprites = [];
@@ -144,9 +150,10 @@ for (let i = 0; i < mark1Chars.length; i++) {
 }
 for (let i = 0; i < mark1Sprites.length; i++) {
 	if (mark1Sprites[i]) {
-		console.log("[" + mark1Sprites[i].join(",") + "], // " + mark1Chars[i] + "\n");
+		console.log("\"" + mark1Chars[i] + "\": [" + mark1Sprites[i].join(",") + "],");
+		picoCharSprite(mark1Chars[i], mark1Sprites[i]);
 	} else {
-		console.log("[],\n");
+		console.log("\"" + mark1Chars[i] + "\": [],\n");
 	}
 }
 
@@ -249,20 +256,22 @@ const katakana = [
 
 let katakanaSprites = [];
 for (let i = 0; i < katakana.length; i++) {
-	picoSetStrings(katakana[i]);
-	let code = pico.param.code6();
-	katakanaSprites[i] = [];
-	for (let j = 1; j < code.length/3; j++) {
-		katakanaSprites[i][(j-1)*3] = -1;
-		katakanaSprites[i][(j-1)*3+1] = code[j*3+1] - (code[1]-1) / 2;
-		katakanaSprites[i][(j-1)*3+2] = code[j*3+2] - (code[2]-1) / 2;
+	if (katakana[i]) {
+		picoSetStrings(katakana[i]);
+		let code = pico.param.code6();
+		katakanaSprites[i] = [];
+		for (let j = 1; j < code.length/3; j++) {
+			katakanaSprites[i][(j-1)*3] = -1;
+			katakanaSprites[i][(j-1)*3+1] = code[j*3+1] - (code[1]-1) / 2;
+			katakanaSprites[i][(j-1)*3+2] = code[j*3+2] - (code[2]-1) / 2;
+		}
 	}
 }
 for (let i = 0; i < katakanaSprites.length; i++) {
 	if (katakanaSprites[i]) {
-		console.log("[" + katakanaSprites[i].join(",") + "], // " + String.fromCharCode("ァ".charCodeAt(0) + i) + "\n");
-	} else {
-		console.log("[],\n");
+		let katakanaChar = String.fromCharCode("ァ".charCodeAt(0) + i);
+		console.log("\"" + katakanaChar + "\": [" + katakanaSprites[i].join(",") + "],");
+		picoCharSprite(katakanaChar, katakanaSprites[i]);
 	}
 }
 
@@ -364,38 +373,42 @@ const hiragana = [
 
 let hiraganaSprites = [];
 for (let i = 0; i < hiragana.length; i++) {
-	picoSetStrings(hiragana[i]);
-	let code = pico.param.code6();
-	hiraganaSprites[i] = [];
-	for (let j = 1; j < code.length/3; j++) {
-		hiraganaSprites[i][(j-1)*3] = -1;
-		hiraganaSprites[i][(j-1)*3+1] = code[j*3+1] - (code[1]-1) / 2;
-		hiraganaSprites[i][(j-1)*3+2] = code[j*3+2] - (code[2]-1) / 2;
+	if (hiragana[i]) {
+		picoSetStrings(hiragana[i]);
+		let code = pico.param.code6();
+		hiraganaSprites[i] = [];
+		for (let j = 1; j < code.length/3; j++) {
+			hiraganaSprites[i][(j-1)*3] = -1;
+			hiraganaSprites[i][(j-1)*3+1] = code[j*3+1] - (code[1]-1) / 2;
+			hiraganaSprites[i][(j-1)*3+2] = code[j*3+2] - (code[2]-1) / 2;
+		}
 	}
 }
 for (let i = 0; i < hiraganaSprites.length; i++) {
 	if (hiraganaSprites[i]) {
-		console.log("[" + hiraganaSprites[i].join(",") + "], // " + String.fromCharCode("ぁ".charCodeAt(0) + i) + "\n");
-	} else {
-		console.log("[],\n");
+		let hiraganaChar = String.fromCharCode("ぁ".charCodeAt(0) + i);
+		console.log("\"" + hiraganaChar + "\": [" + hiraganaSprites[i].join(",") + "],");
+		picoCharSprite(hiraganaChar, hiraganaSprites[i]);
 	}
 }
 //*/
 
-const mark2Chars = "ー゛゜、。" + "＊○△□●▲■＆％＄＃";
+const mark2Chars = "ー゛゜、。「」" + "＊○△□●■＆％＄＃";
 const mark2Rects = [
 	[-2,0,4,0], // ー
 	[-2,-2,0,1, 0,-2,0,1], // ゛
 	[-2,-2,2,0, -2,-2,0,2, 0,-2,0,2, -2,0,2,0], // ゜
 	[-2,1,0,0, -1,2,0,0], // 、
 	[-2,0,2,0, -2,0,0,2, 0,0,0,2, -2,2,2,0], // 。
+	[-1,-2,2,0, -1,-2,0,2], // 「
+	[-1,2,2,0, 1,0,0,2], // 」
 
 	[-2,-2,0,0, -2,2,0,0, -1,-1,0,0, -1,1,0,0, 0,0,0,0, 1,-1,0,0, 1,1,0,0, 2,-2,0,0, 2,2,0,0], // ＊
 	[-2,-1,0,2, -1,-2,2,0, -1,2,2,0, 2,-1,0,2], // ○
 	[-2,2,4,0, -2,1,0,1, -1,-1,0,1, 0,-2,0,0, 1,-1,0,1, 2,1,0,1], // △
 	[-2,-2,4,0, -2,-2,0,4, 2,-2,0,4, -2,2,4,0], // □
 	[-2,-1,4,2, -1,-2,2,4], // ●
-	[-2,1,4,1, -1,-1,2,1, 0,-2,0,0], // ▲
+//	[-2,1,4,1, -1,-1,2,1, 0,-2,0,0], // ▲
 	[-2,-2,4,4], // ■
 	[-2,0,4,1, -1,-1,2,3, 0,-2,0,2], // SPADE(＆)
 	[-2,-1,4,1, -1,-2,0,1, -1,0,2,1, 0,1,0,1, 1,-2,0,1], // HEART(％)
@@ -423,38 +436,42 @@ for (let i = 0; i < mark2Chars.length; i++) {
 }
 for (let i = 0; i < mark2Sprites.length; i++) {
 	if (mark2Sprites[i]) {
-		console.log("[" + mark2Sprites[i].join(",") + "], // " + mark2Chars[i] + "\n");
+		console.log("\"" + mark2Chars[i] + "\": [" + mark2Sprites[i].join(",") + "],");
+		picoCharSprite(mark2Chars[i], mark2Sprites[i]);
 	} else {
-		console.log("[],\n");
+		console.log("\"" + mark2Chars[i] + "\": [],\n");
 	}
 }
 
+
+(async()=>{
 let text = "";
-for (let i = "0".charCodeAt(0); i <= "9".charCodeAt(0); i++) {
+for(let i = "0".charCodeAt(0); i <= "9".charCodeAt(0); i++) {
 	text += String.fromCharCode(i);
 }
-for (let i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
+for(let i = "A".charCodeAt(0); i <= "Z".charCodeAt(0); i++) {
 	text += String.fromCharCode(i);
 }
-text += pico.Image.mark1Chars;
-for (let i = "ァ".charCodeAt(0); i <= "ロ".charCodeAt(0); i++) {
+text += mark1Chars;
+for(let i = "ぁ".charCodeAt(0); i <= "ろ".charCodeAt(0); i++) {
 	text += String.fromCharCode(i);
 }
-text += String.fromCharCode("ワ".charCodeAt(0));
-text += String.fromCharCode("ヲ".charCodeAt(0));
-text += String.fromCharCode("ン".charCodeAt(0));
-for (let i = "ぁ".charCodeAt(0); i <= "ろ".charCodeAt(0); i++) {
+text += "わをん";
+for(let i = "ァ".charCodeAt(0); i <= "ロ".charCodeAt(0); i++) {
 	text += String.fromCharCode(i);
 }
-text += String.fromCharCode("わ".charCodeAt(0));
-text += String.fromCharCode("を".charCodeAt(0));
-text += String.fromCharCode("ん".charCodeAt(0));
-text += pico.Image.mark2Chars;
-
+text += "ワヲン";
+text += mark2Chars;
 picoCharLeading(8,8);
-picoRect(1, 0,0,150,150, 0,1);
-picoText(text, -1, 0,0,120,120, 0,1);
+for (let i = 0; i <= 360; i++) {
+	picoClear();
 
+	picoRect(1, 0,0,150,150, 0,1);
+	picoText(text.substr(0,i), -1, 0,0,120,120, 0,1);
+
+	await picoFlip(20);
+}
+})();
 </script><!--/Main-->
 </body>
 </html>
