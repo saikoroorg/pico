@@ -256,7 +256,7 @@ pico.App = class {
 			let e2 = document.getElementById(id + "Icon");
 			if (e2 && (text || icon)) {
 				e2.style.display = "flex";
-				e2.src = icon ? icon : await picoTextData(text, [0,0,0], 0,0,4*text.length,6, 0);
+				e2.src = icon ? icon : await picoTextData(text, [0,0,0], 4,6, 4*text.length,6, 1);
 				if (e1) {
 					e1.style.display = "none";
 				}
