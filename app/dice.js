@@ -59,13 +59,16 @@ async function appUpdate() {
 		picoLabel("action");
 	}
 	if (pixels.length > 0) {
-		let data = await picoSpriteData(pixels[maximum - 1], colors);
+		picoColor(colors);
+		let data = await picoSpriteData(pixels[maximum - 1]);
 		picoLabel("select", null, data);
 	} else if (maximum <= 9) {
-		let data = await picoSpriteData(dots[maximum - 1], colors);
+		picoColor(colors);
+		let data = await picoSpriteData(dots[maximum - 1]);
 		picoLabel("select", null, data);
 	} else if (maximum <= maxmaximum) {
-		let data = await picoSpriteData(nums[maximum], colors);
+		picoColor(colors);
+		let data = await picoSpriteData(nums[maximum]);
 		picoLabel("select", null, data);
 	} else {
 		picoLabel("select", "#");
@@ -323,13 +326,6 @@ async function appMain() {
 		}
 	}
 
-	// Draw parameters.
-	picoColor();
-	if (pixels.length <= 0) {
-		let param = "" + count + "d" + maximum;
-		picoChar(param, -1, 0,landscape?-50:-85, 0,2);
-	}
-
 	// Draw customizing dice.
 	if (custom) {
 
@@ -390,6 +386,13 @@ async function appMain() {
 				picoSprite(nums[randoms[i]], 0, posx[i], posy[i], angle, s);
 			}
 		}
+	}
+
+	// Draw parameters.
+	picoColor();
+	if (pixels.length <= 0) {
+		let param = "" + count + "d" + maximum;
+		picoChar(param, -1, 0,landscape?-50:-85, 0,2);
 	}
 
 	// Update animation if rolling.

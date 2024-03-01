@@ -81,8 +81,8 @@ function picoWideScreen(enable=true) {
 }
 
 // Share screen image.
-async function picoShareScreen(bgcolors=null, watermark=null) {
-	await pico.app.shareScreen(bgcolors, watermark);
+async function picoShareScreen(c=0, bg=1) {
+	await pico.app.shareScreen(c, bg);
 }
 
 // App mode.
@@ -256,7 +256,7 @@ pico.App = class {
 			let e2 = document.getElementById(id + "Icon");
 			if (e2 && (text || icon)) {
 				e2.style.display = "flex";
-				e2.src = icon ? icon : await picoTextData(text, [0,0,0], 4,6, 4*text.length,6, 1);
+				e2.src = icon ? icon : await picoTextData(text, -1, 4*text.length,6, 1);
 				if (e1) {
 					e1.style.display = "none";
 				}
@@ -394,14 +394,9 @@ pico.App = class {
 	}
 
 	// Share screen image.
-	async shareScreen(bgcolors=null, watermark=null) {
-		if (bgcolors == null) {
-			bgcolors = [223,223,223, 255,255,255];
-		}
-		if (watermark == null) {
-			watermark = this.author + "#" + this.timestamp;
-		}
-		let file = await picoScreenFile(bgcolors, watermark);
+	async shareScreen(c=0, bg=1) {
+		let watermark = this.author + "#" + this.timestamp;
+		let file = await picoScreenFile(watermark, c, bg);
 		let files = [file];
 		await picoShare(null, files);
 	}

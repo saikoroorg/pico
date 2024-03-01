@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40229"; // Updatable by package.json.
+pico.version = "0.9.40301"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -103,18 +103,18 @@ async function picoText(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1
 }
 
 // Get multiple lines of text image data.
-async function picoTextData(text, color=null, leading=0, vleading=0, width=0, height=0, scale=1) {
+async function picoTextData(text, c=0, width=0, height=0, scale=1) {
 	try {
-		return await pico.image.textData("" + text, color, leading, vleading, width, height, scale);
+		return await pico.image.textData("" + text, c, width, height, scale);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Draw sprite.
-async function picoSprite(cells=[-1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
+async function picoSprite(cells=[-1,0,0], bg=-1, x=0, y=0, angle=0, scale=1) {
 	try {
-		await pico.image.drawSprite(cells, c, x, y, angle, scale);
+		await pico.image.drawSprite(cells, bg, x, y, angle, scale);
 	} catch (error) {
 		console.error(error);
 	}
@@ -130,18 +130,18 @@ function picoSpriteSize(cells=[-1,0,0]) {
 }
 
 // Get sprite image data.
-async function picoSpriteData(cells=[-1,0,0], colors=null, scale=10) {
+async function picoSpriteData(cells=[-1,0,0], scale=10) {
 	try {
-		return await pico.image.spriteData(cells, colors, scale);
+		return await pico.image.spriteData(cells, scale);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Get screen data file.
-async function picoScreenFile(colors=null, watermark=null, leading=0, vleading=0) {
+async function picoScreenFile(watermark=null, c=0, bg=-1) {
 	try {
-		return await pico.image.screenFile(colors, watermark, leading, vleading);
+		return await pico.image.screenFile(watermark, c, bg);
 	} catch (error) {
 		console.error(error);
 	}
@@ -191,15 +191,21 @@ var pico = pico || {};
 // Image class.
 pico.Image = class {
 	static debug = false; // Debug print.
+	static count = 0; // Object count.
 	static width = 200; // Image width. (-width/2 .. width/2)
 	static height = 200; // Image height. (-height/2 .. height/2)
 	static ratio = 4; // Pixel ratio.
 	static parent = "picoImage"; // Parent element id.
 
+	// Default image color. (5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000)
+	static colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0];
+
+	// Default char leading.
 	static leading = 4; // Default char leading.
 	static vleading = 6; // Default line leading (vertical).
 
-	static charSprites = { // Char sprite table.
+	// Default char sprite.
+	static csprites = { // Char sprite table.
 		"0": [-1,-1,-2,0,2,0,-1,-1,-2,0,0,4,-1,1,-2,0,0,4,-1,-1,2,0,2,0],
 		"1": [-1,0,-2,0,0,4],
 		"2": [-1,-1,-2,0,2,0,-1,1,-2,0,0,2,-1,-1,0,0,2,0,-1,-1,0,0,0,2,-1,-1,2,0,2,0],
@@ -237,27 +243,23 @@ pico.Image = class {
 		"Y": [-1,-1,-2,0,0,1,-1,0,0,0,0,2,-1,1,-2,0,0,1],
 		"Z": [-1,-1,-2,0,2,0,-1,1,-2,0,0,1,-1,0,0,-1,-1,1,0,0,1,-1,-1,2,0,2,0],
 		".": [-1,0,2],
-		"?": [-1,-1,-2,0,2,0,-1,1,-2,0,0,1,-1,0,0,-1,0,2],
+		"-": [-1,-1,0,0,2,0],
 		"/": [-1,-1,2,-1,0,-1,0,0,2,-1,1,-2],
 		":": [-1,0,-1,-1,0,1],
-		"-": [-1,-1,0,0,2,0],
 		"+": [-1,-1,0,0,2,0,-1,0,-1,0,0,2],
 		"=": [-1,-1,-1,0,2,0,-1,-1,1,0,2,0],
+		"?": [-1,-1,-2,0,2,0,-1,1,-2,0,0,1,-1,0,0,-1,0,2],
 		"*": [-1,-1,-1,-1,-1,1,-1,0,0,-1,1,-1,-1,1,1],
 		"&": [-1,-1,0,0,0,1,-1,0,-1,-1,1,0,0,0,1,-1,-1,1,0,2,0],
 		"%": [-1,-1,-1,0,2,0,-1,-1,-1,0,0,1,-1,0,1,-1,1,-1,0,0,1],
 		"$": [-1,-1,0,-1,0,-1,-1,0,1,-1,1,0],
 		"#": [-1,-1,-1,0,2,0,-1,-1,-1,0,0,2,-1,-1,1,0,2,0,-1,1,-1,0,0,2],
 	};
-
-	static charAliases = { // Char sprite alias table.
+	static caliases = { // Char sprite alias table.
 		"a":"A", "b":"B", "c":"C", "d":"D", "e":"E", "f":"F", "g":"G",
 		"h":"H", "i":"I", "j":"J", "k":"K", "l":"L", "m":"M", "n":"N",
 		"o":"O", "p":"P", "q":"Q", "r":"R", "s":"S", "t":"T", "u":"U",
 		"v":"V", "w":"W", "x":"X", "y":"Y", "z":"Z",};
-
-	// Master image color. (5 gray scale colors: ffffff dfdfdf bfbfbf 7f7f7f 3f3f3f 000000)
-	static colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0];
 
 	// Wait and flip image.
 	flip(t=10) {
@@ -278,14 +280,19 @@ pico.Image = class {
 	// Set image color pallete.
 	color(colors=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			this._color(colors);
+			if (colors && colors.length > 0) {
+				this.colors = colors.concat();
+			} else {
+				this.colors = pico.Image.colors.concat();
+			}
 		}); // end of lock.
 	}
 
 	// Set char leading.
 	charLeading(leading, vleading) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			this._charLeading(leading, vleading);
+			this.leading = leading;
+			this.vleading = vleading;
 		}); // end of lock.
 	}
 
@@ -293,10 +300,10 @@ pico.Image = class {
 	charSprite(text, sprite) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (text[0] && sprite) {
-				pico.Image.charSprites[text[0]] = sprite;
+				this.sprites[text[0]] = sprite;
 			}
 			for (let i = 1; i < text.length; i++) {
-				pico.Image.charAliases[text[i]] = text[0];
+				this.aliases[text[i]] = text[0];
 			}
 		}); // end of lock.
 	}
@@ -304,12 +311,9 @@ pico.Image = class {
 	// Draw rect to image.
 	drawRect(c=0, x=0, y=0, width=1, height=1, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				await this._ready();
-				await this._reset(x, y, angle, scale);
-				await this._draw(c, -(width-1)/2, -(height-1)/2, width-1, height-1);
-				resolve();
-			}); // end of new Promise.
+			await this._ready();
+			await this._reset(x, y, angle, scale);
+			await this._draw(c, -(width-1)/2, -(height-1)/2, width-1, height-1);
 		}); // end of lock.
 	}
 
@@ -317,97 +321,96 @@ pico.Image = class {
 	drawChar(char, c=0, x=0, y=0, angle=0, scale=1) {
 		const w = this.leading;
 		return navigator.locks.request(this.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				await this._ready();
-				await this._reset(x, y, angle, scale);
-				let length = char.length;
-				if (length >= 2) {
-					await this._move(-(length-1)/2 * w, 0);
-				}
-				for (let i = 0; i < length; i++) {
-					await this._char(char.charCodeAt(i), c);
-					await this._move(w, 0);
-				}
-				resolve();
-			}); // end of new Promise.
+			await this._ready();
+			await this._reset(x, y, angle, scale);
+			let length = char.length;
+			if (length >= 2) {
+				await this._move(-(length-1)/2 * w, 0);
+			}
+			for (let i = 0; i < length; i++) {
+				await this._char(char.charCodeAt(i), c);
+				await this._move(w, 0);
+			}
 		}); // end of lock.
 	}
 
 	// Draw multiple lines of text to image.
 	drawText(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				await this._ready();
-				await this._text(text, c, x, y, width, height, angle, scale);
-				resolve();
-			}); // end of new Promise.
+			await this._ready();
+			await this._text(text, c, x, y, width, height, angle, scale);
 		}); // end of lock.
 	}
 
 	// Draw offscreen and get multiple lines of text image data.
-	textData(text, color=null, leading=0, vleading=0, width=0, height=0, scale=1) {
-		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				await pico.image.offscreen._resize(width * scale, height * scale);
-				await pico.image.offscreen._ready();
-				await pico.image.offscreen._color(color);
-				await pico.image.offscreen._charLeading(leading, vleading);
-				await pico.image.offscreen._text(text, -1, 0, 0, width, height, 0, scale);
-				resolve(pico.image.offscreen._data());
-			}); // end of new Promise.
-		}); // end of lock.
+	textData(text, c=0, width=0, height=0, scale=1) {
+		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
+			await navigator.locks.request(this.lock, async (lock) => {
+				this.offscreen.colors = Object.assign([],this.colors);
+				this.offscreen.leading = this.leading;
+				this.offscreen.vleading = this.vleading;
+				this.offscreen.sprites = Object.assign({}, this.sprites);
+				this.offscreen.aliases = Object.assign({}, this.aliases);
+			}); // end of lock.
+			await this.offscreen._resize(width * scale, height * scale);
+			await this.offscreen._ready();
+			await this.offscreen._text(text, c, 0, 0, width, height, 0, scale);
+			return this.offscreen._data();
+		}); // end of offscreenlock.
 	}
 
 	// Draw sprite to image.
-	drawSprite(cells=[-1,0,0], c=-1, x=0, y=0, angle=0, scale=1) {
+	drawSprite(cells=[-1,0,0], bg=-1, x=0, y=0, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				await this._ready();
-				await this._reset(x, y, angle, scale);
-				await this._sprite(cells, c);
-				resolve();
-			}); // end of new Promise.
+			await this._ready();
+			await this._reset(x, y, angle, scale);
+			await this._sprite(cells, bg);
 		}); // end of lock.
 	}
 
 	// Draw offscreen and get sprite image data.
-	spriteData(cells=[-1,0,0], colors=null, scale=10) {
-		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				let size = pico.image.offscreen._spriteSize(cells);
-				await pico.image.offscreen._resize(size * scale, size * scale);
-				await pico.image.offscreen._ready();
-				await pico.image.offscreen._reset(0, 0, 0, scale);
-				await pico.image.offscreen._color(colors);
-				await pico.image.offscreen._sprite(cells, 0);
-				resolve(pico.image.offscreen._data());
-			}); // end of new Promise.
+	spriteData(cells=[-1,0,0], scale=10) {
+		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
+			await navigator.locks.request(this.lock, async (lock) => {
+				this.offscreen.colors = this.colors.concat();
+			}); // end of lock.
+			let size = this.offscreen._spriteSize(cells);
+			await this.offscreen._resize(size * scale, size * scale);
+			await this.offscreen._ready();
+			await this.offscreen._reset(0, 0, 0, scale);
+			await this.offscreen._sprite(cells, 0);
+			return this.offscreen._data();
 		}); // end of lock.
 	}
 
 	// Draw bg/watermark and get screen data file.
-	async screenFile(colors=null,  watermark=null, leading=0, vleading=0) {
-		if (!colors && !watermark) {
+	async screenFile(watermark=null, c=0, bg=-1) {
+		if (!watermark && bg < 0) {
 			return await pico.image._file();
 		}
-		return navigator.locks.request(pico.image.offscreen.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				await pico.image.offscreen._resize(
-					pico.image.canvas[0].width/pico.Image.ratio,
-					pico.image.canvas[0].height/pico.Image.ratio);
-				await pico.image.offscreen._ready();
-				await pico.image.offscreen._reset(0, 0, 0, 1);
-				if (colors) {
-					await pico.image.offscreen._color(colors);
-					await pico.image.offscreen._draw(0, -pico.Image.width/2, -pico.Image.height/2, pico.Image.width, pico.Image.height);
-				}
-				await pico.image.offscreen._image(pico.image);
-				if (watermark && watermark.length >= 2) {
-					await pico.image.offscreen._charLeading(leading, vleading);
-					await pico.image.offscreen._char(watermark, -1);
-				}
-				resolve(pico.image.offscreen._file());
-			}); // end of new Promise.
+		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
+			await navigator.locks.request(this.lock, async (lock) => {
+				this.offscreen.colors = Object.assign([], this.colors);
+				this.offscreen.leading = this.leading;
+				this.offscreen.vleading = this.vleading;
+				this.offscreen.sprites = Object.assign({}, this.sprites);
+				this.offscreen.aliases = Object.assign({}, this.aliases);
+			}); // end of lock.
+			await this.offscreen._resize(
+				pico.image.canvas[0].width/pico.Image.ratio,
+				pico.image.canvas[0].height/pico.Image.ratio);
+			await this.offscreen._ready();
+			await this.offscreen._reset(0, 0, 0, 1);
+			if (bg >= 0) {
+				await this.offscreen._draw(bg,
+					-pico.Image.width/2, -pico.Image.height/2,
+					pico.Image.width, pico.Image.height);
+			}
+			await this.offscreen._image(pico.image);
+			if (watermark && watermark.length >= 2) {
+				await this.offscreen._char(watermark, c);
+			}
+			return pico.image.offscreen._file();
 		}); // end of lock.
 	}
 
@@ -422,27 +425,24 @@ pico.Image = class {
 	// Draw other image to this image.
 	drawImage(image, x=0, y=0, angle=0, scale=1, width=0, height=0, frame=0, yframe=-1) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			return new Promise(async (resolve) => {
-				await this._ready();
-				await this._reset(x, y, angle, scale);
-				if (width > 0 && yframe < 0) {
-					let nx = image.canvas[0].width / width;
-					if (frame < 0) {
-						let sx = image.canvas[0].width - (Math.floor((-frame - 1) % nx) + 1) * width;
-						let sy = image.canvas[0].height - (Math.floor((-frame - 1) / nx) + 1) * height;
-						await this._image(image, sx, sy, width, height);
-					} else {
-						let sx = Math.floor(frame % nx) * width;
-						let sy = Math.floor(frame / nx) * height;
-						await this._image(image, sx, sy, width, height);
-					}
+			await this._ready();
+			await this._reset(x, y, angle, scale);
+			if (width > 0 && yframe < 0) {
+				let nx = image.canvas[0].width / width;
+				if (frame < 0) {
+					let sx = image.canvas[0].width - (Math.floor((-frame - 1) % nx) + 1) * width;
+					let sy = image.canvas[0].height - (Math.floor((-frame - 1) / nx) + 1) * height;
+					await this._image(image, sx, sy, width, height);
 				} else {
-					let sx = frame * width;
-					let sy = yframe * height;
+					let sx = Math.floor(frame % nx) * width;
+					let sy = Math.floor(frame / nx) * height;
 					await this._image(image, sx, sy, width, height);
 				}
-				resolve();
-			}); // end of new Promise.
+			} else {
+				let sx = frame * width;
+				let sy = yframe * height;
+				await this._image(image, sx, sy, width, height);
+			}
 		}); // end of lock.
 	}
 
@@ -450,16 +450,24 @@ pico.Image = class {
 
 	// constructor.
 	constructor(parent=null, width=0, height=0) {
-		this.lock = "picoImageLock" + Date.now(); // Lock object identifier.
+		pico.Image.count++;
+		this.lock = "picoImageLock" + pico.Image.count; // Lock object identifier.
 		this.canvas = []; // Double buffered canvas elements.
 		this.primary = 0; // Primary canvas index.
 		this.context = null; // Canvas 2d context.
-		this.colors = pico.Image.colors; // Master image color. 
+		this.colors = pico.Image.colors.concat(); // Master image color. 
 		this.leading = pico.Image.leading; // Char leading.
 		this.vleading = pico.Image.vleading; // Line leading (vertical).
+		this.sprites = pico.Image.csprites; // Char sprites.
+		this.aliases = pico.Image.caliases; // Char aliases.
 
 		// Setup canvas.
 		this._setup(parent, width, height);
+
+		// Create offscreen image class.
+		if (parent) {
+			this.offscreen = new pico.Image("");
+		}
 	}
 
 	// Debug print.
@@ -604,17 +612,6 @@ pico.Image = class {
 		}); // end of new Promise.
 	}
 
-	// Set image color pallete.
-	_color(colors=null) {
-		this.colors = colors && colors.length > 0 ? colors : pico.Image.colors;
-	}
-
-	// Set text char/line leading.
-	_charLeading(leading, vleading) {
-		this.leading = leading;
-		this.vleading = vleading;
-	}
-
 	// Draw pixel to image.
 	_draw(c=0, x=0, y=0, dx=0, dy=0) {
 		this._debug("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
@@ -634,11 +631,11 @@ pico.Image = class {
 	_char(char, c=0) {
 		let sprite = [];
 		let charStr = String.fromCharCode(char);
-		if (pico.Image.charAliases[charStr]) {
-			charStr = pico.Image.charAliases[charStr];
+		if (this.aliases[charStr]) {
+			charStr = this.aliases[charStr];
 		}
-		if (pico.Image.charSprites[charStr]) {
-			sprite = pico.Image.charSprites[charStr];
+		if (this.sprites[charStr]) {
+			sprite = this.sprites[charStr];
 		}
 		return new Promise(async (resolve) => {
 			await this._sprite(sprite, -1, c);
@@ -795,9 +792,6 @@ pico.Image = class {
 
 // Master image.
 pico.image = new pico.Image(pico.Image.parent);
-
-// Create offscreen image class.
-pico.image.offscreen = new pico.Image("");
 
 /* PICO Param module */
 
@@ -1821,6 +1815,7 @@ var pico = pico || {};
 // Touch class.
 pico.Touch = class {
 	static debug = false; // Debug print.
+	static count = 0; // Object count.
 	static width = 200; // Touch width.
 	static height = 200; // Touch height.
 	static unit = 4; // Unit size. (Requires multiple of 2 for center pixel)
@@ -1870,13 +1865,19 @@ pico.Touch = class {
 
 	// constructor.
 	constructor(parent=null) {
-		this.lock = "picoTouchLock" + Date.now(); // Lock object identifier.
+		pico.Touch.count++;
+		this.lock = "picoTouchLock" + pico.Touch.count; // Lock object identifier.
 		this.panel = null; // Touch panel element.
 		this.touching = [[], []]; // Double buffered touching states.
 		this.primary = 0; // Primary touching index.
 		this.flushing = false; // Flushing flag.
 
 		this._setup(parent);
+
+		// Create allscreen touch class.
+		if (parent) {
+			this.allscreen = new pico.Touch("");
+		}
 	}
 
 	// Debug print.
@@ -2124,7 +2125,4 @@ pico.Touch = class {
 
 // Master touch.
 pico.touch = new pico.Touch(pico.Touch.parent);
-
-// Create allscreen touch class.
-pico.touch.allscreen = new pico.Touch("");
 
