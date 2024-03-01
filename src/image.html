@@ -6,7 +6,7 @@
 <img id="image2" src="" />
 <script src="image.js"></script>
 <!--Main--><script>
-var text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.?/:-+=*&%$#";
+var text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#";
 window.addEventListener("load", async (evt) => {
 
 //(async()=>{
@@ -37,7 +37,8 @@ window.addEventListener("load", async (evt) => {
 document.addEventListener("click", async (evt) => {
 
 //*/
-	const extraCharAiliases = { // Char sprite ailias table.
+	const extraCharAiliases = { // Extra char ailias table.
+		"0０": null,
 		"1１": null,
 		"2２": null,
 		"3３": null,
@@ -48,12 +49,13 @@ document.addEventListener("click", async (evt) => {
 		"8８": null,
 		"9９": null,
 		"-−": null,
+		"#・": null,
 	};
 	for (let key in extraCharAiliases) {
 		picoCharSprite(key, extraCharAiliases[key]);
 	}
 
-	const extraCharSprites = { // Char sprite table.
+	const extraCharSprites = { // Extra char sprite table.
 		"ァ": [-1,-2,-1,-1,-1,-1,-1,0,-1,-1,1,-1,-1,-1,0,-1,1,0,-1,-1,1,-1,0,1,-1,-1,2],
 		"ア": [-1,-2,-2,-1,-1,-2,-1,0,-2,-1,1,-2,-1,2,-2,-1,0,-1,-1,2,-1,-1,0,0,-1,1,0,-1,0,1,-1,-1,2],
 		"ィ": [-1,0,0,-1,1,0,-1,-2,1,-1,-1,1,-1,0,1,-1,0,2],
