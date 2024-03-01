@@ -32,6 +32,7 @@ var pico = pico || {};
 // Touch class.
 pico.Touch = class {
 	static debug = false; // Debug print.
+	static count = 0; // Object count.
 	static width = 200; // Touch width.
 	static height = 200; // Touch height.
 	static unit = 4; // Unit size. (Requires multiple of 2 for center pixel)
@@ -81,13 +82,19 @@ pico.Touch = class {
 
 	// constructor.
 	constructor(parent=null) {
-		this.lock = "picoTouchLock" + Date.now(); // Lock object identifier.
+		pico.Touch.count++;
+		this.lock = "picoTouchLock" + pico.Touch.count; // Lock object identifier.
 		this.panel = null; // Touch panel element.
 		this.touching = [[], []]; // Double buffered touching states.
 		this.primary = 0; // Primary touching index.
 		this.flushing = false; // Flushing flag.
 
 		this._setup(parent);
+
+		// Create allscreen touch class.
+		if (parent) {
+			this.allscreen = new pico.Touch("");
+		}
 	}
 
 	// Debug print.
@@ -335,7 +342,4 @@ pico.Touch = class {
 
 // Master touch.
 pico.touch = new pico.Touch(pico.Touch.parent);
-
-// Create allscreen touch class.
-pico.touch.allscreen = new pico.Touch("");
 

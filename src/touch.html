@@ -12,12 +12,12 @@
 	pico.Touch.debug = true;
 
 	picoColor(pico.Image.colors0);
-	let keyboard = ["1234567890", "QWERTYUIOP", "ASDFGHJKL<", "ZXCVBNM./>"];
+	let keyboard = ["1234567890", "QWERTYUIOP", "ASDFGHJKL*", "ZXCVBNM./%"];
 	let textarea = "";
 
 	for (;;) {
 		picoClear();
-		picoPixel(0, -100,-100,200,200);
+		picoRect(0, 0,0,200,200);
 
 		for (let j = 0; j < keyboard.length; j++) {
 			let y = j * 24;
@@ -25,9 +25,9 @@
 				let x = (i - keyboard[j].length / 2) * 16 + 8;
 				let char = keyboard[j].substr(i, 1);
 				if (picoAction(x, y, 8, 12)) {
-					if (char == "<") {
+					if (char == "*") {
 						textarea = textarea.substr(0, textarea.length - 1);
-					} else if (char == ">") {
+					} else if (char == "%") {
 						textarea = "";
 					} else {
 						textarea = textarea.substr(-9, 9) + char;
@@ -40,8 +40,8 @@
 				}
 			}
 		}
-		//picoRect([-20,-24,40,24], 1, 0,0, 0, 4);
-		picoText(textarea, [-20,-24,40,24], 2, 0,0, 0, 4);
+		picoRect(1, 0,-48,4*10+4,6+4, 0,4);
+		picoText(textarea, 2, 0,-48,4*10,6, 0,4);
 
 		await picoFlip();
 		await picoRead();
