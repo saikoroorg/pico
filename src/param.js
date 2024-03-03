@@ -100,6 +100,16 @@ function picoSetCode8(code8, key=0) {
 	return pico.param.setCode8(code8, key);
 }
 
+// Get 6bit code by strings.
+function picoCode6(str) {
+	return pico.param._str2code(str);
+}
+
+// Get 8bit code by strings.
+function picoCode8(str) {
+	return pico.param._expandCode(pico.param._str2code(str));
+}
+
 //************************************************************/
 
 // Namespace.
@@ -182,17 +192,17 @@ pico.Param = class {
 
 	// Get param as 6bit code.
 	code6(key=0) {
-		return this._code6(key);
+		return this._str2code(this._strings(key));
 	}
 
 	// Set param as 6bit code.
 	setCode6(code6, key=0) {
-		this._setCode6(code6, key);
+		this._setStrings(this._code2str(code6), key);
 	}
 
 	// Get param as 8bit compatible 6bit code.
 	code8(key=0) {
-		let code6 = this._code6(key)
+		let code6 = this.code6(key)
 		return this._expandCode(code6);
 	}
 
@@ -200,9 +210,9 @@ pico.Param = class {
 	setCode8(code8, key=0) {
 		const compression = 2;
 		let code6 = this._compressCode(code8, compression)
-		this._setCode6(code6, key);
+		this.setCode6(code6, key);
 	}
-	
+
 	//*----------------------------------------------------------*/
 
 	// constructor.
@@ -356,11 +366,11 @@ pico.Param = class {
 	}
 
 	// Get number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
-	_code6(key=0) {
+	_str2code(str) {
 		let results = [];
-		if (this.context[key]) {
-			for (let i = 0; i < this.context[key].length; i++) {
-				let c = this.context[key].charCodeAt(i);
+		if (str) {
+			for (let i = 0; i < str.length; i++) {
+				let c = str.charCodeAt(i);
 				if ("0".charCodeAt(0) <= c && c <= "9".charCodeAt(0)) {
 					results[i] = c - "0".charCodeAt(0);
 				} else if ("a".charCodeAt(0) <= c && c <= "z".charCodeAt(0)) {
@@ -380,23 +390,24 @@ pico.Param = class {
 	}
 
 	// Set number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
-	_setCode6(code6, key=0) {
-		this.context[key] = "";
+	_code2str(code6) {
+		let result = "";
 		for (let i = 0; i < code6.length; i++) {
 			if (0 <= code6[i] && code6[i] < 10) {
-				this.context[key] += code6[i];
+				result += code6[i];
 			} else if (10 <= code6[i] && code6[i] < 36) {
-				this.context[key] += String.fromCharCode("a".charCodeAt(0) + code6[i] - 10);
+				result += String.fromCharCode("a".charCodeAt(0) + code6[i] - 10);
 			} else if (36 <= code6[i] && code6[i] < 62) {
-				this.context[key] += String.fromCharCode("A".charCodeAt(0) + code6[i] - 36);
+				result += String.fromCharCode("A".charCodeAt(0) + code6[i] - 36);
 			} else if (code6[i] == 62) {
-				this.context[key] += ".";
+				result += ".";
 			} else if (code6[i] == 63) {
-				this.context[key] += "-";
+				result += "-";
 			} else {
-				this.context[key] += "_";
+				result += "_";
 			}
 		}
+		return result;
 	}
 
 	// Expand code to 8bit code.

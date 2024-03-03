@@ -98,19 +98,6 @@ function picoDevMode(enable=false) {
 	return pico.app.ver < 0;
 }
 
-// Get sprite 6bit code.
-function picoSpriteCode(str) {
-	let p = new pico.Param();
-	p.setStrings(str);
-	return p.code6();
-}
-
-// Get color 8bit code.
-function picoColorCode(str) {
-	let p = new pico.Param();
-	p.setStrings(str);
-	return p.code8();
-}
 //************************************************************/
 
 // Namespace.
@@ -132,6 +119,7 @@ pico.App = class {
 		this.timestamp = ""; // Timestamp (App version).
 		this.wakeLock = null; // Wake lock object.
 		this.lock = "picoAppLock" + Date.now(); // Lock object identifier.
+		//this.parser = new pico.Param(); // Code parser.
 
 		// Load app information.
 		let e = document.getElementById("author");
