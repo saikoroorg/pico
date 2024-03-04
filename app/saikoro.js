@@ -16,7 +16,7 @@ const devitems = [ // Menu items for dev.
 	["kuku", "app/kuku.svg", "app/kuku.js"],
 	["bros", "app/bros.svg", "app/bros.js"],
 	["edit", "app/edit.svg", "app/edit.js"],
-	["demo", "app/demo.svg", "app/demo.js"],
+	["text", "app/text.svg", "app/text.js"],
 ];
 var devreturl = null; // Return url for dev.
 var items = [ // Menu items.

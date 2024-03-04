@@ -1,8 +1,8 @@
 {
-	"name": "Pico",
-	"short_name": "Pico",
+	"name": "Text",
+	"short_name": "Text",
 	"version": "0.9.40304a",
-	"author": "saikoro.org/pico",
+	"author": "saikoro.org/text",
 	"background_color": "#fff",
 	"theme_color": "#fff",
 	"icons": [{
