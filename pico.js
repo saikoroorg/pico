@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40301"; // Updatable by package.json.
+pico.version = "0.9.40306"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -1836,9 +1836,9 @@ pico.Touch = class {
 	read(t=10) {
 		if (t >= 0) {
 			return new Promise(r => setTimeout(r, t)).then(() => {
-				return navigator.locks.request(this.lock, async (lock) => {
+				//return navigator.locks.request(this.lock, async (lock) => {
 					return this._read();
-				}); // end of lock.
+				//}); // end of lock.
 			}); // end of new Promise.
 
 		// Wait until input.
@@ -1916,60 +1916,60 @@ pico.Touch = class {
 					let rect = this.panel.getBoundingClientRect();
 					let x = (evt.pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
 					let y = (evt.pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.width; // Fix to square canvas. // height;
-					navigator.locks.request(this.lock, async (lock) => {
+					//navigator.locks.request(this.lock, async (lock) => {
 						this._eventTouchCancel(-1);
 						this._eventTouchDown(-1, x, y);
-					}); // end of lock.
+					//}); // end of lock.
 				});
 				this.panel.addEventListener("mousemove", (evt) => {
 					let rect = this.panel.getBoundingClientRect();
 					let x = (evt.pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
 					let y = (evt.pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.width; // Fix to square canvas. // height;
-					navigator.locks.request(this.lock, async (lock) => {
+					//navigator.locks.request(this.lock, async (lock) => {
 						this._eventTouchMove(-1, x, y);
-					}); // end of lock.
+					//}); // end of lock.
 				});
 				document.addEventListener("mouseup", () => {
-					navigator.locks.request(this.lock, async (lock) => {
+					//navigator.locks.request(this.lock, async (lock) => {
 						this._eventTouchUp(-1);
-					}); // end of lock.
+					//}); // end of lock.
 				});
 				this.panel.addEventListener("touchstart", (evt) => {
 					let rect = this.panel.getBoundingClientRect();
-					navigator.locks.request(this.lock, async (lock) => {
+					//navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							let x = (evt.changedTouches[i].pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
 							let y = (evt.changedTouches[i].pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.width; // Fix to square canvas. // height;
 							this._eventTouchDown(evt.changedTouches[i].identifier, x, y);
 						}
-					}); // end of lock.
+					//}); // end of lock.
 				});
 				this.panel.addEventListener("touchmove", (evt) => {
 					evt.preventDefault(); // Lock scroll.
 					let rect = this.panel.getBoundingClientRect();
-					navigator.locks.request(this.lock, async (lock) => {
+					//navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							let x = (evt.changedTouches[i].pageX - rect.x - window.pageXOffset) * pico.Touch.width / rect.width;
 							let y = (evt.changedTouches[i].pageY - rect.y - window.pageYOffset) * pico.Touch.height / rect.width; // Fix to square canvas. // height;
 							this._eventTouchMove(evt.changedTouches[i].identifier, x, y);
 						}
-					}); // end of lock.
+					//}); // end of lock.
 				}, {passive: false});
 				this.panel.addEventListener("touchend", (evt) => {
 					let rect = this.panel.getBoundingClientRect();
-					navigator.locks.request(this.lock, async (lock) => {
+					//navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							this._eventTouchUp(evt.changedTouches[i].identifier);
 						}
-					}); // end of lock.
+					//}); // end of lock.
 				});
 				this.panel.addEventListener("touchcancel", (evt) => {
 					let rect = this.panel.getBoundingClientRect();
-					navigator.locks.request(this.lock, async (lock) => {
+					//navigator.locks.request(this.lock, async (lock) => {
 						for (let i = 0; i < evt.changedTouches.length; ++i) {
 							this._eventTouchCancel(evt.changedTouches[i].identifier);
 						}
-					}); // end of lock.
+					//}); // end of lock.
 				});
 			}
 			return resolve();
