@@ -896,13 +896,13 @@ function picoSetCode8(code8, key=0) {
 }
 
 // Get 6bit code by strings.
-function picoStringsCode6(str) {
-	return pico.param._stringsCode(str);
+function picoStringsCode6(strings) {
+	return pico.param._stringsCode(strings);
 }
 
 // Get 8bit code by strings.
-function picoStringsCode8(str) {
-	return pico.param._expandCode(pico.param._stringsCode(str));
+function picoStringsCode8(strings) {
+	return pico.param._expandCode(pico.param._stringsCode(strings));
 }
 
 //************************************************************/
