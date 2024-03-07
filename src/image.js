@@ -60,9 +60,9 @@ async function picoCharLeading(leading, vleading) {
 }
 
 // Set extra char sprite.
-async function picoCharSprite(char, sprite) {
+async function picoCharSprite(chars, sprite) {
 	try {
-		pico.image.charSprite(char, sprite);
+		pico.image.charSprite(chars, sprite);
 	} catch (error) {
 		console.error(error);
 	}
@@ -290,13 +290,13 @@ pico.Image = class {
 	}
 
 	// Set extra char sprite.
-	charSprite(text, sprite) {
+	charSprite(chars, sprite) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			if (text[0] && sprite) {
-				this.sprites[text[0]] = sprite;
+			if (chars[0] && sprite) {
+				this.sprites[chars[0]] = sprite;
 			}
-			for (let i = 1; i < text.length; i++) {
-				this.aliases[text[i]] = text[0];
+			for (let i = 1; i < chars.length; i++) {
+				this.aliases[chars[i]] = chars[0];
 			}
 		}); // end of lock.
 	}

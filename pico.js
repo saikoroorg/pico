@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40306"; // Updatable by package.json.
+pico.version = "0.9.40307"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -67,9 +67,9 @@ async function picoCharLeading(leading, vleading) {
 }
 
 // Set extra char sprite.
-async function picoCharSprite(char, sprite) {
+async function picoCharSprite(chars, sprite) {
 	try {
-		pico.image.charSprite(char, sprite);
+		pico.image.charSprite(chars, sprite);
 	} catch (error) {
 		console.error(error);
 	}
@@ -297,13 +297,13 @@ pico.Image = class {
 	}
 
 	// Set extra char sprite.
-	charSprite(text, sprite) {
+	charSprite(chars, sprite) {
 		return navigator.locks.request(this.lock, async (lock) => {
-			if (text[0] && sprite) {
-				this.sprites[text[0]] = sprite;
+			if (chars[0] && sprite) {
+				this.sprites[chars[0]] = sprite;
 			}
-			for (let i = 1; i < text.length; i++) {
-				this.aliases[text[i]] = text[0];
+			for (let i = 1; i < chars.length; i++) {
+				this.aliases[chars[i]] = chars[0];
 			}
 		}); // end of lock.
 	}
@@ -896,13 +896,13 @@ function picoSetCode8(code8, key=0) {
 }
 
 // Get 6bit code by strings.
-function picoCode6(str) {
-	return pico.param._str2code(str);
+function picoStringsCode6(str) {
+	return pico.param._stringsCode(str);
 }
 
 // Get 8bit code by strings.
-function picoCode8(str) {
-	return pico.param._expandCode(pico.param._str2code(str));
+function picoStringsCode8(str) {
+	return pico.param._expandCode(pico.param._stringsCode(str));
 }
 
 //************************************************************/
@@ -987,7 +987,7 @@ pico.Param = class {
 
 	// Get param as 6bit code.
 	code6(key=0) {
-		return this._str2code(this._strings(key));
+		return this._stringsCode(this._strings(key));
 	}
 
 	// Set param as 6bit code.
@@ -1049,7 +1049,7 @@ pico.Param = class {
 
 	// Reset param.
 	_reset() {
-		this.context = [];
+		this.context = {};
 	}
 
 	// Reload with param.
@@ -1161,7 +1161,7 @@ pico.Param = class {
 	}
 
 	// Get number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
-	_str2code(str) {
+	_stringsCode(str) {
 		let results = [];
 		if (str) {
 			for (let i = 0; i < str.length; i++) {

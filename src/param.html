@@ -7,6 +7,7 @@
 <!--Main--><script>
 pico.Param.debug = true;
 
+/*/
 // Calculate random numbers.
 console.log("Time: " + picoTime());
 console.log("Date: " + picoDate());
@@ -16,8 +17,9 @@ console.log("NewSeed: " + picoSeed());
 for (let i = 0; i < 100; i++) {
 	console.log("Random" + i + ": " + picoRandom(1000000, i));
 }
+//*/
 
-/*
+/*/
 // Test numbers param.
 picoSetNumbers([255,255,255,
 		255,219,171, 159,255,243, 191,191,191,
@@ -25,7 +27,9 @@ picoSetNumbers([255,255,255,
 		167,0,0,     143,0,119,   0,63,23]);
 console.log("Strings: " + picoStrings());
 console.log("Numbers: " + picoNumbers());
+//*/
 
+//*/
 // Test 6bit code param.
 picoSetCode6([255,255,255,
 		255,219,171, 159,255,243, 191,191,191,
@@ -33,7 +37,9 @@ picoSetCode6([255,255,255,
 		167,0,0,     143,0,119,   0,63,23]);
 console.log("Strings: " + picoStrings());
 console.log("Code6: " + picoCode6());
+//*/
 
+//*/
 // Test 8bit compatible 6bit code param.
 picoSetCode8([255,255,255,
 		255,219,171, 159,255,243, 191,191,191,
@@ -42,9 +48,9 @@ picoSetCode8([255,255,255,
 console.log("Strings: " + picoStrings());
 console.log("Code6: " + picoCode6());
 console.log("Code8: " + picoCode8());
-*/
+//*/
 
-/*
+//*/
 // Compress and expand 8bit code.
 let code = [];
 for (let i = 0; i <= 255; i++) {
@@ -59,6 +65,7 @@ for (let i = 0; i <= 255; i++) {
 		code2[i] + ":" + ("00000000"+code2[i].toString(2)).slice(-8));
 }
 
+//*/
 // Compress 8bit code and expand 8bit compatible 6bit code.
 code = [
 255,255,255, 171,231,255, 199,215,255, 215,203,255,
@@ -86,7 +93,7 @@ for (let i = 0; i < code.length; i++) {
 		("000"+code1[i]).slice(-3) + ":" + ("00000000"+code1[i].toString(2)).slice(-8) + " -> " + 
 		("000"+code2[i]).slice(-3) + ":" + ("00000000"+code2[i].toString(2)).slice(-8));
 }
-*/
+//*/
 
 document.addEventListener("click", async (evt) => {
 pico.Param.debug = false;
