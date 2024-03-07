@@ -273,6 +273,25 @@ const extra5x5CharSprites = { // Extra5x5 char sprite table.
 	"＄": picoCode6("077931922932942913923933943953924934944935"),
 	"＃": picoCode6("077921931941922932942913923933943953914924934944954935"),
 };
+
+const extraCharAiliases = [ // Extra char ailias.
+	"0０",
+	"1１",
+	"2２",
+	"3３",
+	"4４",
+	"5５",
+	"6６",
+	"7７",
+	"8８",
+	"9９",
+	"-−",
+	"+＋",
+	"/／",
+	":：",
+	"?？",
+];
+
 const colors64 = [
 	 255,255,255, 171,231,255, 199,215,255, 215,203,255, // 30-33
 	 255,199,255, 255,199,219, 255,191,179, 255,219,171, // 34-37
@@ -299,24 +318,6 @@ const colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,
 
 window.addEventListener("load", async (evt) => {
 
-	const extraCharAiliases = { // Extra char ailias table.
-		"0０": null,
-		"1１": null,
-		"2２": null,
-		"3３": null,
-		"4４": null,
-		"5５": null,
-		"6６": null,
-		"7７": null,
-		"8８": null,
-		"9９": null,
-		"-−": null,
-		"#・": null,
-	};
-	for (let key in extraCharAiliases) {
-		picoCharSprite(key, extraCharAiliases[key]);
-	}
-
 		let extraText = "";
 		for (let key in katakana5x5CharSprites) {
 			picoCharSprite(key, katakana5x5CharSprites[key]);
@@ -329,6 +330,9 @@ window.addEventListener("load", async (evt) => {
 		for (let key in extra5x5CharSprites) {
 			picoCharSprite(key, extra5x5CharSprites[key]);
 			extraText += key;
+		}
+		for (let i = 0; i < extraCharAiliases.length; i++) {
+			picoCharSprite(extraCharAiliases[i]);
 		}
 		picoCharLeading(8,8);
 		picoColor(colors);
@@ -359,6 +363,9 @@ if (count <= 0) {
 			picoCharSprite(key, extra5x5CharSprites[key]);
 			extraText += key;
 		}
+		for (let i = 0; i < extraCharAiliases.length; i++) {
+			picoCharSprite(extraCharAiliases[i]);
+		}
 		picoCharLeading(8,8);
 		picoColor(colors);
 
@@ -366,8 +373,25 @@ if (count <= 0) {
 		picoRect(1, 0,0,150,150, 0,1);
 		picoText(text + extraText, -1, 0,0,120,120, 0,1);
 		await picoFlip(20);
+
+/*/
+	//for (let i = 0; i <= 180; i++) {
+	//	picoClear();
+
+		await picoRect(2, 0,-60, 0, 52,52); // width: 52
+		await picoChar("00", 1, 0,-60, 0,6); // width: (4*2+1) x6 = 54
+
+		await picoRect(2, 0,0, 0, 52,52); // width: 52
+		await picoChar("000", 1, 0,0, 0,4); // width: (4*3+1) x4 = 52
+
+		await picoRect(2, 0,60, 0, 52,52); // width: 52
+		await picoChar("0000", 1, 0,60, 0,3); // width: (4*4+1) x3 = 51
+
+	//	await picoFlip(20);
+	//}
 //*/
 	} else if (count <= 2) {
+
 		picoCharLeading(6,6);
 		picoColor(colors);
 
