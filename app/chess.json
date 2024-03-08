@@ -1,8 +1,8 @@
 {
-	"name": "Saikoro.org",
-	"short_name": "Saikoro.org",
+	"name": "Chess",
+	"short_name": "Chess",
 	"version": "0.9.40308a",
-	"author": "saikoro.org",
+	"author": "saikoro.org/chess",
 	"background_color": "#fff",
 	"theme_color": "#fff",
 	"icons": [{

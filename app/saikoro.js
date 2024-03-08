@@ -17,12 +17,14 @@ const devitems = [ // Menu items for dev.
 	["bros", "app/bros.svg", "app/bros.js"],
 	["edit", "app/edit.svg", "app/edit.js"],
 	["text", "app/text.svg", "app/text.js"],
+	["chess", "app/chess.svg", "app/chess.js"],
 ];
 var devreturl = null; // Return url for dev.
 var items = [ // Menu items.
 	["dice", "dice/icon.svg", "dice/"],
 	["clock", "clock/icon.svg", "clock/"],
 	["kuku", "kuku/icon.svg", "kuku/"],
+	["chess", "app/chess.svg", "app/chess.js"],
 ];
 var returl = "../"; // Return url.
 var images = []; // Menu images.
