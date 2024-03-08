@@ -1,174 +1,14 @@
 const title = "Text"; // Title.
 
-const labels = {
-	0:"　　　　　　いろはにほへと　　　　　　",
-	1:"　　　　　　いろはにほへと　　　　　　",
-	2:"　　　　　　いろはにほへと　　　　　　",
-	3:"　　　　　　いろはにほへと　　　　　　",
-	4:"　　　　　　いろはにほへと　　　　　　",
-	5:"　　　　　　いろはにほへと　　　　　　",
-	6:"　　　　　　いろはにほへと　　　　　　",
-};
-const dots = {
-	0:"　　　　　　■□□□□□□　　　　　　",
-	1:"　　　　　　□■□□□□□　　　　　　",
-	2:"　　　　　　□□■□□□□　　　　　　",
-	3:"　　　　　　□□□■□□□　　　　　　",
-	4:"　　　　　　□□□□■□□　　　　　　",
-	5:"　　　　　　□□□□□■□　　　　　　",
-	6:"　　　　　　□□□□□□■　　　　　　",
-};
-const figs = {
-	0:"いろはにほへとちりぬるを、わかよた"+
-	  "れそつねならむ。うゐのおくやまけふ"+
-	  "こえて、あさきゆめみしゑひもせす。"+
-		"イロハニホヘトチリヌルヲ、ワカヨタ"+
-		"レソツネナラム。ウヰノオクヤマケフ"+
-		"コエテ、アサキユメミシヱヒモセス。"+
-		"0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-	1:"・・・・・・・・・・・・・・・・・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　■　　　　　　　　　□　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・・・・・・・・・・・・・・・・・",
-	2:"・・・・・・・・・・・・・・・・・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　■　　　　　　　　　□　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・・・・・・・・・・・・・・・・・",
-	3:"・・・・・・・・・・・・・・・・・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　■　　　　　　　　　□　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・・・・・・・・・・・・・・・・・",
-	4:"・・・・・・・・・・・・・・・・・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　■　　　　　　　　　□　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・・・・・・・・・・・・・・・・・",
-	5:"・・・・・・・・・・・・・・・・・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　■　　　　　　　　　□　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・・・・・・・・・・・・・・・・・",
-	6:"・・・・・・・・・・・・・・・・・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　■　　　　　　　　　□　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・　　　　　　　　　　　　　　　・"+
-		"・・・・・・・・・・・・・・・・・",
-};
-const texts = {
-	0:"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□▼",
-	1:"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□▼",
-	2:"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□▼",
-	3:"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□▼",
-	4:"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□▼",
-	5:"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□▼",
-	6:"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□▼",
-};
-var state = 0; // Playing state.
-var playing = 0; // Playing count.
-const maxfig = 17 * 7;
-const maxtext = 19 * 12;
-
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringsCode6("077912922932942923943924934925"),
 	"ア": picoStringsCode6("077911921931941951932952933943934925"),
 	"ィ": picoStringsCode6("077933943914924934935"),
-	"イ": picoStringsCode6("077941951922932913933934935"),
+	"イヰ": picoStringsCode6("077941951922932913933934935"),
 	"ゥ": picoStringsCode6("077932913923933943914944935"),
 	"ウ": picoStringsCode6("077931912922932942952913953944935"),
 	"ェ": picoStringsCode6("077913923933943934915925935945"),
-	"エ": picoStringsCode6("077912922932942952933934915925935945955"),
+	"エヱ": picoStringsCode6("077912922932942952933934915925935945955"),
 	"ォ": picoStringsCode6("077932913923933943924934915935"),
 	"オ": picoStringsCode6("077941912922932942952933943924944915945"),
 	"カ": picoStringsCode6("077921912922932942952923953924954915945955"),
@@ -238,7 +78,7 @@ const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ル": picoStringsCode6("077921941922942923943924944915945955"),
 	"レ": picoStringsCode6("077911912913953914944915925935"),
 	"ロ": picoStringsCode6("077911921931941951912952913953914954915925935945955"),
-	"ワ": picoStringsCode6("077911921931941951912952953944925935"),
+	"ワヮ": picoStringsCode6("077911921931941951912952953944925935"),
 	"ヲ": picoStringsCode6("077911921931941951952913923933943944925935"),
 	"ン": picoStringsCode6("077911921951952953944915925935"),
 };
@@ -246,11 +86,11 @@ const hiragana5x5CharSprites = { // Hiragana5x5 char sprite table.
 	"ぁ": picoStringsCode6("077912922932942923933914934944915925945"),
 	"あ": picoStringsCode6("077911921931941922913923933943914924944954915925935955"),
 	"ぃ": picoStringsCode6("077913943914944925"),
-	"い": picoStringsCode6("077911912952913953914934954925"),
+	"いゐ": picoStringsCode6("077911912952913953914934954925"),
 	"ぅ": picoStringsCode6("077922932913923933943944925935"),
 	"う": picoStringsCode6("077921931941922932942913953954935945"),
 	"ぇ": picoStringsCode6("077922932913923933943924934915935945"),
-	"え": picoStringsCode6("077921931912922932942933924934915945955"),
+	"えゑ": picoStringsCode6("077921931912922932942933924934915945955"),
 	"ぉ": picoStringsCode6("077912922942923914924934944915925945"),
 	"お": picoStringsCode6("077911921931951922913923933943914934954915925935955"),
 	"か": picoStringsCode6("077921941912922932952923943914944915945"),
@@ -320,7 +160,7 @@ const hiragana5x5CharSprites = { // Hiragana5x5 char sprite table.
 	"る": picoStringsCode6("077921931941922932913943953924934954925935945"),
 	"れ": picoStringsCode6("077921912922932942923943914924944925945955"),
 	"ろ": picoStringsCode6("077921931941932923933943914954935945"),
-	"わ": picoStringsCode6("077921912922932942923953914924954925945"),
+	"わゎ": picoStringsCode6("077921912922932942923953914924954925945"),
 	"を": picoStringsCode6("077911921931941922923933943914934925935945"),
 	"ん": picoStringsCode6("077921922913923914934954915935945"),
 };
@@ -328,11 +168,11 @@ const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
 	"ぁ": picoStringsCode6("077912922932942923933914934944915925945"),
 	"あ": picoStringsCode6("077920911921931941951922932913923943914934954915925955"),
 	"ぃ": picoStringsCode6("077913943914944925"),
-	"い": picoStringsCode6("077911912952913953914934954925"),
+	"いゐ": picoStringsCode6("077911912952913953914934954925"),
 	"ぅ": picoStringsCode6("077922932913923933943944925935"),
 	"う": picoStringsCode6("077920930922932942913953954935945"),
 	"ぇ": picoStringsCode6("077922932913923933943924934915935945"),
-	"え": picoStringsCode6("077920930912922932942933924934915945955"),
+	"えゑ": picoStringsCode6("077920930912922932942933924934915945955"),
 	"ぉ": picoStringsCode6("077912922942923914924934944915925945"),
 	"お": picoStringsCode6("077920911921931951922913923933943914934954915925935955"),
 	"か": picoStringsCode6("077940921941912922932952923943914944915935945"),
@@ -402,7 +242,7 @@ const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
 	"る": picoStringsCode6("077920930940931922932942913953924934954925935945"),
 	"れ": picoStringsCode6("077920911921941922932942923943914924944925945955"),
 	"ろ": picoStringsCode6("077920930940931922932942913953954935945"),
-	"わ": picoStringsCode6("077920911921941922932952923953914924954925945"),
+	"わゎ": picoStringsCode6("077920911921941922932952923953914924954925945"),
 	"を": picoStringsCode6("077920911921931941922913933943924934925935945"),
 	"ん": picoStringsCode6("077920921922913923914934954915935945"),
 };
@@ -426,36 +266,71 @@ const extra5x5CharSprites = { // Extra5x5 char sprite table.
 	"＃": picoStringsCode6("077921931941922932942913923933943953914924934944954935"),
 };
 
-const extraCharAiliases = [ // Extra char ailias.
-	"0０",
-	"1１",
-	"2２",
-	"3３",
-	"4４",
-	"5５",
-	"6６",
-	"7７",
-	"8８",
-	"9９",
-	"-−",
-	"+＋",
-	"/／",
-	":：",
-	"?？",
-];
+const maxstate = 6;
+const labels = {
+	0:"　　　　　　いろはにほへと　　　　　　",
+};
+for (let i = 1; i <= maxstate; i++) {
+	labels[i] = labels[0];
+}
+const dots = {
+	0:"　　　　　　■□□□□□□　　　　　　",
+	1:"　　　　　　□■□□□□□　　　　　　",
+	2:"　　　　　　□□■□□□□　　　　　　",
+	3:"　　　　　　□□□■□□□　　　　　　",
+	4:"　　　　　　□□□□■□□　　　　　　",
+	5:"　　　　　　□□□□□■□　　　　　　",
+	6:"　　　　　　□□□□□□■　　　　　　",
+};
+const maxfig = 17 * 7;
+const figs = {
+	0:"いろはにほへとちりぬるを、わかよた"+
+	  "れそつねならむ。うゐのおくやまけふ"+
+	  "こえて、あさきゆめみしゑひもせす。"+
+	  "いろばにぼべどぢりぬるを、わがよだ"+
+	  "れぞづねならむ。うゐのおぐやまげぶ"+
+	  "ごえで、あざぎゆめみじゑびもぜず。"+
+	  "ぱぴぷぺぽんぁぃぅぇぉっゃゅょー　",
+};
+for (let i = 1; i <= maxstate; i++) {
+	figs[i] = figs[0];
+}
+const maxtext = 19 * 12;
+const texts = {
+	0:"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□□▼",
+};
+let chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" + // Default chars.
+	Object.keys(katakana5x5CharSprites).join("") + 
+	Object.keys(hiragana5x5CharSprites).join("") + 
+	Object.keys(extra5x5CharSprites).join(""); // And extra chars.
+for (let i = 0; i <= maxstate; i++) {
+	texts[i] = "";
+	for (let j = 0; j < maxtext - 1; j++) {
+		texts[i] += i > 0 ? chars[picoRandom(chars.length)] : j < chars.length ? chars[j] : " ";
+	}
+	texts[i] += "▼";
+}
+
+var state = 0; // Playing state.
+var playing = 0; // Playing count.
 
 // Load.
 async function appLoad() {
 	await picoTitle(title);
 
 	const extraCharSprites = { // Extra char sprite table.
-		"ヰ": picoStringsCode6("077911951922942933924944915955"),
-		"ヱ": picoStringsCode6("077911951922942933924944915955"),
-		"ゐ": picoStringsCode6("077911951922942933924944915955"),
-		"ゑ": picoStringsCode6("077911951922942933924944915955"),
-
 		"▼": picoStringsCode6("077911921931941951912922932942952923933943924934944935"),
-
 /*
 		"▽": picoStringsCode6("077911951912952923943924944935"),
 		"＜": picoStringsCode6("077941951922932913924934945955"),
@@ -466,48 +341,26 @@ async function appLoad() {
 */
 	};
 
-	for (let key in katakana5x5CharSprites) {
-		picoCharSprite(key, katakana5x5CharSprites[key]);
+	const extraCharAiliases = [ // Extra char ailias.
+		"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
+	];
+
+	for (let chars in katakana5x5CharSprites) {
+		picoCharSprite(chars, katakana5x5CharSprites[chars]);
 	}
-	for (let key in hiragana5x6CharSprites) {
-		picoCharSprite(key, hiragana5x6CharSprites[key]);
+	for (let chars in hiragana5x6CharSprites) {
+		picoCharSprite(chars, hiragana5x6CharSprites[chars]);
 	}
-	for (let key in extra5x5CharSprites) {
-		picoCharSprite(key, extra5x5CharSprites[key]);
+	for (let chars in extra5x5CharSprites) {
+		picoCharSprite(chars, extra5x5CharSprites[chars]);
 	}
-	for (let key in extraCharSprites) {
-		picoCharSprite(key, extraCharSprites[key]);
+	for (let chars in extraCharSprites) {
+		picoCharSprite(chars, extraCharSprites[chars]);
 	}
 	for (let i = 0; i < extraCharAiliases.length; i++) {
 		picoCharSprite(extraCharAiliases[i]);
 	}
 	picoCharLeading(8,8);
-
-	let chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" + 
-		Object.keys(katakana5x5CharSprites).join("") + 
-		Object.keys(hiragana5x6CharSprites).join("") + 
-		Object.keys(extra5x5CharSprites).join("");
-	for (let i = 0; i <= 6; i++) {
-		if (i > 0) {
-			figs[i] = "";
-			for (let j = 0; j < maxfig; j++) {
-				let char = chars[picoRandom(chars.length)];
-				figs[i] += char;
-			}
-			texts[i] = "";
-			for (let j = 0; j < maxtext - 1; j++) {
-				let char = chars[picoRandom(chars.length)];
-				texts[i] += char;
-			}
-			texts[i] += "▼";
-		} else {
-			texts[i] = "";
-			for (let j = 0; j < maxtext - 1; j++) {
-				texts[i] += j < chars.length ? chars[j] : " ";
-			}
-			texts[i] += "▼";
-		}
-	}
 }
 
 // Main.
@@ -515,7 +368,19 @@ async function appMain() {
 	let pressing = 0;
 	if (playing >= texts[state].length) {
 		if (picoAction()) {
-			state = state + 1 <= 6 ? state + 1: 0;
+			state = state + 1 <= maxstate ? state + 1: 0;
+
+			// Switch hiragana char sprites.
+			if (!picoMod(state, 2)) {
+				for (let chars in hiragana5x6CharSprites) {
+					picoCharSprite(chars, hiragana5x6CharSprites[chars]);
+				}
+			} else {
+				for (let chars in hiragana5x5CharSprites) {
+					picoCharSprite(chars, hiragana5x5CharSprites[chars]);
+				}
+			}
+
 			playing = 0;
 			picoFlush();
 		} else if (picoMotion()) {

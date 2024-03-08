@@ -7,16 +7,16 @@
 <script src="image.js"></script>
 <script src="param.js"></script>
 <!--Main--><script>
-const text = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#";
+const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#"; // Default chars.
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringsCode6("077912922932942923943924934925"),
 	"ア": picoStringsCode6("077911921931941951932952933943934925"),
 	"ィ": picoStringsCode6("077933943914924934935"),
-	"イ": picoStringsCode6("077941951922932913933934935"),
+	"イヰ": picoStringsCode6("077941951922932913933934935"),
 	"ゥ": picoStringsCode6("077932913923933943914944935"),
 	"ウ": picoStringsCode6("077931912922932942952913953944935"),
 	"ェ": picoStringsCode6("077913923933943934915925935945"),
-	"エ": picoStringsCode6("077912922932942952933934915925935945955"),
+	"エヱ": picoStringsCode6("077912922932942952933934915925935945955"),
 	"ォ": picoStringsCode6("077932913923933943924934915935"),
 	"オ": picoStringsCode6("077941912922932942952933943924944915945"),
 	"カ": picoStringsCode6("077921912922932942952923953924954915945955"),
@@ -86,7 +86,7 @@ const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ル": picoStringsCode6("077921941922942923943924944915945955"),
 	"レ": picoStringsCode6("077911912913953914944915925935"),
 	"ロ": picoStringsCode6("077911921931941951912952913953914954915925935945955"),
-	"ワ": picoStringsCode6("077911921931941951912952953944925935"),
+	"ワヮ": picoStringsCode6("077911921931941951912952953944925935"),
 	"ヲ": picoStringsCode6("077911921931941951952913923933943944925935"),
 	"ン": picoStringsCode6("077911921951952953944915925935"),
 };
@@ -94,11 +94,11 @@ const hiragana5x5CharSprites = { // Hiragana5x5 char sprite table.
 	"ぁ": picoStringsCode6("077912922932942923933914934944915925945"),
 	"あ": picoStringsCode6("077911921931941922913923933943914924944954915925935955"),
 	"ぃ": picoStringsCode6("077913943914944925"),
-	"い": picoStringsCode6("077911912952913953914934954925"),
+	"いゐ": picoStringsCode6("077911912952913953914934954925"),
 	"ぅ": picoStringsCode6("077922932913923933943944925935"),
 	"う": picoStringsCode6("077921931941922932942913953954935945"),
 	"ぇ": picoStringsCode6("077922932913923933943924934915935945"),
-	"え": picoStringsCode6("077921931912922932942933924934915945955"),
+	"えゑ": picoStringsCode6("077921931912922932942933924934915945955"),
 	"ぉ": picoStringsCode6("077912922942923914924934944915925945"),
 	"お": picoStringsCode6("077911921931951922913923933943914934954915925935955"),
 	"か": picoStringsCode6("077921941912922932952923943914944915945"),
@@ -168,7 +168,7 @@ const hiragana5x5CharSprites = { // Hiragana5x5 char sprite table.
 	"る": picoStringsCode6("077921931941922932913943953924934954925935945"),
 	"れ": picoStringsCode6("077921912922932942923943914924944925945955"),
 	"ろ": picoStringsCode6("077921931941932923933943914954935945"),
-	"わ": picoStringsCode6("077921912922932942923953914924954925945"),
+	"わゎ": picoStringsCode6("077921912922932942923953914924954925945"),
 	"を": picoStringsCode6("077911921931941922923933943914934925935945"),
 	"ん": picoStringsCode6("077921922913923914934954915935945"),
 };
@@ -176,11 +176,11 @@ const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
 	"ぁ": picoStringsCode6("077912922932942923933914934944915925945"),
 	"あ": picoStringsCode6("077920911921931941951922932913923943914934954915925955"),
 	"ぃ": picoStringsCode6("077913943914944925"),
-	"い": picoStringsCode6("077911912952913953914934954925"),
+	"いゐ": picoStringsCode6("077911912952913953914934954925"),
 	"ぅ": picoStringsCode6("077922932913923933943944925935"),
 	"う": picoStringsCode6("077920930922932942913953954935945"),
 	"ぇ": picoStringsCode6("077922932913923933943924934915935945"),
-	"え": picoStringsCode6("077920930912922932942933924934915945955"),
+	"えゑ": picoStringsCode6("077920930912922932942933924934915945955"),
 	"ぉ": picoStringsCode6("077912922942923914924934944915925945"),
 	"お": picoStringsCode6("077920911921931951922913923933943914934954915925935955"),
 	"か": picoStringsCode6("077940921941912922932952923943914944915935945"),
@@ -250,7 +250,7 @@ const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
 	"る": picoStringsCode6("077920930940931922932942913953924934954925935945"),
 	"れ": picoStringsCode6("077920911921941922932942923943914924944925945955"),
 	"ろ": picoStringsCode6("077920930940931922932942913953954935945"),
-	"わ": picoStringsCode6("077920911921941922932952923953914924954925945"),
+	"わゎ": picoStringsCode6("077920911921941922932952923953914924954925945"),
 	"を": picoStringsCode6("077920911921931941922913933943924934925935945"),
 	"ん": picoStringsCode6("077920921922913923914934954915935945"),
 };
@@ -275,21 +275,7 @@ const extra5x5CharSprites = { // Extra5x5 char sprite table.
 };
 
 const extraCharAiliases = [ // Extra char ailias.
-	"0０",
-	"1１",
-	"2２",
-	"3３",
-	"4４",
-	"5５",
-	"6６",
-	"7７",
-	"8８",
-	"9９",
-	"-−",
-	"+＋",
-	"/／",
-	":：",
-	"?？",
+	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
 ];
 
 const colors64 = [
@@ -318,18 +304,18 @@ const colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,
 
 window.addEventListener("load", async (evt) => {
 
-		let extraText = "";
-		for (let key in katakana5x5CharSprites) {
-			picoCharSprite(key, katakana5x5CharSprites[key]);
-			extraText += key;
+		let extraChars = "";
+		for (let chars in katakana5x5CharSprites) {
+			picoCharSprite(chars, katakana5x5CharSprites[chars]);
+			extraChars += chars[0];
 		}
-		for (let key in hiragana5x5CharSprites) {
-			picoCharSprite(key, hiragana5x5CharSprites[key]);
-			extraText += key;
+		for (let chars in hiragana5x5CharSprites) {
+			picoCharSprite(chars, hiragana5x5CharSprites[chars]);
+			extraChars += chars[0];
 		}
-		for (let key in extra5x5CharSprites) {
-			picoCharSprite(key, extra5x5CharSprites[key]);
-			extraText += key;
+		for (let chars in extra5x5CharSprites) {
+			picoCharSprite(chars, extra5x5CharSprites[chars]);
+			extraChars += chars[0];
 		}
 		for (let i = 0; i < extraCharAiliases.length; i++) {
 			picoCharSprite(extraCharAiliases[i]);
@@ -339,7 +325,7 @@ window.addEventListener("load", async (evt) => {
 
 		picoClear();
 		picoRect(1, 0,0,150,150, 0,1);
-		picoText(text + extraText, -1, 0,0,120,120, 0,1);
+		picoText(chars + extraChars, -1, 0,0,120,120, 0,1);
 		await picoFlip(20);
 
 });
@@ -350,18 +336,18 @@ if (count <= 0) {
 
 //*/
 	if (count <= 1) {
-		let extraText = "";
+		let extraChars = "";
 		for (let key in katakana5x5CharSprites) {
 			picoCharSprite(key, katakana5x5CharSprites[key]);
-			extraText += key;
+			extraChars += key;
 		}
 		for (let key in hiragana5x6CharSprites) {
 			picoCharSprite(key, hiragana5x6CharSprites[key]);
-			extraText += key;
+			extraChars += key;
 		}
 		for (let key in extra5x5CharSprites) {
 			picoCharSprite(key, extra5x5CharSprites[key]);
-			extraText += key;
+			extraChars += key;
 		}
 		for (let i = 0; i < extraCharAiliases.length; i++) {
 			picoCharSprite(extraCharAiliases[i]);
@@ -371,7 +357,7 @@ if (count <= 0) {
 
 		picoClear();
 		picoRect(1, 0,0,150,150, 0,1);
-		picoText(text + extraText, -1, 0,0,120,120, 0,1);
+		picoText(chars + extraChars, -1, 0,0,120,120, 0,1);
 		await picoFlip(20);
 
 /*/
@@ -395,10 +381,10 @@ if (count <= 0) {
 		picoCharLeading(6,6);
 		picoColor(colors);
 
-		for (let i = 0; i < text.length; i++) {
+		for (let i = 0; i < chars.length; i++) {
 			picoClear();
 			picoRect(1, 0,0,42,42, 0,4);
-			picoText(text.substr(0, picoMod(i,text.length)), -1, 0,0,42,42, 0,4);
+			picoText(chars.substr(0, picoMod(i,chars.length)), -1, 0,0,42,42, 0,4);
 			await picoFlip(20);
 		}
 //*/
