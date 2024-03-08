@@ -246,7 +246,7 @@ const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
 	"を": picoStringsCode6("077920911921931941922913933943924934925935945"),
 	"ん": picoStringsCode6("077920921922913923914934954915935945"),
 };
-const extra5x5CharSprites = { // Extra5x5 char sprite table.
+const symbol5x5CharSprites = { // Symbol5x5 char sprite table.
 	"ー": picoStringsCode6("077913923933943953"),
 	"゛": picoStringsCode6("077911931912932"),
 	"゜": picoStringsCode6("077911921931912932913923933"),
@@ -265,6 +265,22 @@ const extra5x5CharSprites = { // Extra5x5 char sprite table.
 	"＄": picoStringsCode6("077931922932942913923933943953924934944935"),
 	"＃": picoStringsCode6("077921931941922932942913923933943953914924934944954935"),
 };
+
+const extraCharSprites = { // Extra char sprite table.
+	"▼": picoStringsCode6("077911921931941951912922932942952923933943924934944935"),
+/*
+	"▽": picoStringsCode6("077911951912952923943924944935"),
+	"＜": picoStringsCode6("077941951922932913924934945955"),
+	"＞": picoStringsCode6("077911921932942953934944915925"),
+	"→": picoStringsCode6("077931942913923933943953944935"),
+	"◉": picoStringsCode6("099900910920930940950960970980901911921931941951961971981902912932942952972982903913923933943953963973983904914924934944964974984905915935955975985906916926966976986907917927937947957967977987908918928938948958968978988"), //[0,7,7,9,1,0,9,2,0,9,3,0,9,4,0,9,5,0,9,1,1,9,3,1,9,5,1,9,1,2,9,2,2,9,3,2,9,4,2,9,5,2,9,2,4,9,4,4,9,1,5,9,3,5,9,5,5],
+	"◎": picoStringsCode6("099900910920930940950960970980901921931941951961981902922942962982903923933943953963983904984905935955985906926946966986907987908918928938948958968978988"), //[0,7,7,9,0,0,9,1,0,9,2,0,9,3,0,9,4,0,9,5,0,9,6,0,9,0,1,9,2,1,9,3,1,9,4,1,9,6,1,9,0,2,9,1,2,9,2,2,9,3,2,9,4,2,9,5,2,9,6,2,9,0,3,9,1,3,9,2,3,9,3,3,9,5,3,9,6,3,9,0,4,9,2,4,9,4,4,9,6,4,9,0,5,9,1,5,9,5,5,9,6,5,9,0,6,9,1,6,9,2,6,9,3,6,9,4,6,9,5,6,9,6,6],
+*/
+};
+
+const extraCharAiliases = [ // Extra char ailiases.
+	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
+];
 
 const maxstate = 6;
 const labels = {
@@ -310,14 +326,14 @@ const texts = {
 		"□□□□□□□□□□□□□□□□□□□"+
 		"□□□□□□□□□□□□□□□□□□▼",
 };
-let chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" + // Default chars.
+const allChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" +
 	Object.keys(katakana5x5CharSprites).join("") + 
 	Object.keys(hiragana5x5CharSprites).join("") + 
-	Object.keys(extra5x5CharSprites).join(""); // And extra chars.
+	Object.keys(symbol5x5CharSprites).join("");
 for (let i = 0; i <= maxstate; i++) {
 	texts[i] = "";
 	for (let j = 0; j < maxtext - 1; j++) {
-		texts[i] += i > 0 ? chars[picoRandom(chars.length)] : j < chars.length ? chars[j] : " ";
+		texts[i] += i > 0 ? allChars[picoRandom(allChars.length)] : j < allChars.length ? allChars[j] : " ";
 	}
 	texts[i] += "▼";
 }
@@ -329,30 +345,14 @@ var playing = 0; // Playing count.
 async function appLoad() {
 	await picoTitle(title);
 
-	const extraCharSprites = { // Extra char sprite table.
-		"▼": picoStringsCode6("077911921931941951912922932942952923933943924934944935"),
-/*
-		"▽": picoStringsCode6("077911951912952923943924944935"),
-		"＜": picoStringsCode6("077941951922932913924934945955"),
-		"＞": picoStringsCode6("077911921932942953934944915925"),
-		"→": picoStringsCode6("077931942913923933943953944935"),
-		"◉": picoStringsCode6("099900910920930940950960970980901911921931941951961971981902912932942952972982903913923933943953963973983904914924934944964974984905915935955975985906916926966976986907917927937947957967977987908918928938948958968978988"), //[0,7,7,9,1,0,9,2,0,9,3,0,9,4,0,9,5,0,9,1,1,9,3,1,9,5,1,9,1,2,9,2,2,9,3,2,9,4,2,9,5,2,9,2,4,9,4,4,9,1,5,9,3,5,9,5,5],
-		"◎": picoStringsCode6("099900910920930940950960970980901921931941951961981902922942962982903923933943953963983904984905935955985906926946966986907987908918928938948958968978988"), //[0,7,7,9,0,0,9,1,0,9,2,0,9,3,0,9,4,0,9,5,0,9,6,0,9,0,1,9,2,1,9,3,1,9,4,1,9,6,1,9,0,2,9,1,2,9,2,2,9,3,2,9,4,2,9,5,2,9,6,2,9,0,3,9,1,3,9,2,3,9,3,3,9,5,3,9,6,3,9,0,4,9,2,4,9,4,4,9,6,4,9,0,5,9,1,5,9,5,5,9,6,5,9,0,6,9,1,6,9,2,6,9,3,6,9,4,6,9,5,6,9,6,6],
-*/
-	};
-
-	const extraCharAiliases = [ // Extra char ailias.
-		"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
-	];
-
 	for (let chars in katakana5x5CharSprites) {
 		picoCharSprite(chars, katakana5x5CharSprites[chars]);
 	}
 	for (let chars in hiragana5x6CharSprites) {
 		picoCharSprite(chars, hiragana5x6CharSprites[chars]);
 	}
-	for (let chars in extra5x5CharSprites) {
-		picoCharSprite(chars, extra5x5CharSprites[chars]);
+	for (let chars in symbol5x5CharSprites) {
+		picoCharSprite(chars, symbol5x5CharSprites[chars]);
 	}
 	for (let chars in extraCharSprites) {
 		picoCharSprite(chars, extraCharSprites[chars]);

@@ -7,7 +7,7 @@
 <script src="image.js"></script>
 <script src="param.js"></script>
 <!--Main--><script>
-const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#"; // Default chars.
+const builtinChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#"; // Built in chars.
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringsCode6("077912922932942923943924934925"),
 	"ア": picoStringsCode6("077911921931941951932952933943934925"),
@@ -254,7 +254,7 @@ const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
 	"を": picoStringsCode6("077920911921931941922913933943924934925935945"),
 	"ん": picoStringsCode6("077920921922913923914934954915935945"),
 };
-const extra5x5CharSprites = { // Extra5x5 char sprite table.
+const symbol5x5CharSprites = { // Symbol5x5 char sprite table.
 	"ー": picoStringsCode6("077913923933943953"),
 	"゛": picoStringsCode6("077911931912932"),
 	"゜": picoStringsCode6("077911921931912932913923933"),
@@ -274,7 +274,7 @@ const extra5x5CharSprites = { // Extra5x5 char sprite table.
 	"＃": picoStringsCode6("077921931941922932942913923933943953914924934944954935"),
 };
 
-const extraCharAiliases = [ // Extra char ailias.
+const extraCharAiliases = [ // Extra char ailiases.
 	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
 ];
 
@@ -313,8 +313,8 @@ window.addEventListener("load", async (evt) => {
 			picoCharSprite(chars, hiragana5x5CharSprites[chars]);
 			extraChars += chars[0];
 		}
-		for (let chars in extra5x5CharSprites) {
-			picoCharSprite(chars, extra5x5CharSprites[chars]);
+		for (let chars in symbol5x5CharSprites) {
+			picoCharSprite(chars, symbol5x5CharSprites[chars]);
 			extraChars += chars[0];
 		}
 		for (let i = 0; i < extraCharAiliases.length; i++) {
@@ -325,7 +325,7 @@ window.addEventListener("load", async (evt) => {
 
 		picoClear();
 		picoRect(1, 0,0,150,150, 0,1);
-		picoText(chars + extraChars, -1, 0,0,120,120, 0,1);
+		picoText(builtinChars + extraChars, -1, 0,0,120,120, 0,1);
 		await picoFlip(20);
 
 });
@@ -345,8 +345,8 @@ if (count <= 0) {
 			picoCharSprite(key, hiragana5x6CharSprites[key]);
 			extraChars += key;
 		}
-		for (let key in extra5x5CharSprites) {
-			picoCharSprite(key, extra5x5CharSprites[key]);
+		for (let key in symbol5x5CharSprites) {
+			picoCharSprite(key, symbol5x5CharSprites[key]);
 			extraChars += key;
 		}
 		for (let i = 0; i < extraCharAiliases.length; i++) {
@@ -357,7 +357,7 @@ if (count <= 0) {
 
 		picoClear();
 		picoRect(1, 0,0,150,150, 0,1);
-		picoText(chars + extraChars, -1, 0,0,120,120, 0,1);
+		picoText(builtinChars + extraChars, -1, 0,0,120,120, 0,1);
 		await picoFlip(20);
 
 /*/
