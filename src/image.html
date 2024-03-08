@@ -169,7 +169,7 @@ const hiragana5x5CharSprites = { // Hiragana5x5 char sprite table.
 	"れ": picoStringsCode6("077921912922932942923943914924944925945955"),
 	"ろ": picoStringsCode6("077921931941932923933943914954935945"),
 	"わゎ": picoStringsCode6("077921912922932942923953914924954925945"),
-	"を": picoStringsCode6("077911921931941922923933943914934925935945"),
+	"を": picoStringsCode6("077911921931941922913933943924934925935945"),
 	"ん": picoStringsCode6("077921922913923914934954915935945"),
 };
 const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
@@ -240,7 +240,7 @@ const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
 	"め": picoStringsCode6("077920940921931941912922942952913933953914924954945"),
 	"も": picoStringsCode6("077920911921931922913923933924954925935945"),
 	"ゃ": picoStringsCode6("077922932913923933943924944925"),
-	"や": picoStringsCode6("077910940921931941951912922952923934935"),
+	"や": picoStringsCode6("077940911931941922952913923943953924935"),
 	"ゅ": picoStringsCode6("077932913923933943914934944935"),
 	"ゆ": picoStringsCode6("077930911931941912922932952913933953914934944954935"),
 	"ょ": picoStringsCode6("077932933943914924934915925945"),
@@ -337,17 +337,17 @@ if (count <= 0) {
 //*/
 	if (count <= 1) {
 		let extraChars = "";
-		for (let key in katakana5x5CharSprites) {
-			picoCharSprite(key, katakana5x5CharSprites[key]);
-			extraChars += key;
+		for (let chars in katakana5x5CharSprites) {
+			picoCharSprite(chars, katakana5x5CharSprites[chars]);
+			extraChars += chars[0];
 		}
-		for (let key in hiragana5x6CharSprites) {
-			picoCharSprite(key, hiragana5x6CharSprites[key]);
-			extraChars += key;
+		for (let chars in hiragana5x6CharSprites) {
+			picoCharSprite(chars, hiragana5x6CharSprites[chars]);
+			extraChars += chars[0];
 		}
-		for (let key in symbol5x5CharSprites) {
-			picoCharSprite(key, symbol5x5CharSprites[key]);
-			extraChars += key;
+		for (let chars in symbol5x5CharSprites) {
+			picoCharSprite(chars, symbol5x5CharSprites[chars]);
+			extraChars += chars[0];
 		}
 		for (let i = 0; i < extraCharAiliases.length; i++) {
 			picoCharSprite(extraCharAiliases[i]);
@@ -381,10 +381,10 @@ if (count <= 0) {
 		picoCharLeading(6,6);
 		picoColor(colors);
 
-		for (let i = 0; i < chars.length; i++) {
+		for (let i = 0; i < builtinChars.length; i++) {
 			picoClear();
 			picoRect(1, 0,0,42,42, 0,4);
-			picoText(chars.substr(0, picoMod(i,chars.length)), -1, 0,0,42,42, 0,4);
+			picoText(builtinChars.substr(0, picoMod(i,builtinChars.length)), -1, 0,0,42,42, 0,4);
 			await picoFlip(20);
 		}
 //*/
