@@ -294,9 +294,15 @@ pico.Image = class {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (chars[0] && sprite) {
 				this.sprites[chars[0]] = sprite;
+				if (this.aliases[chars[0]]) {
+					this.aliases[chars[0]] = null;
+				}
 			}
 			for (let i = 1; i < chars.length; i++) {
 				this.aliases[chars[i]] = chars[0];
+				if (this.sprites[chars[i]]) {
+					this.sprites[chars[i]] = null;
+				}
 			}
 		}); // end of lock.
 	}
