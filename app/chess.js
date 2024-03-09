@@ -29,7 +29,9 @@ var board =
 	" RNBKQBNR "+
 	"          "+
 	"..........";
+var piece = null, px = -1, py = -1;
 
+const grid = 8, scale = 2;
 var playing = 0; // Playing count.
 
 // Load.
@@ -39,17 +41,36 @@ async function appLoad() {
 	for (let chars in sprites) {
 		picoCharSprite(chars, sprites[chars]);
 	}
-	picoCharLeading(8,8);
+	picoCharLeading(grid,grid);
 }
 
 // Main.
 async function appMain() {
-	if (picoMotion()) {
-	} else {
-		playing += 1;
+	for (let i = 0; i < board.length; i++) {
+		let x = (picoMod(i,10) - 4.5) * grid * scale;
+		let y = (picoDiv(i,10) - 5.5) * grid * scale;
+		if (picoAction(x,y, grid,grid)) {
+			if (piece && board[i] == ".") {
+				board = board.slice(0,i) + piece + board.slice(i+1);
+				piece = null;
+			}
+		} else if (picoMotion(x,y, grid,grid)) {
+			if (piece && board[i] == ".") {
+				px = x;
+				py = y;
+			} else if (!piece && board[i] != "." && board[i] != " ") {
+				piece = board[i];
+				px = x;
+				py = y;
+				board = board.slice(0,i) + "." + board.slice(i+1);
+			}
+		}
 	}
 
 	picoClear();
-	picoRect(0, 0,0, 66,66, 0,2);
-	picoText(board, -1, 0,0, 80,96, 0,2);
+	picoRect(0, 0,0, grid*8.5,grid*8.5, 0,scale);
+	picoText(board, -1, 0,0, grid*10,grid*12, 0,scale);
+	if (piece) {
+		picoChar(piece, -1, px,py, 0,scale*2);
+	}
 }
