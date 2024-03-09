@@ -18,6 +18,7 @@ const devitems = [ // Menu items for dev.
 	["edit", "app/edit.svg", "app/edit.js"],
 	["text", "app/text.svg", "app/text.js"],
 	["chess", "app/chess.svg", "app/chess.js"],
+	["shogi", "app/shogi.svg", "app/shogi.js"],
 ];
 var devreturl = null; // Return url for dev.
 var items = [ // Menu items.
