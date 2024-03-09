@@ -450,7 +450,7 @@ pico.Image = class {
 	// constructor.
 	constructor(parent=null, width=0, height=0) {
 		pico.Image.count++;
-		this.lock = "picoImageLock" + pico.Image.count; // Lock object identifier.
+		this.lock = "picoImageLock" + pico.Image.count + Date.now(); // Lock object identifier.
 		this.canvas = []; // Double buffered canvas elements.
 		this.primary = 0; // Primary canvas index.
 		this.context = null; // Canvas 2d context.

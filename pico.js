@@ -457,7 +457,7 @@ pico.Image = class {
 	// constructor.
 	constructor(parent=null, width=0, height=0) {
 		pico.Image.count++;
-		this.lock = "picoImageLock" + pico.Image.count; // Lock object identifier.
+		this.lock = "picoImageLock" + pico.Image.count + Date.now(); // Lock object identifier.
 		this.canvas = []; // Double buffered canvas elements.
 		this.primary = 0; // Primary canvas index.
 		this.context = null; // Canvas 2d context.
@@ -1842,12 +1842,14 @@ pico.Touch = class {
 	read(t=10) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (t >= 0) {
+				console.log("Wait timeout: " + t);
 				return new Promise(r => setTimeout(r, t)).then(() => {
 					return this._read();
 				}); // end of new Promise.
 
 			// Wait until input.
 			} else {
+				console.log("Wait until input.");
 				return new Promise((resolve) => {
 					const timer = setInterval(() => {
 						if (this.flushing || pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
@@ -1883,7 +1885,7 @@ pico.Touch = class {
 	// constructor.
 	constructor(parent=null) {
 		pico.Touch.count++;
-		this.lock = "picoTouchLock" + pico.Touch.count; // Lock object identifier.
+		this.lock = "picoTouchLock" + pico.Touch.count + Date.now(); // Lock object identifier.
 		this.panel = null; // Touch panel element.
 		this.touching = [[], []]; // Double buffered touching states.
 		this.primary = 0; // Primary touching index.

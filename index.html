@@ -105,10 +105,13 @@ var pico = pico || {};
 
 // App class.
 pico.App = class {
+	static count = 0; // Object count.
 	static script = "app.js"; // Default script.
 
 	// constructor.
 	constructor() {
+		pico.App.count++;
+		this.lock = "picoAppLock" + pico.App.count + Date.now(); // Lock object identifier.
 		this.returl = null; // Return url.
 		this.script = pico.App.script; // App script.
 		this.retscript = null; // Return script.
@@ -118,7 +121,6 @@ pico.App = class {
 		this.author = "*"; // App author.
 		this.timestamp = ""; // Timestamp (App version).
 		this.wakeLock = null; // Wake lock object.
-		this.lock = "picoAppLock" + Date.now(); // Lock object identifier.
 
 		// Load app information.
 		let e = document.getElementById("author");
