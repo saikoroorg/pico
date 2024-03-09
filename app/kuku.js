@@ -95,7 +95,7 @@ async function appLoad() {
 	// Load query levels.
 	let keys = picoKeys();
 	for (let k = 0; k < keys.length; k++) {
-		let value = picoStrings(k);
+		let value = picoString(k);
 		if (value) {
 			let numbers = picoNumbers(keys[k]);
 			let date = picoDate();

@@ -147,7 +147,7 @@ pico.Worker = class {
 					result.text().then((text) => {
 						this._debug("Fetched html file: " + text.replace(/\s+/g, " ").substr(-1000));
 
-						// Replace strings by manifest.
+						// Replace string by manifest.
 						for (let key in replacing) {
 							this._debug("Replacing: " + key + " -> " + replacing[key]);
 							let reg1 = new RegExp("(<.*id=\"" + key + "\".*>).*(<\/.*>)");

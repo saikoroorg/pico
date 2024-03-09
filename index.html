@@ -150,7 +150,7 @@ pico.App = class {
 		}
 
 		// Load app script.
-		let script = picoStrings("s");
+		let script = picoString("s");
 		if (script) {
 			this.script = script;
 		}
@@ -174,7 +174,7 @@ pico.App = class {
 			if (this.returl) {
 				picoResetParams();
 				if (this.ver > 0) {
-					picoSetStrings(this.ver, "v");
+					picoSetString(this.ver, "v");
 				}
 				await picoReload(this.returl);
 
@@ -182,7 +182,7 @@ pico.App = class {
 			} else {
 				picoResetParams();
 				if (this.ver > 0) {
-					picoSetStrings(this.ver, "v");
+					picoSetString(this.ver, "v");
 				}
 				await picoReload();
 			}
@@ -219,16 +219,16 @@ pico.App = class {
 	// On load event.
 	async onLoad() {
 		try {
-			let retscript = picoStrings("r");
+			let retscript = picoString("r");
 			if (retscript) {
 				this.retscript = retscript;
 			}
-			let title = picoStrings("t");
+			let title = picoString("t");
 			if (title) {
 				this.apptitle = title;
 				await picoTitle(this.apptitle);
 			}
-			this.returl = picoStrings("u");
+			this.returl = picoString("u");
 			this.ver = picoNumbers("v")[0];
 			if (typeof appLoad === "function") {
 				await navigator.locks.request(this.lock, async (lock) => {
@@ -301,61 +301,61 @@ pico.App = class {
 	// Switch script or share.
 	async switchScript(target=null, returl=null) {
 		if (picoDevMode()) {
-			picoSetStrings(-1, "v");
+			picoSetString(-1, "v");
 		} else if (this.ver > 0) {
-			picoSetStrings(this.ver, "v");
+			picoSetString(this.ver, "v");
 		}
 
 		// Change and reload script.
 		if (target && target.match(/js$/)) {
-			if (this.returl && !picoStrings("u")) {
-				picoSetStrings(this.returl, "u");
+			if (this.returl && !picoString("u")) {
+				picoSetString(this.returl, "u");
 			}
-			if (this.title && !picoStrings("t")) {
-				picoSetStrings(this.title, "t");
+			if (this.title && !picoString("t")) {
+				picoSetString(this.title, "t");
 			}
-			picoSetStrings(target, "s");
-			if (this.script && !picoStrings("r")) {
-				picoSetStrings(this.script, "r");
+			picoSetString(target, "s");
+			if (this.script && !picoString("r")) {
+				picoSetString(this.script, "r");
 			}
 			await picoReload();
 
 		// Jump to next page.
 		} else if (target) {
-			if (returl && !picoStrings("u")) {
-				picoSetStrings(returl, "u");
-			} else if (this.returl && !picoStrings("u")) {
-				picoSetStrings(this.returl, "u");
+			if (returl && !picoString("u")) {
+				picoSetString(returl, "u");
+			} else if (this.returl && !picoString("u")) {
+				picoSetString(this.returl, "u");
 			}
-			if (this.title && !picoStrings("t")) {
-				picoSetStrings(this.title, "t");
+			if (this.title && !picoString("t")) {
+				picoSetString(this.title, "t");
 			}
-			picoSetStrings("", "s");
-			picoSetStrings("", "r");
+			picoSetString("", "s");
+			picoSetString("", "r");
 			await picoReload(target);
 
 		// Back to previous script.
 		} else if (this.retscript) {
-			if (this.returl && !picoStrings("u")) {
-				picoSetStrings(this.returl, "u");
+			if (this.returl && !picoString("u")) {
+				picoSetString(this.returl, "u");
 			}
-			picoSetStrings("", "t");
-			picoSetStrings(this.retscript, "s");
-			picoSetStrings("", "r");
+			picoSetString("", "t");
+			picoSetString(this.retscript, "s");
+			picoSetString("", "r");
 			await picoReload();
 
 		// Back to previous page.
 		} else if (this.returl) {
-			picoSetStrings("", "u");
-			picoSetStrings("", "t");
-			picoSetStrings("", "s");
-			picoSetStrings("", "r");
+			picoSetString("", "u");
+			picoSetString("", "t");
+			picoSetString("", "s");
+			picoSetString("", "r");
 			await picoReload(this.returl);
 
 		// Share.
 		} else {
 			if (this.script && this.script != pico.App.script) {
-				picoSetStrings(this.script, "s");
+				picoSetString(this.script, "s");
 			}
 			await picoShare();
 		}

@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40307"; // Updatable by package.json.
+pico.version = "0.9.40309"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -846,7 +846,7 @@ async function picoShare(url=null, files=null) {
 	}
 }
 
-// Get all params by one strings.
+// Get all params by one string.
 function picoParams() {
 	return pico.param.params();
 }
@@ -861,14 +861,14 @@ function picoKeys() {
 	return pico.param.keys();
 }
 
-// Get param as strings.
-function picoStrings(key=0) {
-	return pico.param.strings(key);
+// Get param as string.
+function picoString(key=0) {
+	return pico.param.string(key);
 }
 
-// Set param as strings.
-function picoSetStrings(strings, key=0) {
-	return pico.param.setStrings(strings, key);
+// Set param as string.
+function picoSetString(str, key=0) {
+	return pico.param.setString(str, key);
 }
 
 // Get param as numbers.
@@ -901,14 +901,14 @@ function picoSetCode8(code8, key=0) {
 	return pico.param.setCode8(code8, key);
 }
 
-// Get 6bit code by strings.
-function picoStringsCode6(strings) {
-	return pico.param._stringsCode(strings);
+// Get 6bit code by string.
+function picoStringCode6(str) {
+	return pico.param._stringCode(str);
 }
 
-// Get 8bit code by strings.
-function picoStringsCode8(strings) {
-	return pico.param._expandCode(pico.param._stringsCode(strings));
+// Get 8bit code by string.
+function picoStringCode8(str) {
+	return pico.param._expandCode(pico.param._stringCode(str));
 }
 
 //************************************************************/
@@ -956,7 +956,7 @@ pico.Param = class {
 		await this._share(url, files);
 	}
 
-	// Get all params by one strings.
+	// Get all params by one string.
 	params() {
 		return this._serialize();
 	}
@@ -971,14 +971,14 @@ pico.Param = class {
 		return this._keys();
 	}
 
-	// Get param as strings.
-	strings(key=0) {
-		return this._strings(key);
+	// Get param as string.
+	string(key=0) {
+		return this._string(key);
 	}
 
-	// Set param as strings.
-	setStrings(strings, key=0) {
-		this._setStrings(strings, key);
+	// Set param as string.
+	setString(str, key=0) {
+		this._setString(str, key);
 	}
 
 	// Get param as numbers.
@@ -993,12 +993,12 @@ pico.Param = class {
 
 	// Get param as 6bit code.
 	code6(key=0) {
-		return this._stringsCode(this._strings(key));
+		return this._stringCode(this._string(key));
 	}
 
 	// Set param as 6bit code.
 	setCode6(code6, key=0) {
-		this._setStrings(this._code2str(code6), key);
+		this._setString(this._code2str(code6), key);
 	}
 
 	// Get param as 8bit compatible 6bit code.
@@ -1135,14 +1135,14 @@ pico.Param = class {
 		return Object.keys(this.context);
 	}
 	
-	// Get value by strings.
-	_strings(key=0) {
+	// Get value by string.
+	_string(key=0) {
 		return this.context[key];
 	}
 
-	// Set value by strings.
-	_setStrings(strings, key=0) {
-		this.context[key] = strings;
+	// Set value by string.
+	_setString(str, key=0) {
+		this.context[key] = str;
 	}
 
 	// Get value by integer numbers.
@@ -1167,7 +1167,7 @@ pico.Param = class {
 	}
 
 	// Get number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
-	_stringsCode(str) {
+	_stringCode(str) {
 		let results = [];
 		if (str) {
 			for (let i = 0; i < str.length; i++) {

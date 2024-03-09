@@ -25,7 +25,7 @@ picoSetNumbers([255,255,255,
 		255,219,171, 159,255,243, 191,191,191,
 		231,0,91,    0,115,239,   0,147,59,
 		167,0,0,     143,0,119,   0,63,23]);
-console.log("Strings: " + picoStrings());
+console.log("String: " + picoString());
 console.log("Numbers: " + picoNumbers());
 //*/
 
@@ -35,7 +35,7 @@ picoSetCode6([255,255,255,
 		255,219,171, 159,255,243, 191,191,191,
 		231,0,91,    0,115,239,   0,147,59,
 		167,0,0,     143,0,119,   0,63,23]);
-console.log("Strings: " + picoStrings());
+console.log("String: " + picoString());
 console.log("Code6: " + picoCode6());
 //*/
 
@@ -45,7 +45,7 @@ picoSetCode8([255,255,255,
 		255,219,171, 159,255,243, 191,191,191,
 		231,0,91,    0,115,239,   0,147,59,
 		167,0,0,     143,0,119,   0,63,23]);
-console.log("Strings: " + picoStrings());
+console.log("String: " + picoString());
 console.log("Code6: " + picoCode6());
 console.log("Code8: " + picoCode8());
 //*/
@@ -99,13 +99,13 @@ document.addEventListener("click", async (evt) => {
 pico.Param.debug = false;
 
 // Test parse param.
-if (!picoStrings()) {
+if (!picoString()) {
 	picoSetCode8([255,255,255,
 		255,219,171, 159,255,243, 191,191,191,
 		231,0,91,    0,115,239,   0,147,59,
 		167,0,0,     143,0,119,   0,63,23]);
 }
-console.log("Strings: " + picoStrings());
+console.log("String: " + picoString());
 console.log("Numbers: " + picoNumbers());
 console.log("6bit code: " + picoCode6());
 console.log("8bit compatible 6bit code: " + picoCode8());

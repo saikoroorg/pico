@@ -145,9 +145,9 @@ async function appLoad() {
 	// Load query params.
 	let keys = picoKeys(), framecount = 0;
 	for (let k = 0; k < keys.length; k++) {
-		let value = picoStrings(k);
+		let value = picoString(k);
 		if (value) {
-			console.log("Param" + k + ": " + keys[k] + " -> " + picoStrings(k));
+			console.log("Param" + k + ": " + keys[k] + " -> " + picoString(k));
 
 			// Load colors.
 			if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ||

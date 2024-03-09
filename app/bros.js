@@ -70,7 +70,7 @@ async function appAction() {
 	// Share cleared level.
 	if (level >= 1 && level < levels.length) {
 		let password = picoRandom(1000000, level);
-		picoSetStrings("" + level + "@" + password, 0);
+		picoSetString("" + level + "@" + password, 0);
 		return 1; // Return 1 to share.
 
 	// Share or edit custom level.
@@ -123,7 +123,7 @@ async function appLoad() {
 	picoTitle(title);
 
 	// Load query params.
-	let value = picoStrings();
+	let value = picoString();
 	if (value) {
 
 		// Load extra level.

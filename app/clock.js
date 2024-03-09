@@ -182,7 +182,7 @@ async function appLoad() {
 	}
 
 	// Load query params.
-	let value = picoStrings();
+	let value = picoString();
 	if (value) {
 		let numbers = picoNumbers();
 
