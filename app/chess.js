@@ -91,6 +91,10 @@ async function appMain() {
 			}
 		}
 	}
+	if (hand && pieces[index] == "." && picoAction()) {
+		pieces = pieces.slice(0,index) + hand + pieces.slice(index+1);
+		hand = null;
+	}
 
 	picoClear();
 	picoRect(0, 0,0, grid*(square+0.5),grid*(square+0.5), 0,scale);

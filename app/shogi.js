@@ -131,6 +131,10 @@ async function appMain() {
 				}
 			}
 		}
+		if (hands[j] && pieces[j][indexes[j]] == movable && picoAction()) {
+			pieces[j] = pieces[j].slice(0,indexes[j]) + hands[j] + pieces[j].slice(indexes[j]+1);
+			hands[j] = null;
+		}
 	}
 
 	picoClear();
