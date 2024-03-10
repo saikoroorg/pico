@@ -103,6 +103,7 @@ async function appMain() {
 				y = -y;
 			}
 			if (picoAction(x,y, grid,grid)) {
+				// Catch enemy pieces.
 				if (hands[j] &&
 					pieces[j?0:1][pieces[j].length-1-i] != movable &&
 					pieces[j?0:1][pieces[j].length-1-i] != space) {
@@ -110,24 +111,32 @@ async function appMain() {
 					hands[j] = pieces[j?0:1][pieces[j].length-1-i];
 					indexes[j] = i;
 					pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + movable + pieces[j?0:1].slice(pieces[j].length-1-i+1);
+				// Move pieces.
 				} else if (hands[j] && pieces[j][i] == movable) {
 					pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 					hands[j] = null;
-				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == movable) {
-					pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + hands[j] + pieces[j?0:1].slice(pieces[j].length-1-i+1);
-					hands[j] = null;
+				// Flip pieces.
 				} else if (hands[j] && pieces[j][i] == picked) {
 					pieces[j] = pieces[j].slice(0,i) + flips[hands[j]] + pieces[j].slice(i+1);
+					hands[j] = null;
+				// Move to enemy places.
+				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == movable) {
+					pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + hands[j] + pieces[j?0:1].slice(pieces[j].length-1-i+1);
 					hands[j] = null;
 				}
 				pieces[j] = pieces[j].replace(picked, movable);
 			} else if (picoMotion(x,y, grid,grid)) {
+				// Moving pieces.
 				if (hands[j] && pieces[j][i] == movable) {
 					indexes[j] = i;
 					pieces[j] = pieces[j].replace(picked, movable);
+				// Flip pieces.
+				} else if (hands[j] && pieces[j][i] == picked) {
+				// Moving to enemy places.
 				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == movable) {
 					indexes[j] = i;
 					pieces[j] = pieces[j].replace(picked, movable);
+				// Touching pieces.
 				} else if (!hands[j] && !hands[j?0:1] &&
 					pieces[j][i] != movable &&
 					pieces[j][i] != space) {
