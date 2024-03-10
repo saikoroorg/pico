@@ -23,49 +23,49 @@ const sprites = { // Sprite table.
 const colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // 10 colors from the 5 bits.
 
 const board = 
-	"■■■■■■■■■■■"+
-	"　　　　　　　　　　　"+
-	"　□□□□□□□□□　"+
-	"　□□□□□□□□□　"+
-	"　□□□□□□□□□　"+
-	"　□□□□□□□□□　"+
-	"　□□□□□□□□□　"+
-	"　□□□□□□□□□　"+
-	"　□□□□□□□□□　"+
-	"　□□□□□□□□□　"+
-	"　□□□□□□□□□　"+
-	"　　　　　　　　　　　"+
-	"■■■■■■■■■■■";
+	"　■■■■■■■■■■■　"+
+	"　　　　　　　　　　　　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　　　　　　　　　　　　"+
+	"　■■■■■■■■■■■　";
 
 var pieces = [
-	"　　　　　　　　　　　"+
-	"　　　　　　　　　　　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　歩歩歩歩歩歩歩歩歩　"+
-	"　・角・・・・・飛・　"+
-	"　香桂銀金玉金銀桂香　"+
-	"　　　　　　　　　　　"+
-	"・・・・・・・・・・・",
-	"　　　　　　　　　　　"+
-	"　　　　　　　　　　　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　・・・・・・・・・　"+
-	"　歩歩歩歩歩歩歩歩歩　"+
-	"　・角・・・・・飛・　"+
-	"　香桂銀金玉金銀桂香　"+
-	"　　　　　　　　　　　"+
-	"・・・・・・・・・・・",
+	"　　　　　　　　　　　　・"+
+	"　　　　　　　　　　　　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　歩歩歩歩歩歩歩歩歩　・"+
+	"　　・角・・・・・飛・　・"+
+	"　　香桂銀金玉金銀桂香　・"+
+	"　　　　　　　　　　　　・"+
+	"　・・・・・・・・・・・・",
+	"　　　　　　　　　　　　・"+
+	"　　　　　　　　　　　　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　・・・・・・・・・　・"+
+	"　　歩歩歩歩歩歩歩歩歩　・"+
+	"　　・角・・・・・飛・　・"+
+	"　　香桂銀金玉金銀桂香　・"+
+	"　　　　　　　　　　　　・"+
+	"　・・・・・・・・・・・・",
 ];
-const width = 11, height = 13, square = 9;
+const width = 13, height = 13, square = 9;
 const grid = 10, scale = 1.5, scale2 = 2;
 const movable = "・", picked = "×", space = "　";
 const flips = {
@@ -113,6 +113,9 @@ async function appMain() {
 				} else if (hands[j] && pieces[j][i] == movable) {
 					pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 					hands[j] = null;
+				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == movable) {
+					pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + hands[j] + pieces[j?0:1].slice(pieces[j].length-1-i+1);
+					hands[j] = null;
 				} else if (hands[j] && pieces[j][i] == picked) {
 					pieces[j] = pieces[j].slice(0,i) + flips[hands[j]] + pieces[j].slice(i+1);
 					hands[j] = null;
@@ -120,6 +123,9 @@ async function appMain() {
 				pieces[j] = pieces[j].replace(picked, movable);
 			} else if (picoMotion(x,y, grid,grid)) {
 				if (hands[j] && pieces[j][i] == movable) {
+					indexes[j] = i;
+					pieces[j] = pieces[j].replace(picked, movable);
+				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == movable) {
 					indexes[j] = i;
 					pieces[j] = pieces[j].replace(picked, movable);
 				} else if (!hands[j] && !hands[j?0:1] &&
