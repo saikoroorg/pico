@@ -21,6 +21,8 @@ const sprites = { // Sprite table.
 	"盤": picoStringCode6("099901911921931941951961971902912932952972913923933943953963973914934954974915925935945955965975916936956976986917927937947957967977987"),
 	"▲": picoStringCode6("099941922932942952962923933943953963924934944954964915925935945955965975916926936946956966976917927937947957967977"),
 	"△": picoStringCode6("099341322332352362323363324364315375316376317327337347357367377"),
+	"▼": picoStringCode6("099941922932942952962923933943953963924934944954964915925935945955965975916926936946956966976917927937947957967977"),
+	"▽": picoStringCode6("099341322332352362323363324364315375316376317327337347357367377"),
 	"・": picoStringCode6("077"),
 	"×": picoStringCode6("077"),
 	"□": picoStringCode6("0bb3000aa011088"),
@@ -34,46 +36,46 @@ const board =
 	"　　□□□□□□□□□　　"+
 	"　　□□□□□□□□□　　"+
 	"　　□□□□□□□□□　　"+
-	"　　□□□□□□□□□　▲"+
-	"　　□□□□□□□□□　将"+
-	"　　□□□□□□□□□　棋"+
-	"　　□□□□□□□□□　盤"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
 	"　　□□□□□□□□□　　"+
 	"　　□□□□□□□□□　　"+
 	"　　　　　　　　　　　　　"+
 	"　■■■■■■■■■■■　";
 
 var pieces = [
-	"　　　　　　　　　　　　・"+
-	"　　　　　　　　　　　　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　歩歩歩歩歩歩歩歩歩　・"+
-	"　　・角・・・・・飛・　・"+
-	"　　香桂銀金玉金銀桂香　・"+
-	"　　　　　　　　　　　　・"+
-	"　・・・・・・・・・・・・",
-	"　　　　　　　　　　　　・"+
-	"　　　　　　　　　　　　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　歩歩歩歩歩歩歩歩歩　・"+
-	"　　・角・・・・・飛・　・"+
-	"　　香桂銀金玉金銀桂香　・"+
-	"　　　　　　　　　　　　・"+
-	"　・・・・・・・・・・・・",
+	"　　　　　　　　　　　　×"+
+	"　　　　　　　　　　　　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　歩歩歩歩歩歩歩歩歩　×"+
+	"　　・角・・・・・飛・　×"+
+	"　　香桂銀金玉金銀桂香　×"+
+	"　　　　　　　　　　　　×"+
+	"　××××××××××××",
+	"　　　　　　　　　　　　×"+
+	"　　　　　　　　　　　　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　・・・・・・・・・　×"+
+	"　　歩歩歩歩歩歩歩歩歩　×"+
+	"　　・角・・・・・飛・　×"+
+	"　　香桂銀金玉金銀桂香　×"+
+	"　　　　　　　　　　　　×"+
+	"　××××××××××××",
 ];
 const width = 13, height = 13, square = 9;
 const grid = 10, scale = 1.5, scale2 = 2;
-const movable = "・", picked = "×", space = "　";
+const movable = "・", extra = "×", picked = "○", space = "　";
 const flips = {
 	"歩": "と", "と": "歩",
 	"香": "杏", "杏": "香",
@@ -112,13 +114,15 @@ async function appMain() {
 				// Catch enemy pieces.
 				if (hands[j] &&
 					pieces[j?0:1][pieces[j].length-1-i] != movable &&
+					pieces[j?0:1][pieces[j].length-1-i] != extra &&
 					pieces[j?0:1][pieces[j].length-1-i] != space) {
 					pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 					hands[j] = pieces[j?0:1][pieces[j].length-1-i];
 					indexes[j] = i;
 					pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + movable + pieces[j?0:1].slice(pieces[j].length-1-i+1);
 				// Move pieces.
-				} else if (hands[j] && pieces[j][i] == movable) {
+				} else if (hands[j] && pieces[j][i] == movable ||
+					hands[j] && pieces[j][i] == extra) {
 					pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 					hands[j] = null;
 				// Flip pieces.
@@ -126,25 +130,27 @@ async function appMain() {
 					pieces[j] = pieces[j].slice(0,i) + flips[hands[j]] + pieces[j].slice(i+1);
 					hands[j] = null;
 				// Move to enemy places.
-				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == movable) {
+				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == extra) {
 					pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + hands[j] + pieces[j?0:1].slice(pieces[j].length-1-i+1);
 					hands[j] = null;
 				}
 				pieces[j] = pieces[j].replace(picked, movable);
 			} else if (picoMotion(x,y, grid,grid)) {
 				// Moving pieces.
-				if (hands[j] && pieces[j][i] == movable) {
+				if (hands[j] && pieces[j][i] == movable ||
+					hands[j] && pieces[j][i] == extra) {
 					indexes[j] = i;
 					pieces[j] = pieces[j].replace(picked, movable);
 				// Flip pieces.
 				} else if (hands[j] && pieces[j][i] == picked) {
 				// Moving to enemy places.
-				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == movable) {
+				} else if (hands[j] && pieces[j?0:1][pieces[j].length-1-i] == extra) {
 					indexes[j] = i;
 					pieces[j] = pieces[j].replace(picked, movable);
 				// Touching pieces.
 				} else if (!hands[j] && !hands[j?0:1] &&
 					pieces[j][i] != movable &&
+					pieces[j][i] != extra &&
 					pieces[j][i] != space) {
 					hands[j] = pieces[j][i];
 					indexes[j] = i;
