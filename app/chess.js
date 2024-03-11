@@ -45,8 +45,8 @@ var pieces =
 	". RNBQKBNR ."+
 	".          ."+
 	"............";
-const movable = ".", picked = "x", space = " ";
-const width = 12, height = 12, square = 8;
+const movable = ".", holding = "x", nothing = " ";
+const width = 12, height = 12, inside = 8;
 const grid = 6, scale = 2.5;
 
 var hand = null, index = -1;
@@ -70,28 +70,28 @@ async function appMain() {
 			// Dropping pieces.
 			if (hand) {
 				let drop = hand;
-				// Drop to another piece.
+				// Drop and switch with another piece.
 				if (pieces[i] != movable) {
 					hand = pieces[i];
 					index = i;
-				// Drop to vacant space.
-				} else  {
+				// Drop to vacant square.
+				} else {
 					hand = null;
 					index = -1;
 				}
 				pieces = pieces.slice(0,i) + drop + pieces.slice(i+1);
 			}
-			pieces = pieces.replace(picked, movable);
+			pieces = pieces.replace(holding, movable);
 		} else if (picoMotion(x,y, grid,grid)) {
-			// Moving pieces.
-			if (hand && pieces[i] != space) {
+			// Move holding pieces.
+			if (hand && pieces[i] != nothing) {
 				index = i;
-				pieces = pieces.replace(picked, movable);
-			// Holding pieces.
-			} else if (!hand && pieces[i] != movable && pieces[i] != space) {
+				pieces = pieces.replace(holding, movable);
+			// Hold pieces.
+			} else if (pieces[i] != movable && pieces[i] != holding && pieces[i] != nothing) {
 				hand = pieces[i];
 				index = i;
-				pieces = pieces.slice(0,i) + picked + pieces.slice(i+1);
+				pieces = pieces.slice(0,i) + holding + pieces.slice(i+1);
 			}
 		}
 	}
@@ -102,7 +102,7 @@ async function appMain() {
 	}
 
 	picoClear();
-	picoRect(0, 0,0, grid*(square+0.5),grid*(square+0.5), 0,scale);
+	picoRect(0, 0,0, grid*(inside+0.5),grid*(inside+0.5), 0,scale);
 	picoText(board, -1, 0,0, grid*width,grid*height, 0,scale);
 	picoText(pieces, -1, 0,0, grid*width,grid*height, 0,scale);
 	if (hand) {
