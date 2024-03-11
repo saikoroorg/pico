@@ -31,20 +31,14 @@ console.log("Numbers: " + picoNumbers());
 
 //*/
 // Test 6bit code param.
-picoSetCode6([255,255,255,
-		255,219,171, 159,255,243, 191,191,191,
-		231,0,91,    0,115,239,   0,147,59,
-		167,0,0,     143,0,119,   0,63,23]);
+picoSetCode6([255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]);
 console.log("String: " + picoString());
 console.log("Code6: " + picoCode6());
 //*/
 
 //*/
 // Test 8bit compatible 6bit code param.
-picoSetCode8([255,255,255,
-		255,219,171, 159,255,243, 191,191,191,
-		231,0,91,    0,115,239,   0,147,59,
-		167,0,0,     143,0,119,   0,63,23]);
+picoSetCode8([255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0]);
 console.log("String: " + picoString());
 console.log("Code6: " + picoCode6());
 console.log("Code8: " + picoCode8());
