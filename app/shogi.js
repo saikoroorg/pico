@@ -18,18 +18,16 @@ const sprites = { // Sprite table.
 	"王": picoStringCode6("099922932942952962943944925935945955965946947918928938948958968978"),
 	"将": picoStringCode6("099920970921951961981902922932942982913923933953973914924944964974925935945955965975985916926946156976907927957977928968978"),
 	"棋": picoStringCode6("099920940970921941951961971981902912922932942972923933943953963973914924934944954964974915925945975906926936946956966976986907927947977928938988"),
-//	"盤": picoStringCode6("099901911921931941951961971902912932952972913923933943953963973914934954974915925935945955965975916936956976986917927937947957967977987"),
 	"▲": picoStringCode6("099941922932942952962923933943953963924934944954964915925935945955965975916926936946956966976917927937947957967977"),
 	"△": picoStringCode6("099341322332352362323363324364315375316376317327337347357367377"),
 	"▼": picoStringCode6("099958977967957947937976966956946936975965955945935984974964954944934924983973963953943933923982972962952942932922"),
 	"▽": picoStringCode6("099358377367347337376336375335384324383323382372362352342332322"),
+	"□": picoStringCode6("0bb3000aa011088"),
+	"■": picoStringCode6("099000088"),
 	"・": picoStringCode6("077"),
 	"×": picoStringCode6("077"),
-//	"□": picoStringCode6("0bb3003103203303403503603703803903a03013a13023a23033a33043a43053a53063a63073a73083a83093a930a31a32a33a34a35a36a37a38a39a3aa"),
-	"□": picoStringCode6("0bb3000aa011088"),
-	"■": picoStringCode6("099011077"),
 };
-const colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // 10 colors from the 5 bits.
+const colors = picoStringCode8("11171h15b3330i9p060n4f0ir0004o");
 
 const board = 
 	"　■■■■■■■■■■■　"+
@@ -84,7 +82,7 @@ const flips = {
 };
 const movable = "・", holding = "×", nothing = "　";
 const width = 13, height = 13, inside = 9;
-const grid = 10, scale = 1.5, scale2 = 2;
+const grid = 10, margin = 4, scale = 1.5, scale2 = 2.5;
 
 var hands = [null,null], indexes = [-1,-1];
 
@@ -109,30 +107,34 @@ async function appMain() {
 				x = -x;
 				y = -y;
 			}
-			if (picoAction(x,y, grid,grid)) {
+			if (picoAction(x,y, grid-margin,grid-margin)) {
 				// Dropping pieces.
 				if (hands[j]) {
 					// Drop and switch with enemy piece.
 					if (pieces[j?0:1][pieces[j].length-1-i] != movable && pieces[j?0:1][pieces[j].length-1-i] != nothing) {
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = pieces[j?0:1][pieces[j].length-1-i];
-						indexes[j] = i;
 						pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + movable + pieces[j?0:1].slice(pieces[j].length-1-i+1);
 					// Drop and flip holding piece.
 					} else if (pieces[j][i] == holding && flips[hands[j]]) {
 						pieces[j] = pieces[j].slice(0,i) + flips[hands[j]] + pieces[j].slice(i+1);
 						hands[j] = null;
+					// Drop and switch with another piece.
+					} else if (pieces[j][i] != movable) {
+						let drop = hands[j];
+						hands[j] = pieces[j][i];
+						pieces[j] = pieces[j].slice(0,i) + drop + pieces[j].slice(i+1);
+						indexes[j] = i;
 					// Drop to vacant square.
 					} else if (pieces[j][i] == movable) {
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = null;
 					}
 				}
-				pieces[j] = pieces[j].replace(holding, movable);
-			} else if (picoMotion(x,y, grid,grid)) {
+			} else if (picoMotion(x,y, grid-margin,grid-margin)) {
 				// Move holding pieces to vacant square.
-				if (hands[j] && pieces[j][i] == movable) {
-					if (pieces[j][indexes[j]] == holding) {
+				if (hands[j] && pieces[j][i] != nothing && pieces[j][i] != holding) {
+					if (pieces[j][indexes[j]] == holding) { // Reset holding square.
 						pieces[j] = pieces[j].slice(0,indexes[j]) + movable + pieces[j].slice(indexes[j]+1);
 					}
 					indexes[j] = i;
@@ -164,7 +166,9 @@ async function appMain() {
 	picoRect(0, 0,0, grid*(inside+0.5),grid*(inside+0.5), 0,scale);
 	picoText(board, -1, 0,0, grid*width,grid*height, 0,scale);
 	for (let j = 0; j < pieces.length; j++) {
-		picoText(pieces[j], -1, 0,0, grid*width,grid*height, !j?0:180,scale);
+		picoText(pieces[j], -1, 0,0, grid*width,grid*height, j?180:0,scale);
+	}
+	for (let j = 0; j < pieces.length; j++) {
 		if (hands[j]) {
 			let x = (picoMod(indexes[j],width) - (width/2 - 0.5)) * grid * scale;
 			let y = (picoDiv(indexes[j],width) - (height/2 - 0.5)) * grid * scale;
@@ -172,7 +176,8 @@ async function appMain() {
 				x = -x;
 				y = -y;
 			}
-			picoChar(hands[j], -1, x,y, !j?0:180,scale2);
+			picoChar("■", -1, x,y, j?180:0,scale);
+			picoChar(hands[j], -1, x,y, j?180:0,scale2);
 		}
 	}
 }
