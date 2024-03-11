@@ -32,7 +32,6 @@ const board =
 	"  # # # #   "+
 	"            "+
 	" @@@@@@@@@@ ";
-
 var pieces = 
 	"............"+
 	".          ."+
@@ -46,7 +45,7 @@ var pieces =
 	". RNBQKBNR ."+
 	".          ."+
 	"............";
-
+const movable = ".", picked = "x", space = " ";
 const width = 12, height = 12, square = 8;
 const grid = 6, scale = 2.5;
 
@@ -68,30 +67,36 @@ async function appMain() {
 		let x = (picoMod(i,width) - (width/2 - 0.5)) * grid * scale;
 		let y = (picoDiv(i,width) - (height/2 - 0.5)) * grid * scale;
 		if (picoAction(x,y, grid,grid)) {
+			// Dropping pieces.
 			if (hand) {
 				let drop = hand;
-				if (pieces[i] != ".") {
+				// Drop to another piece.
+				if (pieces[i] != movable) {
 					hand = pieces[i];
 					index = i;
+				// Drop to vacant space.
 				} else  {
 					hand = null;
 					index = -1;
 				}
 				pieces = pieces.slice(0,i) + drop + pieces.slice(i+1);
 			}
-			pieces = pieces.replace("x", ".");
+			pieces = pieces.replace(picked, movable);
 		} else if (picoMotion(x,y, grid,grid)) {
-			if (hand && pieces[i] != " ") {
+			// Moving pieces.
+			if (hand && pieces[i] != space) {
 				index = i;
-				pieces = pieces.replace("x", ".");
-			} else if (!hand && pieces[i] != "." && pieces[i] != " ") {
+				pieces = pieces.replace(picked, movable);
+			// Holding pieces.
+			} else if (!hand && pieces[i] != movable && pieces[i] != space) {
 				hand = pieces[i];
 				index = i;
-				pieces = pieces.slice(0,i) + "x" + pieces.slice(i+1);
+				pieces = pieces.slice(0,i) + picked + pieces.slice(i+1);
 			}
 		}
 	}
-	if (hand && pieces[index] == "." && picoAction()) {
+	// Cancel holding pieces.
+	if (hand && pieces[index] == movable && picoAction()) {
 		pieces = pieces.slice(0,index) + hand + pieces.slice(index+1);
 		hand = null;
 	}
