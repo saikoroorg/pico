@@ -18,6 +18,7 @@ const sprites = { // Sprite table.
 	".": picoStringCode6("077"),
 	"*": picoStringCode6("077"),
 };
+const colors = picoStringCode8("111555333222444000");
 
 const board = 
 	" @@@@@@@@@@ "+
@@ -54,11 +55,11 @@ var hand = null, index = -1;
 // Load.
 async function appLoad() {
 	await picoTitle(title);
-
 	for (let chars in sprites) {
 		picoCharSprite(chars, sprites[chars]);
 	}
 	picoCharLeading(grid,grid);
+	picoColor(colors);
 }
 
 // Main.
