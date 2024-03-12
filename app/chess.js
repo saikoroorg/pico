@@ -48,7 +48,7 @@ var pieces =
 	"............";
 const movable = ".", holding = "*", nothing = " ";
 const width = 12, height = 12, inside = 8;
-const grid = 6, margin = 0, scale = 2.5, scale2 = 5;
+const grid = 6, margin = 0, scale = 2.5, scale2 = 3.5;
 
 var hand = null, index = -1;
 
@@ -82,6 +82,7 @@ async function appMain() {
 				}
 				pieces = pieces.slice(0,i) + drop + pieces.slice(i+1);
 			}
+			break;
 		} else if (picoMotion(x,y, grid-margin,grid-margin)) {
 			// Move holding pieces.
 			if (hand && pieces[i] != nothing) {
@@ -96,6 +97,7 @@ async function appMain() {
 				index = i;
 				pieces = pieces.slice(0,i) + holding + pieces.slice(i+1);
 			}
+			break;
 		}
 	}
 	// Cancel holding pieces.

@@ -82,9 +82,9 @@ const faces = {
 };
 const movable = "・", holding = "×", nothing = "　";
 const width = 13, height = 13, inside = 9;
-const grid = 10, margin = 4, scale = 1.5, scale2 = 2.5;
+const grid = 10, margin = 4, scale = 1.5, scale2 = 2;
 
-var hands = [null,null], indexes = [-1,-1];
+var hand = null, index = -1, angle = 0;
 
 // Load.
 async function appLoad() {
@@ -98,66 +98,78 @@ async function appLoad() {
 
 // Main.
 async function appMain() {
-	for (let j = 0; j < pieces.length; j++) {
-		for (let i = 0; i < pieces[j].length; i++) {
+	if (hand) {
+		for (let i = 0; i < pieces[0].length; i++) {
 			let x = (picoMod(i,width) - (width/2 - 0.5)) * grid * scale;
 			let y = (picoDiv(i,width) - (height/2 - 0.5)) * grid * scale;
-			if (j == 1) { // Transform positions for enemy pieces.
-				x = -x;
-				y = -y;
-			}
+			let index0 = angle?pieces[0].length-1-i:i;
+			let index1 = angle?i:pieces[0].length-1-i;
+			let piece0 = pieces[angle?1:0][index0];
+			let piece1 = pieces[angle?0:1][index1];
+
 			if (picoAction(x,y, grid-margin,grid-margin)) {
-				// Dropping pieces.
-				if (hands[j]) {
-					// Drop and switch with enemy piece.
-					if (pieces[j?0:1][pieces[j].length-1-i] != movable && pieces[j?0:1][pieces[j].length-1-i] != nothing) {
-						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
-						hands[j] = pieces[j?0:1][pieces[j].length-1-i];
-						pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + movable + pieces[j?0:1].slice(pieces[j].length-1-i+1);
-					// Drop and flip holding piece.
-					} else if (pieces[j][i] == holding && faces[hands[j]]) {
-						pieces[j] = pieces[j].slice(0,i) + faces[hands[j]] + pieces[j].slice(i+1);
-						hands[j] = null;
-					// Drop and switch with another piece.
-					} else if (pieces[j][i] != movable) {
-						let drop = hands[j];
-						hands[j] = pieces[j][i];
-						pieces[j] = pieces[j].slice(0,i) + drop + pieces[j].slice(i+1);
-						indexes[j] = i;
-					// Drop to vacant square.
-					} else if (pieces[j][i] == movable) {
-						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
-						hands[j] = null;
-					}
+				// Drop and switch with enemy piece.
+				if (piece1 != movable && piece1 != nothing) {
+					pieces[angle?1:0] = pieces[angle?1:0].slice(0,index0) + hand + pieces[angle?1:0].slice(index0+1);
+					hand = piece1;
+					index = index0;
+					pieces[angle?0:1] = pieces[angle?0:1].slice(0,index1) + movable + pieces[angle?0:1].slice(index1+1);
+				// Drop and flip holding piece.
+				} else if (piece0 == holding && faces[hand]) {
+					pieces[angle?1:0] = pieces[angle?1:0].slice(0,index0) + faces[hand] + pieces[angle?1:0].slice(index0+1);
+					hand = null;
+					index = -1;
+				// Drop and switch with another piece.
+				} else if (piece0 != movable) {
+					pieces[angle?1:0] = pieces[angle?1:0].slice(0,index0) + hand + pieces[angle?1:0].slice(index0+1);
+					hand = piece0;
+					index = index0;
+				// Drop to vacant square.
+				} else if (piece0 == movable) {
+					pieces[angle?1:0] = pieces[angle?1:0].slice(0,index0) + hand + pieces[angle?1:0].slice(index0+1);
+					hand = null;
+					index = -1;
 				}
+				break;
 			} else if (picoMotion(x,y, grid-margin,grid-margin)) {
 				// Move holding pieces to vacant square.
-				if (hands[j] && pieces[j][i] != nothing && pieces[j][i] != holding) {
-					if (pieces[j][indexes[j]] == holding) { // Reset holding square.
-						pieces[j] = pieces[j].slice(0,indexes[j]) + movable + pieces[j].slice(indexes[j]+1);
+				if (piece0 != nothing && piece0 != holding) {
+					if (pieces[angle?1:0][index] == holding) { // Reset holding square.
+						pieces[angle?1:0] = pieces[angle?1:0].slice(0,i) + movable + pieces[angle?1:0].slice(i+1);
 					}
-					indexes[j] = i;
+					index = i;
 				// Reverse holding pieces on enemy square.
-				} else if (hands[j] &&
-					pieces[j?0:1][pieces[j].length-1-i] == movable && 
+				} else if (piece1 == movable && 
 					(picoMod(i,width) < (width-inside)/2 || picoMod(i,width) > width-(width-inside)/2 ||
 					 picoDiv(i,width) < (height-inside)/2 || picoDiv(i,width) > height-(height-inside)/2)) {
-					hands[j?0:1] = hands[j];
-					indexes[j?0:1] = indexes[j];
-					hands[j] = null;
-					indexes[j] = -1;
-				// Hold pieces.
-				} else if (!hands[j] && !hands[j?0:1] && pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
-					hands[j] = pieces[j][i];
-					indexes[j] = i;
-					pieces[j] = pieces[j].slice(0,i) + holding + pieces[j].slice(i+1);
+					angle = angle ? 0 : 180;
 				}
+				break;
 			}
 		}
 		// Cancel holding pieces.
-		if (hands[j] && pieces[j][indexes[j]] == movable && picoAction()) {
-			pieces[j] = pieces[j].slice(0,indexes[j]) + hands[j] + pieces[j].slice(indexes[j]+1);
-			hands[j] = null;
+		if (index >= 0 && pieces[angle?1:0][index] == movable && picoAction()) {
+			pieces[angle?1:0] = pieces[angle?1:0].slice(0,index) + hand + pieces[angle?1:0].slice(index+1);
+			hand = null;
+			index = -1;
+		}
+	} else {
+		for (let i = 0; i < pieces[0].length; i++) {
+			let x = (picoMod(i,width) - (width/2 - 0.5)) * grid * scale;
+			let y = (picoDiv(i,width) - (height/2 - 0.5)) * grid * scale;
+			// Hold pieces.
+			if (picoMotion(x,y, grid-margin,grid-margin)) {
+				let targets = [pieces[0][i], pieces[1][pieces[0].length-1-i]];
+				for (let j = 0; j < targets.length; j++) {
+					if (targets[j] != movable && targets[j] != holding && targets[j] != nothing) {
+						hand = targets[j];
+						index = j ? pieces[0].length-1-i : i;
+						angle = j ? 180 : 0;
+						pieces[j] = pieces[j].slice(0,index) + holding + pieces[j].slice(index+1);
+					}
+				}
+				break;
+			}
 		}
 	}
 
@@ -167,15 +179,9 @@ async function appMain() {
 	for (let j = 0; j < pieces.length; j++) {
 		picoText(pieces[j], -1, 0,0, grid*width,grid*height, j?180:0,scale);
 	}
-	for (let j = 0; j < pieces.length; j++) {
-		if (hands[j]) {
-			let x = (picoMod(indexes[j],width) - (width/2 - 0.5)) * grid * scale;
-			let y = (picoDiv(indexes[j],width) - (height/2 - 0.5)) * grid * scale;
-			if (j == 1) { // Transform positions for enemy pieces.
-				x = -x;
-				y = -y;
-			}
-			picoChar(hands[j], -1, x,y, j?180:0,scale2);
-		}
+	if (hand) {
+		let x = (picoMod(index,width) - (width/2 - 0.5)) * grid * scale;
+		let y = (picoDiv(index,width) - (height/2 - 0.5)) * grid * scale;
+		picoChar(hand, -1, x,y, angle,scale2);
 	}
 }
