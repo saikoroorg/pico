@@ -156,7 +156,7 @@ a {
 		height: 100%;
 	}
 	#widescreen {
-		height: 150%;
+		height: 200%;
 	}
 }
 @media (max-aspect-ratio: 1.0) {
