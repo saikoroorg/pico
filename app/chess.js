@@ -21,7 +21,7 @@ const sprites = { // Sprite table.
 const colors = picoStringCode8("111555333222444000");
 
 const board = 
-	" @@@@@@@@@@ "+
+	"  @@@@@@@@  "+
 	"            "+
 	"   # # # #  "+
 	"  # # # #   "+
@@ -32,7 +32,7 @@ const board =
 	"   # # # #  "+
 	"  # # # #   "+
 	"            "+
-	" @@@@@@@@@@ ";
+	"  @@@@@@@@  ";
 var pieces = 
 	"............"+
 	".          ."+
@@ -48,9 +48,10 @@ var pieces =
 	"............";
 const movable = ".", holding = "*", nothing = " ";
 const width = 12, height = 12, inside = 8;
-const grid = 6, margin = 0, scale = 2.5, scale2 = 5;
+const grid = 6, margin = 0, scale = 2, scale2 = 5;
 
 var hand = null, index = -1;
+var landscape = false; // landscape mode.
 
 // Load.
 async function appLoad() {
@@ -60,6 +61,24 @@ async function appLoad() {
 	}
 	picoCharLeading(grid,grid);
 	picoColor(colors);
+	appResize();
+}
+
+// Resize.
+async function appResize() {
+	let landscape2 = picoWideScreen();
+	if (landscape != landscape2) { // Replace pieces on the outside of the board.
+		landscape = landscape2;
+		for (let k = 0; k < height; k++) {
+			let i0 = (k + 1) * width - 1, i1 = pieces.length - width + k;
+			let piece0 = pieces[i0], piece1 = pieces[i1];
+			if (piece0 != movable || piece1 != movable) {
+				pieces = pieces.slice(0,i0) + piece1 + pieces.slice(i0+1);
+				pieces = pieces.slice(0,i1) + piece0 + pieces.slice(i1+1);
+			}
+		}
+		picoFlush();
+	}
 }
 
 // Main.
