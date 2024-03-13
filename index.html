@@ -259,7 +259,7 @@ pico.App = class {
 			if (e2 && (text || icon)) {
 				e2.style.display = "flex";
 				e2.src = icon ? icon : await picoTextData(
-					text, -1, pico.image.leading*text.length,pico.image.vleading, 1);
+					text, 9, pico.image.leading*text.length,pico.image.vleading, 1);
 				if (e1) {
 					e1.style.display = "none";
 				}
