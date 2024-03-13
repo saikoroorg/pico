@@ -30,45 +30,45 @@ const sprites = { // Sprite table.
 const colors = picoStringCode8("1115553332224440i9p060n4f0i000");
 
 const board = 
-	"　　■■■■■■■■■　　"+
 	"　　　　　　　　　　　　　"+
-	"■　□□□□□□□□□　■"+
-	"■　□□□□□□□□□　■"+
-	"■　□□□□□□□□□　■"+
-	"■　□□□□□□□□□　■"+
-	"■　□□□□□□□□□　■"+
-	"■　□□□□□□□□□　■"+
-	"■　□□□□□□□□□　■"+
-	"■　□□□□□□□□□　■"+
-	"■　□□□□□□□□□　■"+
 	"　　　　　　　　　　　　　"+
-	"　　■■■■■■■■■　　";
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　□□□□□□□□□　　"+
+	"　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　";
 var pieces = [
 	"　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　歩歩歩歩歩歩歩歩歩　・"+
-	"　　・角・・・・・飛・　・"+
-	"　　香桂銀金玉金銀桂香　・"+
-	"　　　　　　　　　　　　　"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　歩歩歩歩歩歩歩歩歩・・"+
+	"　　・角・・・・・飛・・・"+
+	"　　香桂銀金玉金銀桂香・・"+
+	"　　・・・・・・・・・　　"+
 	"　　・・・・・・・・・　　", // Upright pieces.
 	"　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　・・・・・・・・・　・"+
-	"　　歩歩歩歩歩歩歩歩歩　・"+
-	"　　・角・・・・・飛・　・"+
-	"　　香桂銀金王金銀桂香　・"+
-	"　　　　　　　　　　　　　"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　・・・・・・・・・・・"+
+	"　　歩歩歩歩歩歩歩歩歩・・"+
+	"　　・角・・・・・飛・・・"+
+	"　　香桂銀金王金銀桂香・・"+
+	"　　・・・・・・・・・　　"+
 	"　　・・・・・・・・・　　", // Reverse pieces.
 ];
 const faces = {
@@ -100,16 +100,17 @@ async function appLoad() {
 
 // Resize.
 async function appResize() {
-	let landscape2 = picoWideScreen();
-	if (landscape != landscape2) { // Replace pieces on the outside of the board.
-		landscape = landscape2;
+	let r = picoWideScreen();
+	if (landscape != r) { // Replace pieces on the outside of the board.
+		landscape = r;
 		for (let j = 0; j < pieces.length; j++) {
-			for (let k = 0; k < height; k++) {
-				let i0 = (k + 1) * width - 1, i1 = pieces[j].length - width + k;
-				let piece0 = pieces[j][i0], piece1 = pieces[j][i1];
+			for (let k = 0; k < width*(height-inside)/2; k++) {
+				let l0 = pieces[j].length-1-k;
+				let l1 = picoDiv(pieces[j].length-1-k,width)+picoMod(pieces[j].length-1-k,width)*width;
+				let piece0 = pieces[j][l0], piece1 = pieces[j][l1];
 				if (piece0 != movable || piece1 != movable) {
-					pieces[j] = pieces[j].slice(0,i0) + piece1 + pieces[j].slice(i0+1);
-					pieces[j] = pieces[j].slice(0,i1) + piece0 + pieces[j].slice(i1+1);
+					pieces[j] = pieces[j].slice(0,l0) + piece1 + pieces[j].slice(l0+1);
+					pieces[j] = pieces[j].slice(0,l1) + piece0 + pieces[j].slice(l1+1);
 				}
 			}
 		}
@@ -121,8 +122,8 @@ async function appResize() {
 async function appMain() {
 	for (let j = 0; j < pieces.length; j++) {
 		for (let i = 0; i < pieces[j].length; i++) {
-			let x = (picoMod(i,width) - (width/2 - 0.5)) * grid * scale;
-			let y = (picoDiv(i,width) - (height/2 - 0.5)) * grid * scale;
+			let x = (picoMod(i,width) - (width-1)/2) * grid * scale;
+			let y = (picoDiv(i,width) - (height-1)/2) * grid * scale;
 			if (j == 1) { // Transform positions for enemy pieces.
 				x = -x;
 				y = -y;
@@ -130,21 +131,27 @@ async function appMain() {
 			if (picoAction(x,y, grid-margin,grid-margin)) {
 				// Dropping pieces.
 				if (hands[j]) {
-					// Drop and switch with enemy piece.
+					// Drop and catch enemy pieces.
 					if (pieces[j?0:1][pieces[j].length-1-i] != movable && pieces[j?0:1][pieces[j].length-1-i] != nothing) {
-						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
-						hands[j] = pieces[j?0:1][pieces[j].length-1-i];
+						let enemy = pieces[j?0:1][pieces[j].length-1-i];
 						pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + movable + pieces[j?0:1].slice(pieces[j].length-1-i+1);
+						for (let k = 0; k < width*(height-inside)/2; k++) {
+							let l0 = pieces[j].length-1-k;
+							let l1 = picoDiv(pieces[j].length-1-k,width)+picoMod(pieces[j].length-1-k,width)*width;
+							let l = landscape ? l1 : l0;
+							if (pieces[j][l] == movable) {
+								pieces[j] = pieces[j].slice(0,l) + enemy + pieces[j].slice(l+1);
+								enemy = null;
+								break;
+							}
+						}
+						// Switch holding pieces with enemy pieces if full.
+						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
+						hands[j] = enemy;
 					// Drop and flip holding piece.
 					} else if (pieces[j][i] == holding && faces[hands[j]]) {
 						pieces[j] = pieces[j].slice(0,i) + faces[hands[j]] + pieces[j].slice(i+1);
 						hands[j] = null;
-					// Drop and switch with another piece.
-					} else if (pieces[j][i] != movable) {
-						let drop = hands[j];
-						hands[j] = pieces[j][i];
-						pieces[j] = pieces[j].slice(0,i) + drop + pieces[j].slice(i+1);
-						indexes[j] = i;
 					// Drop to empty square.
 					} else if (pieces[j][i] == movable) {
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
@@ -166,7 +173,6 @@ async function appMain() {
 					hands[j?0:1] = hands[j];
 					indexes[j?0:1] = indexes[j];
 					hands[j] = null;
-					indexes[j] = -1;
 				// Hold pieces.
 				} else if (!hands[j] && !hands[j?0:1] && pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
 					hands[j] = pieces[j][i];
@@ -190,8 +196,8 @@ async function appMain() {
 	}
 	for (let j = 0; j < pieces.length; j++) {
 		if (hands[j]) {
-			let x = (picoMod(indexes[j],width) - (width/2 - 0.5)) * grid * scale;
-			let y = (picoDiv(indexes[j],width) - (height/2 - 0.5)) * grid * scale;
+			let x = (picoMod(indexes[j],width) - (width-1)/2) * grid * scale;
+			let y = (picoDiv(indexes[j],width) - (height-1)/2) * grid * scale;
 			if (j == 1) { // Transform positions for enemy pieces.
 				x = -x;
 				y = -y;

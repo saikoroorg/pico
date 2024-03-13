@@ -21,7 +21,7 @@ const sprites = { // Sprite table.
 const colors = picoStringCode8("111555333222444000");
 
 const board = 
-	"  @@@@@@@@  "+
+	"            "+
 	"            "+
 	"   # # # #  "+
 	"  # # # #   "+
@@ -32,20 +32,24 @@ const board =
 	"   # # # #  "+
 	"  # # # #   "+
 	"            "+
-	"  @@@@@@@@  ";
+	"            ";
 var pieces = 
+	"  ........  "+
+	"  ........  "+
+	"..rnbqkbnr.."+
+	"..pppppppp.."+
 	"............"+
-	".          ."+
-	". rnbqkbnr ."+
-	". pppppppp ."+
-	". ........ ."+
-	". ........ ."+
-	". ........ ."+
-	". ........ ."+
-	". PPPPPPPP ."+
-	". RNBQKBNR ."+
-	".          ."+
-	"............";
+	"............"+
+	"............"+
+	"............"+
+	"..PPPPPPPP.."+
+	"..RNBQKBNR.."+
+	"  ........  "+
+	"  ........  ";
+const sides = {
+	"P":0,"R":0,"N":0,"B":0,"Q":0,"K":0,
+	"p":1,"r":1,"n":1,"b":1,"q":1,"k":1,
+};
 const movable = ".", holding = "*", nothing = " ";
 const width = 12, height = 12, inside = 8;
 const grid = 6, margin = 0, scale = 2, scale2 = 5;
@@ -66,15 +70,16 @@ async function appLoad() {
 
 // Resize.
 async function appResize() {
-	let landscape2 = picoWideScreen();
-	if (landscape != landscape2) { // Replace pieces on the outside of the board.
-		landscape = landscape2;
-		for (let k = 0; k < height; k++) {
-			let i0 = (k + 1) * width - 1, i1 = pieces.length - width + k;
-			let piece0 = pieces[i0], piece1 = pieces[i1];
+	let r = picoWideScreen();
+	if (landscape != r) { // Replace pieces on the outside of the board.
+		landscape = r;
+		for (let k = 0; k < width*(height-inside)/2; k++) {
+			let l0 = pieces.length-1-k;
+			let l1 = picoDiv(pieces.length-1-k,width)+picoMod(pieces.length-1-k,width)*width;
+			let piece0 = pieces[l0], piece1 = pieces[l1];
 			if (piece0 != movable || piece1 != movable) {
-				pieces = pieces.slice(0,i0) + piece1 + pieces.slice(i0+1);
-				pieces = pieces.slice(0,i1) + piece0 + pieces.slice(i1+1);
+				pieces = pieces.slice(0,l0) + piece1 + pieces.slice(l0+1);
+				pieces = pieces.slice(0,l1) + piece0 + pieces.slice(l1+1);
 			}
 		}
 		picoFlush();
@@ -84,22 +89,36 @@ async function appResize() {
 // Main.
 async function appMain() {
 	for (let i = 0; i < pieces.length; i++) {
-		let x = (picoMod(i,width) - (width/2 - 0.5)) * grid * scale;
-		let y = (picoDiv(i,width) - (height/2 - 0.5)) * grid * scale;
+		let x = (picoMod(i,width) - (width-1)/2) * grid * scale;
+		let y = (picoDiv(i,width) - (height-1)/2) * grid * scale;
 		if (picoAction(x,y, grid-margin,grid-margin)) {
 			// Dropping pieces.
 			if (hand) {
-				let drop = hand;
-				// Drop and switch with another piece.
 				if (pieces[i] != movable) {
-					hand = pieces[i];
-					index = i;
-				// Drop to vacant square.
+					// Drop and remove enemy pieces.
+					if (sides[hand] != sides[pieces[i]]) {
+						let enemy = pieces[i];
+						pieces = pieces.slice(0,i) + movable + pieces.slice(i+1);
+						for (let k = 0; k < width*(height-inside)/2; k++) {
+							let l0 = pieces.length-1-k;
+							let l1 = picoDiv(pieces.length-1-k,width)+picoMod(pieces.length-1-k,width)*width;
+							let l = sides[hand] ? pieces.length-1-(landscape ? l1 : l0) : (landscape ? l1 : l0);
+							if (pieces[l] == movable) {
+								pieces = pieces.slice(0,l) + enemy + pieces.slice(l+1);
+								enemy = null;
+								break;
+							}
+						}
+						// Switch holding pieces with enemy pieces if full.
+						pieces = pieces.slice(0,i) + hand + pieces.slice(i+1);
+						hand = enemy;
+					}
+				// Drop to empty square.
 				} else {
+					pieces = pieces.slice(0,i) + hand + pieces.slice(i+1);
 					hand = null;
 					index = -1;
 				}
-				pieces = pieces.slice(0,i) + drop + pieces.slice(i+1);
 			}
 		} else if (picoMotion(x,y, grid-margin,grid-margin)) {
 			// Move holding pieces.
@@ -121,6 +140,7 @@ async function appMain() {
 	if (hand && pieces[index] == movable && picoAction()) {
 		pieces = pieces.slice(0,index) + hand + pieces.slice(index+1);
 		hand = null;
+		index = -1;
 	}
 
 	picoClear();
@@ -128,8 +148,8 @@ async function appMain() {
 	picoText(board, -1, 0,0, grid*width,grid*height, 0,scale);
 	picoText(pieces, -1, 0,0, grid*width,grid*height, 0,scale);
 	if (hand) {
-		let x = (picoMod(index,width) - (width/2 - 0.5)) * grid * scale;
-		let y = (picoDiv(index,width) - (height/2 - 0.5)) * grid * scale;
+		let x = (picoMod(index,width) - (width-1)/2) * grid * scale;
+		let y = (picoDiv(index,width) - (height-1)/2) * grid * scale;
 		picoChar(hand, -1, x,y, 0,scale2);
 	}
 }

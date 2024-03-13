@@ -1,8 +1,8 @@
 {
-	"name": "Chess",
-	"short_name": "Chess",
+	"name": "Shogi",
+	"short_name": "Shogi",
 	"version": "0.9.40313a",
-	"author": "saikoro.org/chess",
+	"author": "saikoro.org/shogi",
 	"background_color": "#fff",
 	"theme_color": "#fff",
 	"icons": [{
