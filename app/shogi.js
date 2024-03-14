@@ -111,7 +111,7 @@ async function appAction() {
 
 // Load.
 async function appLoad() {
-	await picoTitle(title);
+	picoTitle(title);
 	for (let chars in sprites) {
 		picoCharSprite(chars, sprites[chars]);
 	}

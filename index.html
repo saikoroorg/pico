@@ -131,6 +131,7 @@ pico.App = class {
 		this.author = "*"; // App author.
 		this.timestamp = ""; // Timestamp (App version).
 		this.wakeLock = null; // Wake lock object.
+		this.image = new pico.Image(""); // App offscreen image.
 
 		// Load app information.
 		let e = document.getElementById("author");
@@ -268,7 +269,7 @@ pico.App = class {
 			let e2 = document.getElementById(id + "Icon");
 			if (e2 && (text || icon)) {
 				e2.style.display = "flex";
-				e2.src = icon ? icon : await picoTextData(text);
+				e2.src = icon ? icon : await this.image.textData(text);
 				if (e1) {
 					e1.style.display = "none";
 				}

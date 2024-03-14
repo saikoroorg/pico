@@ -98,7 +98,7 @@ async function picoText(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=
 // Get multiple lines of text image data.
 async function picoTextData(text, c=-1, width=0, height=0, scale=1) {
 	try {
-		return await pico.image.textData("" + text, c, width, height, scale);
+		return await pico.image.offscreen.textData("" + text, c, width, height, scale, pico.image);
 	} catch (error) {
 		console.error(error);
 	}
@@ -125,7 +125,7 @@ function picoSpriteSize(cells=[-1,0,0]) {
 // Get sprite image data.
 async function picoSpriteData(cells=[-1,0,0], scale=10) {
 	try {
-		return await pico.image.spriteData(cells, scale);
+		return await pico.image.offscreen.spriteData(cells, scale, pico.image);
 	} catch (error) {
 		console.error(error);
 	}
@@ -342,24 +342,26 @@ pico.Image = class {
 	}
 
 	// Draw offscreen and get multiple lines of text image data.
-	textData(text, c=-1, width=0, height=0, scale=1) {
-		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
-			await navigator.locks.request(this.lock, async (lock) => {
-				this.offscreen.colors = Object.assign([],this.colors);
-				this.offscreen.leading = this.leading;
-				this.offscreen.vleading = this.vleading;
-				this.offscreen.sprites = Object.assign({}, this.sprites);
-				this.offscreen.aliases = Object.assign({}, this.aliases);
-			}); // end of lock.
+	textData(text, c=-1, width=0, height=0, scale=1, parent=null) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			if (parent) {
+				await navigator.locks.request(parent.lock, async (parentlock) => {
+					this.colors = Object.assign([],parent.colors);
+					this.leading = parent.leading;
+					this.vleading = parent.vleading;
+					this.sprites = Object.assign({}, parent.sprites);
+					this.aliases = Object.assign({}, parent.aliases);
+				}); // end of lock.
+			}
 			if (!width || !height) {
 				text = text.replaceAll("\r\n");
-				width = this.offscreen.leading*text.length;
-				height = this.offscreen.vleading;
+				width = this.leading*text.length;
+				height = this.vleading;
 			}
-			await this.offscreen._resize(width * scale, height * scale);
-			await this.offscreen._ready();
-			await this.offscreen._text(text, c, 0, 0, width, height, 0, scale);
-			return this.offscreen._data();
+			await this._resize(width * scale, height * scale);
+			await this._ready();
+			await this._text(text, c, 0, 0, width, height, 0, scale);
+			return this._data();
 		}); // end of offscreenlock.
 	}
 
@@ -373,17 +375,19 @@ pico.Image = class {
 	}
 
 	// Draw offscreen and get sprite image data.
-	spriteData(cells=[-1,0,0], scale=10) {
-		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
-			await navigator.locks.request(this.lock, async (lock) => {
-				this.offscreen.colors = this.colors.concat();
-			}); // end of lock.
-			let size = this.offscreen._spriteSize(cells);
-			await this.offscreen._resize(size * scale, size * scale);
-			await this.offscreen._ready();
-			await this.offscreen._reset(0, 0, 0, scale);
-			await this.offscreen._sprite(cells, -1, 0);
-			return this.offscreen._data();
+	spriteData(cells=[-1,0,0], scale=10, parent=null) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			if (parent) {
+				await navigator.locks.request(parent.lock, async (parentlock) => {
+					this.colors = parent.colors.concat();
+				}); // end of lock.
+			}
+			let size = this._spriteSize(cells);
+			await this._resize(size * scale, size * scale);
+			await this._ready();
+			await this._reset(0, 0, 0, scale);
+			await this._sprite(cells, -1, 0);
+			return this._data();
 		}); // end of lock.
 	}
 
