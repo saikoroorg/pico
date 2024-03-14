@@ -76,7 +76,7 @@ async function picoCharSprite(chars, sprite) {
 }
 
 // Draw rect.
-async function picoRect(c=0, x=0, y=0, width=1, height=1, angle=0, scale=1) {
+async function picoRect(c=-1, x=0, y=0, width=1, height=1, angle=0, scale=1) {
 	try {
 		await pico.image.drawRect(c, x, y, width, height, angle, scale);
 	} catch (error) {
@@ -85,7 +85,7 @@ async function picoRect(c=0, x=0, y=0, width=1, height=1, angle=0, scale=1) {
 }
 
 // Draw char as string or number.
-async function picoChar(char, c=0, x=0, y=0, angle=0, scale=1) {
+async function picoChar(char, c=-1, x=0, y=0, angle=0, scale=1) {
 	try {
 		await pico.image.drawChar("" + char, c, x, y, angle, scale);
 	} catch (error) {
@@ -94,7 +94,7 @@ async function picoChar(char, c=0, x=0, y=0, angle=0, scale=1) {
 }
 
 // Draw multiple lines of text.
-async function picoText(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+async function picoText(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1) {
 	try {
 		await pico.image.drawText("" + text, c, x, y, width, height, angle, scale);
 	} catch (error) {
@@ -103,7 +103,7 @@ async function picoText(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1
 }
 
 // Get multiple lines of text image data.
-async function picoTextData(text, c=0, width=0, height=0, scale=1) {
+async function picoTextData(text, c=-1, width=0, height=0, scale=1) {
 	try {
 		return await pico.image.textData("" + text, c, width, height, scale);
 	} catch (error) {
@@ -112,9 +112,9 @@ async function picoTextData(text, c=0, width=0, height=0, scale=1) {
 }
 
 // Draw sprite.
-async function picoSprite(cells=[-1,0,0], bg=-1, x=0, y=0, angle=0, scale=1) {
+async function picoSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1) {
 	try {
-		await pico.image.drawSprite(cells, bg, x, y, angle, scale);
+		await pico.image.drawSprite(cells, bgcolor, x, y, angle, scale);
 	} catch (error) {
 		console.error(error);
 	}
@@ -139,9 +139,9 @@ async function picoSpriteData(cells=[-1,0,0], scale=10) {
 }
 
 // Get screen data file.
-async function picoScreenFile(watermark=null, c=0, bg=-1) {
+async function picoScreenFile(watermark=null, fgcolor=-1, bgcolor=-1) {
 	try {
-		return await pico.image.screenFile(watermark, c, bg);
+		return await pico.image.screenFile(watermark, fgcolor, bgcolor);
 	} catch (error) {
 		console.error(error);
 	}
@@ -315,7 +315,7 @@ pico.Image = class {
 	}
 
 	// Draw rect to image.
-	drawRect(c=0, x=0, y=0, width=1, height=1, angle=0, scale=1) {
+	drawRect(c=-1, x=0, y=0, width=1, height=1, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
 			await this._reset(x, y, angle, scale);
@@ -324,7 +324,7 @@ pico.Image = class {
 	}
 
 	// Draw char as string or number to image.
-	drawChar(char, c=0, x=0, y=0, angle=0, scale=1) {
+	drawChar(char, c=-1, x=0, y=0, angle=0, scale=1) {
 		const w = this.leading;
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
@@ -341,7 +341,7 @@ pico.Image = class {
 	}
 
 	// Draw multiple lines of text to image.
-	drawText(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+	drawText(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
 			await this._text(text, c, x, y, width, height, angle, scale);
@@ -349,7 +349,7 @@ pico.Image = class {
 	}
 
 	// Draw offscreen and get multiple lines of text image data.
-	textData(text, c=0, width=0, height=0, scale=1) {
+	textData(text, c=-1, width=0, height=0, scale=1) {
 		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
 			await navigator.locks.request(this.lock, async (lock) => {
 				this.offscreen.colors = Object.assign([],this.colors);
@@ -371,11 +371,11 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	drawSprite(cells=[-1,0,0], bg=-1, x=0, y=0, angle=0, scale=1) {
+	drawSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
 			await this._reset(x, y, angle, scale);
-			await this._sprite(cells, bg);
+			await this._sprite(cells, -1, bgcolor);
 		}); // end of lock.
 	}
 
@@ -389,14 +389,14 @@ pico.Image = class {
 			await this.offscreen._resize(size * scale, size * scale);
 			await this.offscreen._ready();
 			await this.offscreen._reset(0, 0, 0, scale);
-			await this.offscreen._sprite(cells, 0);
+			await this.offscreen._sprite(cells, -1, 0);
 			return this.offscreen._data();
 		}); // end of lock.
 	}
 
 	// Draw bg/watermark and get screen data file.
-	async screenFile(watermark=null, c=0, bg=-1) {
-		if (!watermark && bg < 0) {
+	async screenFile(watermark=null, fgcolor=-1, bgcolor=-1) {
+		if (!watermark && bgcolor < 0) {
 			return await pico.image._file();
 		}
 		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
@@ -412,14 +412,14 @@ pico.Image = class {
 				pico.image.canvas[0].height/pico.Image.ratio);
 			await this.offscreen._ready();
 			await this.offscreen._reset(0, 0, 0, 1);
-			if (bg >= 0) {
-				await this.offscreen._draw(bg,
+			if (bgcolor >= 0) {
+				await this.offscreen._draw(bgcolor,
 					-pico.Image.width/2, -pico.Image.height/2,
 					pico.Image.width, pico.Image.height);
 			}
 			await this.offscreen._image(pico.image);
 			if (watermark && watermark.length >= 2) {
-				await this.offscreen._char(watermark, c);
+				await this.offscreen._char(watermark, fgcolor);
 			}
 			return pico.image.offscreen._file();
 		}); // end of lock.
@@ -624,7 +624,7 @@ pico.Image = class {
 	}
 
 	// Draw pixel to image.
-	_draw(c=0, x=0, y=0, dx=0, dy=0) {
+	_draw(c=-1, x=0, y=0, dx=0, dy=0) {
 		this._debug("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
 		////this._debug("Center: " + cx + "," + cy + " / " + u);
@@ -639,7 +639,7 @@ pico.Image = class {
 	}
 
 	// Draw char as string or number to image.
-	_char(char, c=0) {
+	_char(char, c=-1) {
 		let sprite = [];
 		let charStr = String.fromCharCode(char);
 		if (this.aliases[charStr]) {
@@ -649,13 +649,13 @@ pico.Image = class {
 			sprite = this.sprites[charStr];
 		}
 		return new Promise(async (resolve) => {
-			await this._sprite(sprite, -1, c);
+			await this._sprite(sprite, c, -1);
 			resolve();
 		}); // end of new Promise.
 	}
 
 	// Draw multiple lines of text.
-	_text(text, c=0, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+	_text(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1) {
 		const u = pico.Image.ratio;
 		const ux = this.leading, uy = this.vleading;
 		let mx = width > 0 ? width / ux - 1 : this.canvas[0].width / (ux * u * scale) - 1;
@@ -687,7 +687,7 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	_sprite(cells=[-1,0,0], bgcolor=-1, fgcolor=-1) {
+	_sprite(cells=[-1,0,0], fgcolor=-1, bgcolor=-1) {
 		this._debug("Sprite: " + cells.join(","));
 		return new Promise(async (resolve) => {
 			let i = 0, x0 = 0, y0 = 0;

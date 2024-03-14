@@ -188,6 +188,9 @@ async function appMain() {
 			if (frameselecting >= 0 && buffers[frame]) {
 				for (let j = 0; j < maxheight; j++) {
 					pixels[j] = [];
+					for (let i = 0; i < maxwidth; i++) {
+						pixels[j][i] = 0;
+					}
 				}
 				if (buffers[frame][0] == 0) {
 					width = buffers[frame][0 + 1] >= 0 && buffers[frame][0 + 1] <= maxwidth ? buffers[frame][0 + 1] : 7;
