@@ -113,6 +113,15 @@ async function picoSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1
 	}
 }
 
+// Flip sprite.
+function picoSpriteFlip(cells=[-1,0,0], x=0, y=0) {
+	try {
+		return pico.image.spriteFlip(cells, x, y);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 // Get sprite size.
 function picoSpriteSize(cells=[-1,0,0]) {
 	try {
@@ -363,6 +372,35 @@ pico.Image = class {
 			await this._text(text, c, 0, 0, width, height, 0, scale);
 			return this._data();
 		}); // end of offscreenlock.
+	}
+
+	// Flip splite.
+	spriteFlip(cells=[-1,0,0], x=0, y=0) {
+		let flipped = [];
+		let i = 0, w = 0, h = 0;
+		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
+			w = cells[1];
+			h = cells[2];
+			flipped[0] = cells[0];
+			flipped[1] = cells[1];
+			flipped[2] = cells[2];
+			i += 3;
+		}
+		for (; i < cells.length; i += 3) {
+			flipped[i+0] = cells[i];
+			if (cells[i+3] != 0) {
+				flipped[i+1] = x ? w-1-cells[i+1] : cells[i+1];
+				flipped[i+2] = y ? h-1-cells[i+2] : cells[i+2];
+			} else {
+				flipped[i+1] = x ? w-cells[i+1] : cells[i+1];
+				flipped[i+2] = y ? h-cells[i+2] : cells[i+2];
+				flipped[i+3] = cells[i+3];
+				flipped[i+4] = x ? -cells[i+4]-2 : cells[i+4];
+				flipped[i+5] = y ? -cells[i+5]-2 : cells[i+5];
+				i += 3;
+			}
+		}
+		return flipped;
 	}
 
 	// Draw sprite to image.

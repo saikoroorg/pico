@@ -42,14 +42,14 @@ pico.Touch = class {
 	read(t=10) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (t >= 0) {
-				console.log("Wait timeout: " + t);
+				this._debug("Wait timeout: " + t);
 				return new Promise(r => setTimeout(r, t)).then(() => {
 					return this._read();
 				}); // end of new Promise.
 
 			// Wait until input.
 			} else {
-				console.log("Wait until input.");
+				this._debug("Wait until input.");
 				return new Promise((resolve) => {
 					const timer = setInterval(() => {
 						if (this.flushing || pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
