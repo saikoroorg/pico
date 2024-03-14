@@ -81,7 +81,7 @@ const grid = 12, margin = 4, scale = 1, scale2 = 2.5;
 
 // Global variables.
 var hands = [null,null], indexes = [-1,-1];
-var landscape = false; // landscape mode.
+var landscape = -1; // landscape mode.
 
 // Action button.
 async function appAction() {
@@ -115,8 +115,8 @@ async function appLoad() {
 	for (let chars in sprites) {
 		picoCharSprite(chars, sprites[chars]);
 	}
-	picoColor(colors);
 	picoCharLeading(grid,grid);
+	picoColor(colors);
 
 	// Load query params.
 	for (let j = 0; j < pieces.length; j++) {
@@ -158,7 +158,7 @@ async function appResize() {
 				let l0 = pieces[j].length-1-k;
 				let l1 = picoDiv(pieces[j].length-1-k,width)+picoMod(pieces[j].length-1-k,width)*width;
 				let piece0 = pieces[j][l0], piece1 = pieces[j][l1];
-				if (piece0 != movable || piece1 != movable) {
+				if ((landscape && piece0 != movable) || (!landscape && piece1 != movable)) {
 					pieces[j] = pieces[j].slice(0,l0) + piece1 + pieces[j].slice(l0+1);
 					pieces[j] = pieces[j].slice(0,l1) + piece0 + pieces[j].slice(l1+1);
 				}
