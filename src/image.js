@@ -44,7 +44,7 @@ async function picoClear() {
 // Set image color pallete.
 async function picoColor(colors=null) {
 	try {
-		pico.image.color(colors);
+		await pico.image.color(colors);
 	} catch (error) {
 		console.error(error);
 	}
@@ -53,7 +53,7 @@ async function picoColor(colors=null) {
 // Set char leading
 async function picoCharLeading(leading, vleading) {
 	try {
-		pico.image.charLeading(leading, vleading);
+		await pico.image.charLeading(leading, vleading);
 	} catch (error) {
 		console.error(error);
 	}
@@ -62,7 +62,7 @@ async function picoCharLeading(leading, vleading) {
 // Set extra char sprite.
 async function picoCharSprite(chars, sprite) {
 	try {
-		pico.image.charSprite(chars, sprite);
+		await pico.image.charSprite(chars, sprite);
 	} catch (error) {
 		console.error(error);
 	}
