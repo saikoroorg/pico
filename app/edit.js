@@ -41,7 +41,7 @@ async function appUpdate(force = true) {
 
 	// Update icon image.
 	if (buffers[frame]) {
-		let data = await picoSpriteData(buffers[frame], colors);
+		let data = await picoSpriteData(buffers[frame]);
 		picoLabel("action", null, data);
 	} else {
 		picoLabel("action", "&");
