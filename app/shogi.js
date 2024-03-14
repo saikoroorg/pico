@@ -22,8 +22,8 @@ const sprites = { // Sprite table.
 	"▲": picoStringCode6("099941922932942952962923933943953963924934944954964915925935945955965975916926936946956966976917927937947957967977"),
 	"▽": picoStringCode6("099911921931941951961971912972913973924964925965926936956966947"),
 	"▼": picoStringCode6("099911921931941951961971912922932942952962972913923933943953963973924934944954964925935945955965926936946956966947"),
-	"#": picoStringCode6("0bb1000aa011088"),
-	"@": picoStringCode6("099000088"),
+	"#": picoStringCode6("0dd1000cc0110aa"),
+	"@": picoStringCode6("0bb0000aa"),
 	".": picoStringCode6("099"),
 	"*": picoStringCode6("099"),
 };
@@ -77,7 +77,7 @@ const faces = {
 };
 const movable = ".", holding = "*", nothing = " ";
 const width = 13, height = 13, inside = 9, offset = 1;
-const grid = 10, margin = 4, scale = 1, scale2 = 2.5;
+const grid = 12, margin = 4, scale = 1, scale2 = 2.5;
 
 // Global variables.
 var hands = [null,null], indexes = [-1,-1];
