@@ -358,6 +358,11 @@ pico.Image = class {
 				this.offscreen.sprites = Object.assign({}, this.sprites);
 				this.offscreen.aliases = Object.assign({}, this.aliases);
 			}); // end of lock.
+			if (!width || !height) {
+				text = text.replaceAll("\r\n");
+				width = this.offscreen.leading*text.length;
+				height = this.offscreen.vleading;
+			}
 			await this.offscreen._resize(width * scale, height * scale);
 			await this.offscreen._ready();
 			await this.offscreen._text(text, c, 0, 0, width, height, 0, scale);
