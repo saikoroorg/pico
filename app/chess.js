@@ -14,7 +14,6 @@ const sprites = { // Sprite table.
 	"q": picoStringCode6("077456436416445435425454444434424414443433423342332322351341331321311"),
 	"k": picoStringCode6("077456446436426416455445435425415454444434424414443433423342332322351341331321311"),
 	"#": picoStringCode6("077111121131141151112122132142152113123133143153114124134144154115125135145155"),
-	"@": picoStringCode6("077011044"),
 	".": picoStringCode6("077"),
 	"*": picoStringCode6("077"),
 };
@@ -55,7 +54,7 @@ var pieces = [
 	"  .........."+
 	"  .........."+
 	"  pppppppp.."+
-	"  rnbqkbnr.."+
+	"  rnbkqbnr.."+
 	"  ........  "+
 	"  ........  ", // Reverse pieces.
 ];
@@ -68,14 +67,13 @@ const width = 12, height = 12, inside = 8, offset = 1;
 const grid = 6, margin = 0, scale = 2, scale2 = 5;
 
 // Global variables.
-var hands = [null,null], indexes = [-1,-1];
-var landscape = -1; // landscape mode.
+var hands = [null,null], indexes = [-1,-1]; // Hand pieces and indexes of the piece table.
+var landscape = -1; // 0 if portrait mode, 1 if landscape mode, and -1 if uninitialized.
 
 // Action button.
 async function appAction() {
-	picoResetParams();
-
 	// Share board with pieces.
+	picoResetParams();
 	for (let j = 0; j < pieces.length; j++) {
 		let code6 = [];
 		for (let i = 0; i < pieces[j].length; i++) {
@@ -94,7 +92,7 @@ async function appAction() {
 		}
 		picoSetCode6(code6, j);
 	}
-	picoShareApp(); // Share.
+	picoShareApp();
 }
 
 // Load.
@@ -139,8 +137,9 @@ async function appLoad() {
 // Resize.
 async function appResize() {
 	let r = picoWideScreen();
-	if (landscape != r) { // Replace pieces on the outside of the board.
+	if (landscape != r) {
 		landscape = r;
+		// Replace pieces on the outside of the board.
 		for (let j = 0; j < pieces.length; j++) {
 			for (let k = 0; k < width*(height-inside)/2; k++) {
 				let l0 = pieces[j].length-1-k;
@@ -226,6 +225,7 @@ async function appMain() {
 		}
 	}
 
+	// Draw board with pieces.
 	picoClear();
 	picoRect(0, 0,0, grid*(inside+0.5),grid*(inside+0.5), 0,scale);
 	picoText(board, -1, 0,0, grid*width,grid*height, 0,scale);
