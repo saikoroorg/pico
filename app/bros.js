@@ -77,10 +77,10 @@ async function appAction() {
 	} else {
 		picoSetCode6(levels[level], 0);
 		if (blocking == 0) {
-			picoSwitch(); // Share or back.
+			picoShareApp(); // Share.
 		} else {
 			picoSetCode8(colors, 1);
-			picoSwitch(editjs); // Open editor.
+			picoSwitchApp(editjs); // Open editor.
 		}
 	}
 }

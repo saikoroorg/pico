@@ -65,10 +65,26 @@ async function picoTitle(text=null) {
 	await pico.app.setTitle(text);
 }
 
-// Switch script or share.
-async function picoSwitch(target=null, returl=null) {
-	await pico.app.switchScript(target, returl);
+// Switch app script.
+async function picoSwitchApp(target=null, returl=null) {
+	return await pico.app.switchApp(target, returl);
 }
+
+// Return app script.
+async function picoReturnApp() {
+	return await pico.app.returnApp();
+}
+
+// Share app url.
+async function picoShareApp() {
+	await pico.app.shareApp();
+}
+
+// Share screen image.
+async function picoShareScreen(c=0, bg=1) {
+	await pico.app.shareScreen(c, bg);
+}
+
 
 // Lock screen with wakelock.
 function picoLockScreen(enable=true) {
@@ -79,12 +95,6 @@ function picoLockScreen(enable=true) {
 function picoWideScreen(enable=true) {
 	return pico.app.wideScreen(enable);
 }
-
-// Share screen image.
-async function picoShareScreen(c=0, bg=1) {
-	await pico.app.shareScreen(c, bg);
-}
-
 // App mode.
 function picoAppMode() {
 	return pico.app.ver > 0;
@@ -298,8 +308,8 @@ pico.App = class {
 		}
 	}
 
-	// Switch script or share.
-	async switchScript(target=null, returl=null) {
+	// Switch app script.
+	async switchApp(target=null, returl=null) {
 		if (picoDevMode()) {
 			picoSetString(-1, "v");
 		} else if (this.ver > 0) {
@@ -319,6 +329,7 @@ pico.App = class {
 				picoSetString(this.script, "r");
 			}
 			await picoReload();
+			return true;
 
 		// Jump to next page.
 		} else if (target) {
@@ -333,9 +344,21 @@ pico.App = class {
 			picoSetString("", "s");
 			picoSetString("", "r");
 			await picoReload(target);
+			return true;
+		}
+		return false;
+	}
+
+	// Return app script.
+	async returnApp() {
+		if (picoDevMode()) {
+			picoSetString(-1, "v");
+		} else if (this.ver > 0) {
+			picoSetString(this.ver, "v");
+		}
 
 		// Back to previous script.
-		} else if (this.retscript) {
+		if (this.retscript) {
 			if (this.returl && !picoString("u")) {
 				picoSetString(this.returl, "u");
 			}
@@ -343,6 +366,7 @@ pico.App = class {
 			picoSetString(this.retscript, "s");
 			picoSetString("", "r");
 			await picoReload();
+			return true;
 
 		// Back to previous page.
 		} else if (this.returl) {
@@ -351,14 +375,25 @@ pico.App = class {
 			picoSetString("", "s");
 			picoSetString("", "r");
 			await picoReload(this.returl);
-
-		// Share.
-		} else {
-			if (this.script && this.script != pico.App.script) {
-				picoSetString(this.script, "s");
-			}
-			await picoShare();
+			return true;
 		}
+		return false;
+	}
+
+	// Share app url.
+	async shareApp() {
+		if (this.script && this.script != pico.App.script) {
+			picoSetString(this.script, "s");
+		}
+		await picoShare();
+	}
+
+	// Share screen image.
+	async shareScreen(c=0, bg=1) {
+		let watermark = this.author + "#" + this.timestamp;
+		let file = await picoScreenFile(watermark, c, bg);
+		let files = [file];
+		await picoShare(null, files);
 	}
 
 	// Lock screen with wakelock.
@@ -394,14 +429,6 @@ pico.App = class {
 
 		// True if landscape mode.
 		return window.matchMedia("(min-aspect-ratio: 1.0)").matches;
-	}
-
-	// Share screen image.
-	async shareScreen(c=0, bg=1) {
-		let watermark = this.author + "#" + this.timestamp;
-		let file = await picoScreenFile(watermark, c, bg);
-		let files = [file];
-		await picoShare(null, files);
 	}
 }
 

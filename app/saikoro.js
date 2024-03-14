@@ -89,7 +89,7 @@ async function appMain() {
 		if (picoAction(x,y, square/2,square/2)) {
 			if (items[i][2]) {
 				picoTitle(""); // Clear this title for starting each apps.
-				picoSwitch(items[i][2], returl);
+				picoSwitchApp(items[i][2], returl);
 			}
 		}
 		picoRect(2, x,y, square,square, 0,s);

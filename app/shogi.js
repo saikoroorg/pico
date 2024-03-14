@@ -106,7 +106,7 @@ async function appAction() {
 		}
 		picoSetCode6(code6, j);
 	}
-	picoSwitch(); // Share.
+	picoShareApp(); // Share.
 }
 
 // Load.

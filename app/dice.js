@@ -108,7 +108,7 @@ async function appAction() {
 		}
 
 		// Enter to edit mode.
-		picoSwitch(editjs); // Open editor.
+		picoSwitchApp(editjs); // Open editor.
 
 	// Share screen.
 	} else if (result > 0) {

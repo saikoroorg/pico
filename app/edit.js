@@ -78,7 +78,10 @@ async function appAction() {
 		picoSetCode8(colors, k);
 	}
 
-	picoSwitch(); // Share or back.
+	// Back or share.
+	if (!picoReturnApp()) {
+		picoShareApp();
+	}
 }
 
 // Select button.
