@@ -71,10 +71,25 @@ const faces = {
 const movable = ".", holding = "*", nothing = " ";
 const width = 13, height = 13, inside = 9, offset = 1;
 const grid = 12, margin = 4, scale = 1, scale2 = 2.5;
+const icons = [
+	picoStringCode6("099941922932942952962923933943953963924934944954964915925935945955965975916926936946956966976917927937947957967977"),
+	picoStringCode6("099941922932952962923963924964915975916976917927937947957967977"),
+];
 
 // Global variables.
 var hands = [null,null], indexes = [-1,-1]; // Hand pieces and indexes of the piece table.
 var landscape = -1; // 0 if portrait mode, 1 if landscape mode, and -1 if uninitialized.
+var reverse = 0; // 0 if upright board, 1 if reverse board.
+
+// Select button.
+async function appSelect() {
+	if (icons) {
+		reverse = reverse ? 0 : 1;
+		let data = await picoSpriteData(icons[reverse]);
+		picoLabel("select", null, data);
+		picoFlush();
+	}
+}
 
 // Action button.
 async function appAction() {
@@ -136,6 +151,10 @@ async function appLoad() {
 		}
 	}
 
+	if (icons) {
+		let data = await picoSpriteData(icons[reverse]);
+		picoLabel("select", null, data);
+	}
 	picoLabel("action", "&");
 	appResize();
 }
@@ -167,7 +186,7 @@ async function appMain() {
 		for (let i = 0; i < pieces[j].length; i++) {
 			let x = (picoMod(i,width) - (width-1)/2) * grid * scale;
 			let y = (picoDiv(i,width) - (height-1)/2) * grid * scale;
-			if (j == 1) { // Transform positions for enemy pieces.
+			if (j ^ reverse) { // Transform positions for enemy pieces.
 				x = -x;
 				y = -y;
 			}
@@ -236,17 +255,17 @@ async function appMain() {
 	picoRect(0, 0,0, grid*(inside+0.5),grid*(inside+0.5), 0,scale);
 	picoText(board, -1, 0,0, grid*width,grid*height, 0,scale);
 	for (let j = 0; j < pieces.length; j++) {
-		picoText(pieces[j], -1, 0,0, grid*width,grid*height, j?180:0,scale);
+		picoText(pieces[j], -1, 0,0, grid*width,grid*height, j^reverse?180:0,scale);
 	}
 	for (let j = 0; j < pieces.length; j++) {
 		if (hands[j]) {
 			let x = (picoMod(indexes[j],width) - (width-1)/2) * grid * scale;
 			let y = (picoDiv(indexes[j],width) - (height-1)/2) * grid * scale;
-			if (j == 1) { // Transform positions for enemy pieces.
+			if (j ^ reverse) { // Transform positions for enemy pieces.
 				x = -x;
 				y = -y;
 			}
-			picoChar(hands[j], -1, x,y, j?180:0,scale2);
+			picoChar(hands[j], -1, x,y, j^reverse?180:0,scale2);
 		}
 	}
 }
