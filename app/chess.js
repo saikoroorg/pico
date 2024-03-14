@@ -64,11 +64,11 @@ const faces = {
 };
 const movable = ".", holding = "*", nothing = " ";
 const width = 12, height = 12, inside = 8, offset = 1;
-const grid = 6, margin = 0, scale = 2, scale2 = 5;
-const icons = null;/*[
-	picoStringCode6("077222232242223233243324334344"),
-	picoStringCode6("077444434424443433423342332322"),
-];*/ // Disable to reverse board by select button.
+const grid = 6, margin = 0, scale = 2, scale2 = 5, yflip = 1;
+const icons = [
+	picoStringCode6("077211231251212222232242252213223233243253324334344315325335345355"),
+	picoStringCode6("077411431451412422432442452413423433443453324334344315325335345355"),
+];
 
 // Global variables.
 var hands = [null,null], indexes = [-1,-1]; // Hand pieces and indexes of the piece table.
@@ -79,6 +79,11 @@ var reverse = 0; // 0 if upright board, 1 if reverse board.
 async function appSelect() {
 	if (icons) {
 		reverse = reverse ? 0 : 1;
+		if (yflip) {
+			for (let chars in sprites) {
+				picoCharSprite(chars, picoSpriteFlip(sprites[chars],reverse,reverse));
+			}
+		}
 		let data = await picoSpriteData(icons[reverse]);
 		picoLabel("select", null, data);
 		picoFlush();
