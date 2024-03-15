@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40314"; // Updatable by package.json.
+pico.version = "0.9.40315"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -956,6 +956,18 @@ function picoStringCode6(str) {
 // Get 8bit code by string.
 function picoStringCode8(str) {
 	return pico.param._expandCode(pico.param._stringCode(str));
+}
+
+// Get char by 6bit code (1 number).
+function picoCode6Char(code6) {
+	return pico.param._code2str([code6])[0];
+}
+
+// Get char by 8bit code (1 number).
+function picoCode8Char(code8) {
+	const compression = 2;
+	let code6 = this._compressCode([code8], compression)
+	return pico.param._code2str(code6)[0];
 }
 
 //************************************************************/
