@@ -383,6 +383,9 @@ pico.Image = class {
 
 	// Flip splite.
 	spriteFlip(cells=[-1,0,0], x=0, y=0) {
+		if (!x && !y) {
+			return cells;
+		}
 		let flipped = [];
 		let i = 0, w = 0, h = 0;
 		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
