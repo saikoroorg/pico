@@ -74,10 +74,46 @@ const icons = [
 var hands = [null,null], indexes = [-1,-1]; // Hand pieces and indexes of the piece table.
 var landscape = -1; // 0 if portrait mode, 1 if landscape mode, and -1 if uninitialized.
 var reverse = 0; // 0 if upright board, 1 if reverse board.
+var movelogs = []; // Move logs.
 
 // Select button.
-async function appSelect() {
-	if (icons) {
+async function appSelect(x) {
+
+	// Undo move for move logs.
+	if (x < 0) {
+		if (movelogs.length >= 6) {
+			let k0 = 0, k1 = 6;
+			if (movelogs[movelogs.length-6] && movelogs[movelogs.length-9]) {
+				// Pattern A (0?? X11 Y22 033): X moves 11 to 22 and Y moves 22 to 33.
+				k0 = 9;
+			} else if (movelogs[movelogs.length-6]) {
+				// Pattern B (??? 0?? Z22 033): Z moves 22 to 33.
+				k0 = 6;
+			}
+			for (let k = k0; k >= k1; k-=3) {
+				// Z moves x1y1 to x2y2 so Z unmoves x2y2 to x1y1.
+				let z = picoCode6Char(movelogs[movelogs.length-k]);
+				let x1 = movelogs[movelogs.length-k+1] + offset;
+				let y1 = movelogs[movelogs.length-k+2] + offset;
+				let x2 = movelogs[movelogs.length-k+4] + offset;
+				let y2 = movelogs[movelogs.length-k+5] + offset;
+				let l01 = x1 + y1*width, l02 = x2 + y2*width;
+				if (pieces[0][l02] == z) {
+					pieces[0] = pieces[0].slice(0,l01) + pieces[0][l02] + pieces[0].slice(l01+1);
+					pieces[0] = pieces[0].slice(0,l02) + movable + pieces[0].slice(l02+1);
+				}
+				let l11 = pieces[0].length-1-l01, l12 = pieces[0].length-1-l02; // Transform positions for enemy pieces.
+				if (pieces[1][l12] == z) {
+					pieces[1] = pieces[1].slice(0,l11) + pieces[1][l12] + pieces[1].slice(l11+1);
+					pieces[1] = pieces[1].slice(0,l12) + movable + pieces[1].slice(l12+1);
+				}
+			}
+			movelogs = movelogs.slice(0,movelogs.length-k0);
+			picoFlush();
+		}
+
+	// Reverse board.
+	} else if (icons) {
 		reverse = reverse ? 0 : 1;
 		if (yflip) {
 			for (let chars in sprites) {
@@ -128,6 +164,7 @@ async function appLoad() {
 	for (let j = 0; j < pieces.length; j++) {
 		let value = picoString(j);
 		if (value) {
+			// Load piece positions by parameters 0 and 1.
 			if (value[j] != "0") {
 				let params = picoCode6(j);
 				for (let char in faces) {
@@ -149,12 +186,26 @@ async function appLoad() {
 			}
 		}
 	}
+	{
+		// Load move logs by parameters 2.
+		let j = pieces.length;
+		let value = picoString(j);
+		if (value) {
+			if (value[j] != "0") {
+				movelogs = picoCode6(j);
+			}
+		}
+	}
 
 	if (icons) {
 		let data = await picoSpriteData(icons[reverse]);
 		picoLabel("select", null, data);
 	}
 	picoLabel("action", "&");
+	if (movelogs.length > 0) {
+		picoLabel("minus", "-");
+		//picoLabel("plus", "+");
+	}
 	appResize();
 }
 
