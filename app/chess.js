@@ -71,7 +71,7 @@ const icons = [
 ];
 
 // Global variables.
-var hands = [null,null], indexes = [-1,-1]; // Hand pieces and indexes of the piece table.
+var hands = [null,null], indexes = [-1,-1], indexes0 = [-1, -1]; // Hand pieces and indexes of the piece table.
 var landscape = -1; // 0 if portrait mode, 1 if landscape mode, and -1 if uninitialized.
 var reverse = 0; // 0 if upright board, 1 if reverse board.
 var movelogs = []; // Move logs.
@@ -109,6 +109,9 @@ async function appSelect(x) {
 				}
 			}
 			movelogs = movelogs.slice(0,movelogs.length-k0);
+			if (movelogs.length <= 0) {
+				picoLabel("minus");
+			}
 			picoFlush();
 		}
 
@@ -147,6 +150,9 @@ async function appAction() {
 			code6[l+2] = picoDiv(indexes[j],width) - offset;
 		}
 		picoSetCode6(code6, j);
+	}
+	if (movelogs.length > 0) {
+		picoSetCode6(movelogs, pieces.length);
 	}
 	picoShareApp();
 }
@@ -252,6 +258,18 @@ async function appMain() {
 							let l1 = picoDiv(pieces[j].length-1-k,width)+picoMod(pieces[j].length-1-k,width)*width;
 							let l = landscape ? l1 : l0;
 							if (pieces[j][l] == movable) {
+								// Add move logs.
+								let k = movelogs.length;
+								movelogs[k] = picoStringCode6(hands[j])[0];
+								movelogs[k+1] = picoMod(indexes0[j],width) - offset;
+								movelogs[k+2] = picoDiv(indexes0[j],width) - offset;
+								movelogs[k+3] = picoStringCode6(target)[0];
+								movelogs[k+4] = picoMod(indexes[j],width) - offset;
+								movelogs[k+5] = picoDiv(indexes[j],width) - offset;
+								movelogs[k+6] = 0;
+								movelogs[k+7] = picoMod(l,width) - offset;
+								movelogs[k+8] = picoDiv(l,width) - offset;
+								picoLabel("minus", "-");
 								pieces[j] = pieces[j].slice(0,l) + target + pieces[j].slice(l+1);
 								target = null;
 								break;
@@ -266,6 +284,15 @@ async function appMain() {
 						hands[j] = null;
 					// Drop to empty square.
 					} else if (pieces[j][i] == movable) {
+						// Add move logs.
+						let k = movelogs.length;
+						movelogs[k] = picoStringCode6(hands[j])[0];
+						movelogs[k+1] = picoMod(indexes0[j],width) - offset;
+						movelogs[k+2] = picoDiv(indexes0[j],width) - offset;
+						movelogs[k+3] = 0;
+						movelogs[k+4] = picoMod(indexes[j],width) - offset;
+						movelogs[k+5] = picoDiv(indexes[j],width) - offset;
+						picoLabel("minus", "-");
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = null;
 					}
@@ -288,7 +315,7 @@ async function appMain() {
 				// Hold pieces.
 				} else if (!hands[j] && !hands[j?0:1] && pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
 					hands[j] = pieces[j][i];
-					indexes[j] = i;
+					indexes[j] = indexes0[j] = i;
 					pieces[j] = pieces[j].slice(0,i) + holding + pieces[j].slice(i+1);
 				}
 			}
