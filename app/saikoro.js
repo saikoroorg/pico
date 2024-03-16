@@ -14,18 +14,19 @@ const devitems = [ // Menu items for dev.
 	["dice", "app/dice.svg", "app/dice.js"],
 	["clock", "app/clock.svg", "app/clock.js"],
 	["kuku", "app/kuku.svg", "app/kuku.js"],
-	["bros", "app/bros.svg", "app/bros.js"],
-	["edit", "app/edit.svg", "app/edit.js"],
-	["text", "app/text.svg", "app/text.js"],
 	["chess", "app/chess.svg", "app/chess.js"],
 	["shogi", "app/shogi.svg", "app/shogi.js"],
+	["bros", "app/bros.svg", "app/bros.js"],
+	["edit", "app/edit.svg", "app/edit.js"],
+	["demo", "app/demo.svg", "app/demo.js"],
 ];
 var devreturl = null; // Return url for dev.
 var items = [ // Menu items.
 	["dice", "dice/icon.svg", "dice/"],
 	["clock", "clock/icon.svg", "clock/"],
 	["kuku", "kuku/icon.svg", "kuku/"],
-	["chess", "app/chess.svg", "app/chess.js"],
+	["chess", "chess/icon.svg", "chess/"],
+	["shogi", "shogi/icon.svg", "shogi/"],
 ];
 var returl = "../"; // Return url.
 var images = []; // Menu images.
@@ -56,7 +57,7 @@ async function appMain() {
 
 	// Dice.
 	const x = 0, rect = 8, maximum = 6;
-	let y = items.length > 3 ? -55 : -40;
+	let y = items.length > 3 ? -58 : -40;
 	if (picoMotion(x,y, rect*4,rect*4)) {
 		if (playing <= 60) {
 			playing = 0;
@@ -78,7 +79,7 @@ async function appMain() {
 	picoSprite(dots[random], 0, x,y, angle,rect*scale);
 
 	// Menu.
-	const square = 42, title0 = 2, title1 = 2, image0 = 0.5, grid = 50, offset = 36;
+	const square = 42, title0 = 2, title1 = 2, image0 = 0.5, grid = 58, offset = 34;
 	let column = picoSqrt(items.length - 1) + 1;
 	column = column >= 3 ? column : 3;
 	let row = picoDiv(items.length - 1, column) + 1;
