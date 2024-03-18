@@ -74,49 +74,71 @@ const icons = [
 var hands = [null,null], indexes = [-1,-1], indexes0 = [-1, -1]; // Hand pieces and indexes of the piece table.
 var landscape = -1; // 0 if portrait mode, 1 if landscape mode, and -1 if uninitialized.
 var reverse = 0; // 0 if upright board, 1 if reverse board.
-var movelogs = []; // Move logs.
+var movelogs = [], undologs = []; // Move,unmove logs.
 
 // Select button.
 async function appSelect(x) {
 
-	// Undo move by move logs.
+	// Unmove by move logs.
 	if (x < 0) {
-		if (movelogs.length >= 6) {
-			let k0 = 0, k1 = 6;
-			for (let k = k1; k <= movelogs.length; k+=3) {
-				if (movelogs[movelogs.length-k] < pieces.length) {
-					k0 = k;
-					break;
-				}
-			}
-			for (let k = k1; k <= k0; k+=3) {
-				// (??? ??? P22 A11): P=0(White)/1(Black),
+		let moves = movelogs.pop();
+		if (moves) {
+			let p1 = moves[0];
+			for (let k = moves.length-6; k >= 0; k-=3) {
 				// A moves 022 to 011,
 				// so A unmoves 011 to 022 and remove 011.
-				let p2 = movelogs[movelogs.length-k0], p1 = p2;
-				let x2 = movelogs[movelogs.length-k+1] + offset;
-				let y2 = movelogs[movelogs.length-k+2] + offset;
+				let p2 = p1;
+				let x2 = moves[k+1] + offset;
+				let y2 = moves[k+2] + offset;
 				let l2 = x2 + y2*width;
-				let z = picoCode6Char(movelogs[movelogs.length-k+3]);
-				let x1 = movelogs[movelogs.length-k+4] + offset;
-				let y1 = movelogs[movelogs.length-k+5] + offset;
+				let z = picoCode6Char(moves[k+3]);
+				let x1 = moves[k+4] + offset;
+				let y1 = moves[k+5] + offset;
 				let l1 = x1 + y1*width;
 				// Change piece side when inside to outside changes.
-				// (??? P33 B22 A11): P=0(White)/1(Black),
-				// B moves 033 to 022 (to take A) and A moves 122 to 011,
-				// so A unmoves 011 to 122 and remove 011.
 				if (x2 <= inside + offset && y2 <= inside + offset &&
 					(x1 > inside + offset || y1 > inside + offset)) {
 					p2 = p2 ? 0 : 1;
 					l2 = pieces[p2].length-1-l2; // Transform positions for enemy pieces.
 				}
 				pieces[p2] = pieces[p2].slice(0,l2) + z + pieces[p2].slice(l2+1);
-				pieces[p1] = pieces[p1].slice(0,l1) + movable + pieces[p1].slice(l1+1);
+				if (l1 != l2) {
+					pieces[p1] = pieces[p1].slice(0,l1) + movable + pieces[p1].slice(l1+1);
+				}
 			}
-			movelogs = movelogs.slice(0,movelogs.length-k0);
-			if (movelogs.length <= 0) {
-				picoLabel("minus");
+			undologs.push(moves);
+			picoLabel("select", ""+movelogs.length);
+			picoFlush();
+		}
+
+	// Remove by undo logs.
+	} else if (x > 0) {
+		let moves = undologs.pop();
+		if (moves) {
+			let p2 = moves[0];
+			for (let k = 0; k <= moves.length - 6; k+=3) {
+				// A moves 011 to 022,
+				let x1 = moves[k+1] + offset;
+				let y1 = moves[k+2] + offset;
+				let l1 = x1 + y1*width;
+				let z = picoCode6Char(moves[k+3]);
+				let p1 = p2;
+				let x2 = moves[k+4] + offset;
+				let y2 = moves[k+5] + offset;
+				let l2 = x2 + y2*width;
+				// Change piece side when inside to outside changes.
+				if (x1 <= inside + offset && y1 <= inside + offset &&
+					(x2 > inside + offset || y2 > inside + offset)) {
+					p1 = p1 ? 0 : 1;
+					l1 = pieces[p1].length-1-l1; // Transform positions for enemy pieces.
+				}
+				pieces[p2] = pieces[p2].slice(0,l2) + z + pieces[p2].slice(l2+1);
+				if (l1 != l2) {
+					pieces[p1] = pieces[p1].slice(0,l1) + movable + pieces[p1].slice(l1+1);
+				}
 			}
+			movelogs.push(moves);
+			picoLabel("select", ""+movelogs.length);
 			picoFlush();
 		}
 
@@ -128,8 +150,8 @@ async function appSelect(x) {
 				picoCharSprite(chars, picoSpriteFlip(sprites[chars],reverse,reverse));
 			}
 		}
-		let data = await picoSpriteData(icons[reverse]);
-		picoLabel("select", null, data);
+		//let data = await picoSpriteData(icons[reverse]);
+		//picoLabel("select", null, data);
 		picoFlush();
 	}
 }
@@ -157,7 +179,11 @@ async function appAction() {
 		picoSetCode6(code6, j);
 	}
 	if (movelogs.length > 0) {
-		picoSetCode6(movelogs, pieces.length);
+		let moveparams = [];
+		for (let k = 0; k < movelogs.length; k++) {
+			moveparams = moveparams.concat(movelogs[k]);
+		}
+		picoSetCode6(moveparams, pieces.length);
 	}
 	picoShareApp();
 }
@@ -202,21 +228,25 @@ async function appLoad() {
 		let j = pieces.length;
 		let value = picoString(j);
 		if (value) {
-			if (value[0] == "0" || value[0] == "1") {
-				movelogs = picoCode6(j);
+			let params = picoCode6(j), l = params.length;
+			for (let k = params.length-1; k >=0; k--) {
+				if (params[k] < pieces.length) {
+					let p = params.slice(k, l);
+					movelogs.unshift(p);
+					l = k;
+				}
 			}
 		}
 	}
 
-	if (icons) {
+	/*if (icons) {
 		let data = await picoSpriteData(icons[reverse]);
 		picoLabel("select", null, data);
-	}
+	}*/
+	picoLabel("select", ""+movelogs.length);
 	picoLabel("action", "&");
-	if (movelogs.length > 0) {
-		picoLabel("minus", "-");
-		//picoLabel("plus", "+");
-	}
+	picoLabel("minus", "-");
+	picoLabel("plus", "+");
 	appResize();
 }
 
@@ -262,21 +292,20 @@ async function appMain() {
 							let l0 = pieces[j].length-1-k;
 							let l1 = picoDiv(pieces[j].length-1-k,width)+picoMod(pieces[j].length-1-k,width)*width;
 							let l = landscape ? l1 : l0;
+							// Add move and catch logs.
 							if (pieces[j][l] == movable) {
-								// Add move logs.
-								// (??? P33 B22 A11): P=0(White)/1(Black),
-								// B moves 033 to 022 (to take A) and A moves 122 to 011.
-								let k = movelogs.length;
-								movelogs[k] = j;
-								movelogs[k+1] = picoMod(indexes0[j],width) - offset;
-								movelogs[k+2] = picoDiv(indexes0[j],width) - offset;
-								movelogs[k+3] = picoCharCode6(hands[j]);
-								movelogs[k+4] = picoMod(indexes[j],width) - offset;
-								movelogs[k+5] = picoDiv(indexes[j],width) - offset;
-								movelogs[k+6] = picoCharCode6(target);
-								movelogs[k+7] = picoMod(l,width) - offset;
-								movelogs[k+8] = picoDiv(l,width) - offset;
-								picoLabel("minus", "-");
+								undologs = [];
+								let moves = [j];
+								moves[1] = picoMod(indexes0[j],width) - offset;
+								moves[2] = picoDiv(indexes0[j],width) - offset;
+								moves[3] = picoCharCode6(hands[j]);
+								moves[4] = picoMod(indexes[j],width) - offset;
+								moves[5] = picoDiv(indexes[j],width) - offset;
+								moves[6] = picoCharCode6(target);
+								moves[7] = picoMod(l,width) - offset;
+								moves[8] = picoDiv(l,width) - offset;
+								movelogs.push(moves);
+								picoLabel("select", ""+movelogs.length);
 								pieces[j] = pieces[j].slice(0,l) + target + pieces[j].slice(l+1);
 								target = null;
 								break;
@@ -287,21 +316,62 @@ async function appMain() {
 						hands[j] = target;
 					// Drop and flip holding piece.
 					} else if (pieces[j][i] == holding && faces[hands[j]]) {
+						// Modify move logs.
+						undologs = [];
+						let moves = movelogs.pop();
+						if (moves) {
+							let x1 = moves[1] + offset;
+							let y1 = moves[2] + offset;
+							let l1 = x1 + y1*width;
+							let x2 = moves[4] + offset;
+							let y2 = moves[5] + offset;
+							let l2 = x2 + y2*width;
+							if (l1 == indexes[j] || l2 == indexes[j]) {
+								moves[3] = picoCharCode6(hands[j]);
+							} else {
+								movelogs.push(moves);
+								moves = null;
+							}
+						}
+						// Add flip logs.
+						if (!moves) {
+							moves = [j];
+							moves[3] = picoCharCode6(hands[j]);
+							moves[1] = moves[4] = picoMod(indexes[j],width) - offset;
+							moves[2] = moves[5] = picoDiv(indexes[j],width) - offset;
+						}
+						movelogs.push(moves);
+						picoLabel("select", ""+movelogs.length);
 						pieces[j] = pieces[j].slice(0,i) + faces[hands[j]] + pieces[j].slice(i+1);
 						hands[j] = null;
 					// Drop to empty square.
 					} else if (pieces[j][i] == movable) {
+						// Modify move logs.
+						undologs = [];
+						let moves = movelogs.pop();
+						if (moves) {
+							let x2 = moves[4] + offset;
+							let y2 = moves[5] + offset;
+							let l2 = x2 + y2*width;
+							if (l2 == indexes0[j]) {
+								moves[4] = picoMod(indexes[j],width) - offset;
+								moves[5] = picoDiv(indexes[j],width) - offset;
+							} else if (indexes[j] != indexes0[j]) {
+								movelogs.push(moves);
+								moves = null;
+							}
+						}
 						// Add move logs.
-						// (??? ??? P22 A11): P=0(White)/1(Black),
-						// A moves 022 to 011.
-						let k = movelogs.length;
-						movelogs[k] = j;
-						movelogs[k+1] = picoMod(indexes0[j],width) - offset;
-						movelogs[k+2] = picoDiv(indexes0[j],width) - offset;
-						movelogs[k+3] = picoCharCode6(hands[j]);
-						movelogs[k+4] = picoMod(indexes[j],width) - offset;
-						movelogs[k+5] = picoDiv(indexes[j],width) - offset;
-						picoLabel("minus", "-");
+						if (!moves) {
+							moves = [j];
+							moves[1] = picoMod(indexes0[j],width) - offset;
+							moves[2] = picoDiv(indexes0[j],width) - offset;
+							moves[3] = picoCharCode6(hands[j]);
+							moves[4] = picoMod(indexes[j],width) - offset;
+							moves[5] = picoDiv(indexes[j],width) - offset;
+						}
+						movelogs.push(moves);
+						picoLabel("select", ""+movelogs.length);
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = null;
 					}
