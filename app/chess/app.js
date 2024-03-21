@@ -16,6 +16,7 @@ const sprites = { // Sprite table.
 	"#": picoStringCode6("077111121131141151112122132142152113123133143153114124134144154115125135145155"),
 	".": picoStringCode6("077"),
 	"*": picoStringCode6("077"),
+	"@": picoStringCode6("077200066"),
 };
 const colors = picoStringCode8("111555333222444000");
 
@@ -78,6 +79,16 @@ Playlog = class {
 	// Log count.
 	count() {
 		return this.moves.length;
+	}
+
+	// Get last moved index.
+	last() {
+		let m = this.moves[this.moves.length-1];
+		let p1 = m[0];
+		let x2 = m[4] + offset;
+		let y2 = m[5] + offset;
+		let l2 = x2 + y2*width;
+		return p1 ? pieces[p1].length-1-l2 : l2;
 	}
 
 	// Get log code.
@@ -465,6 +476,12 @@ async function appMain() {
 	picoClear();
 	picoRect(0, 0,0, grid*(inside+0.5),grid*(inside+0.5), 0,scale);
 	picoText(board, -1, 0,0, grid*width,grid*height, 0,scale);
+	if (playlog.count()) {
+		let l = playlog.last();
+		let x = (picoMod(l,width) - (width-1)/2) * grid * scale;
+		let y = (picoDiv(l,width) - (height-1)/2) * grid * scale;
+		picoChar("@", -1, x,y, 0,scale);
+	}
 	for (let j = 0; j < pieces.length; j++) {
 		picoText(pieces[j], -1, 0,0, grid*width,grid*height, j^reverse?180:0,scale);
 	}
