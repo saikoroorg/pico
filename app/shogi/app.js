@@ -19,6 +19,7 @@ const sprites = { // Sprite table.
 	"#": picoStringCode6("0dd1000cc0110aa"),
 	".": picoStringCode6("099"),
 	"*": picoStringCode6("099"),
+	"@": picoStringCode6("0dd1000cc"),
 };
 const colors = picoStringCode8("1115553332224440i9p060n4f0i000");
 
@@ -71,27 +72,293 @@ const faces = {
 const movable = ".", holding = "*", nothing = " ";
 const width = 13, height = 13, inside = 9, offset = 1;
 const grid = 12, margin = 6, scale = 1, scale2 = 2.5, yflip = 0;
-const icons = [
-	picoStringCode6("099442433443453424434444454464425435445455465426436446456466"),
-	picoStringCode6("099442433453424464425465426436446456466"),
-];
 
 // Global variables.
 var hands = [null,null], indexes = [-1,-1]; // Hand pieces and indexes of the piece table.
 var landscape = -1; // 0 if portrait mode, 1 if landscape mode, and -1 if uninitialized.
 var reverse = 0; // 0 if upright board, 1 if reverse board.
 
+// Playlog class.
+Playlog = class {
+
+	// constructor.
+	constructor() {
+		this.moves = [];
+		this.undos = [];
+	}
+
+	// Log count.
+	count() {
+		return this.moves.length;
+	}
+
+	// Get last moved index.
+	last() {
+		let m = this.moves[this.moves.length-1];
+		let p1 = m[0];
+		let x2 = m[4] + offset;
+		let y2 = m[5] + offset;
+		let l2 = x2 + y2*width;
+		return p1 ? pieces[p1].length-1-l2 : l2;
+	}
+
+	// Get log code.
+	code6() {
+		let code6 = [];
+		for (let k = 0; k < this.moves.length; k++) {
+			code6 = code6.concat(this.moves[k]);
+		}
+		return code6;
+	}
+
+	// Set log by code.
+	setCode6(code6) {
+		this.moves = [];
+		this.undos = [];
+		let l = code6.length;
+		for (let k = code6.length; k >=0; k-=3) {
+			if (code6[k] < pieces.length) {
+				let p = code6.slice(k, l);
+				this.moves.unshift(p);
+				l = k;
+			}
+		}
+	}
+
+	// Undo move.
+	undo() {
+		let m = this.moves.pop();
+		if (m) {
+			let p0 = m[0];
+			for (let k = m.length-6; k >= 0; k-=3) {
+				// A moves 022 to 033,
+				// so A unmoves 033 to 022 and remove 033.
+				let p2 = p0;
+				let x2 = m[k+1] + offset;
+				let y2 = m[k+2] + offset;
+				let l2 = x2 + y2*width;
+				let z = picoCode6Char(m[k+3]);
+				let x3 = m[k+4] + offset;
+				let y3 = m[k+5] + offset;
+				let l3 = x3 + y3*width;
+				// Change piece side when inside(022) to outside(033) changes.
+				if (x2 <= inside + offset && y2 <= inside + offset &&
+					(x3 > inside + offset || y3 > inside + offset)) {
+					p2 = p2 ? 0 : 1;
+					l2 = pieces[p2].length-1-l2; // Transform positions for enemy pieces.
+				}
+				pieces[p2] = pieces[p2].slice(0,l2) + z + pieces[p2].slice(l2+1);
+				m[k+3] = picoCharCode6(pieces[p2][l3]); // Update flip face for redo.
+				if (l3 != l2) {
+					pieces[p0] = pieces[p0].slice(0,l3) + movable + pieces[p0].slice(l3+1);
+				}
+			}
+			this.undos.push(m);
+			return true;
+		}
+		return false;
+	}
+
+	// Redo move.
+	redo() {
+		let m = this.undos.pop();
+		if (m) {
+			let p0 = m[0];
+			for (let k = 0; k <= m.length - 6; k+=3) {
+				// A moves 011 to 022,
+				let x1 = m[k+1] + offset;
+				let y1 = m[k+2] + offset;
+				let l1 = x1 + y1*width;
+				let z = picoCode6Char(m[k+3]);
+				let p1 = p0;
+				let x2 = m[k+4] + offset;
+				let y2 = m[k+5] + offset;
+				let l2 = x2 + y2*width;
+				// Change piece side when inside(011) to outside(033) changes.
+				if (x1 <= inside + offset && y1 <= inside + offset &&
+					(x2 > inside + offset || y2 > inside + offset)) {
+					p1 = p1 ? 0 : 1;
+					l1 = pieces[p1].length-1-l1; // Transform positions for enemy pieces.
+				}
+				pieces[p0] = pieces[p0].slice(0,l2) + z + pieces[p0].slice(l2+1);
+				m[k+3] = picoCharCode6(pieces[p1][l1]); // Update flip face for undo.
+				if (l1 != l2) {
+					pieces[p1] = pieces[p1].slice(0,l1) + movable + pieces[p1].slice(l1+1);
+				}
+			}
+			this.moves.push(m);
+			return true;
+		}
+		return false;
+	}
+
+	// Add log.
+	_add(p0, i0, piece, i1, target=null, i2=0) {
+		let m = [p0];
+		m[1] = picoMod(i0,width) - offset;
+		m[2] = picoDiv(i0,width) - offset;
+		m[3] = picoCharCode6(piece);
+		m[4] = picoMod(i1,width) - offset;
+		m[5] = picoDiv(i1,width) - offset;
+		if (target) {
+			m[6] = picoCharCode6(target);
+			m[7] = picoMod(i2,width) - offset;
+			m[8] = picoDiv(i2,width) - offset;
+		}
+		this.moves.push(m);
+	}
+
+	// Add flip piece log.
+	addFlip(p0, i0, piece) {
+		this.undos = [];
+		let m = this.moves.pop();
+		if (m) {
+			let x0 = m[1] + offset;
+			let y0 = m[2] + offset;
+			let l0 = x0 + y0*width;
+			let z = picoCode6Char(m[3]);
+			let x1 = m[4] + offset;
+			let y1 = m[5] + offset;
+			let l1 = x1 + y1*width;
+			if (l0 != l1 && (l0 == i0 || l1 == i0)) {
+				// Modify move.
+				this.moves.push(m);
+				console.log("Modify move.");
+			} else if (l0 == l1) {
+				// Cancel flip.
+				console.log("Cancel flip.");
+			} else {
+				// Not modify.
+				this.moves.push(m);
+				// New flip piece.
+				this._add(p0, i0, piece, i0);
+				console.log("Not modify and new flip piece.");
+			}
+		} else {
+			// New flip piece.
+			this._add(p0, i0, piece, i0);
+				console.log("New flip piece.");
+		}
+	}
+
+	// Add move piece log.
+	addMove(p0, i0, piece, i1) {
+		this.undos = [];
+		let m = this.moves.pop();
+		if (m) {
+			if (m.length >= 9) {
+				// Not modify for catching.
+				this.moves.push(m);
+				if (i1 != i0) {
+					// New move piece.
+					this._add(p0, i0, piece, i1);
+					console.log("Not modify and new move piece.");
+				}
+			} else {
+				let x0 = m[1] + offset;
+				let y0 = m[2] + offset;
+				let l0 = x0 + y0*width;
+				let z = picoCode6Char(m[3]);
+				let x1 = m[4] + offset;
+				let y1 = m[5] + offset;
+				let l1 = x1 + y1*width;
+				if (i0 == l1 && i1 != l0) { // l0->l1(i0)->i1
+					// Change move.
+					console.log("Change move.");
+					this._add(p0, l0, z, i1);
+				} else if (i0 == l1 && i1 == l0 && z == piece) { // l0->l1->l0(i1)
+					// Cancel move.
+					console.log("Cancel move.");
+				} else {
+					// Not modify.
+					this.moves.push(m);
+					if (i1 != i0) {
+						// New move piece.
+						this._add(p0, i0, piece, i1);
+						console.log("Not modify and new move piece.");
+					}
+				}
+			}
+		} else if (i1 != i0) {
+			// New move piece.
+			this._add(p0, i0, piece, i1);
+			console.log("New move piece.");
+		}
+	}
+
+
+	// Add catch target log.
+	addCatch(p0, i0, piece, i1, target, i2) {
+		this.undos = [];
+		let m = this.moves.pop();
+		if (m) {
+			if (m.length >= 9) {
+				// Not modify for catching.
+				this.moves.push(m);
+				if (i1 != i0) {
+					// New move piece.
+					this._add(p0, i0, piece, i1, target, i2);
+					console.log("Not modify and new move piece.");
+				}
+			} else {
+				let x0 = m[1] + offset;
+				let y0 = m[2] + offset;
+				let l0 = x0 + y0*width;
+				let z = picoCode6Char(m[3]);
+				let x1 = m[4] + offset;
+				let y1 = m[5] + offset;
+				let l1 = x1 + y1*width;
+				if (i0 == l1) { // l0->l1(i0)->i1
+					// Change move.
+					console.log("Change move.");
+					this._add(p0, l0, z, i1, target, i2);
+				} else if (i1 != i0) {
+					// Not modify and new catch target.
+					this.moves.push(m);
+					this._add(p0, i0, piece, i1, target, i2);
+					console.log("Not modify and new move piece.");
+				}
+			}
+		} else {
+			// New catch target.
+			this._add(p0, i0, piece, i1, target, i2);
+			console.log("New catch target.");
+		}
+	}
+};
+
+// Global variables.
+var hands = [null,null], indexes = [-1,-1], indexes0 = [-1, -1]; // Hand pieces and indexes of the piece table.
+var landscape = -1; // 0 if portrait mode, 1 if landscape mode, and -1 if uninitialized.
+var reverse = 0; // 0 if upright board, 1 if reverse board.
+
+var playlog = new Playlog(); // Playlog.
+
 // Select button.
-async function appSelect() {
-	if (icons) {
+async function appSelect(x) {
+
+	// Undo move.
+	if (x < 0) {
+		if (playlog.undo()) {
+			picoLabel("select", ""+playlog.count());
+			picoFlush();
+		}
+
+	// Redo move.
+	} else if (x > 0) {
+		if (playlog.redo()) {
+			picoLabel("select", ""+playlog.count());
+			picoFlush();
+		}
+
+	// Reverse board.
+	} else {
 		reverse = reverse ? 0 : 1;
 		if (yflip) {
 			for (let chars in sprites) {
 				picoCharSprite(chars, picoSpriteFlip(sprites[chars],reverse,reverse));
 			}
 		}
-		let data = await picoSpriteData(icons[reverse]);
-		picoLabel("select", null, data);
 		picoFlush();
 	}
 }
@@ -105,18 +372,21 @@ async function appAction() {
 		for (let i = 0; i < pieces[j].length; i++) {
 			if (pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
 				let l = code6.length;
-				code6[l] = picoStringCode6(pieces[j][i])[0];
+				code6[l] = picoCharCode6(pieces[j][i]);
 				code6[l+1] = picoMod(i,width) - offset;
 				code6[l+2] = picoDiv(i,width) - offset;
 			}
 		}
 		if (hands[j]) {
 			let l = code6.length;
-			code6[l] = picoStringCode6(hands[j])[0];
+			code6[l] = picoCharCode6(hands[j]);
 			code6[l+1] = picoMod(indexes[j],width) - offset;
 			code6[l+2] = picoDiv(indexes[j],width) - offset;
 		}
 		picoSetCode6(code6, j);
+	}
+	if (playlog.count()) {
+		picoSetCode6(playlog.code6(), pieces.length);
 	}
 	picoShareApp();
 }
@@ -134,7 +404,8 @@ async function appLoad() {
 	for (let j = 0; j < pieces.length; j++) {
 		let value = picoString(j);
 		if (value) {
-			if (value[j] != "0") {
+			// Load piece positions by parameters 0 and 1.
+			if (value[0] != "0") {
 				let params = picoCode6(j);
 				for (let char in faces) {
 					pieces[j] = pieces[j].replaceAll(char, movable);
@@ -155,13 +426,20 @@ async function appLoad() {
 			}
 		}
 	}
-
-	if (icons) {
-		let data = await picoSpriteData(icons[reverse]);
-		picoLabel("select", null, data);
+	{
+		// Load move playlog by parameters 2.
+		let j = pieces.length;
+		let value = picoString(j);
+		if (value) {
+			playlog.setCode6(picoCode6(j));
+		}
 	}
+
+	picoLabel("select", ""+playlog.count());
 	let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
 	picoLabel("action", null, data);
+	picoLabel("minus", "-");
+	picoLabel("plus", "+");
 	appResize();
 }
 
@@ -201,27 +479,39 @@ async function appMain() {
 				if (hands[j]) {
 					// Drop and catch target pieces.
 					if (pieces[j?0:1][pieces[j].length-1-i] != movable && pieces[j?0:1][pieces[j].length-1-i] != nothing) {
+						// Catch target pieces.
 						let target = pieces[j?0:1][pieces[j].length-1-i];
 						pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + movable + pieces[j?0:1].slice(pieces[j].length-1-i+1);
 						for (let k = 0; k < width*(height-inside)/2; k++) {
 							let l0 = pieces[j].length-1-k;
 							let l1 = picoDiv(pieces[j].length-1-k,width)+picoMod(pieces[j].length-1-k,width)*width;
 							let l = landscape ? l1 : l0;
+							// Add move and catch playlog.
 							if (pieces[j][l] == movable) {
+								playlog.addCatch(j, indexes0[j], hands[j], indexes[j], target, l);
+								picoLabel("select", ""+playlog.count());
 								pieces[j] = pieces[j].slice(0,l) + target + pieces[j].slice(l+1);
 								target = null;
 								break;
 							}
 						}
-						// Switch holding pieces with target pieces if full.
+						// Switch holding pieces with target pieces.
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = target;
 					// Drop and flip holding piece.
-					} else if (pieces[j][i] == holding && faces[hands[j]]) {
+					} else if (pieces[j][i] == holding && faces[hands[j]] != hands[j]) {
+						// Add flip playlog.
+						playlog.addFlip(j, indexes0[j], hands[j]);
+						picoLabel("select", ""+playlog.count());
+						// Move and flip holding pieces.
 						pieces[j] = pieces[j].slice(0,i) + faces[hands[j]] + pieces[j].slice(i+1);
 						hands[j] = null;
 					// Drop to empty square.
 					} else if (pieces[j][i] == movable) {
+						// Add move playlog.
+						playlog.addMove(j, indexes0[j], hands[j], indexes[j]);
+						picoLabel("select", ""+playlog.count());
+						// Move holding pieces.
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = null;
 					}
@@ -244,7 +534,7 @@ async function appMain() {
 				// Hold pieces.
 				} else if (!hands[j] && !hands[j?0:1] && pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
 					hands[j] = pieces[j][i];
-					indexes[j] = i;
+					indexes[j] = indexes0[j] = i;
 					pieces[j] = pieces[j].slice(0,i) + holding + pieces[j].slice(i+1);
 				}
 			}
@@ -260,6 +550,12 @@ async function appMain() {
 	picoClear();
 	picoRect(0, 0,0, grid*(inside+0.5),grid*(inside+0.5), 0,scale);
 	picoText(board, -1, 0,0, grid*width,grid*height, 0,scale);
+	if (playlog.count()) {
+		let l = playlog.last();
+		let x = (picoMod(l,width) - (width-1)/2) * grid * scale;
+		let y = (picoDiv(l,width) - (height-1)/2) * grid * scale;
+		picoChar("@", -1, x,y, 0,scale);
+	}
 	for (let j = 0; j < pieces.length; j++) {
 		picoText(pieces[j], -1, 0,0, grid*width,grid*height, j^reverse?180:0,scale);
 	}
