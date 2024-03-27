@@ -1,10 +1,10 @@
 {
-	"name": "Saikoro.org",
-	"short_name": "Saikoro.org",
+	"name": "Voxel",
+	"short_name": "Voxel",
 	"version": "0.9.40327a",
-	"author": "saikoro.org",
-	"background_color": "#fff",
-	"theme_color": "#fff",
+	"author": "saikoro.org/voxel",
+	"background_color": "#dfdfdf",
+	"theme_color": "#dfdfdf",
 	"icons": [{
 		"src": "./icon.png",
 		"sizes": "192x192",
