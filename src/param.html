@@ -90,8 +90,9 @@ for (let i = 0; i < code.length; i++) {
 //*/
 
 document.addEventListener("click", async (evt) => {
-pico.Param.debug = false;
 
+/*
+pico.Param.debug = false;
 // Test parse param.
 if (!picoString()) {
 	picoSetCode8([255,255,255,
@@ -110,6 +111,13 @@ console.log("8bit compatible 6bit code: " + picoCode8());
 // color0 = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0];
 // -> compressed to "111555333222444000"
 picoShare();
+*/
+
+// Test share file.
+pico.Param.debug = true;
+picoResetParams();
+let file = picoTextFile("12345667890");
+await picoShare(null, [file]);
 
 });</script><!--/Main-->
 </body>

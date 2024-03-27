@@ -45,6 +45,15 @@ async function picoShare(url=null, files=null) {
 	}
 }
 
+// Get text file.
+function picoTextFile(text) {
+	try {
+		return pico.param.textFile(text);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 // Get all params by one string.
 function picoParams() {
 	return pico.param.params();
@@ -153,6 +162,19 @@ pico.Param = class {
 	// Share param.
 	async share(url=null, files=null) {
 		await this._share(url, files);
+	}
+
+	// Get text file.
+	textFile(text) {
+		try {
+			const blob = new Blob([text], {type: 'text/plain'});
+			const file = new File([blob], "text.txt", {type: blob.type});
+			this._debug("Text file: " + file.size);
+			return file;
+		} catch (error) {
+			console.error(error);
+			return null;
+		}
 	}
 
 	// Get all params by one string.
@@ -299,10 +321,12 @@ pico.Param = class {
 				if (navigator.share) {
 					this._debug("Share: " + JSON.stringify(data));
 					await navigator.share(data).then(() => {
-						this._debug('Successful share');
+						this._debug("Successful share");
 					}).catch((error) => {
-						this._debug('Error sharing', error);
+						this._debug("Error sharing:" + error);
 					});
+				} else {
+					this._debug("Not supported sharing");
 				}
 			}
 			return resolve();

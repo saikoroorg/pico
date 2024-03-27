@@ -826,9 +826,9 @@ pico.Image = class {
 		}
 		try {
 			const blob = new Blob([buffers.buffer], {type: "image/png"});
-			const imageFile = new File([blob], "image.png", {type: "image/png"});
-			this._debug("Image data: " + imageFile.size);
-			return imageFile;
+			const file = new File([blob], "image.png", {type: blob.type});
+			this._debug("Image data file: " + file.size);
+			return file;
 		} catch (error) {
 			console.error(error);
 			return null;
