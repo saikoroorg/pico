@@ -46,9 +46,9 @@ async function picoShare(url=null, files=null) {
 }
 
 // Get text file.
-function picoTextFile(text) {
+function picoTextFile(text, name=null) {
 	try {
-		return pico.param.textFile(text);
+		return pico.param.textFile(text, name);
 	} catch (error) {
 		console.error(error);
 	}
@@ -165,10 +165,10 @@ pico.Param = class {
 	}
 
 	// Get text file.
-	textFile(text) {
+	textFile(text, name=null) {
 		try {
 			const blob = new Blob([text], {type: 'text/plain'});
-			const file = new File([blob], "text.txt", {type: blob.type});
+			const file = new File([blob], name ? name : "text.txt", {type: blob.type});
 			this._debug("Text file: " + file.size);
 			return file;
 		} catch (error) {

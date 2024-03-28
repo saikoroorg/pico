@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40327"; // Updatable by package.json.
+pico.version = "0.9.40328"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -184,9 +184,9 @@ function picoImageSize(image) {
 }
 
 // Get image file.
-function picoImageFile(image) {
+function picoImageFile(image, name=null) {
 	try {
-		return image._file();
+		return image._file(name);
 	} catch (error) {
 		console.error(error);
 	}
@@ -383,9 +383,6 @@ pico.Image = class {
 
 	// Flip splite.
 	spriteFlip(cells=[-1,0,0], x=0, y=0) {
-		if (!x && !y) {
-			return cells;
-		}
 		let flipped = [];
 		let i = 0, w = 0, h = 0;
 		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
@@ -828,7 +825,7 @@ pico.Image = class {
 	}
 
 	// Get image data file.
-	_file() {
+	_file(name=null) {
 		const decoded = atob(this.canvas[this.primary].toDataURL("image/png").replace(/^.*,/, ""));
 		const buffers = new Uint8Array(decoded.length);
 		for (let i = 0; i < decoded.length; i++) {
@@ -836,7 +833,7 @@ pico.Image = class {
 		}
 		try {
 			const blob = new Blob([buffers.buffer], {type: "image/png"});
-			const file = new File([blob], "image.png", {type: blob.type});
+			const file = new File([blob], name ? name : "image.png", {type: blob.type});
 			this._debug("Image data file: " + file.size);
 			return file;
 		} catch (error) {
@@ -897,9 +894,9 @@ async function picoShare(url=null, files=null) {
 }
 
 // Get text file.
-function picoTextFile(text) {
+function picoTextFile(text, name=null) {
 	try {
-		return pico.param.textFile(text);
+		return pico.param.textFile(text, name);
 	} catch (error) {
 		console.error(error);
 	}
@@ -970,30 +967,6 @@ function picoStringCode8(str) {
 	return pico.param._expandCode(pico.param._stringCode(str));
 }
 
-// Get 6bit code (1 number) by char.
-function picoCharCode6(char) {
-	let code = picoStringCode6(char);
-	return code[0];
-}
-
-// Get 8bit code (1 number) by char.
-function picoCharCode8(char) {
-	let code = picoStringCode8(char);
-	return code[0];
-}
-
-// Get char by 6bit code (1 number).
-function picoCode6Char(code6) {
-	return pico.param._code2str([code6])[0];
-}
-
-// Get char by 8bit code (1 number).
-function picoCode8Char(code8) {
-	const compression = 2;
-	let code6 = this._compressCode([code8], compression)
-	return pico.param._code2str(code6)[0];
-}
-
 //************************************************************/
 
 // Namespace.
@@ -1040,10 +1013,10 @@ pico.Param = class {
 	}
 
 	// Get text file.
-	textFile(text) {
+	textFile(text, name=null) {
 		try {
 			const blob = new Blob([text], {type: 'text/plain'});
-			const file = new File([blob], "text.txt", {type: blob.type});
+			const file = new File([blob], name ? name : "text.txt", {type: blob.type});
 			this._debug("Text file: " + file.size);
 			return file;
 		} catch (error) {

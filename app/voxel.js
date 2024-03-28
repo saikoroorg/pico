@@ -28,7 +28,7 @@ Voxel = class {
 
 	// constructor.
 	constructor() {
-		this.colors = [255,255,255, 0,0,0]; // Original design colors.
+		this.colors = [255,255,255, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // Original design colors.
 		this.pixels = [
 		]; // Original design pixels.
 	}
@@ -86,7 +86,7 @@ Voxel = class {
 			}
 		}
 		text += "endsolid\n";
-		return picoTextFile(text);
+		return picoTextFile(text, "voxel" + c + ".stl");
 	}
 };
 var voxel = new Voxel();
@@ -94,8 +94,24 @@ var voxel = new Voxel();
 // Action button.
 async function appAction() {
 
-	// Share voxle stl file.
-	picoShare(null, [voxel.stlFile(1), voxel.stlFile(2)]);
+	// Enter to edit mode.
+	picoResetParams();
+
+	// Enter to edit mode with custom design.
+	let key = 0;
+	if (voxel.pixels.length > 0) {
+		for (; key < voxel.pixels.length; key++) {
+			if (voxel.pixels[key].length > 0) {
+				picoSetCode6(voxel.pixels[key], key);
+			}
+		}
+	}
+	if (voxel.colors.length > 0) {
+		picoSetCode8(voxel.colors, key);
+	}
+
+	// Enter to edit mode.
+	picoSwitchApp(editjs); // Open editor.
 
 	// Share screen.
 	//picoShareScreen(); // Start sharing screen.
@@ -105,26 +121,16 @@ async function appAction() {
 async function appSelect(x) {
 	if (x) {
 		depth = depth + (x*adddepth) < 0 ? 0 : depth + (x*adddepth) < maxdepth ? depth + (x*adddepth) : maxdepth;
-		picoLabel("select", depth>0?""+depth:"*");
+		picoLabel("select", depth>0?""+depth:"&");
 		picoFlush();
-	} else 	if (depth <= 0) {
+	} else {
 
-		// Enter to edit mode.
-		picoResetParams();
-
-		// Enter to edit mode with custom design.
-		if (voxel.pixels.length > 0) {
-			let key = 0;
-			for (; key < voxel.pixels.length; key++) {
-				if (voxel.pixels[key].length > 0) {
-					picoSetCode6(voxel.pixels[key], key);
-				}
-			}
-			picoSetCode8(voxel.colors, key);
+		// Share voxle stl file.
+		let files = [];
+		for (let i = 1; i < voxel.colors.length/3; i++) {
+			files.push(voxel.stlFile(i));
 		}
-
-		// Enter to edit mode.
-		picoSwitchApp(editjs); // Open editor.
+		picoShare(null, files);
 	}
 }
 
@@ -154,8 +160,8 @@ async function appLoad() {
 	}
 	picoColor(voxel.colors);
 
-	picoLabel("action", "&");
-	picoLabel("select", depth>0?""+depth:"*");
+	picoLabel("action", "*");
+	picoLabel("select", depth>0?""+depth:"&");
 	picoLabel("minus", "-");
 	picoLabel("plus", "+");
 }
@@ -200,14 +206,14 @@ async function appMain() {
 		if (picoAction()) {
 			depth = depth0;
 			playing = -1;
-			picoLabel("select", depth>0?""+depth:"*");
+			picoLabel("select", depth>0?""+depth:"&");
 			picoBeep(1.2, 0.1);
 		} else if (picoMotion()) {
 			s1 = 8;
 		}
 
 		// Draw original design sprite.
-		for (let i = voxel.pixels.length-1; i >= 0; i--) {
+		for (let i = 0; i < voxel.pixels.length; i++) {
 			picoSprite(voxel.pixels[i], -1, 0,0, angle, s1);
 		}
 
@@ -219,16 +225,16 @@ async function appMain() {
 		if (picoAction()) {
 			depth = 0;
 			playing = -1;
-			picoLabel("select", depth>0?""+depth:"*");
+			picoLabel("select", depth>0?""+depth:"&");
 			picoBeep(1.2, 0.1);
 		} else if (picoMotion()) {
 			s1 = 8;
 		}
 
 		// Draw original design sprite.
-		let x0 = -voxel.pixels.length*depth/2, y0 = voxel.pixels.length*depth/2;
-		for (let i = voxel.pixels.length-1; i >= 0; i--) {
-			let x = x0+i*depth, y = y0-i*depth;
+		let x0 = voxel.pixels.length*depth/2, y0 = -voxel.pixels.length*depth/2;
+		for (let i = 0; i < voxel.pixels.length; i++) {
+			let x = x0-i*depth, y = y0+i*depth;
 			picoSprite(voxel.pixels[i], -1, x,y, angle, s1);
 		}
 	}

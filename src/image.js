@@ -177,9 +177,9 @@ function picoImageSize(image) {
 }
 
 // Get image file.
-function picoImageFile(image) {
+function picoImageFile(image, name=null) {
 	try {
-		return image._file();
+		return image._file(name);
 	} catch (error) {
 		console.error(error);
 	}
@@ -818,7 +818,7 @@ pico.Image = class {
 	}
 
 	// Get image data file.
-	_file() {
+	_file(name=null) {
 		const decoded = atob(this.canvas[this.primary].toDataURL("image/png").replace(/^.*,/, ""));
 		const buffers = new Uint8Array(decoded.length);
 		for (let i = 0; i < decoded.length; i++) {
@@ -826,7 +826,7 @@ pico.Image = class {
 		}
 		try {
 			const blob = new Blob([buffers.buffer], {type: "image/png"});
-			const file = new File([blob], "image.png", {type: blob.type});
+			const file = new File([blob], name ? name : "image.png", {type: blob.type});
 			this._debug("Image data file: " + file.size);
 			return file;
 		} catch (error) {
