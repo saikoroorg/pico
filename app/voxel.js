@@ -8,10 +8,20 @@ var depth = 0; // Depth.
 var maximum = 6; // Maximum of dice faces.
 var maxmaximum = 20; // Maximum of numbered dice.
 var playing = 0; // Playing count.
+const colors = picoStringCode8("111333222444000");
+const pixels = [
+	picoStringCode6("077121131141122132142123133143126136146"),
+	picoStringCode6("077120130140111121131141151112122132142152113123133143153124134144116126136146156"),
+	picoStringCode6("077120130140111121131141151112122132142152113123133143153124134144125135145116126136146156"),
+	picoStringCode6("077120130140111121131141151112122132142152113123133143153124134144115125135145155116126136146156"),
+	picoStringCode6("077120130140111121131141151112122132142152113123133143153124134144125135145116126136146156"),
+	picoStringCode6("077120130140111221131241151112122132142152113223233243153124134144116126136146156"),
+	picoStringCode6("077132126136146"),
+];
 
 // Voxel class.
 Voxel = class {
-	static scale = [0.01,0.01,0.01];
+	static scale = [1,1,1];
 	static normals = [
 		[1,0,0],[-1,0,0],
 		[0,1,0],[0,-1,0],
@@ -26,31 +36,21 @@ Voxel = class {
 		[[1,0,0],[0,0,0],[1,1,0],[0,1,0],[1,1,0],[0,0,0]],
 	];
 
-	// constructor.
+	// Constructor.
 	constructor() {
-		this.colors = [255,255,255, 191,191,191, 127,127,127, 63,63,63, 0,0,0]; // Original design colors.
-		this.pixels = [
-		]; // Original design pixels.
+		this.colors = [];
+		this.pixels = [];
 	}
 
 	// Get normal string.
-	normalString(v0) {
-		let r = "";
-		for (let i=0; i<v0.length; i++) {
-			r += v0[i] ? v0[i] +"e+01" : "0e+00";
-			r += " ";
-		}
-		return r;
+	normalString(v) {
+		return v.join(" ");
 	}
 
 	// Get vertex string.
 	vertexString(v1, v0, s) {
-		let r = "", v=[(v1[0]+v0[0])*s[0], (v1[1]+v0[1])*s[1], (v1[2]+v0[2])*s[2]];
-		for (let i=0; i<v.length; i++) {
-			r += v[i] ? v[i] +"e+01" : "0e+00";
-			r += " ";
-		}
-		return r;
+		let v=[(v1[0]+v0[0])*s[0], (v1[1]+v0[1])*s[1], (v1[2]+v0[2])*s[2]];
+		return v.join(" ");
 	}
 
 	// Get vec.
@@ -158,6 +158,8 @@ async function appLoad() {
 			}
 		}
 	}
+	voxel.colors = voxel.colors.length>0 ? voxel.colors : colors;
+	voxel.pixels = voxel.pixels.length>0 ? voxel.pixels : pixels;
 	picoColor(voxel.colors);
 
 	picoLabel("action", "*");
