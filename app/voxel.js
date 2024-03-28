@@ -4,7 +4,7 @@ const maxdepth = 40; // Maximum of depth.
 const adddepth = 1; // Additions of depth.
 const depth0 = 4; // Initial depth.
 var count = 1; // Count of dice.
-var depth = 0; // Depth.
+var depth = 4; // Depth.
 var maximum = 6; // Maximum of dice faces.
 var maxmaximum = 20; // Maximum of numbered dice.
 var playing = 0; // Playing count.
@@ -18,6 +18,10 @@ const pixels = [
 	picoStringCode6("077120130140111221131241151112122132142152113223233243153124134144116126136146156"),
 	picoStringCode6("077132126136146"),
 ];
+const extraCharSprites = { // Extra char sprite table.
+	"↑": picoStringCode6("077931922932942913933953934935"),
+	"→": picoStringCode6("077931942913923933943953944935"),
+};
 
 // Voxel class.
 Voxel = class {
@@ -40,6 +44,52 @@ Voxel = class {
 	constructor() {
 		this.colors = [];
 		this.pixels = [];
+	}
+
+	// Rotate.
+	rotate(x,y) {
+		let newsize = 0;
+		for (let i=0; i<this.pixels.length; i++) {
+			let size = picoSpriteSize(this.pixels[i]);
+			if (newsize < size) {
+				newsize = size;
+			}
+		}
+		let newpixels = [];
+		for (let i=0; i<newsize; i++) {
+			newpixels[i] = [0,newsize,newsize];
+		}
+
+		// Rotate by axis x.
+		// new = [old.x, -old.z*x, old.y*x]
+		if (x) {
+			for (let i=0; i<this.pixels.length; i++) {
+				for (let j=1; j<this.pixels[i].length/3; j++) {
+					let y = (this.pixels.length-1-i) * x;
+					let z = this.pixels[i][j*3+2] * x;
+					let n = newpixels[z].length;
+					newpixels[z][n+0] = this.pixels[i][j*3+0];
+					newpixels[z][n+1] = this.pixels[i][j*3+1];
+					newpixels[z][n+2] = y;
+				}
+			}
+			this.pixels = newpixels;
+
+		// Rotate by axis y.
+		// new = [old.z*-y, old.y, old.x*y]
+		} else if (y) {
+			for (let i=0; i<this.pixels.length; i++) {
+				for (let j=1; j<this.pixels[i].length/3; j++) {
+					let x = (this.pixels.length-1-i) * y;
+					let z = this.pixels[i][j*3+1] * y;
+					let n = newpixels[z].length;
+					newpixels[z][n+0] = this.pixels[i][j*3+0];
+					newpixels[z][n+1] = x;
+					newpixels[z][n+2] = this.pixels[i][j*3+2];
+				}
+			}
+			this.pixels = newpixels;
+		}
 	}
 
 	// Get normal string.
@@ -99,11 +149,9 @@ async function appAction() {
 
 	// Enter to edit mode with custom design.
 	let key = 0;
-	if (voxel.pixels.length > 0) {
-		for (; key < voxel.pixels.length; key++) {
-			if (voxel.pixels[key].length > 0) {
-				picoSetCode6(voxel.pixels[key], key);
-			}
+	for (; key < voxel.pixels.length; key++) {
+		if (voxel.pixels[key].length > 0) {
+			picoSetCode6(voxel.pixels[key], key);
 		}
 	}
 	if (voxel.colors.length > 0) {
@@ -120,8 +168,9 @@ async function appAction() {
 // Select button.
 async function appSelect(x) {
 	if (x) {
-		depth = depth + (x*adddepth) < 0 ? 0 : depth + (x*adddepth) < maxdepth ? depth + (x*adddepth) : maxdepth;
-		picoLabel("select", depth>0?""+depth:"&");
+		//depth = depth + (x*adddepth) < 0 ? 0 : depth + (x*adddepth) < maxdepth ? depth + (x*adddepth) : maxdepth;
+		//picoLabel("select", depth>0?""+depth:"&");
+		voxel.rotate(x<0?1:0, x>0?1:0);
 		picoFlush();
 	} else {
 
@@ -151,7 +200,7 @@ async function appLoad() {
 				voxel.colors = picoCode8(keys[k]);
 
 			// Load pixels.
-			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0" && value.length >= 6) {
+			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
 				voxel.pixels[voxel.pixels.length] = picoCode6(keys[k]);
 				maxmaximum = maximum = voxel.pixels.length;
 				custom = true;
@@ -163,9 +212,9 @@ async function appLoad() {
 	picoColor(voxel.colors);
 
 	picoLabel("action", "*");
-	picoLabel("select", depth>0?""+depth:"&");
-	picoLabel("minus", "-");
-	picoLabel("plus", "+");
+	picoLabel("select", "&");
+	picoLabel("minus", null, await picoSpriteData(extraCharSprites["↑"]));
+	picoLabel("plus", null, await picoSpriteData(extraCharSprites["→"]));
 }
 
 var angle = 0; // Rolling angle.
@@ -208,7 +257,7 @@ async function appMain() {
 		if (picoAction()) {
 			depth = depth0;
 			playing = -1;
-			picoLabel("select", depth>0?""+depth:"&");
+			//picoLabel("select", depth>0?""+depth:"&");
 			picoBeep(1.2, 0.1);
 		} else if (picoMotion()) {
 			s1 = 8;
@@ -227,7 +276,7 @@ async function appMain() {
 		if (picoAction()) {
 			depth = 0;
 			playing = -1;
-			picoLabel("select", depth>0?""+depth:"&");
+			//picoLabel("select", depth>0?""+depth:"&");
 			picoBeep(1.2, 0.1);
 		} else if (picoMotion()) {
 			s1 = 8;

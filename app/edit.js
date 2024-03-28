@@ -66,8 +66,10 @@ async function appAction() {
 	for (let p = 0; p < anime; p++) {
 		if (buffers[p]) {
 			picoSetCode6(buffers[p], k);
-			k++;
+		} else {
+			picoSetCode6([0,7,7], k);
 		}
+		k++;
 	}
 	if (k == 0) {
 		picoSetCode6([0,7,7], k);
@@ -162,7 +164,7 @@ async function appLoad() {
 				console.log("Load color: " + colors);
 
 			// Load pixels.
-			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0" && value.length >= 6) {
+			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
 				buffers[framecount] = picoCode6(keys[k]);
 				frame = framecount;
 				anime = framecount + 1;
