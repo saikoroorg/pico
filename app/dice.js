@@ -108,8 +108,11 @@ async function appAction() {
 			}
 		}
 
-		// Enter to edit mode.
-		picoSwitchApp(editjs); // Open editor.
+		// Back or edit.
+		if (!picoReturnApp()) {
+			// Enter to edit mode.
+			picoSwitchApp(editjs); // Open editor.
+		}
 
 	// Share screen.
 	} else if (result > 0) {
@@ -332,7 +335,7 @@ async function appMain() {
 
 		// Update angle.
 		if (result <= 0) {
-			angle = picoMod(angle + 20, 360);
+			angle = picoMod(angle + 40, 360);
 			for (let i = 0; i < count; i++) {
 				randoms[i] = picoMod(picoTime(), maximum);
 			}
