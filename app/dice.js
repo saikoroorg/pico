@@ -40,6 +40,7 @@ const kcents = [-1.0,
 	 1.5, 1.7, 1.9,  2.0, 2.2];
 var colors = [255,255,255, 0,0,0]; // Original design colors.
 var pixels = []; // Original design pixels.
+var bgcolor = 0; // Original design bg color.
 var count = 1; // Count of dice.
 const maxcount = 20; // Maximum count of dice
 var maximum = 6; // Maximum of dice faces.
@@ -60,15 +61,15 @@ async function appUpdate() {
 	}
 	if (pixels.length > 0) {
 		picoColor(colors);
-		let data = await picoSpriteData(pixels[maximum - 1]);
+		let data = await picoSpriteData(pixels[maximum - 1], bgcolor);
 		picoLabel("select", null, data);
 	} else if (maximum <= 9) {
 		picoColor(colors);
-		let data = await picoSpriteData(dots[maximum - 1]);
+		let data = await picoSpriteData(dots[maximum - 1], 0);
 		picoLabel("select", null, data);
 	} else if (maximum <= maxmaximum) {
 		picoColor(colors);
-		let data = await picoSpriteData(nums[maximum]);
+		let data = await picoSpriteData(nums[maximum], 0);
 		picoLabel("select", null, data);
 	} else {
 		picoLabel("select", "#");
@@ -118,16 +119,17 @@ async function appAction() {
 
 // Select button.
 async function appSelect(x) {
+	// Change count of dice.
 	if (x) {
-
-		// Change count of dice.
 		if ((x > 0 && count + x <= maxcount) || (x < 0 && count + x > 0)) {
+			custom = false;
+			picoLabel("action");
 			count = count + x;
 			playing = -1; // Reroll.
 			result = 0;
 			picoBeep(1.2, 0.1);
 			appResize(); // Update positions.
-			appUpdate(); // Update buttons.
+			//appUpdate(); // Update buttons.
 		} else {
 			picoBeep(-1.2, 0.1);
 		}
@@ -135,24 +137,28 @@ async function appSelect(x) {
 	// Do nothing on customize dice.
 	} else if (pixels.length > 0) {
 		custom = true;
+		picoLabel("action", "*");
 		picoBeep(-1.2, 0.1);
 
 	// Change custom mode.
 	} else if (!custom) {
 		custom = true;
+		picoLabel("action", "*");
 		picoBeep(1.2, 0.1);
 		appResize(); // Update positions.
-		appUpdate(); // Update buttons.
+		//appUpdate(); // Update buttons.
 
 	// Change maximum of dice faces.
 	} else {
 		custom = true;
+		picoLabel("action", "*");
+
 		maximum = maximum < 8 ? 8 : maximum < 10 ? 10 : 6;
 		playing = -1; // Reroll.
 		result = 0;
 		picoBeep(1.2, 0.1);
 		appResize(); // Update positions.
-		appUpdate(); // Update buttons.
+		//appUpdate(); // Update buttons.
 	}
 }
 
@@ -168,9 +174,14 @@ async function appLoad() {
 			console.log("Param" + k + ": " + keys[k] + " -> " + picoString(k));
 
 			// Load colors.
-			if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ||
-				(value[0] == "1" && value[1] == "1" && value[2] == "1")) {
+			if ((value[0] == "1" && value[1] == "1" && value[2] == "1")) {
 				colors = picoCode8(keys[k]);
+				bgcolor = 0;
+
+			// Load colors with transparent color.
+			} else if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ) {
+				colors = picoCode8(keys[k]);
+				bgcolor = -1;
 
 			// Load pixels.
 			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0" && value.length >= 6) {
@@ -288,7 +299,8 @@ async function appMain() {
 
 				// Reset playing count.
 				playing = -1;
-				appUpdate();
+				//appUpdate();
+				picoLabel("action");
 			}
 
 		} else {
@@ -305,7 +317,8 @@ async function appMain() {
 				}
 				angle = 0;
 				playing = 1;
-				appUpdate();
+				//appUpdate();
+				picoLabel("action", "&");
 
 				// Number matched beeps on show result.
 				let timing = count <= 2 ? 0.2 : 0.5/count;
@@ -335,7 +348,8 @@ async function appMain() {
 			custom = 0;
 			playing = -1;
 			picoBeep(1.2, 0.1);
-			appUpdate();
+			//appUpdate();
+			picoLabel("action");
 		} else if (picoMotion()) {
 			s1 = 8;
 		}
@@ -344,7 +358,7 @@ async function appMain() {
 		picoColor(colors);
 		if (pixels.length > 0) {
 			s1 = s1 * 7 / picoSpriteSize(pixels[maximum - 1]);
-			picoSprite(pixels[maximum - 1], 0, x1, y1, 0, s1);
+			picoSprite(pixels[maximum - 1], bgcolor, x1, y1, 0, s1);
 
 		// Draw dotted design sprite.	
 		} else if (maximum <= 9) {
@@ -371,7 +385,7 @@ async function appMain() {
 		if (pixels.length > 0) {
 			for (let i = 0; i < count; i++) {
 				let s1 = s * 7 / picoSpriteSize(pixels[randoms[i]]);
-				picoSprite(pixels[randoms[i]], 0, posx[i], posy[i], angle, s1);
+				picoSprite(pixels[randoms[i]], bgcolor, posx[i], posy[i], angle, s1);
 			}
 
 		// Draw dotted design sprite.

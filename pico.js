@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40328"; // Updatable by package.json.
+pico.version = "0.9.40330"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -139,9 +139,9 @@ function picoSpriteSize(cells=[-1,0,0]) {
 }
 
 // Get sprite image data.
-async function picoSpriteData(cells=[-1,0,0], scale=10) {
+async function picoSpriteData(cells=[-1,0,0], bgcolor=-1, scale=10) {
 	try {
-		return await pico.image.offscreen.spriteData(cells, scale, pico.image);
+		return await pico.image.offscreen.spriteData(cells, bgcolor, scale, pico.image);
 	} catch (error) {
 		console.error(error);
 	}
@@ -420,7 +420,7 @@ pico.Image = class {
 	}
 
 	// Draw offscreen and get sprite image data.
-	spriteData(cells=[-1,0,0], scale=10, parent=null) {
+	spriteData(cells=[-1,0,0], bgcolor=-1, scale=10, parent=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (parent) {
 				await navigator.locks.request(parent.lock, async (parentlock) => {
@@ -431,7 +431,7 @@ pico.Image = class {
 			await this._resize(size * scale, size * scale);
 			await this._ready();
 			await this._reset(0, 0, 0, scale);
-			await this._sprite(cells, -1, 0);
+			await this._sprite(cells, -1, bgcolor);
 			return this._data();
 		}); // end of lock.
 	}

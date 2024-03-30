@@ -1,5 +1,6 @@
 const title = "Edit"; // Title.
 var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
+var bgcolor = 0; // Original design bg color.
 const maxwidth = 20, maxheight = 20; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
@@ -41,7 +42,7 @@ async function appUpdate(force = true) {
 
 	// Update icon image.
 	if (buffers[frame]) {
-		let data = await picoSpriteData(buffers[frame]);
+		let data = await picoSpriteData(buffers[frame], bgcolor);
 		picoLabel("action", null, data);
 	} else {
 		picoLabel("action", "&");
@@ -154,10 +155,22 @@ async function appLoad() {
 		if (value) {
 			console.log("Param" + k + ": " + keys[k] + " -> " + picoString(k));
 
+
 			// Load colors.
-			if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ||
-				(value[0] == "1" && value[1] == "1" && value[2] == "1")) {
+			if ((value[0] == "1" && value[1] == "1" && value[2] == "1")) {
 				colors = picoCode8(keys[k]);
+				bgcolor = 0;
+
+				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
+				depth = colors.length / 3;
+				colorselecting = depth - 1;
+				console.log("Load color: " + colors);
+
+			// Load colors with transparent color.
+			} else if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ) {
+				colors = picoCode8(keys[k]);
+				bgcolor = -1;
+
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
 				depth = colors.length / 3;
 				colorselecting = depth - 1;
@@ -341,6 +354,8 @@ async function appMain() {
 						let c = colors[0];
 						colors[0] = colors[1] = colors[2] = c > 0 ? 0 : 255;
 						bgindex = colors[0] != 0 ? 0 : -1;
+						bgcolor = colors[0] != 0 ? 0 : -1;
+						appUpdate(); // Update thumbnail.
 						picoBeep(1.2, 0.1);
 						colortouching = -1;
 						colorholding = 0;
