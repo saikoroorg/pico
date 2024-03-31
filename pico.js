@@ -438,11 +438,11 @@ pico.Image = class {
 
 	// Draw bg/watermark and get screen data file.
 	async screenFile(watermark=null, fgcolor=-1, bgcolor=-1, name=null) {
-		if (!watermark && bgcolor < 0) {
-			return await pico.image._file(name);
-		}
 		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
 			await navigator.locks.request(this.lock, async (lock) => {
+				if (!watermark && bgcolor < 0) {
+					return pico.image._file(name);
+				}
 				this.offscreen.colors = Object.assign([], this.colors);
 				this.offscreen.leading = this.leading;
 				this.offscreen.vleading = this.vleading;
@@ -807,12 +807,12 @@ pico.Image = class {
 				let cx = (this.canvas[0].width - width) / 2;
 				let cy = (this.canvas[0].height - height) / 2;
 				this._debug("DrawImage: " + cx + "," + cy + " " + sx + "," + sy + " " + width + "," + height);
-				this.context.drawImage(image.canvas[0], sx, sy, width, height, cx, cy, width, height);
+				this.context.drawImage(image.canvas[image.primary], sx, sy, width, height, cx, cy, width, height);
 			} else {
 				let cx = (this.canvas[0].width - image.canvas[0].width) / 2;
 				let cy = (this.canvas[0].height - image.canvas[0].height) / 2;
 				this._debug("DrawImage: " + cx + "," + cy + " " + image.canvas[0].width + "," + image.canvas[0].height);
-				this.context.drawImage(image.canvas[0], cx, cy);
+				this.context.drawImage(image.canvas[image.primary], cx, cy);
 			}
 			resolve();
 		}); // end of new Promise.

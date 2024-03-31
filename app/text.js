@@ -284,10 +284,10 @@ const extraCharAiliases = [ // Extra char ailiases.
 
 const maxstate = 6;
 const labels = {
-	0:"　　　　　　いろはにほへと　　　　　　",
+	0:"いろはにほへと",
 };
 for (let i = 1; i <= maxstate; i++) {
-	labels[i] = labels[0];
+	labels[i] = labels[0]+i;
 }
 const maxfig = 17 * 7;
 const figs = {
@@ -351,11 +351,10 @@ async function appAction() {
 		await picoRect(2, 0,-52, 144,64, 0,1);
 		await picoText(figs[i], -1, 0,-52, 136,56, 0,1);
 		await picoText(texts[i].substr(0,maxtext-1), -1, 0,32, 152,96, 0,1);
-		await picoFlip();
-		await picoFlip(10); //@todo use lock mechanism.
 		await picoCharLeading(4,6);
 		files[i] = await picoScreenFile(pico.app.author, 0, -1, "image"+i+".png");
-		await picoWait(100); //@todo use lock mechanism.
+		await picoFlip(0); // @todo: Flip after get screen file for first screen.
+		console.log("File"+i+": "+labels[i]+":"+files[i].name);
 	}
 	await picoShare(null, files);
 	await picoCharLeading(8,8);
@@ -367,6 +366,7 @@ async function appAction() {
 
 // Load.
 async function appLoad() {
+	pico.Param.debug = true;
 	await picoTitle(title);
 
 	for (let chars in katakana5x5CharSprites) {
@@ -425,10 +425,13 @@ async function appMain() {
 		picoFlush();
 	}
 
+	console.log("Draw.");
+/*
 	picoClear();
 	picoText(labels[state], -1, 0,-92, 152,8, 0,1)
 	picoRect(2, 0,-52, 144,64, 0,1);
 	picoText(figs[state], -1, 0,-52, 136,56, 0,1);
 	picoText(texts[state].substr(0,pressing?maxtext-1:playing), -1, 0,32, 152,96, 0,1);
-	picoText(dots[state], -1, 0,92, 152,8, 0,1)
+	picoText(dots[state], -1, 0,92, 152,8, 0,1);
+*/
 }
