@@ -353,15 +353,9 @@ async function appAction() {
 		await picoText(texts[i].substr(0,maxtext-1), -1, 0,32, 152,96, 0,1);
 		await picoCharLeading(4,6);
 		files[i] = await picoScreenFile(pico.app.author, 0, -1, "image"+i+".png");
-		await picoFlip(0); // @todo: Flip after get screen file for first screen.
-		console.log("File"+i+": "+labels[i]+":"+files[i].name);
 	}
 	await picoShare(null, files);
 	await picoCharLeading(8,8);
-
-	// Restart.
-	state = 0;
-	playing = 0;
 }
 
 // Load.
@@ -425,13 +419,10 @@ async function appMain() {
 		picoFlush();
 	}
 
-	console.log("Draw.");
-/*
 	picoClear();
 	picoText(labels[state], -1, 0,-92, 152,8, 0,1)
 	picoRect(2, 0,-52, 144,64, 0,1);
 	picoText(figs[state], -1, 0,-52, 136,56, 0,1);
 	picoText(texts[state].substr(0,pressing?maxtext-1:playing), -1, 0,32, 152,96, 0,1);
 	picoText(dots[state], -1, 0,92, 152,8, 0,1);
-*/
 }
