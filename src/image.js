@@ -141,9 +141,9 @@ async function picoSpriteData(cells=[-1,0,0], bgcolor=-1, scale=10) {
 }
 
 // Get screen data file.
-async function picoScreenFile(watermark=null, fgcolor=-1, bgcolor=-1) {
+async function picoScreenFile(watermark=null, fgcolor=-1, bgcolor=-1, name=null) {
 	try {
-		return await pico.image.screenFile(watermark, fgcolor, bgcolor);
+		return await pico.image.screenFile(watermark, fgcolor, bgcolor, name);
 	} catch (error) {
 		console.error(error);
 	}
@@ -430,9 +430,9 @@ pico.Image = class {
 	}
 
 	// Draw bg/watermark and get screen data file.
-	async screenFile(watermark=null, fgcolor=-1, bgcolor=-1) {
+	async screenFile(watermark=null, fgcolor=-1, bgcolor=-1, name=null) {
 		if (!watermark && bgcolor < 0) {
-			return await pico.image._file();
+			return await pico.image._file(name);
 		}
 		return navigator.locks.request(this.offscreen.lock, async (offscreenlock) => {
 			await navigator.locks.request(this.lock, async (lock) => {
@@ -454,9 +454,20 @@ pico.Image = class {
 			}
 			await this.offscreen._image(pico.image);
 			if (watermark && watermark.length >= 2) {
-				await this.offscreen._char(watermark, fgcolor);
+				let w = this.offscreen.leading;
+				let h = this.offscreen.vleading;
+				let x = this.offscreen.canvas[0].width/pico.Image.ratio/2 - (w * (watermark.length + 1) / 2);
+				let y = this.offscreen.canvas[0].height/pico.Image.ratio/2 - h;
+				await this.offscreen._move(x, y);
+				if (watermark.length >= 2) {
+					await this.offscreen._move(-(watermark.length-1)/2 * w, 0);
+				}
+				for (let i = 0; i < watermark.length; i++) {
+					await this.offscreen._char(watermark.charCodeAt(i), fgcolor);
+					await this.offscreen._move(w, 0);
+				}
 			}
-			return pico.image.offscreen._file();
+			return pico.image.offscreen._file(name);
 		}); // end of lock.
 	}
 

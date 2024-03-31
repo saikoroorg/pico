@@ -289,15 +289,6 @@ const labels = {
 for (let i = 1; i <= maxstate; i++) {
 	labels[i] = labels[0];
 }
-const dots = {
-	0:"　　　　　　■□□□□□□　　　　　　",
-	1:"　　　　　　□■□□□□□　　　　　　",
-	2:"　　　　　　□□■□□□□　　　　　　",
-	3:"　　　　　　□□□■□□□　　　　　　",
-	4:"　　　　　　□□□□■□□　　　　　　",
-	5:"　　　　　　□□□□□■□　　　　　　",
-	6:"　　　　　　□□□□□□■　　　　　　",
-};
 const maxfig = 17 * 7;
 const figs = {
 	0:"いろはにほへとちりぬるを、わかよた"+
@@ -326,6 +317,15 @@ const texts = {
 		"□□□□□□□□□□□□□□□□□□□"+
 		"□□□□□□□□□□□□□□□□□□▼",
 };
+const dots = {
+	0:"　　　　　　■□□□□□□　　　　　　",
+	1:"　　　　　　□■□□□□□　　　　　　",
+	2:"　　　　　　□□■□□□□　　　　　　",
+	3:"　　　　　　□□□■□□□　　　　　　",
+	4:"　　　　　　□□□□■□□　　　　　　",
+	5:"　　　　　　□□□□□■□　　　　　　",
+	6:"　　　　　　□□□□□□■　　　　　　",
+};
 const allChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" +
 	Object.keys(katakana5x5CharSprites).join("") + 
 	Object.keys(hiragana5x5CharSprites).join("") + 
@@ -340,6 +340,30 @@ for (let i = 0; i <= maxstate; i++) {
 
 var state = 0; // Playing state.
 var playing = 0; // Playing count.
+
+// Action button.
+async function appAction() {
+	let files = [];
+	for (let i = 0; i <= maxstate; i++) {
+		await picoClear();
+		await picoCharLeading(8,8);
+		await picoText(labels[i], -1, 0,-92, 152,8, 0,1)
+		await picoRect(2, 0,-52, 144,64, 0,1);
+		await picoText(figs[i], -1, 0,-52, 136,56, 0,1);
+		await picoText(texts[i].substr(0,maxtext-1), -1, 0,32, 152,96, 0,1);
+		await picoFlip();
+		await picoFlip(10); //@todo use lock mechanism.
+		await picoCharLeading(4,6);
+		files[i] = await picoScreenFile(pico.app.author, 0, -1, "image"+i+".png");
+		await picoWait(100); //@todo use lock mechanism.
+	}
+	await picoShare(null, files);
+	await picoCharLeading(8,8);
+
+	// Restart.
+	state = 0;
+	playing = 0;
+}
 
 // Load.
 async function appLoad() {
@@ -361,6 +385,8 @@ async function appLoad() {
 		picoCharSprite(extraCharAiliases[i]);
 	}
 	picoCharLeading(8,8);
+
+	picoLabel("action", "&");
 }
 
 // Main.
@@ -401,9 +427,8 @@ async function appMain() {
 
 	picoClear();
 	picoText(labels[state], -1, 0,-92, 152,8, 0,1)
-	picoRect(0, 0,-52, 144,64, 0,1);
+	picoRect(2, 0,-52, 144,64, 0,1);
 	picoText(figs[state], -1, 0,-52, 136,56, 0,1);
-	picoRect(0, 0,32, 160,104, 0,1);
 	picoText(texts[state].substr(0,pressing?maxtext-1:playing), -1, 0,32, 152,96, 0,1);
 	picoText(dots[state], -1, 0,92, 152,8, 0,1)
 }

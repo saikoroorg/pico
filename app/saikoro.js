@@ -14,6 +14,7 @@ const devitems = [ // Menu items for dev.
 	["dice", "app/dice.svg", "app/dice.js"],
 	["clock", "app/clock.svg", "app/clock.js"],
 	["kuku", "app/kuku.svg", "app/kuku.js"],
+	["text", "app/text.svg", "app/text.js"],
 	["chess", "app/chess.svg", "app/chess.js"],
 	["shogi", "app/shogi.svg", "app/shogi.js"],
 	["bros", "app/bros.svg", "app/bros.js"],
