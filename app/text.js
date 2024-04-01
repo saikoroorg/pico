@@ -396,6 +396,7 @@ async function appLoad() {
 	picoCharLeading(8,8);
 
 	picoLabel("action", "&");
+	picoWideScreen(true);
 }
 
 // Main.
