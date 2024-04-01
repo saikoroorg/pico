@@ -328,38 +328,28 @@ const nums = [ // Numbered design pixels.
 ];
 
 window.addEventListener("load", async (evt) => {
-
-	for (let i = 0; i < dots.length; i++) {
-		console.log("0: " + dots[i]);
-		console.log("x=1: " + picoSpriteFlip(dots[i],1));
-		console.log("y=1: " + picoSpriteFlip(dots[i],0,1));
+	let extraChars = "";
+	for (let chars in katakana5x5CharSprites) {
+		picoCharSprite(chars, katakana5x5CharSprites[chars]);
+		extraChars += chars[0];
 	}
+	for (let chars in hiragana5x6CharSprites) {
+		picoCharSprite(chars, hiragana5x6CharSprites[chars]);
+		extraChars += chars[0];
+	}
+	for (let chars in symbol5x5CharSprites) {
+		picoCharSprite(chars, symbol5x5CharSprites[chars]);
+		extraChars += chars[0];
+	}
+	for (let i = 0; i < extraCharAiliases.length; i++) {
+		picoCharSprite(extraCharAiliases[i]);
+	}
+	picoCharLeading(8,8);
+	picoColor(colors);
 
-
-		let extraChars = "";
-		for (let chars in katakana5x5CharSprites) {
-			picoCharSprite(chars, katakana5x5CharSprites[chars]);
-			extraChars += chars[0];
-		}
-		for (let chars in hiragana5x5CharSprites) {
-			picoCharSprite(chars, hiragana5x5CharSprites[chars]);
-			extraChars += chars[0];
-		}
-		for (let chars in symbol5x5CharSprites) {
-			picoCharSprite(chars, symbol5x5CharSprites[chars]);
-			extraChars += chars[0];
-		}
-		for (let i = 0; i < extraCharAiliases.length; i++) {
-			picoCharSprite(extraCharAiliases[i]);
-		}
-		picoCharLeading(8,8);
-		picoColor(colors);
-
-		picoClear();
-		picoRect(1, 0,0,150,150, 0,1);
-		picoText(builtinChars + extraChars, -1, 0,0,120,120, 0,1);
-		await picoFlip(20);
-
+	picoClear();
+	picoRect(1, 0,0,150,150, 0,1);
+	picoText(builtinChars + extraChars, -1, 0,0,120,120, 0,1);
 });
 var count = 0;
 document.addEventListener("click", async (evt) => {
@@ -368,45 +358,14 @@ if (count <= 0) {
 
 //*/
 	if (count <= 1) {
-		let extraChars = "";
-		for (let chars in katakana5x5CharSprites) {
-			picoCharSprite(chars, katakana5x5CharSprites[chars]);
-			extraChars += chars[0];
+		let image = await picoScreenImage();
+
+		for (let i = 0; i <= 180; i++) {
+			picoClear();
+			picoImage(image, 0,0, i*5);
+			await picoFlip(20);
 		}
-		for (let chars in hiragana5x6CharSprites) {
-			picoCharSprite(chars, hiragana5x6CharSprites[chars]);
-			extraChars += chars[0];
-		}
-		for (let chars in symbol5x5CharSprites) {
-			picoCharSprite(chars, symbol5x5CharSprites[chars]);
-			extraChars += chars[0];
-		}
-		for (let i = 0; i < extraCharAiliases.length; i++) {
-			picoCharSprite(extraCharAiliases[i]);
-		}
-		picoCharLeading(8,8);
-		picoColor(colors);
 
-		picoClear();
-		picoRect(1, 0,0,150,150, 0,1);
-		picoText(builtinChars + extraChars, -1, 0,0,120,120, 0,1);
-		await picoFlip(20);
-
-/*/
-	//for (let i = 0; i <= 180; i++) {
-	//	picoClear();
-
-		await picoRect(2, 0,-60, 0, 52,52); // width: 52
-		await picoChar("00", 1, 0,-60, 0,6); // width: (4*2+1) x6 = 54
-
-		await picoRect(2, 0,0, 0, 52,52); // width: 52
-		await picoChar("000", 1, 0,0, 0,4); // width: (4*3+1) x4 = 52
-
-		await picoRect(2, 0,60, 0, 52,52); // width: 52
-		await picoChar("0000", 1, 0,60, 0,3); // width: (4*4+1) x3 = 51
-
-	//	await picoFlip(20);
-	//}
 //*/
 	} else if (count <= 2) {
 
