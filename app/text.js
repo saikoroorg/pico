@@ -282,12 +282,12 @@ const extraCharAiliases = [ // Extra char ailiases.
 	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
 ];
 
-const maxstate = 6;
+const maxstate = 8;//6;
 const labels = {
 	0:"いろはにほへと",
 };
-for (let i = 1; i <= maxstate; i++) {
-	labels[i] = labels[0]+i;
+for (let i = 1; i < maxstate; i++) {
+	labels[i] = labels[0]+" "+i;
 }
 const maxfig = 17 * 7;
 const figs = {
@@ -299,10 +299,10 @@ const figs = {
 	  "ごえで、あざぎゆめみじゑびもぜず。"+
 	  "ぱぴぷぺぽんぁぃぅぇぉっゃゅょー　",
 };
-for (let i = 1; i <= maxstate; i++) {
+for (let i = 1; i < maxstate; i++) {
 	figs[i] = figs[0];
 }
-const maxtext = 19 * 12;
+const maxtext = 17 * 13;
 const texts = {
 	0:"□□□□□□□□□□□□□□□□□□□"+
 		"□□□□□□□□□□□□□□□□□□□"+
@@ -330,7 +330,7 @@ const allChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" +
 	Object.keys(katakana5x5CharSprites).join("") + 
 	Object.keys(hiragana5x5CharSprites).join("") + 
 	Object.keys(symbol5x5CharSprites).join("");
-for (let i = 0; i <= maxstate; i++) {
+for (let i = 0; i < maxstate; i++) {
 	texts[i] = "";
 	for (let j = 0; j < maxtext - 1; j++) {
 		texts[i] += i > 0 ? allChars[picoRandom(allChars.length)] : j < allChars.length ? allChars[j] : " ";
@@ -341,21 +341,36 @@ for (let i = 0; i <= maxstate; i++) {
 var state = 0; // Playing state.
 var playing = 0; // Playing count.
 
+// Draw text.
+function appDrawText(i, j) {
+	picoClear();
+	picoText(labels[i], -1, 0,-92, 72,8, 0,1)
+	picoRect(2, 0,-52, 136,64, 0,1);
+	picoText(figs[i], -1, 0,-52, 136,56, 0,1);
+	picoText(texts[i].substr(0,j), -1, 0,36, 136,104, 0,1);
+}
+
 // Action button.
 async function appAction() {
-	let files = [];
-	for (let i = 0; i <= maxstate; i++) {
-		await picoClear();
-		await picoCharLeading(8,8);
-		await picoText(labels[i], -1, 0,-92, 152,8, 0,1)
-		await picoRect(2, 0,-52, 144,64, 0,1);
-		await picoText(figs[i], -1, 0,-52, 136,56, 0,1);
-		await picoText(texts[i].substr(0,maxtext-1), -1, 0,32, 152,96, 0,1);
-		await picoCharLeading(4,6);
-		files[i] = await picoScreenFile(pico.app.author, 0, -1, "image"+i+".png");
+	let images = [];
+	for (let i = 0; i < maxstate; i++) {
+		appDrawText(i, maxtext-1);
+		images[i] = await picoScreenImage();
 	}
-	await picoShare(null, files);
-	await picoCharLeading(8,8);
+	picoClear();
+//	const width=500, height=700; //A4x600dpi=4961x7016
+	const width=560, height=400; //A4x600dpi=4961x7016
+	picoResize(width, height);
+	for (let i = 0; i < maxstate; i++) {
+//		picoImage(images[i],picoMod(i,2)*200-(width/2-150),picoDiv(i,2)*200-(height/2-150));
+//		picoImage(images[i],picoMod(i,2)*237.5-(237.5*0.5),picoDiv(i,2)*193.75-(193.75*1.5));
+		picoImage(images[i],picoDiv(i,2)*140-(140*1.5),picoMod(i,2)*200-(200*0.5));
+	}
+	picoCharLeading(4,6);
+	let file = await picoScreenFile(pico.app.author, 1, 0);
+	picoShare(null, [file]);
+	picoCharLeading(8,8);
+	picoResize();
 }
 
 // Load.
@@ -388,7 +403,7 @@ async function appMain() {
 	let pressing = 0;
 	if (playing >= texts[state].length) {
 		if (picoAction()) {
-			state = state + 1 <= maxstate ? state + 1: 0;
+			state = state + 1 < maxstate ? state + 1: 0;
 
 			// Switch hiragana char sprites.
 			if (!picoMod(state, 2)) {
@@ -420,9 +435,6 @@ async function appMain() {
 	}
 
 	picoClear();
-	picoText(labels[state], -1, 0,-92, 152,8, 0,1)
-	picoRect(2, 0,-52, 144,64, 0,1);
-	picoText(figs[state], -1, 0,-52, 136,56, 0,1);
-	picoText(texts[state].substr(0,pressing?maxtext-1:playing), -1, 0,32, 152,96, 0,1);
+	appDrawText(state, pressing?maxtext-1:playing);
 	picoText(dots[state], -1, 0,92, 152,8, 0,1);
 }

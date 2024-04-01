@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40331"; // Updatable by package.json.
+pico.version = "0.9.40401"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -43,6 +43,15 @@ async function picoFlip(t=10) {
 async function picoClear() {
 	try {
 		await pico.image.clear();
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+// Resize image.
+async function picoResize(width=0, height=0) {
+	try {
+		await pico.image.resize(width, height);
 	} catch (error) {
 		console.error(error);
 	}
@@ -151,6 +160,15 @@ async function picoSpriteData(cells=[-1,0,0], bgcolor=-1, scale=10) {
 async function picoScreenFile(watermark=null, fgcolor=-1, bgcolor=-1, name=null) {
 	try {
 		return await pico.image.screenFile(watermark, fgcolor, bgcolor, name);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
+// Clone screen image.
+async function picoScreenImage() {
+	try {
+		return await pico.image.cloneImage();
 	} catch (error) {
 		console.error(error);
 	}
@@ -286,6 +304,13 @@ pico.Image = class {
 		}); // end of lock.
 	}
 
+	// Resize image.
+	resize(width=0, height=0) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			await this._resize(width, height);
+		}); // end of lock.
+	}
+
 	// Set image color pallete.
 	color(colors=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
@@ -374,7 +399,7 @@ pico.Image = class {
 				width = this.leading*text.length;
 				height = this.vleading;
 			}
-			await this._resize(width * scale, height * scale);
+			this._resize(width * scale, height * scale);
 			await this._ready();
 			await this._text(text, c, 0, 0, width, height, 0, scale);
 			return this._data();
@@ -428,7 +453,7 @@ pico.Image = class {
 				}); // end of lock.
 			}
 			let size = this._spriteSize(cells);
-			await this._resize(size * scale, size * scale);
+			this._resize(size * scale, size * scale);
 			await this._ready();
 			await this._reset(0, 0, 0, scale);
 			await this._sprite(cells, -1, bgcolor);
@@ -443,21 +468,14 @@ pico.Image = class {
 				if (!watermark && bgcolor < 0) {
 					return pico.image._file(name);
 				}
-				this.offscreen.colors = Object.assign([], this.colors);
-				this.offscreen.leading = this.leading;
-				this.offscreen.vleading = this.vleading;
-				this.offscreen.sprites = Object.assign({}, this.sprites);
-				this.offscreen.aliases = Object.assign({}, this.aliases);
+				this.offscreen._copy(this);
 			}); // end of lock.
-			await this.offscreen._resize(
-				pico.image.canvas[0].width/pico.Image.ratio,
-				pico.image.canvas[0].height/pico.Image.ratio);
 			await this.offscreen._ready();
 			await this.offscreen._reset(0, 0, 0, 1);
 			if (bgcolor >= 0) {
 				await this.offscreen._draw(bgcolor,
-					-pico.Image.width/2, -pico.Image.height/2,
-					pico.Image.width, pico.Image.height);
+					-this.offscreen.canvas[0].width/2, -this.offscreen.canvas[0].height/2,
+					this.offscreen.canvas[0].width, this.offscreen.canvas[0].height);
 			}
 			await this.offscreen._image(pico.image);
 			if (watermark && watermark.length >= 2) {
@@ -475,6 +493,14 @@ pico.Image = class {
 				}
 			}
 			return pico.image.offscreen._file(name);
+		}); // end of lock.
+	}
+
+	// Clone image.
+	cloneImage() {
+		return navigator.locks.request(this.lock, async (lock) => {
+			let image = new pico.Image("");
+			return image._copy(this);
 		}); // end of lock.
 	}
 
@@ -519,11 +545,11 @@ pico.Image = class {
 		this.canvas = []; // Double buffered canvas elements.
 		this.primary = 0; // Primary canvas index.
 		this.context = null; // Canvas 2d context.
-		this.colors = pico.Image.colors.concat(); // Master image color. 
+		this.colors = Object.assign([], pico.Image.colors); // Master image color. 
 		this.leading = pico.Image.leading; // Char leading.
 		this.vleading = pico.Image.vleading; // Line leading (vertical).
-		this.sprites = pico.Image.csprites; // Char sprites.
-		this.aliases = pico.Image.caliases; // Char aliases.
+		this.sprites = Object.assign([], pico.Image.csprites); // Char sprites.
+		this.aliases = Object.assign([], pico.Image.caliases); // Char aliases.
 
 		// Setup canvas.
 		this._setup(parent, width, height);
@@ -543,16 +569,11 @@ pico.Image = class {
 
 	// Resize canvas.
 	_resize(width=0, height=0) {
-		return this._ready().then(() => {
-			this._debug("Flip.");
-			return new Promise((resolve) => {
-				for (let i = 0; i < 2; i++) {
-					this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
-					this.canvas[i].height = (width ? height : pico.Image.height) * pico.Image.ratio;
-				}
-				resolve();
-			}); // end of new Promise.
-		});
+		this._debug("Resize.");
+		for (let i = 0; i < 2; i++) {
+			this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
+			this.canvas[i].height = (width ? height : pico.Image.height) * pico.Image.ratio;
+		}
 	}
 
 	// Setup canvas.
@@ -616,6 +637,20 @@ pico.Image = class {
 				resolve();
 			}); // end of new Promise.
 		});
+	}
+
+	// Copy image.
+	_copy(original) {
+		this._resize(
+			original.canvas[0].width/pico.Image.ratio,
+			original.canvas[0].height/pico.Image.ratio);
+		this.colors = Object.assign([], original.colors);
+		this.leading = original.leading;
+		this.vleading = original.vleading;
+		this.sprites = Object.assign({}, original.sprites);
+		this.aliases = Object.assign({}, original.aliases);
+		this._image(original);
+		return this;
 	}
 
 	// Ready to draw.

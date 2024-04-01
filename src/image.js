@@ -41,6 +41,15 @@ async function picoClear() {
 	}
 }
 
+// Resize image.
+async function picoResize(width=0, height=0) {
+	try {
+		await pico.image.resize(width, height);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 // Set image color pallete.
 async function picoColor(colors=null) {
 	try {
@@ -288,6 +297,13 @@ pico.Image = class {
 		}); // end of lock.
 	}
 
+	// Resize image.
+	resize(width=0, height=0) {
+		return navigator.locks.request(this.lock, async (lock) => {
+			await this._resize(width, height);
+		}); // end of lock.
+	}
+
 	// Set image color pallete.
 	color(colors=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
@@ -451,8 +467,8 @@ pico.Image = class {
 			await this.offscreen._reset(0, 0, 0, 1);
 			if (bgcolor >= 0) {
 				await this.offscreen._draw(bgcolor,
-					-pico.Image.width/2, -pico.Image.height/2,
-					pico.Image.width, pico.Image.height);
+					-this.offscreen.canvas[0].width/2, -this.offscreen.canvas[0].height/2,
+					this.offscreen.canvas[0].width, this.offscreen.canvas[0].height);
 			}
 			await this.offscreen._image(pico.image);
 			if (watermark && watermark.length >= 2) {
