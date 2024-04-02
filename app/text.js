@@ -267,22 +267,17 @@ const symbol5x5CharSprites = { // Symbol5x5 char sprite table.
 };
 
 const extraCharSprites = { // Extra char sprite table.
+	"＜": picoStringCode6("077913922923924932933934941942943944945951952953954955"),
+	"＞": picoStringCode6("077911912913914915921922923924925932933934942943944953"),
+	"▲": picoStringCode6("077931922932942923933943914924934944954915925935945955"),
 	"▼": picoStringCode6("077911921931941951912922932942952923933943924934944935"),
-/*
-	"▽": picoStringCode6("077911951912952923943924944935"),
-	"＜": picoStringCode6("077941951922932913924934945955"),
-	"＞": picoStringCode6("077911921932942953934944915925"),
-	"→": picoStringCode6("077931942913923933943953944935"),
-	"◉": picoStringCode6("099900910920930940950960970980901911921931941951961971981902912932942952972982903913923933943953963973983904914924934944964974984905915935955975985906916926966976986907917927937947957967977987908918928938948958968978988"), //[0,7,7,9,1,0,9,2,0,9,3,0,9,4,0,9,5,0,9,1,1,9,3,1,9,5,1,9,1,2,9,2,2,9,3,2,9,4,2,9,5,2,9,2,4,9,4,4,9,1,5,9,3,5,9,5,5],
-	"◎": picoStringCode6("099900910920930940950960970980901921931941951961981902922942962982903923933943953963983904984905935955985906926946966986907987908918928938948958968978988"), //[0,7,7,9,0,0,9,1,0,9,2,0,9,3,0,9,4,0,9,5,0,9,6,0,9,0,1,9,2,1,9,3,1,9,4,1,9,6,1,9,0,2,9,1,2,9,2,2,9,3,2,9,4,2,9,5,2,9,6,2,9,0,3,9,1,3,9,2,3,9,3,3,9,5,3,9,6,3,9,0,4,9,2,4,9,4,4,9,6,4,9,0,5,9,1,5,9,5,5,9,6,5,9,0,6,9,1,6,9,2,6,9,3,6,9,4,6,9,5,6,9,6,6],
-*/
 };
 
 const extraCharAiliases = [ // Extra char ailiases.
 	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
 ];
 
-const maxstate = 8;//6;
+const maxstate = 7;
 const labels = {
 	0:"いろはにほへと",
 };
@@ -302,35 +297,23 @@ const figs = {
 for (let i = 1; i < maxstate; i++) {
 	figs[i] = figs[0];
 }
-const maxtext = 17 * 13;
+const maxtext = 17 * 9;
 const texts = {
-	0:"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□□▼",
-};
-const dots = {
-	0:"　　　　　　■□□□□□□　　　　　　",
-	1:"　　　　　　□■□□□□□　　　　　　",
-	2:"　　　　　　□□■□□□□　　　　　　",
-	3:"　　　　　　□□□■□□□　　　　　　",
-	4:"　　　　　　□□□□■□□　　　　　　",
-	5:"　　　　　　□□□□□■□　　　　　　",
-	6:"　　　　　　□□□□□□■　　　　　　",
+	0:"□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□□"+
+		"□□□□□□□□□□□□□□□□▼",
 };
 const allChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" +
 	Object.keys(katakana5x5CharSprites).join("") + 
 	Object.keys(hiragana5x5CharSprites).join("") + 
 	Object.keys(symbol5x5CharSprites).join("");
-for (let i = 0; i < maxstate; i++) {
+for (let i = 1; i < maxstate; i++) {
 	texts[i] = "";
 	for (let j = 0; j < maxtext - 1; j++) {
 		texts[i] += i > 0 ? allChars[picoRandom(allChars.length)] : j < allChars.length ? allChars[j] : " ";
@@ -341,41 +324,70 @@ for (let i = 0; i < maxstate; i++) {
 var state = 0; // Playing state.
 var playing = 0; // Playing count.
 
-// Draw text.
-function appDrawText(i, j) {
+// Draw page.
+function appDrawPage(page, count=-1, next=false) {
 	picoClear();
-	picoText(labels[i], -1, 0,-92, 72,8, 0,1)
-	picoRect(2, 0,-52, 136,64, 0,1);
-	picoText(figs[i], -1, 0,-52, 136,56, 0,1);
-	picoText(texts[i].substr(0,j), -1, 0,36, 136,104, 0,1);
+	if (count >= 0) {
+		if (landscape) {
+			picoText(labels[page], -1, -80,0, 8,72, 0,1)
+		} else {
+			picoText(labels[page], -1, 0,-80, 72,8, 0,1)
+		}
+	} else {
+		picoText(labels[page], -1, 0,-80, 72,8, 0,1)
+	}
+	picoRect(2, 0,-40, 136,60, 0,1);
+	picoText(figs[page], -1, 0,-40, 136,56, 0,1);
+	if (count >= 0) {
+		picoText(texts[page].substr(0,!next||count<maxtext?count:maxtext-1), -1, 0,48, 136,104, 0,1);
+		let dots = "　"+"□".repeat(page)+"■"+"□".repeat(maxstate-page-1);
+		if (landscape) {
+			picoText(dots, -1, 80,0, 8,72, 0,1);
+		} else {
+			picoText(dots, -1, 0,80, 72,8, 0,1);
+		}
+	} else {
+		picoText(texts[page], -1, 0,48, 136,104, 0,1);
+	}
 }
 
 // Action button.
 async function appAction() {
+
+	// Draw a page to nearly 5:7(Silveratio) offscreen image.
+	const width = 140, height = 200;
+	picoResize(width, height);
 	let images = [];
 	for (let i = 0; i < maxstate; i++) {
-		appDrawText(i, maxtext-1);
+		appDrawPage(i);
 		images[i] = await picoScreenImage();
 	}
+
+	// Draw all pages to 7:5(Silveratio) offscreen image.
+	const vcount = 2; // Vertical count.
+	const hcount = picoDiv(maxstate+vcount-1,vcount); // Horizontal count.
+	const voffset = height*(vcount-1)/2; // Vertical offset.
+	const hoffset = width*(hcount-1)/2; // Horizontal offset.
+	picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
 	picoClear();
-//	const width=500, height=700; //A4x600dpi=4961x7016
-	const width=560, height=400; //A4x600dpi=4961x7016
-	picoResize(width, height);
 	for (let i = 0; i < maxstate; i++) {
-//		picoImage(images[i],picoMod(i,2)*200-(width/2-150),picoDiv(i,2)*200-(height/2-150));
-//		picoImage(images[i],picoMod(i,2)*237.5-(237.5*0.5),picoDiv(i,2)*193.75-(193.75*1.5));
-		picoImage(images[i],picoDiv(i,2)*140-(140*1.5),picoMod(i,2)*200-(200*0.5));
+		picoImage(images[i],
+			picoDiv(i,vcount)*width-hoffset,
+			picoMod(i,vcount)*height-voffset);
 	}
+
+	// Share screen with watermark.
 	picoCharLeading(4,6);
 	let file = await picoScreenFile(pico.app.author, 1, 0);
 	picoShare(null, [file]);
+
+	// Restore settings.
 	picoCharLeading(8,8);
 	picoResize();
 }
 
 // Load.
 async function appLoad() {
-	pico.Param.debug = true;
 	await picoTitle(title);
 
 	for (let chars in katakana5x5CharSprites) {
@@ -396,7 +408,15 @@ async function appLoad() {
 	picoCharLeading(8,8);
 
 	picoLabel("action", "&");
-	picoWideScreen(true);
+	appResize(); // Initialize positions.
+}
+
+var landscape = false; // landscape mode.
+
+// Resize.
+async function appResize() {
+	landscape = picoWideScreen();
+	picoFlush();
 }
 
 // Main.
@@ -429,13 +449,12 @@ async function appMain() {
 			} else {
 				playing = texts[state].length - 1;
 			}
+			pressing = 1;
 		} else {
 			playing += 1;
 		}
 		picoFlush();
 	}
 
-	picoClear();
-	appDrawText(state, pressing?maxtext-1:playing);
-	picoText(dots[state], -1, 0,92, 152,8, 0,1);
+	appDrawPage(state, playing, pressing);
 }
