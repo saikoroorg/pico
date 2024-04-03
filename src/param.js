@@ -168,7 +168,7 @@ pico.Param = class {
 	textFile(text, name=null) {
 		try {
 			const blob = new Blob([text], {type: "image/png"}); // Avoid "Permission denied" error.
-			const file = new File([blob], name ? name : "text.txt", {type: blob.type});
+			const file = new File([blob], name ? name : "text.png", {type: blob.type});
 			this._debug("Text file: " + file.size);
 			return file;
 		} catch (error) {
@@ -318,15 +318,19 @@ pico.Param = class {
 				if (files) {
 					data.files = files;
 				}
-				if (navigator.share) {
-					this._debug("Share: " + JSON.stringify(data));
-					await navigator.share(data).then(() => {
-						this._debug("Successful share");
-					}).catch((error) => {
-						this._debug("Error sharing:" + error);
-					});
+				if (navigator.canShare) {
+					this._debug("Sharing: " + JSON.stringify(data));
+					if (navigator.canShare(data) && navigator.share) {
+						await navigator.share(data).then(() => {
+							this._debug("Successful share");
+						}).catch((error) => {
+							this._debug("Error sharing:" + error);
+						});
+					} else {
+						this._debug("Not supported file");
+					}
 				} else {
-					this._debug("Not supported sharing");
+					this._debug("Not supported share");
 				}
 			}
 			return resolve();
