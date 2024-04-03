@@ -131,7 +131,7 @@ a {
 		justify-content: space-between; -webkit-justify-content: space-between;
 		align-items: flex-end; -webkit-align-items: flex-end;
 	}
-	@media (min-aspect-ratio: 1.4) {
+	@media (min-aspect-ratio: 1) {
 		#screen {
 			height: 100%;
 		}
@@ -140,7 +140,7 @@ a {
 		}
 	}
 	@media (min-aspect-ratio: 0.7) {
-		@media (max-aspect-ratio: 1.4) {
+		@media (max-aspect-ratio: 1) {
 			#screen {
 				width: 100%;
 			}
@@ -168,12 +168,22 @@ a {
 			display: flex; display: -webkit-flex;
 		}
 	}
-	@media (min-aspect-ratio: 0.7) {
+	@media (min-aspect-ratio: 1) {
 		#screen {
-			width: 100%;
+			height: 100%;
 		}
 		#widescreen {
 			height: 100%;
+		}
+	}
+	@media (min-aspect-ratio: 0.7) {
+		@media (max-aspect-ratio: 1) {
+			#screen {
+				width: 100%;
+			}
+			#widescreen {
+				height: 100%;
+			}
 		}
 	}
 }
