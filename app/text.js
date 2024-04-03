@@ -1,4 +1,5 @@
 const title = "Text"; // Title.
+const dicejs = "app/dice.js"; // Dice script.
 
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringCode6("077912922932942923943924934925"),
@@ -271,44 +272,53 @@ const extraCharSprites = { // Extra char sprite table.
 	"＞": picoStringCode6("077911912913914915921922923924925932933934942943944953"),
 	"▲": picoStringCode6("077931922932942923933943914924934944954915925935945955"),
 	"▼": picoStringCode6("077911921931941951912922932942952923933943924934944935"),
+
+	"①": picoStringCode6("077533"),
+	"②": picoStringCode6("077415451"),
+	"③": picoStringCode6("077633615651"),
+	"④": picoStringCode6("077811815851855"),
+	"⑤": picoStringCode6("077733711715751755"),
+	"⑥": picoStringCode6("077911913915951953955"),
 };
 
 const extraCharAiliases = [ // Extra char ailiases.
 	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
 ];
 
-const maxstate = 7;
-const labels = {
-	0:"いろはにほへと",
-};
+const colors = picoStringCode8("111111333000111111000");
+
+const maxpage = 8, maxstate = 7;
+const labels = [
+	"いろはにほへと",
+];
 for (let i = 1; i < maxstate; i++) {
 	labels[i] = labels[0]+" "+i;
 }
 const maxfig = 17 * 7;
-const figs = {
-	0:"いろはにほへとちりぬるを、わかよた"+
-	  "れそつねならむ。うゐのおくやまけふ"+
-	  "こえて、あさきゆめみしゑひもせす。"+
-	  "いろばにぼべどぢりぬるを、わがよだ"+
-	  "れぞづねならむ。うゐのおぐやまげぶ"+
-	  "ごえで、あざぎゆめみじゑびもぜず。"+
-	  "ぱぴぷぺぽんぁぃぅぇぉっゃゅょー　",
-};
+const figs = [
+	"いろはにほへとちりぬるを、わかよた"+
+	"れそつねならむ。うゐのおくやまけふ"+
+	"こえて、あさきゆめみしゑひもせす。"+
+	"いろばにぼべどぢりぬるを、わがよだ"+
+	"れぞづねならむ。うゐのおぐやまげぶ"+
+	"ごえで、あざぎゆめみじゑびもぜず。"+
+	"ぱぴぷぺぽんぁぃぅぇぉっゃゅょー　",
+];
 for (let i = 1; i < maxstate; i++) {
 	figs[i] = figs[0];
 }
 const maxtext = 17 * 9;
-const texts = {
-	0:"□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□□"+
-		"□□□□□□□□□□□□□□□□▼",
-};
+const texts = [
+	"□□□□□□□□□□□□□□□□□"+
+	"□□□□□□□□□□□□□□□□□"+
+	"□□□□□□□□□□□□□□□□□"+
+	"□□□□□□□□□□□□□□□□□"+
+	"□□□□□□□□□□□□□□□□□"+
+	"□□□□□□□□□□□□□□□□□"+
+	"□□□□□□□□□□□□□□□□□"+
+	"□□□□□□□□□□□□□□□□□"+
+	"□□□□□□□□□□□□□□□□▼",
+];
 const allChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" +
 	Object.keys(katakana5x5CharSprites).join("") + 
 	Object.keys(hiragana5x5CharSprites).join("") + 
@@ -321,33 +331,65 @@ for (let i = 1; i < maxstate; i++) {
 	texts[i] += "▼";
 }
 
+const qrcode = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
+const qrtext = "123456789";
+var qrimage = null; // QR code image.
+
 var state = 0; // Playing state.
 var playing = 0; // Playing count.
 
+// Select button.
+async function appSelect(x) {
+		picoResetParams();
+		picoSetCode6(extraCharSprites["①"], 0);
+		picoSetCode6(extraCharSprites["②"], 1);
+		picoSetCode6(extraCharSprites["③"], 2);
+		picoSetCode6(extraCharSprites["④"], 3);
+		picoSetCode6(extraCharSprites["⑤"], 4);
+		picoSetCode6(extraCharSprites["⑥"], 5);
+		picoSetCode8(colors, 6);
+
+		// Enter to dice mode.
+		picoSwitchApp(dicejs); // Open dice.
+}
+
 // Draw page.
-function appDrawPage(page, count=-1, next=false) {
+async function appDrawPage(page, count=-1, next=false) {
 	picoClear();
-	if (count >= 0) {
-		if (landscape) {
-			picoText(labels[page], -1, -80,0, 8,72, 0,1)
+	picoCharLeading(8,8);
+	if (labels[page]) {
+		if (count >= 0) {
+			if (landscape) {
+				picoText(labels[page], -1, -80,0, 8,72, 0,1)
+			} else {
+				picoText(labels[page], -1, 0,-80, 72,8, 0,1)
+			}
 		} else {
 			picoText(labels[page], -1, 0,-80, 72,8, 0,1)
 		}
-	} else {
-		picoText(labels[page], -1, 0,-80, 72,8, 0,1)
 	}
 	picoRect(2, 0,-40, 136,60, 0,1);
-	picoText(figs[page], -1, 0,-40, 136,56, 0,1);
-	if (count >= 0) {
-		picoText(texts[page].substr(0,!next||count<maxtext?count:maxtext-1), -1, 0,48, 136,104, 0,1);
-		let dots = "　"+"□".repeat(page)+"■"+"□".repeat(maxstate-page-1);
-		if (landscape) {
-			picoText(dots, -1, 80,0, 8,72, 0,1);
+	if (figs[page]) {
+		picoText(figs[page], -1, 0,-40, 136,56, 0,1);
+	}
+	if (texts[page]) {
+		if (count >= 0) {
+			picoText(texts[page].substr(0,!next||count<maxtext?count:maxtext-1), -1, 0,48, 136,104, 0,1);
+			let dots = "　"+"□".repeat(page)+"■"+"□".repeat(maxstate-page-1);
+			if (landscape) {
+				picoText(dots, -1, 80,0, 8,72, 0,1);
+			} else {
+				picoText(dots, -1, 0,80, 72,8, 0,1);
+			}
 		} else {
-			picoText(dots, -1, 0,80, 72,8, 0,1);
+			picoText(texts[page].substr(0,maxtext-1), -1, 0,48, 136,104, 0,1);
 		}
+
+	// Draw QR code image.
 	} else {
-		picoText(texts[page], -1, 0,48, 136,104, 0,1);
+		picoImage(qrimage, 0,26);
+		picoCharLeading(4,6);
+		picoChar(qrtext, -1, 0,64, 0,1);
 	}
 }
 
@@ -358,8 +400,8 @@ async function appAction() {
 	const width = 140, height = 200;
 	picoResize(width, height);
 	let images = [];
-	for (let i = 0; i < maxstate; i++) {
-		appDrawPage(i);
+	for (let i = 0; i < maxpage; i++) {
+		await appDrawPage(i);
 		images[i] = await picoScreenImage();
 	}
 
@@ -370,25 +412,26 @@ async function appAction() {
 	const hoffset = width*(hcount-1)/2; // Horizontal offset.
 	picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
 	picoClear();
-	for (let i = 0; i < maxstate; i++) {
+	for (let i = 0; i < maxpage; i++) {
 		picoImage(images[i],
-			picoDiv(i,vcount)*width-hoffset,
-			picoMod(i,vcount)*height-voffset);
+			picoMod(i,hcount)*width-hoffset,
+			picoDiv(i,hcount)*height-voffset);
 	}
 
 	// Share screen with watermark.
-	picoCharLeading(4,6);
-	let file = await picoScreenFile(pico.app.author, 1, 0);
+	//picoCharLeading(4,6);
+	let file = await picoScreenFile(null, -1, 1);//watermark, 2, 1);
 	picoShare(null, [file]);
 
 	// Restore settings.
-	picoCharLeading(8,8);
+	//picoCharLeading(8,8);
 	picoResize();
 }
 
 // Load.
 async function appLoad() {
 	await picoTitle(title);
+	picoColor(colors);
 
 	for (let chars in katakana5x5CharSprites) {
 		picoCharSprite(chars, katakana5x5CharSprites[chars]);
@@ -408,7 +451,11 @@ async function appLoad() {
 	picoCharLeading(8,8);
 
 	picoLabel("action", "&");
+	picoLabel("select", "*");
 	appResize(); // Initialize positions.
+
+	// Load QR code image.
+	qrimage = await picoLoad(qrcode);
 }
 
 var landscape = false; // landscape mode.
@@ -422,21 +469,9 @@ async function appResize() {
 // Main.
 async function appMain() {
 	let pressing = 0;
-	if (playing >= texts[state].length) {
+	if (!texts[state] || playing >= texts[state].length) {
 		if (picoAction()) {
 			state = state + 1 < maxstate ? state + 1: 0;
-
-			// Switch hiragana char sprites.
-			if (!picoMod(state, 2)) {
-				for (let chars in hiragana5x6CharSprites) {
-					picoCharSprite(chars, hiragana5x6CharSprites[chars]);
-				}
-			} else {
-				for (let chars in hiragana5x5CharSprites) {
-					picoCharSprite(chars, hiragana5x5CharSprites[chars]);
-				}
-			}
-
 			playing = 0;
 			picoFlush();
 		} else if (picoMotion()) {
@@ -444,7 +479,7 @@ async function appMain() {
 		}
 	} else {
 		if (picoMotion()) {
-			if (playing + 10 < texts[state].length - 1) {
+			if (texts[state] && playing + 10 < texts[state].length - 1) {
 				playing = playing + 10;
 			} else {
 				playing = texts[state].length - 1;

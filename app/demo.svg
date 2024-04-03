@@ -1,5 +1,6 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="300" height="300">
-	<g stroke-linecap="square" stroke-width="2" stroke="#000" fill="none">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+	<rect x="0" y="0" width="100%" height="100%" stroke="#000" fill="#000"/>
+	<!--g stroke-linecap="square" stroke-width="2" stroke="#000" fill="none">
 		<g transform="translate(0,0)">
 			<path d="M2,2h16v16h-16Z" stroke="none" fill="#000"/>
 		</g>
@@ -12,5 +13,5 @@
 		<g transform="translate(20,20)">
 			<path d="M2,2h16v16h-16Z" stroke="none" fill="#008"/>
 		</g>
-	</g>
+	</g-->
 </svg>
