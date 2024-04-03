@@ -167,7 +167,7 @@ pico.Param = class {
 	// Get text file.
 	textFile(text, name=null) {
 		try {
-			const blob = new Blob([text], {type: 'text/plain'});
+			const blob = new Blob([text], {type: "image/png"}); // Avoid "Permission denied" error.
 			const file = new File([blob], name ? name : "text.txt", {type: blob.type});
 			this._debug("Text file: " + file.size);
 			return file;

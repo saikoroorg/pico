@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40401"; // Updatable by package.json.
+pico.version = "0.9.40403"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -1061,7 +1061,7 @@ pico.Param = class {
 	// Get text file.
 	textFile(text, name=null) {
 		try {
-			const blob = new Blob([text], {type: 'text/plain'});
+			const blob = new Blob([text], {type: "image/png"}); // Avoid "Permission denied" error.
 			const file = new File([blob], name ? name : "text.txt", {type: blob.type});
 			this._debug("Text file: " + file.size);
 			return file;

@@ -134,6 +134,8 @@ pico.Worker = class {
 					this._debug("Cache the fetched file: " + url + " to " + cacheKey + " -> " + result.status + " " + result.statusText);
 					self.caches.open(cacheKey).then((cache) => {
 						cache.put(url, result.clone());
+					}).catch((error) => {
+						this._debug("Failed to cache: " + url);
 					});
 				}
 
