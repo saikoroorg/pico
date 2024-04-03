@@ -188,6 +188,7 @@ async function appSelect(x) {
 
 // Load.
 async function appLoad() {
+	pico.Param.debug = true;
 	picoTitle(title);
 
 	// Load query params.
