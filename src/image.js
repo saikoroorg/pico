@@ -352,17 +352,16 @@ pico.Image = class {
 
 	// Draw char as string or number to image.
 	drawChar(char, c=-1, x=0, y=0, angle=0, scale=1) {
-		const w = this.leading;
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
 			await this._reset(x, y, angle, scale);
 			let length = char.length;
 			if (length >= 2) {
-				await this._move(-(length-1)/2 * w, 0);
+				await this._move(-(length-1)/2 * this.leading, 0);
 			}
 			for (let i = 0; i < length; i++) {
 				await this._char(char.charCodeAt(i), c);
-				await this._move(w, 0);
+				await this._move(this.leading, 0);
 			}
 		}); // end of lock.
 	}

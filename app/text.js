@@ -335,7 +335,7 @@ const qrcode = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAA
 const qrtext = "123456789";
 var qrimage = null; // QR code image.
 
-var state = 0; // Playing state.
+var state = 7; // Playing state.
 var playing = 0; // Playing count.
 
 // Select button.
