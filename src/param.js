@@ -46,9 +46,9 @@ async function picoShare(url=null, files=null) {
 }
 
 // Get text file.
-function picoTextFile(text, name=null) {
+function picoTextFile(text, name=null, type=null) {
 	try {
-		return pico.param.textFile(text, name);
+		return pico.param.textFile(text, name, type);
 	} catch (error) {
 		console.error(error);
 	}
@@ -165,10 +165,10 @@ pico.Param = class {
 	}
 
 	// Get text file.
-	textFile(text, name=null) {
+	textFile(text, name=null, type=null) {
 		try {
-			const blob = new Blob([text], {type: "image/png"}); // Avoid "Permission denied" error.
-			const file = new File([blob], name ? name : "text.png", {type: blob.type});
+			const blob = new Blob([text], {type: type ? type : "text/plain"});
+			const file = new File([blob], name ? name : "text.txt", {type: type});
 			this._debug("Text file: " + file.size);
 			return file;
 		} catch (error) {

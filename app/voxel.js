@@ -140,7 +140,7 @@ Voxel = class {
 			}
 		}
 		text += "endsolid\n";
-		return picoTextFile(text, "voxel" + c + ".stl.png");
+		return picoTextFile(text, "voxel" + c + ".stl", "model/stl");
 	}
 };
 var voxel = new Voxel();
