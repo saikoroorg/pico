@@ -288,11 +288,11 @@ const extraCharAiliases = [ // Extra char ailiases.
 
 const colors = picoStringCode8("111111333000111111000");
 
-const maxstate = 7;
+const maxpage = 8;
 const labels = [
 	"いろはにほへと",
 ];
-for (let i = 1; i < maxstate; i++) {
+for (let i = 1; i < maxpage-1; i++) {
 	labels[i] = labels[0]+"ー"+i;
 }
 const maxfig = 17 * 7;
@@ -305,36 +305,35 @@ const figs = [
 	"ごえで、あざぎゆめみじゑびもぜず。"+
 	"ぱぴぷぺぽんぁぃぅぇぉっゃゅょー　",
 ];
-for (let i = 1; i < maxstate; i++) {
+for (let i = 1; i < maxpage-1; i++) {
 	figs[i] = figs[0];
 }
 const maxtext = 17 * 9;
 const texts = [
 	"□□□□□□□□□□□□□□□□□"+
+	"　　　　　　　　　　　　　　　　　"+
 	"□□□□□□□□□□□□□□□□□"+
+	"　　　　　　　　　　　　　　　　　"+
 	"□□□□□□□□□□□□□□□□□"+
+	"　　　　　　　　　　　　　　　　　"+
 	"□□□□□□□□□□□□□□□□□"+
-	"□□□□□□□□□□□□□□□□□"+
-	"□□□□□□□□□□□□□□□□□"+
-	"□□□□□□□□□□□□□□□□□"+
-	"□□□□□□□□□□□□□□□□□"+
-	"□□□□□□□□□□□□□□□□▼",
+	"　　　　　　　　　　　　　　　　　"+
+	"□□□□□□□□□□□□□□□□□",
 ];
 const allChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" +
 	Object.keys(katakana5x5CharSprites).join("") + 
 	Object.keys(hiragana5x5CharSprites).join("") + 
 	Object.keys(symbol5x5CharSprites).join("");
-for (let i = 1; i < maxstate; i++) {
+for (let i = 1; i < maxpage-1; i++) {
 	texts[i] = "";
-	for (let j = 0; j < maxtext - 1; j++) {
+	for (let j = 0; j < maxtext; j++) {
 		texts[i] += i > 0 ? allChars[picoRandom(allChars.length)] : j < allChars.length ? allChars[j] : " ";
 	}
-	texts[i] += "▼";
 }
 
-const qrdata = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
-const qrtext = "123456789";
-var qrimage = null; // QR code image.
+const enddata = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
+const endtext = "123456789";
+var endimage = null; // End page image.
 
 var state = 7; // Playing state.
 var playing = 0; // Playing count.
@@ -355,7 +354,7 @@ async function appSelect(x) {
 }
 
 // Draw page.
-async function appDrawPage(page, count=-1, next=false) {
+async function appDrawPage(page, count=-1) {
 	picoClear();
 	picoCharLeading(8,8);
 	if (labels[page]) {
@@ -375,46 +374,56 @@ async function appDrawPage(page, count=-1, next=false) {
 	}
 	if (texts[page]) {
 		if (count >= 0) {
-			picoText(texts[page].substr(0,!next||count<maxtext?count:maxtext-1), -1, 0,48, 136,104, 0,1);
-			let dots = "　"+"□".repeat(page)+"■"+"□".repeat(maxstate-page-1);
+			if (count > maxtext) {
+				let cursor = (landscape?"＞":"▼");
+				picoText(texts[page].substr(0,maxtext-1)+cursor, -1, 0,48, 136,104, 0,1);
+			} else if (count < maxtext) {
+				let cursor = (texts[page].charCodeAt(count)=="　".charCodeAt(0)?"　":"■");
+				picoText(texts[page].substr(0,count)+cursor, -1, 0,48, 136,104, 0,1);
+			} else {
+				picoText(texts[page], -1, 0,48, 136,104, 0,1);
+			}
+			let dots = "　"+"□".repeat(page)+"■"+"□".repeat(maxpage-1-page-1);
 			if (landscape) {
 				picoText(dots, -1, 80,0, 8,72, 0,1);
 			} else {
 				picoText(dots, -1, 0,80, 72,8, 0,1);
 			}
 		} else {
-			picoText(texts[page].substr(0,maxtext-1), -1, 0,48, 136,104, 0,1);
+			picoText(texts[page], -1, 0,48, 136,104, 0,1);
 		}
 
-	// Draw QR code image on shared last page.
+	// Draw end page image last page.
 	} else {
-		picoImage(qrimage, 0,26);
-		picoCharLeading(4,6);
-		picoChar(qrtext, -1, 0,64, 0,1);
+		if (count >= 0) {
+		} else {
+			picoImage(endimage, 0,26);
+			picoCharLeading(4,6);
+			picoChar(endtext, -1, 0,64, 0,1);
+		}
 	}
 }
 
 // Action button.
 async function appAction() {
-	// Draw page with qrcode on sharing.
 
 	// Draw a page to nearly 5:7(Silveratio) offscreen image.
 	const width = 140, height = 200;
 	picoResize(width, height);
 	let images = [];
-	for (let i = 0; i < maxstate+1; i++) {
+	for (let i = 0; i < maxpage; i++) {
 		await appDrawPage(i);
 		images[i] = await picoScreenImage();
 	}
 
 	// Draw all pages to 7:5(Silveratio) offscreen image.
 	const vcount = 2; // Vertical count.
-	const hcount = picoDiv(maxstate+vcount-1,vcount); // Horizontal count.
+	const hcount = picoDiv(maxpage-1+vcount-1,vcount); // Horizontal count.
 	const voffset = height*(vcount-1)/2; // Vertical offset.
 	const hoffset = width*(hcount-1)/2; // Horizontal offset.
 	picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
 	picoClear();
-	for (let i = 0; i < maxstate+1; i++) {
+	for (let i = 0; i < maxpage; i++) {
 		picoImage(images[i],
 			picoMod(i,hcount)*width-hoffset,
 			picoDiv(i,hcount)*height-voffset);
@@ -456,8 +465,8 @@ async function appLoad() {
 	picoLabel("select", "*");
 	appResize(); // Initialize positions.
 
-	// Load QR code image.
-	qrimage = await picoLoad(qrdata);
+	// Load end page image.
+	endimage = await picoLoad(enddata);
 }
 
 var landscape = false; // landscape mode.
@@ -473,7 +482,7 @@ async function appMain() {
 	let pressing = 0;
 	if (!texts[state] || playing >= texts[state].length) {
 		if (picoAction()) {
-			state = state + 1 < maxstate ? state + 1: 0;
+			state = state + 1 < maxpage ? state + 1: 0;
 			playing = 0;
 			picoFlush();
 		} else if (picoMotion()) {
@@ -488,10 +497,10 @@ async function appMain() {
 			}
 			pressing = 1;
 		} else {
-			playing += 1;
+			playing += 0.5;
 		}
 		picoFlush();
 	}
 
-	appDrawPage(state, playing, pressing);
+	appDrawPage(state, playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
 }
