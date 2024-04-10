@@ -1,8 +1,8 @@
 {
-	"name": "Saikoro.org",
-	"short_name": "Saikoro.org",
+	"name": "Hex",
+	"short_name": "Hex",
 	"version": "0.9.40410a",
-	"author": "saikoro.org",
+	"author": "saikoro.org/hex",
 	"background_color": "#fff",
 	"theme_color": "#fff",
 	"icons": [{
