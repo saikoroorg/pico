@@ -1,19 +1,21 @@
 const title = "Hex"; // Title.
 
 const sprites = { // Sprite table.
-	"P": picoStringCode6("077222232242223233243324334344"),
-	"R": picoStringCode6("077211231251212222232242252213223233243253324334344315325335345355"),
-	"N": picoStringCode6("077211221231241212222232242252233243324334344315325335345355"),
-	"B": picoStringCode6("077230221231241212222232242252223233243324334344315325335345355"),
-	"Q": picoStringCode6("077210230250221231241212222232242252223233243324334344315325335345355"),
-	"K": picoStringCode6("077210220230240250211221231241251212222232242252223233243324334344315325335345355"),
-	"p": picoStringCode6("077444434424443433423342332322"),
-	"r": picoStringCode6("077444434424443433423342332322"),
-	"n": picoStringCode6("077444434424443433423342332322"),
-	"b": picoStringCode6("077444434424443433423342332322"),
-	"q": picoStringCode6("077444434424443433423342332322"),
-	"k": picoStringCode6("077444434424443433423342332322"),
+	"P": [3,-1,-2,0,2,4, 3,-2,-1,0,4,2, -1,-1,-2,0,2,0,-1,-1,-2,0,0,4,-1,1,-2,0,0,4,-1,-1,2,0,2,0],//0
+	"R": [2,-1,-2,0,2,4, 2,-2,-1,0,4,2, -1,0,-2,0,0,4],//1
+	"N": [2,-1,-2,0,2,4, 2,-2,-1,0,4,2, -1,0,-2,0,0,4],//1
+	"B": [2,-1,-2,0,2,4, 2,-2,-1,0,4,2, -1,0,-2,0,0,4],//1
+	"Q": [2,-1,-2,0,2,4, 2,-2,-1,0,4,2, -1,-1,-2,0,2,0,-1,1,-2,0,0,2,-1,-1,0,0,2,0,-1,-1,0,0,0,2,-1,-1,2,0,2,0],//2
+	"K": [2,-1,-2,0,2,4, 2,-2,-1,0,4,2, -1,-1,-2,0,2,0,-1,1,-2,0,0,4,-1,-1,0,0,2,0,-1,-1,2,0,2,0],//3
+	"p": picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
+	"r": picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
+	"n": picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
+	"b": picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
+	"q": picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
+	"k": picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
 	"#": picoStringCode6("0bb951941961932972923983914994915995916996927987938978949969959"),
+	"+": picoStringCode6("0bb951941961932972923983914994915995916996927987938978949969959954945955965956"),
+	"@": picoStringCode6("0bb951941961932972923983914994915995916996927987938978949969959944964955946966"),
 	".": picoStringCode6("077"),
 	"*": picoStringCode6("077"),
 };
@@ -23,11 +25,11 @@ const board =
 	"           "+
 	"           "+
 	"           "+
-	"   # # #   "+
+	"   + # +   "+
 	"  # # # #  "+
-	" # # # # # "+
+	" + # @ # + "+
 	"  # # # #  "+
-	"   # # #   "+
+	"   + # +   "+
 	"           "+
 	"           "+
 	"           ";
@@ -63,8 +65,8 @@ const movable = ".", holding = "*", nothing = " ";
 const width = 11, height = 11, inside = 9, offset = 1;
 const hgrid = 4, vgrid = 6, margin = 0, scale = 3, scale2 = 5, yflip = 1;
 const icons = [
-	picoStringCode6("077211231251212222232242252213223233243253324334344315325335345355"),
-	picoStringCode6("077411431451412422432442452413423433443453324334344315325335345355"),
+	picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
+	picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
 ];
 
 // Global variables.
@@ -107,48 +109,6 @@ function appShuffle() {
 async function appSelect() {
 	if (icons) {
 		appShuffle();
-
-		/*
-		// Shuffle pieces.
-		let faces = "", codes = [];
-		for (let j = 0; j < pieces.length; j++) {
-			let code6 = [];
-			for (let i = 0; i < pieces[j].length; i++) {
-				if (pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
-					let l = code6.length;
-					faces += pieces[j][i];
-					code6[l+1] = picoMod(i,width) - offset;
-					code6[l+2] = picoDiv(i,width) - offset;
-				}
-			}
-			if (hands[j]) {
-				let l = code6.length;
-				faces += hands[j];
-				code6[l+1] = picoMod(indexes[j],width) - offset;
-				code6[l+2] = picoDiv(indexes[j],width) - offset;
-			}
-			codes[j] = code6;
-		}
-		for (let j = 0; j < codes.length; j++) {
-			for (let i = 0; i < codes[j].length; i+=3) {
-				let k = picoRandom(faces.length);
-				let face = faces.charAt(k);
-				faces = faces.slice(0,k) + faces.slice(k+1);
-				codes[j][i] = picoStringCode6(face)[0];
-			}
-			picoSetCode6(codes[j], j);
-		}
-		picoReload();
-		*/
-
-		//reverse = reverse ? 0 : 1;
-		//if (yflip) {
-		//	for (let chars in sprites) {
-		//		picoCharSprite(chars, picoSpriteFlip(sprites[chars],reverse,reverse));
-		//	}
-		//}
-		//let data = await picoSpriteData(icons[reverse]);
-		//picoLabel("select", null, data);
 		picoFlush();
 	}
 }
