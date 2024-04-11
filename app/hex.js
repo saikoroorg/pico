@@ -207,9 +207,10 @@ async function appResize() {
 async function appMain() {
 	for (let j = 0; j < pieces.length; j++) {
 		for (let i = 0; i < pieces[j].length; i++) {
-			let xy = picoSpriteRotate([-1,
+			let xy = picoSpriteFlip([-1,
 				(picoMod(i,width) - (width-1)/2) * hgrid * scale,
-				(picoDiv(i,width) - (height-1)/2) * vgrid * scale], picoDiv(angle,90));
+				(picoDiv(i,width) - (height-1)/2) * vgrid * scale],
+				angle>90,angle>90,angle%180);
 			let w = angle==90 ? vgrid-margin : hgrid-margin;
 			let h = angle==90 ? hgrid-margin : vgrid-margin;
 			if (picoAction(xy[1],xy[2],w,h)) {
@@ -281,10 +282,11 @@ async function appMain() {
 	}
 	for (let j = 0; j < pieces.length; j++) {
 		if (hands[j]) {
-			let xy = picoSpriteRotate([-1,
+			let a = angle+j*180;
+			let xy = picoSpriteFlip([-1,
 				(picoMod(indexes[j],width) - (width-1)/2) * hgrid * scale,
-				(picoDiv(indexes[j],width) - (height-1)/2) * vgrid * scale], picoDiv(angle+j*180,90));
-			picoChar(hands[j], -1, xy[1],xy[2], angle+j*180,scale2);
+				(picoDiv(indexes[j],width) - (height-1)/2) * vgrid * scale], a>90,a>90,a%180);
+			picoChar(hands[j], -1, xy[1],xy[2], a,scale2);
 		}
 	}
 }

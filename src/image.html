@@ -420,7 +420,7 @@ if (count <= 0) {
 			picoClear();
 			for (let j = 0; j < 4; j++) {
 				picoSprite(picoSpriteFlip(dots[i%9],j%2,(j/2)%2), -1, -60+40*j,-20, 0,2);
-				picoSprite(picoSpriteRotate(dots[i%9],j%4), -1, -60+40*j,20, 0,2);
+				picoSprite(picoSpriteFlip(dots[i%9],j>1,j>1,(j%2)), -1, -60+40*j,20, 0,2);
 			}
 			await picoFlip(1000);
 		}

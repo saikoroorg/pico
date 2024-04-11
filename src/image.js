@@ -123,18 +123,9 @@ async function picoSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1
 }
 
 // Flip sprite.
-function picoSpriteFlip(cells=[-1,0,0], x=0, y=0) {
+function picoSpriteFlip(cells=[-1,0,0], x=0, y=0, a=0) {
 	try {
-		return pico.image.spriteFlip(cells, x, y);
-	} catch (error) {
-		console.error(error);
-	}
-}
-
-// Rotate sprite.
-function picoSpriteRotate(cells=[-1,0,0], a=0) {
-	try {
-		return pico.image.spriteRotate(cells, a);
+		return pico.image.spriteFlip(cells, x, y, a);
 	} catch (error) {
 		console.error(error);
 	}
@@ -408,8 +399,8 @@ pico.Image = class {
 	}
 
 	// Flip splite.
-	spriteFlip(cells=[-1,0,0], x=0, y=0) {
-		if (x==0 && y==0) {
+	spriteFlip(cells=[-1,0,0], x=0, y=0, a=0) {
+		if (!x && !y && !a) {
 			return cells;
 		}
 		let flipped = [];
@@ -425,72 +416,31 @@ pico.Image = class {
 		for (; i < cells.length; i += 3) {
 			flipped[i+0] = cells[i];
 			if (cells[i+3] != 0) {
-				flipped[i+1] = x ? w-1-cells[i+1] : cells[i+1];
-				flipped[i+2] = y ? h-1-cells[i+2] : cells[i+2];
+				if (a) {
+					flipped[i+1] = y ? cells[i+2] : h-1-cells[i+2];
+					flipped[i+2] = x ? w-1-cells[i+1] : cells[i+1];
+				} else {
+					flipped[i+1] = x ? w-1-cells[i+1] : cells[i+1];
+					flipped[i+2] = y ? h-1-cells[i+2] : cells[i+2];
+				}
 			} else {
-				flipped[i+1] = x ? w-cells[i+1] : cells[i+1];
-				flipped[i+2] = y ? h-cells[i+2] : cells[i+2];
-				flipped[i+3] = cells[i+3];
-				flipped[i+4] = x ? -cells[i+4]-2 : cells[i+4];
-				flipped[i+5] = y ? -cells[i+5]-2 : cells[i+5];
+				if (a) {
+					flipped[i+1] = y ? cells[i+2] : h-cells[i+2];
+					flipped[i+2] = x ? w-cells[i+1] : cells[i+1];
+					flipped[i+3] = cells[i+3];
+					flipped[i+4] = y ? cells[i+5] : -cells[i+5]-2;
+					flipped[i+5] = x ? -cells[i+4]-2 : cells[i+4];
+				} else {
+					flipped[i+1] = x ? w-cells[i+1] : cells[i+1];
+					flipped[i+2] = y ? h-cells[i+2] : cells[i+2];
+					flipped[i+3] = cells[i+3];
+					flipped[i+4] = x ? -cells[i+4]-2 : cells[i+4];
+					flipped[i+5] = y ? -cells[i+5]-2 : cells[i+5];
+				}
 				i += 3;
 			}
 		}
 		return flipped;
-	}
-
-	// Rotate splite.
-	spriteRotate(cells=[-1,0,0], a=0) {
-		if (a==0) {
-			return cells;
-		}
-		let rotated = [];
-		let i = 0, w = 0, h = 0;
-		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
-			w = cells[1];
-			h = cells[2];
-			rotated[0] = cells[0];
-			rotated[1] = cells[1];
-			rotated[2] = cells[2];
-			i += 3;
-		}
-		for (; i < cells.length; i += 3) {
-			rotated[i+0] = cells[i];
-			if (cells[i+3] != 0) {
-				if (a==2) { // Rotate 180.
-					rotated[i+1] = w-1-cells[i+1];
-					rotated[i+2] = h-1-cells[i+2];
-				} else if (a==1) { // Rotate 90: x'=-y, y'=x
-					rotated[i+1] = h-1-cells[i+2];
-					rotated[i+2] = cells[i+1];
-				} else if (a==3) { // Rotate 270: x'=y, y'=x
-					rotated[i+1] = cells[i+2];
-					rotated[i+2] = cells[i+1];
-				}
-			} else {
-				if (a==2) { // Rotate 180.
-					rotated[i+1] = w-cells[i+1];
-					rotated[i+2] = h-cells[i+2];
-					rotated[i+3] = cells[i+3];
-					rotated[i+4] = -cells[i+4]-2;
-					rotated[i+5] = -cells[i+5]-2;
-				} else if (a==1) { // Rotate 90: x'=-y, y'=x
-					rotated[i+1] = h-cells[i+2];
-					rotated[i+2] = cells[i+1];
-					rotated[i+3] = cells[i+3];
-					rotated[i+4] = -cells[i+5]-2;
-					rotated[i+5] = cells[i+4];
-				} else if (a==3) { // Rotate 270: x'=y, y'=x
-					rotated[i+1] = cells[i+2];
-					rotated[i+2] = cells[i+1];
-					rotated[i+3] = cells[i+3];
-					rotated[i+4] = cells[i+5];
-					rotated[i+5] = cells[i+4];
-				}
-				i += 3;
-			}
-		}
-		return rotated;
 	}
 
 	// Draw sprite to image.
