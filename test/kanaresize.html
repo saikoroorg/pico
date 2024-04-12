@@ -1,12 +1,22 @@
+<script src="../src/param.js"></script>
 <script>
 let font = [
-"077422432442423433443324334344",
-"077411431451412422432442452413423433443453324334344315325335345355",
-"077411421431441412422432442452433443324334344315325335345355",
-"077430421431441412422432442452423433443324334344315325335345355",
-"077410430450421431441412422432442452423433443324334344315325335345355",
-"077410420430440450411421431441451412422432442452423433443324334344315325335345355",
+"099914924934944954964974",
+"099911971922962933953914924934944954964974935955926966917977",
+"099971962953944935926917",
+"099911922933944955966977",
 ];
+
+// Resize 099 -> 0jj.
+for (let i = 0; i < font.length; i++) {
+	let code6 = picoStringCode6(font[i]);
+	for (let j = 0; j < code6.length; j+=3) {
+		code6[j+1] += j?5:10;
+		code6[j+2] += j?5:10;
+	}
+	picoSetCode6(code6, i);
+	console.log(picoString(i));
+}
 
 // Resize 099 -> 077.
 /*for (let i = 0; i < font.length; i++) {
@@ -32,18 +42,18 @@ let font = [
 }*/
 
 // Flip 077 upside down.
-for (let i = 0; i < font.length; i++) {
+/*for (let i = 0; i < font.length; i++) {
 	for (let j = 3; j < font[i].length; j+=3) {
 		let k1 = 6 - parseInt(font[i][j+1]);
 		let k2 = 6 - parseInt(font[i][j+2]);
 		font[i] = font[i].slice(0,j+1) + k1 + k2 + font[i].slice(j+3);
 	}
-}
+}*/
 
 // Print result.
-let r = "";
+/*let r = "";
 for (let i = 0; i < font.length; i++) {
 	r += "\"" + font[i] + "\",\n";
 }
-console.log(r);
+console.log(r);*/
 </script>
