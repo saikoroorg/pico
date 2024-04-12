@@ -404,7 +404,7 @@ pico.Image = class {
 			return cells;
 		}
 		let flipped = [];
-		let i = 0, w = 0, h = 0;
+		let i = 0, w = 1, h = 1;
 		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
 			w = cells[1];
 			h = cells[2];
