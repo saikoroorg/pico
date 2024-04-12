@@ -63,7 +63,7 @@ const faces = {
 };
 const movable = ".", holding = "*", nothing = " ";
 const width = 11, height = 11, inside = 9, offset = 1;
-const hgrid = 4, vgrid = 6, margin = 0, scale = 3, scale2 = 5, yflip = 1;
+const hgrid = 4, vgrid = 8, margin = 0, scale = 3, scale2 = 5;
 const icons = [
 	picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
 	picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
@@ -72,13 +72,12 @@ const icons = [
 // Global variables.
 var hands = [null,null], indexes = [-1,-1]; // Hand pieces and indexes of the piece table.
 var landscape = -1; // 0 if portrait mode, 1 if landscape mode, and -1 if uninitialized.
-var reverse = 0; // 0 if upright board, 1 if reverse board.
+var angle = 90; // The angle of the board, 0 if upright board, 180 if reverse board.
 
 // Shuffle pieces.
 function appShuffle() {
-	let faces = "", codes = [];
+	let faces = "";
 	for (let j = 0; j < pieces.length; j++) {
-		let code6 = [];
 		for (let i = 0; i < pieces[j].length; i++) {
 			if (pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
 				faces += pieces[j][i];
@@ -89,7 +88,6 @@ function appShuffle() {
 		}
 	}
 	for (let j = 0; j < pieces.length; j++) {
-		let code6 = [];
 		for (let i = 0; i < pieces[j].length; i++) {
 			if (pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
 				let k = picoRandom(faces.length);
@@ -177,7 +175,7 @@ async function appLoad() {
 	}
 
 	if (icons) {
-		let data = await picoSpriteData(icons[reverse]);
+		let data = await picoSpriteData(icons[picoDiv(angle,180)]);
 		picoLabel("select", null, data);
 	}
 	picoLabel("action", "&");
@@ -209,13 +207,12 @@ async function appResize() {
 async function appMain() {
 	for (let j = 0; j < pieces.length; j++) {
 		for (let i = 0; i < pieces[j].length; i++) {
-			let x = (picoMod(i,width) - (width-1)/2) * hgrid * scale;
-			let y = (picoDiv(i,width) - (height-1)/2) * vgrid * scale;
-			if (j ^ reverse) { // Transform positions for enemy pieces.
-				x = -x;
-				y = -y;
-			}
-			if (picoAction(x,y, hgrid-margin,vgrid-margin)) {
+			let xy = picoSpriteRotate([-1,
+				(picoMod(i,width) - (width-1)/2) * hgrid * scale,
+				(picoDiv(i,width) - (height-1)/2) * vgrid * scale], picoDiv(angle,90));
+			let w = angle==90 ? vgrid-margin : hgrid-margin;
+			let h = angle==90 ? hgrid-margin : vgrid-margin;
+			if (picoAction(xy[1],xy[2],w,h)) {
 				// Dropping pieces.
 				if (hands[j]) {
 					// Drop and catch target pieces.
@@ -245,7 +242,7 @@ async function appMain() {
 						hands[j] = null;
 					}
 				}
-			} else if (picoMotion(x,y, hgrid-margin,vgrid-margin)) {
+			} else if (picoMotion(xy[1],xy[2],w,h)) {
 				// Move holding pieces to empty square.
 				if (hands[j] && pieces[j][i] != nothing && pieces[j][i] != holding) {
 					if (pieces[j][indexes[j]] == holding) { // Reset holding square.
@@ -278,19 +275,16 @@ async function appMain() {
 	// Draw board with pieces.
 	picoClear();
 	//picoRect(0, 0,0, hgrid*(inside+0.5),vgrid*(inside+0.5), 0,scale);
-	picoText(board, -1, 0,0, hgrid*width,vgrid*height, 0,scale);
+	picoText(board, -1, 0,0, hgrid*width,vgrid*height, angle,scale);
 	for (let j = 0; j < pieces.length; j++) {
-		picoText(pieces[j], -1, 0,0, hgrid*width,vgrid*height, j^reverse?180:0,scale);
+		picoText(pieces[j], -1, 0,0, hgrid*width,vgrid*height, angle+j*180,scale);
 	}
 	for (let j = 0; j < pieces.length; j++) {
 		if (hands[j]) {
-			let x = (picoMod(indexes[j],width) - (width-1)/2) * hgrid * scale;
-			let y = (picoDiv(indexes[j],width) - (height-1)/2) * vgrid * scale;
-			if (j ^ reverse) { // Transform positions for enemy pieces.
-				x = -x;
-				y = -y;
-			}
-			picoChar(hands[j], -1, x,y, j^reverse?180:0,scale2);
+			let xy = picoSpriteRotate([-1,
+				(picoMod(indexes[j],width) - (width-1)/2) * hgrid * scale,
+				(picoDiv(indexes[j],width) - (height-1)/2) * vgrid * scale], picoDiv(angle+j*180,90));
+			picoChar(hands[j], -1, xy[1],xy[2], angle+j*180,scale2);
 		}
 	}
 }
