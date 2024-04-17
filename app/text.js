@@ -1,5 +1,5 @@
 const title = "Text"; // Title.
-const dicejs = "app/dice.js"; // Dice script.
+const playjs = "app/dice.js"; // Play script.
 
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringCode6("077912922932942923943924934925"),
@@ -320,37 +320,45 @@ const texts = [
 	"　　　　　　　　　　　　　　　　　"+
 	"□□□□□□□□□□□□□□□□□",
 ];
-const allChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#" +
-	Object.keys(katakana5x5CharSprites).join("") + 
-	Object.keys(hiragana5x5CharSprites).join("") + 
+const builtinChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#";
+const allChars = builtinChars +
+	Object.keys(katakana5x5CharSprites).join("") +
+	Object.keys(hiragana5x5CharSprites).join("") +
 	Object.keys(symbol5x5CharSprites).join("");
 for (let i = 1; i < maxpage-1; i++) {
 	texts[i] = "";
 	for (let j = 0; j < maxtext; j++) {
-		texts[i] += i > 0 ? allChars[picoRandom(allChars.length)] : j < allChars.length ? allChars[j] : " ";
+		texts[i] += allChars[picoRandom(allChars.length)];
 	}
+}
+figs[0] = "";
+for (let j = 0; j < maxfig; j++) {
+	figs[0] += j < allChars.length ? allChars[j] : " ";
+}
+texts[0] = "";
+for (let j = 0; j < maxtext; j++) {
+	texts[0] += j+maxfig < allChars.length ? allChars[j+maxfig] : " ";
 }
 
 const enddata = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
-const endtext = "123456789";
+const endtext = "";
+const endpos = 24;
+const endrect = 64, endpos3 = 40, endcolor = -1;
+//endrect = 96, endpos3 = 36;//108;
+const endtext1 = "";
+const endgrid2 = 8, endtext2 = "いろはにほへと";
+const endgrid3 = 4, endtext3 = "1234567.890/0/00";
 var endimage = null; // End page image.
+const shareall = true; // Share all page as one image.
 
 var state = 7; // Playing state.
 var playing = 0; // Playing count.
 
 // Select button.
 async function appSelect(x) {
-		picoResetParams();
-		picoSetCode6(extraCharSprites["①"], 0);
-		picoSetCode6(extraCharSprites["②"], 1);
-		picoSetCode6(extraCharSprites["③"], 2);
-		picoSetCode6(extraCharSprites["④"], 3);
-		picoSetCode6(extraCharSprites["⑤"], 4);
-		picoSetCode6(extraCharSprites["⑥"], 5);
-		picoSetCode8(colors, 6);
 
-		// Enter to dice mode.
-		picoSwitchApp(dicejs); // Open dice.
+		// Enter to play mode.
+		picoSwitchApp(playjs); // Play.
 }
 
 // Draw page.
@@ -368,14 +376,14 @@ async function appDrawPage(page, count=-1) {
 			picoText(labels[page], -1, 0,-80, 72,8, 0,1)
 		}
 	}
-	picoRect(2, 0,-40, 136,60, 0,1);
 	if (figs[page]) {
+		picoRect(2, 0,-40, 136,60, 0,1);
 		picoText(figs[page], -1, 0,-40, 136,56, 0,1);
 	}
 	if (texts[page]) {
 		if (count >= 0) {
 			if (count > maxtext) {
-				let cursor = (landscape?"＞":"▼");
+				let cursor = "▼";
 				picoText(texts[page].substr(0,maxtext-1)+cursor, -1, 0,48, 136,104, 0,1);
 			} else if (count < maxtext) {
 				let cursor = (texts[page].charCodeAt(count)=="　".charCodeAt(0)?"　":"■");
@@ -395,48 +403,65 @@ async function appDrawPage(page, count=-1) {
 
 	// Draw end page image last page.
 	} else {
-		if (count >= 0) {
-		} else {
-			picoImage(endimage, 0,26);
-			picoCharLeading(4,6);
-			picoChar(endtext, -1, 0,64, 0,1);
-		}
+		picoRect(1, 0,endpos, endrect,endrect, 0,1);
+		picoImage(endimage, 0,endpos);
+		picoCharLeading(endgrid2,8);
+		picoChar(endtext1, endcolor, 0,endpos-44, 0,1);
+		picoChar(endtext2, endcolor, 0,endpos-endpos3, 0,1);
+		picoCharLeading(endgrid3,8);
+		picoChar(endtext3, endcolor, 0,endpos+endpos3, 0,1);
 	}
 }
 
 // Action button.
 async function appAction() {
+	if (!shareall) { // Share all page as one image.
 
-	// Draw a page to nearly 5:7(Silveratio) offscreen image.
-	const width = 140, height = 200;
-	picoResize(width, height);
-	let images = [];
-	for (let i = 0; i < maxpage; i++) {
-		await appDrawPage(i);
-		images[i] = await picoScreenImage();
+		// Draw page by file.
+		let files = [];
+		//for (let i = maxpage-1; i < maxpage; i++) {
+			await picoClear();
+			await appDrawPage(state);
+			files[0] = await picoScreenFile();
+			await picoFlip();
+		//}
+
+		// Share screen.
+		picoShare(null, files);
+
+	} else {
+
+		// Draw a page to nearly 5:7(Silveratio) offscreen image.
+		const width = 140, height = 200;
+		picoResize(width, height);
+		let images = [];
+		for (let i = 0; i < maxpage; i++) {
+			await appDrawPage(i);
+			images[i] = await picoScreenImage();
+		}
+
+		// Draw all pages to 7:5(Silveratio) offscreen image.
+		const vcount = 2; // Vertical count.
+		const hcount = picoDiv(maxpage-1+vcount-1,vcount); // Horizontal count.
+		const voffset = height*(vcount-1)/2; // Vertical offset.
+		const hoffset = width*(hcount-1)/2; // Horizontal offset.
+		picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
+		picoClear();
+		for (let i = 0; i < maxpage; i++) {
+			picoImage(images[i],
+				picoMod(i,hcount)*width-hoffset,
+				picoDiv(i,hcount)*height-voffset);
+		}
+
+		// Share screen with watermark.
+		//picoCharLeading(4,6);
+		let file = await picoScreenFile(null, -1, 1);//watermark, 2, 1);
+		picoShare(null, [file]);
+
+		// Restore settings.
+		//picoCharLeading(8,8);
+		picoResize();
 	}
-
-	// Draw all pages to 7:5(Silveratio) offscreen image.
-	const vcount = 2; // Vertical count.
-	const hcount = picoDiv(maxpage-1+vcount-1,vcount); // Horizontal count.
-	const voffset = height*(vcount-1)/2; // Vertical offset.
-	const hoffset = width*(hcount-1)/2; // Horizontal offset.
-	picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
-	picoClear();
-	for (let i = 0; i < maxpage; i++) {
-		picoImage(images[i],
-			picoMod(i,hcount)*width-hoffset,
-			picoDiv(i,hcount)*height-voffset);
-	}
-
-	// Share screen with watermark.
-	//picoCharLeading(4,6);
-	let file = await picoScreenFile(null, -1, 1);//watermark, 2, 1);
-	picoShare(null, [file]);
-
-	// Restore settings.
-	//picoCharLeading(8,8);
-	picoResize();
 }
 
 // Load.
@@ -482,7 +507,7 @@ async function appMain() {
 	let pressing = 0;
 	if (!texts[state] || playing >= texts[state].length) {
 		if (picoAction()) {
-			state = state + 1 < maxpage ? state + 1: 0;
+			state = state + 1 < maxpage-1 ? state + 1: 0;
 			playing = 0;
 			picoFlush();
 		} else if (picoMotion()) {
