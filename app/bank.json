@@ -1,0 +1,21 @@
+{
+	"name": "Bank",
+	"short_name": "Bank",
+	"version": "0.9.40417a",
+	"author": "saikoro.org/bank",
+	"background_color": "#dfdfdf",
+	"theme_color": "#dfdfdf",
+	"icons": [{
+		"src": "./icon.png",
+		"sizes": "192x192",
+		"type": "image/png",
+		"purpose": "maskable"
+	},{
+		"src": "./icon.svg",
+		"sizes": "300x300",
+		"type": "image/svg"
+	}],
+	"display": "minimal-ui",
+	"start_url": "./?v=1",
+	"contents": ["./", "./pico.css", "./pico.js", "./app.js", "./index.js"]
+}

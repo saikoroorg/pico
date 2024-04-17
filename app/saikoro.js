@@ -13,6 +13,7 @@ const dots = [ // Dotted design pixels.
 const devitems = [ // Menu items for dev.
 	["dice", "app/dice.svg", "app/dice.js"],
 	["clock", "app/clock.svg", "app/clock.js"],
+	["bank", "app/bank.svg", "app/bank.js"],
 	["kuku", "app/kuku.svg", "app/kuku.js"],
 	["text", "app/text.svg", "app/text.js"],
 	["hex", "app/hex.svg", "app/hex.js"],
@@ -26,6 +27,7 @@ var devreturl = null; // Return url for dev.
 var items = [ // Menu items.
 	["dice", "dice/icon.svg", "dice/"],
 	["clock", "clock/icon.svg", "clock/"],
+	["bank", "bank/icon.svg", "bank/"],
 	["kuku", "kuku/icon.svg", "kuku/"],
 	["chess", "chess/icon.svg", "chess/"],
 	["shogi", "shogi/icon.svg", "shogi/"],
