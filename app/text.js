@@ -286,7 +286,7 @@ const extraCharAiliases = [ // Extra char ailiases.
 	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
 ];
 
-const colors = picoStringCode8("111111333000111111000");
+const colors = picoStringCode8("1115553332224440i9p060n4f0i000");
 
 const maxpage = 8;
 const labels = [
@@ -341,15 +341,12 @@ for (let j = 0; j < maxtext; j++) {
 }
 
 const enddata = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
-const endtext = "";
-const endpos = 24;
-const endrect = 64, endpos3 = 40, endcolor = -1;
-//endrect = 96, endpos3 = 36;//108;
-const endtext1 = "";
-const endgrid2 = 8, endtext2 = "いろはにほへと";
-const endgrid3 = 4, endtext3 = "1234567.890/0/00";
+const endcolor = -1, endscale = 2, endrect = 64, endpos = 0;//endpos = 24;
+const endcolor0 = 3, endgrid0 = 8, endrect0 = 88, endpos0 = 0, endtext0 = "□あ□い□う□え□お□\n□か□き□く□け□こ□\n□さ□し□す□せ□そ□\n□た□ち□つ□て□と□\n□な□に□ぬ□ね□の□\n□は□ひ□ふ□へ□ほ□\n□ま□み□む□め□も□\n□や□■□ゆ□■□よ□\n□ら□り□る□れ□ろ□\n□わ□■□を□■□ん□\n□□□□□□□□□□□\n";
+const endcolor1 = -1, endgrid1 = 8, endpos1 = -40,  endtext1 = "いろはにほへと";
+const endcolor2 = -1, endgrid2 = 4, endpos2 = 40,  endtext2 = "1234567.890/0/00";
 var endimage = null; // End page image.
-const shareall = true; // Share all page as one image.
+const shareall = false; // Share all page as one image.
 
 var state = 7; // Playing state.
 var playing = 0; // Playing count.
@@ -403,13 +400,14 @@ async function appDrawPage(page, count=-1) {
 
 	// Draw end page image last page.
 	} else {
-		picoRect(1, 0,endpos, endrect,endrect, 0,1);
-		picoImage(endimage, 0,endpos);
+		picoRect(endcolor, 0,endpos*endscale, endrect,endrect, 0,endscale);
+		//picoImage(endimage, 0,endpos*endscale);
+		picoCharLeading(endgrid0,8);
+		picoText(endtext0, endcolor0, 0,(endpos+endpos0)*endscale, endrect0,endrect0, 0,endscale);
+		picoCharLeading(endgrid1,8);
+		picoChar(endtext1, endcolor1, 0,(endpos+endpos1)*endscale, 0,endscale);
 		picoCharLeading(endgrid2,8);
-		picoChar(endtext1, endcolor, 0,endpos-44, 0,1);
-		picoChar(endtext2, endcolor, 0,endpos-endpos3, 0,1);
-		picoCharLeading(endgrid3,8);
-		picoChar(endtext3, endcolor, 0,endpos+endpos3, 0,1);
+		picoChar(endtext2, endcolor2, 0,(endpos+endpos2)*endscale, 0,endscale);
 	}
 }
 
