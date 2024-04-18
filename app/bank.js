@@ -36,30 +36,30 @@ Player = class {
 };
 var players = []; // Player.
 
-// Clock.
-const clockMax = playerMax + 1; // Maximum clock count.
-var clockCount = 2; // Clock count.
-const clockRects0 = [0,17,17, 0,1,4,0,14,6, 0,3,2,0,10,10]; // Clock base sprite.
-const clockRects2 = [0,17,17, 2,1,4,0,14,6, 2,3,2,0,10,10]; // Clock base sprite.
-const clockRects3 = [0,17,17, 3,1,4,0,14,6, 3,3,2,0,10,10]; // Clock base sprite.
-const clockScale = 6; // Clock base scale.
-const numberScale = 0.5; // Clock number scale.
-const bonusScale = 0.25; // Clock adiitional/bonus number scale.
-const clockPosX = 50; // Clock position X on landscape mode.
-const clockPosY = 50; // Clock position Y on portrait mode.
-const clockGridX = 125; // Clock position grid base width for 3+ players.
-const clockGridY = [-15, 15]; // Clock position grid base height for 3+ players.
+// Button.
+const buttonMax = playerMax + 1; // Maximum button count.
+var buttonCount = 2; // Button count.
+const buttonRects0 = [0,17,17, 0,1,4,0,14,6, 0,3,2,0,10,10]; // Button base sprite.
+const buttonRects2 = [0,17,17, 2,1,4,0,14,6, 2,3,2,0,10,10]; // Button base sprite.
+const buttonRects3 = [0,17,17, 3,1,4,0,14,6, 3,3,2,0,10,10]; // Button base sprite.
+const buttonScale = 6; // Button base scale.
+const numberScale = 0.5; // Button number scale.
+const buttonPosX = 50; // Button position X on landscape mode.
+const buttonPosY = 50; // Button position Y on portrait mode.
+const buttonGridX = 125; // Button position grid base width for 3+ players.
+const buttonGridY = [-15, 15]; // Button position grid base height for 3+ players.
 
-// Clock class.
-Clock = class {
+// Button class.
+Button = class {
 	constructor() {
 		this.scale = 1; // Sprite scale.
 		this.angle = 0; // Sprite angle.
 		this.centerx = 0; // Center position X.
 		this.centery = 0; // Center position Y.
+		this.touching = 0; // Touching count.
 	}
 };
-var clocks = []; // Clock.
+var buttons = []; // Button.
 
 // Global variables.
 var state = "waiting"; // Playing state.
@@ -177,9 +177,9 @@ async function appLoad() {
 		players[j] = new Player();
 	}
 
-	// Create clocks.
-	for (let k = 0; k < clockMax; k++) {
-		clocks[k] = new Clock();
+	// Create buttons.
+	for (let k = 0; k < buttonMax; k++) {
+		buttons[k] = new Button();
 	}
 
 	// Load query params.
@@ -217,7 +217,7 @@ async function appLoad() {
 		}
 	}
 	playerCountMin2 = playerCount > 2 ? playerCount : 2; // Minimum 2 players for hourglass mode.
-	clockCount = playerCount <= 2 ? playerCount : playerCount + 1; // Add playing button on 3+ players mode.
+	buttonCount = playerCount <= 2 ? playerCount : playerCount + 1; // Add playing button on 3+ players mode.
 
 	state = "waiting";
 	appResize(); // Initialize positions.
@@ -237,9 +237,9 @@ async function appResize() {
 
 		// 1 Screen for solo player.
 		for (let j = 0; j < 1; j++) {
-			clocks[j].centerx = clocks[j].centery = 0;
-			clocks[j].scale = clockScale;
-			clocks[j].angle = 0;
+			buttons[j].centerx = buttons[j].centery = 0;
+			buttons[j].scale = buttonScale;
+			buttons[j].angle = 0;
 		}
 
 	// Reset layouts for 2 screens.
@@ -247,16 +247,16 @@ async function appResize() {
 
 		// Set sprite positions and scale for landscape mode.
 		if (landscape) {
-			screens[0].centerx = clockPosX;
-			screens[1].centerx = -clockPosX;
+			screens[0].centerx = buttonPosX;
+			screens[1].centerx = -buttonPosX;
 			screens[0].centery = screens[1].centery = 0;
 			screens[0].width = screens[1].width = screenHeight;
 			screens[0].height = screens[1].height = screenWidth;
 
 		// Set sprite positions and scale for portrait mode.
 		} else {
-			screens[0].centery = clockPosY;
-			screens[1].centery = -clockPosY;
+			screens[0].centery = buttonPosY;
+			screens[1].centery = -buttonPosY;
 			screens[0].centerx = screens[1].centerx = 0;
 			screens[0].width = screens[1].width = screenWidth;
 			screens[0].height = screens[1].height = screenHeight;
@@ -265,43 +265,43 @@ async function appResize() {
 		// 2 Screens for 2 players.
 		if (playerCount <= 2) {
 			for (let j = 0; j < 2; j++) {
-				clocks[j].centerx = clocks[j].centery = 0;
-				clocks[j].scale = clockScale;
-				clocks[j].angle = 0;
+				buttons[j].centerx = buttons[j].centery = 0;
+				buttons[j].scale = buttonScale;
+				buttons[j].angle = 0;
 			}
 
 			// Upsidedown for portrait mode.
 			if (!landscape) {
-				clocks[1].angle = 180;
+				buttons[1].angle = 180;
 			}
 
 		// 2 Screens for 3+ players.
 		} else {
-			clocks[0].centerx = clocks[0].centery = 0;
-			clocks[0].scale = clockScale;
-			clocks[0].angle = 0;
+			buttons[0].centerx = buttons[0].centery = 0;
+			buttons[0].scale = buttonScale;
+			buttons[0].angle = 0;
 
 			if (playerCount <= 4) {
 				for (let j = 0; j < playerCount; j++) {
-					clocks[j + 1].centerx = clockGridX * (j - playerCount/2 + 0.5) / (playerCount + 1);
-					clocks[j + 1].centery = 0;
-					clocks[j + 1].scale = clockScale / playerCount;
-					clocks[j + 1].angle = 0;
+					buttons[j + 1].centerx = buttonGridX * (j - playerCount/2 + 0.5) / (playerCount + 1);
+					buttons[j + 1].centery = 0;
+					buttons[j + 1].scale = buttonScale / playerCount;
+					buttons[j + 1].angle = 0;
 				}
 			} else {
 				let playerCount2 = picoDiv(playerCount, 2);
 				let playerCount1 = playerCount - playerCount2;
 				for (let j = 0; j < playerCount1; j++) {
-					clocks[j + 1].centerx = clockGridX * (j - playerCount1/2 + 0.5) / (playerCount1 + 1);
-					clocks[j + 1].centery = clockGridY[0];
-					clocks[j + 1].scale = clockScale / playerCount1;
-					clocks[j + 1].angle = 0;
+					buttons[j + 1].centerx = buttonGridX * (j - playerCount1/2 + 0.5) / (playerCount1 + 1);
+					buttons[j + 1].centery = buttonGridY[0];
+					buttons[j + 1].scale = buttonScale / playerCount1;
+					buttons[j + 1].angle = 0;
 				}
 				for (let j = playerCount1; j < playerCount; j++) {
-					clocks[j + 1].centerx = clockGridX * (j - playerCount2/2 - playerCount1 + 0.5) / (playerCount2 + 1);
-					clocks[j + 1].centery = clockGridY[1];
-					clocks[j + 1].scale = clockScale / playerCount1;
-					clocks[j + 1].angle = 0;
+					buttons[j + 1].centerx = buttonGridX * (j - playerCount2/2 - playerCount1 + 0.5) / (playerCount2 + 1);
+					buttons[j + 1].centery = buttonGridY[1];
+					buttons[j + 1].scale = buttonScale / playerCount1;
+					buttons[j + 1].angle = 0;
 				}
 			}
 		}
@@ -330,7 +330,7 @@ async function appMain() {
 			players[j].score = 0;
 		}
 
-		// Start clock.
+		// Start button.
 		startTime = picoTime();
 
 		// Reset playing count.
@@ -345,20 +345,39 @@ async function appMain() {
 		picoMotion(screens[0].centerx, screens[0].centery, screens[0].width, screens[0].height),
 		picoMotion(screens[1].centerx, screens[1].centery, screens[1].width, screens[1].height)];
 
-	for (let k = 0; k < clockMax; k++) {
+	for (let k = 0; k < buttonMax; k++) {
 		if (playerCount <= 2) {
-			if (k < clockCount) {
-				if (actions[k]) {
+			if (k < buttonCount) {
+				let s = 1;
+
+				if (actions[k] && buttons[k].touching >= 0) {
 					players[k].score += 1;
+					buttons[k].touching = 0;
+					//console.log("action " + k + ":" + buttons[k].touching);
+				} else if (motions[k]) {
+					if (buttons[k].touching >= 60) {
+						players[k].score = 0;
+						buttons[k].touching = -1;
+						//console.log("hold " + k + ":" + buttons[k].touching);
+					} else if (buttons[k].touching >= 0) {
+						buttons[k].touching++;
+						//console.log("touch " + k + ":" + buttons[k].touching);
+						s = 0.8;
+					} else {
+						//console.log("holding " + k + ":" + buttons[k].touching);
+					}
+				} else {
+					//console.log("none " + k + ":" + buttons[k].touching);
+					buttons[k].touching = 0;
 				}
 
-				// Draw wallet.
-				let x = clocks[k].centerx + screens[k].centerx;
-				let y = clocks[k].centery + screens[k].centery;
-				await picoSprite(clockRects0, -1, x, y, clocks[k].angle, clocks[k].scale);
+				// Draw buttons.
+				let x = buttons[k].centerx + screens[k].centerx;
+				let y = buttons[k].centery + screens[k].centery;
+				await picoSprite(buttonRects0, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
 				// Draw number.
-				await picoChar(players[k].score, -1, x, y, clocks[k].angle, clocks[k].scale*numberScale);
+				await picoChar(players[k].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 			}
 		}
 	}
