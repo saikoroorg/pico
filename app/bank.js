@@ -62,7 +62,7 @@ Button = class {
 var buttons = []; // Button.
 
 // Global variables.
-var state = "waiting"; // Playing state.
+var state = ""; // Playing state.
 var playing = -1; // Playing count.
 var count = 10 * 60; // Time count.
 var addition = 0; // Additional time count.
@@ -76,25 +76,9 @@ var landscape = false; // landscape mode.
 
 // Update buttons.
 async function appUpdate() {
-	if (state == "playing") {
-		picoTitle();
-		picoLabel("select");
-		picoLabel("minus");
-		picoLabel("plus");
-	} else {
-		picoTitle(title);
-		if (addition > 0) {
-			picoLabel("select", "-" + addition);
-		} else if (bonus > 0) {
-			picoLabel("select", "+" + bonus);
-		} else if (bonus < 0) {
-			picoLabel("select", "*");
-		} else {
-			picoLabel("select", "#");
-		}
-		picoLabel("minus", "-");
-		picoLabel("plus", "+");
-	}
+	picoLabel("select", "" + playerCount);
+	picoLabel("minus", "-");
+	picoLabel("plus", "+");
 }
 
 // Action button.
@@ -107,59 +91,20 @@ async function appSelect(x) {
 	// Change count.
 	if (x != 0) {
 
-		// Change count of total time.
-		if (state == "waiting") {
-			if ((x > 0 && count + x <= 999 * 60) || (x < 0 && count + x > 0)) {
-				count = picoDiv(count + x * 60, 60) * 60;
-				playing = -1; // Restart.
-				picoBeep(1.2, 0.1);
-				appUpdate();
-
-			} else {
-				picoBeep(-1.2, 0.1);
-			}
-
-		// Change count of each player time.
-		} else if (state == "pausing") {
-			let c = players[playerIndex].count > 0 ? players[playerIndex].current : 0;
-			if ((x > 0 && c + x <= 999 * 60) || (x < 0 && c + x > 0)) {
-				players[playerIndex].count = players[playerIndex].current = picoDiv(c + x * 60, 60) * 60;
-				picoBeep(1.2, 0.1);
-
-			} else {
-				picoBeep(-1.2, 0.1);
-			}
-		} else {
-			picoBeep(-1.2, 0.1);
-		}
-
-	// Change option.
-	} else {
-
-		if (state == "waiting" || state == "pausing") {
-			if (bonus == 0 && addition < 10) {
-				addition = 10; // -10s additional time (Byoyomi)
-			} else if (bonus == 0 && addition < 30) {
-				addition = 30; // -30s additional time (Byoyomi)
-			} else if (bonus == 0) {
-				addition = 0;
-				bonus = -1; // +?s opposite time (Hourglass)
-			} else if (bonus < 5) {
-				addition = 0;
-				bonus = 5; // +5s bonus time (Fischer)
-			} else if (bonus < 10) {
-				addition = 0;
-				bonus = 10; // +10s bonus time (Fischer)
-			} else {
-				addition = 0;
-				bonus = 0;
-			}
+		// Change count of player.
+		if ((x > 0 && playerCount + x <= playerMax) || (x < 0 && playerCount + x > 0)) {
+			playerCount = playerCount + x;
+			playing = -1; // Restart.
 			picoBeep(1.2, 0.1);
 			appResize();
 			appUpdate();
+
 		} else {
 			picoBeep(-1.2, 0.1);
 		}
+
+	} else {
+		picoBeep(-1.2, 0.1);
 	}
 }
 
@@ -187,32 +132,14 @@ async function appLoad() {
 	if (value) {
 		let numbers = picoNumbers();
 
-		// Additional time mode. (Byoyomi)
-		if (value.match(/a/i)) {
+		// Simple multi players mode.
+		if (value.match(/x/i)) {
 			count = numbers[0] < 0 ? 0 : numbers[0] * 60 < countMax ? numbers[0] * 60 : countMax;
-			addition = numbers[1] < 0 ? 0 : numbers[1] < bonusMax ? numbers[1] : bonusMax;
-			bonus = 0;
-			playerCount = numbers[2] <= 0 ? 2 : numbers[2] < playerMax ? numbers[2] : playerMax;
-
-		// Bonus time mode. (Fischer) / Hourglass mode.
-		} else if (value.match(/b/i)) {
-			count = numbers[0] < 0 ? 0 : numbers[0] * 60 < countMax ? numbers[0] * 60 : countMax;
-			addition = 0
-			bonus = numbers[1] <= 0 ? -1 : numbers[1] < bonusMax ? numbers[1] : bonusMax;
-			playerCount = numbers[2] <= 0 ? 2 : numbers[2] < playerMax ? numbers[2] : playerMax;
-
-		// Simple multi players mode. (Kiremake)
-		} else if (value.match(/x/i)) {
-			count = numbers[0] < 0 ? 0 : numbers[0] * 60 < countMax ? numbers[0] * 60 : countMax;
-			addition = 0
-			bonus = 0;
 			playerCount = numbers[1] <= 0 ? 2 : numbers[1] < playerMax ? numbers[1] : playerMax;
 
-		// Simple 2 players mode. (Kiremake)
+		// Simple 2 players mode.
 		} else if (numbers[0] > 0) {
 			count = numbers[0] < 0 ? 0 : numbers[0] * 60 < countMax ? numbers[0] * 60 : countMax;
-			addition = 0
-			bonus = 0;
 			playerCount = 2;
 		}
 	}
@@ -322,7 +249,7 @@ async function appMain() {
 		counting = false;
 
 		// Reset player states.
-		playerIndex = -1;
+		playerIndex = 0;
 		for (let j = 0; j < playerCountMin2; j++) {
 			players[j].count = players[j].current = count;
 			players[j].consumed = 0;
@@ -345,10 +272,12 @@ async function appMain() {
 		picoMotion(screens[0].centerx, screens[0].centery, screens[0].width, screens[0].height),
 		picoMotion(screens[1].centerx, screens[1].centery, screens[1].width, screens[1].height)];
 
-	for (let k = 0; k < buttonMax; k++) {
+	for (let k = playerCount; k >= 0; k--) {
+
+		// 2 players.
 		if (playerCount <= 2) {
-			if (k < buttonCount) {
-				let s = 1;
+			if (k < playerCount) {
+				let i = k, s = 1;
 
 				if (actions[k] && buttons[k].touching >= 0) {
 					players[k].score += 1;
@@ -372,12 +301,78 @@ async function appMain() {
 				}
 
 				// Draw buttons.
-				let x = buttons[k].centerx + screens[k].centerx;
-				let y = buttons[k].centery + screens[k].centery;
+				let x = buttons[k].centerx + screens[i].centerx;
+				let y = buttons[k].centery + screens[i].centery;
 				await picoSprite(buttonRects0, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
 				// Draw number.
 				await picoChar(players[k].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
+			}
+
+		// 3+ players.
+		} else {
+			if (k > 0) {
+				let i = 1, s = 1;
+
+				if (actions[k] && buttons[k].touching >= 0) {
+					playerIndex = picoMod(playerIndex+1, playerCount);
+					buttons[k].touching = 0;
+					//console.log("action " + k + ":" + buttons[k].touching);
+				} else if (motions[k]) {
+					if (buttons[k].touching >= 60) {
+						buttons[k].touching = -1;
+						//console.log("hold " + k + ":" + buttons[k].touching);
+					} else if (buttons[k].touching >= 0) {
+						buttons[k].touching++;
+						//console.log("touch " + k + ":" + buttons[k].touching);
+						s = 0.8;
+					} else {
+						//console.log("holding " + k + ":" + buttons[k].touching);
+					}
+				} else {
+					//console.log("none " + k + ":" + buttons[k].touching);
+					buttons[k].touching = 0;
+				}
+
+				// Draw buttons.
+				let x = buttons[k].centerx + screens[i].centerx;
+				let y = buttons[k].centery + screens[i].centery;
+				let r = k-1==playerIndex ? buttonRects0 : buttonRects3;
+				await picoSprite(r, -1, x, y, buttons[k].angle, buttons[k].scale*s);
+
+				// Draw number.
+				await picoChar(players[k-1].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
+			} else if (playerIndex >= 0) {
+				let i = 0, s = 1;
+
+				if (actions[k] && buttons[k].touching >= 0) {
+					players[playerIndex].score += 1;
+					buttons[k].touching = 0;
+					//console.log("action " + k + ":" + buttons[k].touching);
+				} else if (motions[k]) {
+					if (buttons[k].touching >= 60) {
+						players[playerIndex].score = 0;
+						buttons[k].touching = -1;
+						//console.log("hold " + k + ":" + buttons[k].touching);
+					} else if (buttons[k].touching >= 0) {
+						buttons[k].touching++;
+						//console.log("touch " + k + ":" + buttons[k].touching);
+						s = 0.8;
+					} else {
+						//console.log("holding " + k + ":" + buttons[k].touching);
+					}
+				} else {
+					//console.log("none " + k + ":" + buttons[k].touching);
+					buttons[k].touching = 0;
+				}
+
+				// Draw buttons.
+				let x = buttons[k].centerx + screens[i].centerx;
+				let y = buttons[k].centery + screens[i].centery;
+				await picoSprite(buttonRects0, -1, x, y, buttons[k].angle, buttons[k].scale*s);
+
+				// Draw number.
+				await picoChar(players[playerIndex].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 			}
 		}
 	}
