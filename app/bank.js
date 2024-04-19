@@ -1,6 +1,4 @@
 const title = "Bank"; // Title.
-const countMax = 999 * 60; // Maximum count.
-const bonusMax = 99; // Maximum bonus time count.
 
 // Screen.
 const screenMax = 2; // Maximum screen count.
@@ -19,18 +17,13 @@ var screens = []; // Screen.
 
 // Player.
 const playerMax = 8; // Maximum player count.
-var playerCount = 2; // Player count.
+var playerCount = 1; // Player count.
 var playerIndex = 0; // Current player index.
 var playerCountMin2 = 2; // Player count for hourglass mode.
 
 // Player class.
 Player = class {
 	constructor() {
-		this.count = 10 * 60; // Time count for each player.
-		this.current = 0; // Current time count.
-		this.consumed = 0; // Consumed time count.
-		this.starting = false; // Start flag.
-		this.number = ""; // Display count.
 		this.score = 0; // Score count for each player.
 	}
 };
@@ -40,9 +33,8 @@ var players = []; // Player.
 const buttonMax = playerMax + 1; // Maximum button count.
 var buttonCount = 2; // Button count.
 const buttonWidth = 8, buttonHeight = 6; // Button sizes.
-const buttonRects0 = [0,17,17, 0,1,4,0,14,6, 0,3,2,0,10,10]; // Button base sprite.
-const buttonRects2 = [0,17,17, 2,1,4,0,14,6, 2,3,2,0,10,10]; // Button base sprite.
-const buttonRects3 = [0,17,17, 3,1,4,0,14,6, 3,3,2,0,10,10]; // Button base sprite.
+const buttonBallSprite = [0,15,15, 0,1,4,0,12,6, 0,3,2,0,8,10]; // Button ball sprite.
+const buttonRectSprite = [0,15,15, 0,2,2,0,10,10]; // Button ball sprite.
 const buttonScale = 6; // Button base scale.
 const numberScale = 0.5; // Button number scale.
 const buttonPosX = 50; // Button position X on landscape mode.
@@ -67,14 +59,8 @@ var buttons = []; // Button.
 // Global variables.
 var state = ""; // Playing state.
 var playing = -1; // Playing count.
-var count = 10 * 60; // Time count.
-var addition = 0; // Additional time count.
-var bonus = 0; // Bonus time count.
+var count = 0; // Time count.
 
-var counting = false; // Counting up/down flag.
-var touching = 0; // Touching count.
-
-var startTime = 0; // Start time.
 var landscape = false; // landscape mode.
 
 // Update buttons.
@@ -259,19 +245,12 @@ async function appMain() {
 
 		// Reset playing states.
 		state = "waiting";
-		counting = false;
 
 		// Reset player states.
 		playerIndex = 0;
 		for (let j = 0; j < playerCountMin2; j++) {
-			players[j].count = players[j].current = count;
-			players[j].consumed = 0;
-			players[j].starting = false;
 			players[j].score = 0;
 		}
-
-		// Start button.
-		startTime = picoTime();
 
 		// Reset playing count.
 		playing = 1;
@@ -309,7 +288,7 @@ async function appMain() {
 				}
 
 				// Draw buttons.
-				await picoSprite(buttonRects0, -1, x, y, buttons[k].angle, buttons[k].scale*s);
+				await picoSprite(buttonRectSprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
 				// Draw number.
 				await picoChar(players[k].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
@@ -345,7 +324,7 @@ async function appMain() {
 				}
 
 				// Draw buttons.
-				let r = k-1==playerIndex ? buttonRects0 : buttonRects3;
+				let r = k-1==playerIndex ? buttonRectSprite : buttonBallSprite;
 				await picoSprite(r, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
 				// Draw number.
@@ -379,7 +358,7 @@ async function appMain() {
 				}
 
 				// Draw buttons.
-				await picoSprite(buttonRects0, -1, x, y, buttons[k].angle, buttons[k].scale*s);
+				await picoSprite(buttonRectSprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
 				// Draw number.
 				await picoChar(players[playerIndex].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
