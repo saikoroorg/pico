@@ -2,9 +2,9 @@ const title = "Bank"; // Title.
 
 // Player.
 const playerMax = 8; // Maximum player count.
-var playerCount = 1; // Player count.
+var playerCount = 2; // Player count.
 var playerIndex = 0; // Current player index.
-var playerCountMin2 = 2; // Player count for hourglass mode.
+//var playerCountMin2 = 2; // Player count for hourglass mode.
 
 // Player class.
 Player = class {
@@ -16,20 +16,21 @@ var players = []; // Player.
 
 // Button.
 const buttonMax = playerMax + 1; // Maximum button count.
-var buttonCount = 2; // Button count.
 const buttonWidth = 8, buttonHeight = 6; // Button sizes.
-const buttonBallSprite = [0,15,15, 0,1,4,0,12,6, 0,3,2,0,8,10]; // Button ball sprite.
-const buttonRectSprite = [0,15,15, 0,2,2,0,10,10]; // Button ball sprite.
+const buttonBallSprite = [0,15,15, 2,1,4,0,12,6, 2,3,2,0,8,10]; // Button ball sprite.
+const buttonRectSprite = [0,15,15, 0,1,4,0,12,6, 0,3,2,0,8,8]; // Button ball sprite.
 const buttonScale = 6; // Button base scale.
 const numberScale = 0.5; // Button number scale.
 const buttonPosX = 50; // Button position X on landscape mode.
 const buttonPosY = 50; // Button position Y on portrait mode.
 const buttonGridX = 125; // Button position grid base width for 3+ players.
 const buttonGridY = [-15, 15]; // Button position grid base height for 3+ players.
+var buttonCount = 3; // Button count.
 
 // Button class.
 Button = class {
 	constructor() {
+		this.sprite = buttonBallSprite;
 		this.scale = 1; // Sprite scale.
 		this.angle = 0; // Sprite angle.
 		this.centerx = 0; // Center position X.
@@ -37,6 +38,7 @@ Button = class {
 		this.width = buttonWidth;
 		this.height = buttonHeight;
 		this.touching = 0; // Touching count.
+		this.score = 0; // Score count for each player.
 	}
 };
 var buttons = []; // Button.
@@ -66,10 +68,10 @@ async function appSelect(x) {
 	if (x != 0) {
 
 		// Change count of player.
-		if ((x > 0 && playerCount + x <= playerMax) || (x < 0 && playerCount + x > 0)) {
+		if ((x > 0 && playerCount + x <= playerMax) || (x < 0 && playerCount + x >= 0)) {
 			playerCount = playerCount + x;
-			playerCountMin2 = playerCount > 2 ? playerCount : 2; // Minimum 2 players for hourglass mode.
-			//playing = -1; // Restart.
+			buttonCount = playerCount + 1; // Add playing button on 3+ players mode.
+			playing = -1; // Restart.
 			picoBeep(1.2, 0.1);
 			appResize();
 			appUpdate();
@@ -113,8 +115,6 @@ async function appLoad() {
 			playerCount = 2;
 		}
 	}
-	playerCountMin2 = playerCount > 2 ? playerCount : 2; // Minimum 2 players for hourglass mode.
-	buttonCount = playerCount <= 2 ? playerCount : playerCount + 1; // Add playing button on 3+ players mode.
 
 	state = "waiting";
 	appResize(); // Initialize positions.
@@ -125,11 +125,10 @@ async function appLoad() {
 async function appResize() {
 	landscape = picoWideScreen();
 
-	// Reset layouts for 1 screen.
-	if (playerCount <= 1) {
-
-		// 1 Screen for solo player.
+	// Reset layouts for 1 screen for solo player.
+	if (buttonCount <= 1) {
 		for (let j = 0; j < 1; j++) {
+			buttons[j].sprite = buttonBallSprite;
 			buttons[j].centerx = buttons[j].centery = 0;
 			buttons[j].scale = buttonScale;
 			buttons[j].angle = 0;
@@ -137,60 +136,83 @@ async function appResize() {
 			buttons[j].height = buttonHeight * buttonScale;
 		}
 
-	// Reset layouts for 2 screens.
-	} else {
-		let centerx = [landscape ? buttonPosX : 0, landscape ? -buttonPosX : 0];
-		let centery = [landscape ? 0 : buttonPosY, landscape ? 0 : -buttonPosY];
+	// Reset layouts for 2 screens for solo player.
+	} else if (buttonCount <= 2) {
+		let centerx = [landscape ? -buttonPosX : 0, landscape ? buttonPosX : 0];
+		let centery = [landscape ? 0 : -buttonPosY, landscape ? 0 : buttonPosY];
 
-		// 2 Screens for 2 players.
-		if (playerCount <= 2) {
-			for (let j = 0; j < 2; j++) {
-				buttons[j].centerx = centerx[j];
-				buttons[j].centery = centery[j];
-				buttons[j].scale = buttonScale;
-				buttons[j].angle = landscape ? 180 : 0; // Upsidedown for portrait mode.
-				buttons[j].width = buttonWidth * buttonScale;
-				buttons[j].height = buttonHeight * buttonScale;
-			}
+		for (let j = 0; j < buttonCount; j++) {
+			buttons[j].sprite = !j ? buttonBallSprite : buttonRectSprite;
+			buttons[j].centerx = centerx[j];
+			buttons[j].centery = centery[j];
+			buttons[j].scale = !j ? buttonScale : buttonScale / 2;
+			buttons[j].angle = 0;
+			buttons[j].width = buttonWidth * buttonScale;
+			buttons[j].height = buttonHeight * buttonScale;
+		}
 
-		// 2 Screens for 3+ players.
-		} else {
+	// 2 Screens for 2 players.
+	} else if (buttonCount <= 3) {
+		let centerx = [0, landscape ? buttonPosX*1.5 : 0, landscape ? -buttonPosX*1.5 : 0];
+		let centery = [0, landscape ? 0 : buttonPosY*1.5, landscape ? 0 : -buttonPosY*1.5];
 
-			buttons[0].centerx = centerx[0];
-			buttons[0].centery = centery[0];
-			buttons[0].scale = buttonScale;
-			buttons[0].angle = 0;
-			buttons[0].width = buttonWidth * buttonScale;
-			buttons[0].height = buttonHeight * buttonScale;
-
-			if (playerCount <= 4) {
-				for (let j = 1; j <= playerCount; j++) {
-					buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount/2 + 0.5) / (playerCount + 1);
-					buttons[j].centery = centery[1];
-					buttons[j].scale = buttonScale / playerCount;
-					buttons[j].angle = 0;
-					buttons[j].width = buttonWidth * buttonScale / playerCount;
-					buttons[j].height = buttonHeight * buttonScale / playerCount;
-				}
+		for (let j = 0; j < buttonCount; j++) {
+			buttons[j].sprite = !j ? buttonBallSprite : buttonRectSprite;
+			buttons[j].centerx = centerx[j];
+			buttons[j].centery = centery[j];
+			buttons[j].scale = !j ? buttonScale : buttonScale / 2;
+			if (landscape) {
+				buttons[j].angle = 0;
 			} else {
-				let playerCount2 = picoDiv(playerCount, 2);
-				let playerCount1 = playerCount - playerCount2;
-				for (let j = 1; j <= playerCount1; j++) {
-					buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount1/2 + 0.5) / (playerCount1 + 1);
-					buttons[j].centery = centery[1] + buttonGridY[0];
-					buttons[j].scale = buttonScale / playerCount1;
-					buttons[j].angle = 0;
-					buttons[j].width = buttonWidth * buttonScale / playerCount1;
-					buttons[j].height = buttonHeight * buttonScale / playerCount1;
-				}
-				for (let j = playerCount1+1; j <= playerCount; j++) {
-					buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount2/2 - playerCount1 + 0.5) / (playerCount2 + 1);
-					buttons[j].centery = centery[1] + buttonGridY[1];
-					buttons[j].scale = buttonScale / playerCount1;
-					buttons[j].angle = 0;
-					buttons[j].width = buttonWidth * buttonScale / playerCount1;
-					buttons[j].height = buttonHeight * buttonScale / playerCount1;
-				}
+				buttons[j].angle = j>=2 ? 180 : j>=1 ? 0 : 90; // Upsidedown for portrait mode.
+			}
+			buttons[j].width = buttonWidth * buttonScale;
+			buttons[j].height = buttonHeight * buttonScale;
+		}
+
+	// 2 Screens for 3+ players.
+	} else {
+		let centerx = [landscape ? -buttonPosX : 0, landscape ? buttonPosX : 0];
+		let centery = [landscape ? 0 : -buttonPosY, landscape ? 0 : buttonPosY];
+
+		buttons[0].sprite = buttonBallSprite;
+		buttons[0].centerx = centerx[0];
+		buttons[0].centery = centery[0];
+		buttons[0].scale = buttonScale;
+		buttons[0].angle = 0;
+		buttons[0].width = buttonWidth * buttonScale;
+		buttons[0].height = buttonHeight * buttonScale;
+
+		if (playerCount <= 4) {
+			for (let j = 1; j <= playerCount; j++) {
+				buttons[j].sprite = buttonRectSprite;
+				buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount/2 + 0.5) / (playerCount + 1);
+				buttons[j].centery = centery[1];
+				buttons[j].scale = buttonScale / playerCount;
+				buttons[j].angle = 0;
+				buttons[j].width = buttonWidth * buttonScale / playerCount;
+				buttons[j].height = buttonHeight * buttonScale / playerCount;
+			}
+		} else {
+			let playerCount2 = picoDiv(playerCount, 2);
+			let playerCount1 = playerCount - playerCount2;
+			for (let j = 1; j <= playerCount1; j++) {
+				buttons[j].sprite = buttonRectSprite;
+				buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount1/2 + 0.5) / (playerCount1 + 1);
+				buttons[j].centery = centery[1] + buttonGridY[0];
+				buttons[j].scale = buttonScale / playerCount1;
+				buttons[j].angle = 0;
+				buttons[j].width = buttonWidth * buttonScale / playerCount1;
+				buttons[j].height = buttonHeight * buttonScale / playerCount1;
+			}
+			for (let j = playerCount1+1; j <= playerCount; j++) {
+				buttons[j].sprite = buttonRectSprite;
+				buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount2/2 - playerCount1 + 0.5) / (playerCount2 + 1);
+				buttons[j].centery = centery[1] + buttonGridY[1];
+				buttons[j].scale = buttonScale / playerCount1;
+				buttons[j].angle = 0;
+				buttons[j].width = buttonWidth * buttonScale / playerCount1;
+				buttons[j].height = buttonHeight * buttonScale / playerCount1;
 			}
 		}
 	}
@@ -205,34 +227,37 @@ async function appMain() {
 	if (playing < 0) {
 		console.log("Initialize playing states.");
 
+		//playerCountMin2 = playerCount > 2 ? playerCount : 2; // Minimum 2 players for hourglass mode.
+		//buttonCount = playerCount + 1; // Add playing button on 3+ players mode.
+
 		// Reset playing states.
 		state = "waiting";
 
 		// Reset player states.
-		playerIndex = 0;
-		for (let j = 0; j < playerCountMin2; j++) {
+		/*playerIndex = 0;
+		for (let j = 0; j < playerCount; j++) {
 			players[j].score = 0;
-		}
+		}*/
 
 		// Reset playing count.
 		playing = 1;
 	}
 
-	for (let k = playerCount; k >= 0; k--) {
+	for (let k = 0; k < buttonCount; k++) {
 
 		// 2 players.
-		if (playerCount <= 2) {
-			if (k < playerCount) {
+		//if (playerCount <= 2) {
+		//	if (k < playerCount) {
 				let i = k, s = 1;
 				let x = buttons[k].centerx, y = buttons[k].centery;
 				let w = buttons[k].width, h = buttons[k].height;
 
 				if (picoAction(x,y,w,h) && buttons[k].touching >= 0) {
-					players[k].score += 1;
+					buttons[k].score += 1;
 					buttons[k].touching = 0;
 				} else if (picoMotion(x,y,w,h)) {
 					if (buttons[k].touching >= 60) {
-						players[k].score = 0;
+						buttons[k].score = 0;
 						buttons[k].touching = -1;
 					} else if (buttons[k].touching >= 0) {
 						buttons[k].touching++;
@@ -244,14 +269,14 @@ async function appMain() {
 				}
 
 				// Draw buttons.
-				await picoSprite(buttonRectSprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
+				await picoSprite(buttons[k].sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
 				// Draw number.
-				await picoChar(players[k].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
-			}
+				await picoChar(buttons[k].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
+		//	}
 
 		// 3+ players.
-		} else {
+		/*} else {
 			if (k > 0) {
 				let i = 1, s = 1;
 				let x = buttons[k].centerx, y = buttons[k].centery;
@@ -307,7 +332,7 @@ async function appMain() {
 				// Draw number.
 				await picoChar(players[playerIndex].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 			}
-		}
+		}*/
 	}
 
 	// Increment playing count.
