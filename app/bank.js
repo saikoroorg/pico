@@ -39,6 +39,7 @@ var players = []; // Player.
 // Button.
 const buttonMax = playerMax + 1; // Maximum button count.
 var buttonCount = 2; // Button count.
+const buttonWidth = 8, buttonHeight = 6; // Button sizes.
 const buttonRects0 = [0,17,17, 0,1,4,0,14,6, 0,3,2,0,10,10]; // Button base sprite.
 const buttonRects2 = [0,17,17, 2,1,4,0,14,6, 2,3,2,0,10,10]; // Button base sprite.
 const buttonRects3 = [0,17,17, 3,1,4,0,14,6, 3,3,2,0,10,10]; // Button base sprite.
@@ -56,6 +57,8 @@ Button = class {
 		this.angle = 0; // Sprite angle.
 		this.centerx = 0; // Center position X.
 		this.centery = 0; // Center position Y.
+		this.width = buttonWidth;
+		this.height = buttonHeight;
 		this.touching = 0; // Touching count.
 	}
 };
@@ -167,6 +170,8 @@ async function appResize() {
 			buttons[j].centerx = buttons[j].centery = 0;
 			buttons[j].scale = buttonScale;
 			buttons[j].angle = 0;
+			buttons[j].width = buttonWidth * buttonScale;
+			buttons[j].height = buttonHeight * buttonScale;
 		}
 
 	// Reset layouts for 2 screens.
@@ -195,6 +200,8 @@ async function appResize() {
 				buttons[j].centerx = buttons[j].centery = 0;
 				buttons[j].scale = buttonScale;
 				buttons[j].angle = 0;
+				buttons[j].width = buttonWidth * buttonScale;
+				buttons[j].height = buttonHeight * buttonScale;
 			}
 
 			// Upsidedown for portrait mode.
@@ -214,6 +221,8 @@ async function appResize() {
 					buttons[j + 1].centery = 0;
 					buttons[j + 1].scale = buttonScale / playerCount;
 					buttons[j + 1].angle = 0;
+					buttons[j + 1].width = buttonWidth * buttonScale / playerCount;
+					buttons[j + 1].height = buttonHeight * buttonScale / playerCount;
 				}
 			} else {
 				let playerCount2 = picoDiv(playerCount, 2);
@@ -223,12 +232,16 @@ async function appResize() {
 					buttons[j + 1].centery = buttonGridY[0];
 					buttons[j + 1].scale = buttonScale / playerCount1;
 					buttons[j + 1].angle = 0;
+					buttons[j + 1].width = buttonWidth * buttonScale / playerCount1;
+					buttons[j + 1].height = buttonHeight * buttonScale / playerCount1;
 				}
 				for (let j = playerCount1; j < playerCount; j++) {
 					buttons[j + 1].centerx = buttonGridX * (j - playerCount2/2 - playerCount1 + 0.5) / (playerCount2 + 1);
 					buttons[j + 1].centery = buttonGridY[1];
 					buttons[j + 1].scale = buttonScale / playerCount1;
 					buttons[j + 1].angle = 0;
+					buttons[j + 1].width = buttonWidth * buttonScale / playerCount1;
+					buttons[j + 1].height = buttonHeight * buttonScale / playerCount1;
 				}
 			}
 		}
@@ -264,26 +277,21 @@ async function appMain() {
 		playing = 1;
 	}
 
-	// Read input.
-	let actions = [
-		picoAction(screens[0].centerx, screens[0].centery, screens[0].width, screens[0].height),
-		picoAction(screens[1].centerx, screens[1].centery, screens[1].width, screens[1].height)];
-	let motions = [
-		picoMotion(screens[0].centerx, screens[0].centery, screens[0].width, screens[0].height),
-		picoMotion(screens[1].centerx, screens[1].centery, screens[1].width, screens[1].height)];
-
 	for (let k = playerCount; k >= 0; k--) {
 
 		// 2 players.
 		if (playerCount <= 2) {
 			if (k < playerCount) {
 				let i = k, s = 1;
+				let x = buttons[k].centerx + screens[i].centerx;
+				let y = buttons[k].centery + screens[i].centery;
+				let w = buttons[k].width, h = buttons[k].height;
 
-				if (actions[k] && buttons[k].touching >= 0) {
+				if (picoAction(x,y,w,h) && buttons[k].touching >= 0) {
 					players[k].score += 1;
 					buttons[k].touching = 0;
 					//console.log("action " + k + ":" + buttons[k].touching);
-				} else if (motions[k]) {
+				} else if (picoMotion(x,y,w,h)) {
 					if (buttons[k].touching >= 60) {
 						players[k].score = 0;
 						buttons[k].touching = -1;
@@ -301,8 +309,6 @@ async function appMain() {
 				}
 
 				// Draw buttons.
-				let x = buttons[k].centerx + screens[i].centerx;
-				let y = buttons[k].centery + screens[i].centery;
 				await picoSprite(buttonRects0, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
 				// Draw number.
@@ -313,12 +319,16 @@ async function appMain() {
 		} else {
 			if (k > 0) {
 				let i = 1, s = 1;
+				let x = buttons[k].centerx + screens[i].centerx;
+				let y = buttons[k].centery + screens[i].centery;
+				let w = buttons[k].width, h = buttons[k].height;
 
-				if (actions[k] && buttons[k].touching >= 0) {
-					playerIndex = picoMod(playerIndex+1, playerCount);
+				if (picoAction(x,y,w,h) && buttons[k].touching >= 0) {
+					playerIndex = k-1;//picoMod(playerIndex+1, playerCount);
 					buttons[k].touching = 0;
+					picoFlush();
 					//console.log("action " + k + ":" + buttons[k].touching);
-				} else if (motions[k]) {
+				} else if (picoMotion(x,y,w,h)) {
 					if (buttons[k].touching >= 60) {
 						buttons[k].touching = -1;
 						//console.log("hold " + k + ":" + buttons[k].touching);
@@ -335,8 +345,6 @@ async function appMain() {
 				}
 
 				// Draw buttons.
-				let x = buttons[k].centerx + screens[i].centerx;
-				let y = buttons[k].centery + screens[i].centery;
 				let r = k-1==playerIndex ? buttonRects0 : buttonRects3;
 				await picoSprite(r, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
@@ -344,12 +352,16 @@ async function appMain() {
 				await picoChar(players[k-1].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 			} else if (playerIndex >= 0) {
 				let i = 0, s = 1;
+				let x = buttons[k].centerx + screens[i].centerx;
+				let y = buttons[k].centery + screens[i].centery;
+				let w = buttons[k].width, h = buttons[k].height;
 
-				if (actions[k] && buttons[k].touching >= 0) {
+				if (picoAction(x,y,w,h) && buttons[k].touching >= 0) {
 					players[playerIndex].score += 1;
 					buttons[k].touching = 0;
+					picoFlush();
 					//console.log("action " + k + ":" + buttons[k].touching);
-				} else if (motions[k]) {
+				} else if (picoMotion(x,y,w,h)) {
 					if (buttons[k].touching >= 60) {
 						players[playerIndex].score = 0;
 						buttons[k].touching = -1;
@@ -367,8 +379,6 @@ async function appMain() {
 				}
 
 				// Draw buttons.
-				let x = buttons[k].centerx + screens[i].centerx;
-				let y = buttons[k].centery + screens[i].centery;
 				await picoSprite(buttonRects0, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 
 				// Draw number.
