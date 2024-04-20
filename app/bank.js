@@ -17,10 +17,13 @@ var players = []; // Player.
 // Button.
 const buttonMax = playerMax + 1; // Maximum button count.
 const buttonWidth = 8, buttonHeight = 6; // Button sizes.
-const buttonBall0Sprite = [0,15,15, 1,1,2,0,12,10]; // Button ball sprite.
-const buttonBall1Sprite = [0,15,15, 1,1,2,0,12,10]; // Button ball sprite.
-const buttonRect0Sprite = [0,15,15, -1,1,4,0,12,6, -1,3,2,0,8,8]; // Button ball sprite.
-const buttonRect1Sprite = [0,19,19, -1,3,6,0,12,6, -1,5,4,0,8,8, 3,7,0,0,4,0, 3,8,1,0,2,0, 3,9,2,0,0,0]; // Button ball sprite.
+const buttonBall1Sprite = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10]; // Button ball sprite for solo/3+ players.
+const buttonBall2Sprite = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10, 1,7,12,0,4,0]; // Button ball sprite for 2 players.
+const buttonBallColor = 1;
+const buttonRect1Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Button ball sprite for solo player.
+const buttonRect2Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Button ball sprite for 2 players.
+const buttonRect3Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8, 4,7,1,0,4,0]; // Button ball sprite for 3+ players.
+const buttonRectColor = 0;
 const buttonScale = 6; // Button base scale.
 const numberScale = 0.5; // Button number scale.
 const buttonPosX = 50; // Button position X on landscape mode.
@@ -274,22 +277,14 @@ async function appMain() {
 
 				// Draw buttons.
 				if (k == 0) {
-					if (playerCount == 2) {
-						let a = buttons[k].angle + picoMod(playerIndex+1,2)*180;
-						await picoSprite(playerIndex?buttonBall1Sprite:buttonBall0Sprite, -1, x, y, a, buttons[k].scale*s);
-						await picoChar(buttons[k].score, 3, x, y, a, buttons[k].scale*numberScale*s);
-					} else {
-						await picoSprite(buttonBall0Sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
-						await picoChar(buttons[k].score, 3, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
-					}
+					let sprite = buttons[k].score > 0 ? buttonBall2Sprite : buttonBall1Sprite;
+					let a = buttons[k].angle + (playerCount == 2 ? picoMod(playerIndex+1,2)*180 : 0);
+					await picoSprite(sprite, -1, x, y, a, buttons[k].scale*s);
+					await picoChar(buttons[k].score, buttonBallColor, x, y, a, buttons[k].scale*numberScale*s);
 				} else {
-					if (k == playerIndex) {
-						await picoSprite(buttonRect1Sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
-						await picoChar(buttons[k].score, 0, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
-					} else {
-						await picoSprite(buttonRect0Sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
-						await picoChar(buttons[k].score, 0, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
-					}
+					let sprite = k == playerIndex ? (playerCount <= 2 ? buttonRect2Sprite : buttonRect3Sprite) : buttonRect1Sprite;
+					await picoSprite(sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
+					await picoChar(buttons[k].score, buttonRectColor, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 				}
 		//	}
 
