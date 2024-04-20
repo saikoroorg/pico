@@ -17,10 +17,10 @@ var players = []; // Player.
 // Button.
 const buttonMax = playerMax + 1; // Maximum button count.
 const buttonWidth = 8, buttonHeight = 6; // Button sizes.
-const buttonBall0Sprite = [0,15,15, 3,1,4,0,12,6, 3,3,2,0,8,10]; // Button ball sprite.
-const buttonBall1Sprite = [0,15,15, 3,1,4,0,12,6, 3,3,2,0,8,8]; // Button ball sprite.
-const buttonRect0Sprite = [0,15,15, 2,1,4,0,12,6, 2,3,2,0,8,8]; // Button ball sprite.
-const buttonRect1Sprite = [0,15,15, 0,1,4,0,12,6, 0,3,2,0,8,8]; // Button ball sprite.
+const buttonBall0Sprite = [0,15,15, 1,1,2,0,12,10]; // Button ball sprite.
+const buttonBall1Sprite = [0,15,15, -1,5,10,0,4,0]; // Button ball sprite.
+const buttonRect0Sprite = [0,15,15, 3,1,4,0,12,6, 3,3,2,0,8,8]; // Button ball sprite.
+const buttonRect1Sprite = [0,15,15, -1,1,4,0,12,6, -1,3,2,0,8,8]; // Button ball sprite.
 const buttonScale = 6; // Button base scale.
 const numberScale = 0.5; // Button number scale.
 const buttonPosX = 50; // Button position X on landscape mode.
@@ -277,18 +277,18 @@ async function appMain() {
 					if (playerCount == 2) {
 						let a = buttons[k].angle + picoMod(playerIndex+1,2)*180;
 						await picoSprite(playerIndex?buttonBall1Sprite:buttonBall0Sprite, -1, x, y, a, buttons[k].scale*s);
-						await picoChar(buttons[k].score, 1, x, y, a, buttons[k].scale*numberScale*s);
+						await picoChar(buttons[k].score, playerIndex?-1:3, x, y, a, buttons[k].scale*numberScale*s);
 					} else {
 						await picoSprite(buttonBall0Sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
-						await picoChar(buttons[k].score, 1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
+						await picoChar(buttons[k].score, playerIndex?-1:3, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 					}
 				} else {
 					if (k == playerIndex) {
 						await picoSprite(buttonRect1Sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
-						await picoChar(buttons[k].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
+						await picoChar(buttons[k].score, 0, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 					} else {
 						await picoSprite(buttonRect0Sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
-						await picoChar(buttons[k].score, -1, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
+						await picoChar(buttons[k].score, 0, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 					}
 				}
 		//	}
