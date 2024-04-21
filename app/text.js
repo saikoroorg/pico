@@ -462,6 +462,8 @@ async function appAction() {
 	}
 }
 
+var kiosk = false; // Kiosk mode.
+
 // Load.
 async function appLoad() {
 	await picoTitle(title);
@@ -488,6 +490,12 @@ async function appLoad() {
 	picoLabel("select", "*");
 	appResize(); // Initialize positions.
 
+	// Load query params.
+	let value = picoString("k");
+	if (value) {
+		kiosk = true; // Kiosk mode.
+	}
+
 	// Load end page image.
 	endimage = await picoLoad(enddata);
 }
@@ -504,7 +512,7 @@ async function appResize() {
 async function appMain() {
 	let pressing = 0;
 	if (!texts[state] || playing >= texts[state].length) {
-		if (picoAction()) {
+		if (picoAction() || kiosk) {
 			state = state + 1 < maxpage-1 ? state + 1: 0;
 			playing = 0;
 			picoFlush();
