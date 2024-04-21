@@ -50,7 +50,8 @@ var buttons = []; // Button.
 // Global variables.
 var state = ""; // Playing state.
 var playing = -1; // Playing count.
-var count = 0; // Time count.
+var score = 0; // Initial score.
+const scoreMax = 9999; // Maximum score.
 
 var landscape = false; // landscape mode.
 
@@ -112,12 +113,12 @@ async function appLoad() {
 
 		// Simple multi players mode.
 		if (value.match(/x/i)) {
-			count = numbers[0] < 0 ? 0 : numbers[0] * 60 < countMax ? numbers[0] * 60 : countMax;
+			score = numbers[0] < 0 ? 0 : numbers[0] < scoreMax ? numbers[0] : scoreMax;
 			playerCount = numbers[1] <= 0 ? 2 : numbers[1] < playerMax ? numbers[1] : playerMax;
 
 		// Simple 2 players mode.
 		} else if (numbers[0] > 0) {
-			count = numbers[0] < 0 ? 0 : numbers[0] * 60 < countMax ? numbers[0] * 60 : countMax;
+			score = numbers[0] < 0 ? 0 : numbers[0] < scoreMax ? numbers[0] : scoreMax;
 			playerCount = 2;
 		}
 	}
@@ -229,6 +230,15 @@ async function appMain() {
 		// Reset playing states.
 		state = "";
 
+		for (let k = 0; k < playerCount; k++) {
+			players[k].score = score;
+		}
+
+		buttons[0].score = 0;
+		for (let k = 1; k < buttonCount; k++) {
+			buttons[k].score = score;
+		}
+
 		// Reset playing count.
 		playing = 1;
 	}
@@ -240,7 +250,7 @@ async function appMain() {
 
 		// Score++.
 		if (buttons[k].touching >= 0 && picoAction(x,y,w,h)) {
-			buttons[k].score += 1;
+			buttons[k].score = buttons[k].score+1 < scoreMax ? buttons[k].score+1 : scoreMax;
 			buttons[k].scoreplus = 0;
 			buttons[k].touching = 0;
 			if (k == 0) {
@@ -250,7 +260,7 @@ async function appMain() {
 
 		// Score--.
 		} else if (buttons[k].touching > 0 && picoAction()) {
-			buttons[k].score -= 1;
+			buttons[k].score = buttons[k].score-1 > -scoreMax ? buttons[k].score-1 : -scoreMax;
 			buttons[k].scoreplus = 0;
 			buttons[k].touching = 0;
 			if (k == 0) {
