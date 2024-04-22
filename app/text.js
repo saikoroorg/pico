@@ -541,8 +541,16 @@ async function appSelect(x) {
 // Action button.
 async function appAction() {
 
-	// Enter to kiosk mode.
-	kiosk = !kiosk;
+	// Switch kiosk mode.
+	if (kiosk) {
+		kiosk = false;
+		console.log("Unlock screen.");
+		picoLockScreen(false);
+	} else {
+		kiosk = true; // Kiosk mode.
+		console.log("Lock screen.");
+		picoLockScreen(true);
+	}
 	picoLabel("action", null, buttondata[kiosk?"■":"＞"]);
 }
 
@@ -572,6 +580,8 @@ async function appLoad() {
 	let value = picoString("k");
 	if (value) {
 		kiosk = true; // Kiosk mode.
+		console.log("Lock screen.");
+		picoLockScreen(true);
 	}
 
 	// Load image.
