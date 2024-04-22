@@ -296,8 +296,16 @@ const labels = [
 for (let i = 1; i < maxpage-1; i++) {
 	labels[i] = labels[0]+"ー"+i;
 }
-const maxfig = 17 * 7;
-const figs = [
+const figrects = [
+	[2, 0,-40, 136,60, 0,1],
+];
+const figdata = [null];
+var figimages = [null];
+const figareas = [
+	[-1, 0,-40, 136,60, 0,1],
+];
+const maxfigtext = 17 * 7;
+const figtexts = [
 	"いろはにほへとちりぬるを、わかよた"+
 	"れそつねならむ。うゐのおくやまけふ"+
 	"こえて、あさきゆめみしゑひもせす。"+
@@ -306,8 +314,16 @@ const figs = [
 	"ごえで、あざぎゆめみじゑびもぜず。"+
 	"ぱぴぷぺぽんぁぃぅぇぉっゃゅょー　",
 ];
-for (let i = 1; i < maxpage-1; i++) {
-	figs[i] = figs[0];
+const figareas4 = [null];
+const figtexts4 = [null];
+for (let i = 1; i < maxpage; i++) {
+	figrects[i] = figrects[0];
+	figdata[i] = null;
+	figimages[i] = null;
+	figareas[i] = figareas[0];
+	figtexts[i] = figtexts[0];
+	figareas4[i] = figareas4[0];
+	figtexts4[i] = figtexts4[0];
 }
 const maxtext = 17 * 9;
 const texts = [
@@ -332,23 +348,58 @@ for (let i = 1; i < maxpage-1; i++) {
 		texts[i] += allChars[picoRandom(allChars.length)];
 	}
 }
-figs[0] = "";
-for (let j = 0; j < maxfig; j++) {
-	figs[0] += j < allChars.length ? allChars[j] : " ";
+
+// First page.
+figtexts[0] = "";
+for (let j = 0; j < maxfigtext; j++) {
+	figtexts[0] += j < allChars.length ? allChars[j] : " ";
 }
 texts[0] = "";
 for (let j = 0; j < maxtext; j++) {
-	texts[0] += j+maxfig < allChars.length ? allChars[j+maxfig] : " ";
+	texts[0] += j+maxfigtext < allChars.length ? allChars[j+maxfigtext] : " ";
 }
 
+// Last page.
+figrects[7] = [4, 0,0, 72,72, 0,2];
+figdata[7] = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
+figareas[7] = [3, 0,0, 88,88, 0,2];
+figtexts[7] = 
+	"□あ□い□う□え□お□"+
+	"□か□き□く□け□こ□"+
+	"□さ□し□す□せ□そ□"+
+	"□た□ち□つ□て□と□"+
+	"□な□に□ぬ□ね□の□"+
+	"□は□ひ□ふ□へ□ほ□"+
+	"□ま□み□む□め□も□"+
+	"□や□■□ゆ□■□よ□"+
+	"□ら□り□る□れ□ろ□"+
+	"□わ□■□を□■□ん□"+
+	"□□□□□＠□□□□□";
+figareas4[7] = [-1, 0,0, 88,88, 0,2];
+figtexts4[7] = 
+	"   1234567.890/0/00   "+
+	"                      "+
+	"                      "+
+	"                      "+
+	"                      "+
+	"                      "+
+	"                      "+
+	"                      "+
+	"                      "+
+	"                      "+
+	"   1234567.890/0/00   ";
+
+/*
 const enddata = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
-const endcolor = -1, endscale = 2, endrect = 64, endpos = 0;//endpos = 24;
+const endcolor = 1, endscale = 2, endrect = 64, endpos = 0;//endpos = 24;
 const endcolor0 = 3, endgrid0 = 8, endrect0 = 88, endpos0 = 0, endtext0 = "□あ□い□う□え□お□\n□か□き□く□け□こ□\n□さ□し□す□せ□そ□\n□た□ち□つ□て□と□\n□な□に□ぬ□ね□の□\n□は□ひ□ふ□へ□ほ□\n□ま□み□む□め□も□\n□や□■□ゆ□■□よ□\n□ら□り□る□れ□ろ□\n□わ□■□を□■□ん□\n□□□□□□□□□□□\n";
 const endcolor1 = -1, endgrid1 = 4, endpos1 = -48,  endtext1 = "1234567.890/0/00";
 const endcolor2 = -1, endgrid2 = 8, endpos2 = -40,  endtext2 = "いろはにほへと";
 const endcolor3 = -1, endgrid3 = 8, endpos3 = 40,  endtext3 = "＠";
 const endcolor4 = -1, endgrid4 = 4, endpos4 = 48,  endtext4 = "1234567.890/0/00";
 var endimage = null; // End page image.
+*/
+
 const shareall = false; // Share all page as one image.
 
 var state = 7; // Playing state.
@@ -357,8 +408,8 @@ var playing = 0; // Playing count.
 // Select button.
 async function appSelect(x) {
 
-		// Enter to play mode.
-		picoSwitchApp(playjs); // Play.
+	// Enter to play mode.
+	picoSwitchApp(playjs); // Play.
 }
 
 // Draw page.
@@ -376,9 +427,19 @@ async function appDrawPage(page, count=-1) {
 			picoText(labels[page], -1, 0,-80, 72,8, 0,1)
 		}
 	}
-	if (figs[page]) {
-		picoRect(2, 0,-40, 136,60, 0,1);
-		picoText(figs[page], -1, 0,-40, 136,56, 0,1);
+	if (figrects[page]) {
+		picoRect(figrects[page][0], figrects[page][1],figrects[page][2], figrects[page][3],figrects[page][4], figrects[page][5],figrects[page][6]);
+		if (figimages[page]) {
+			picoImage(figimages[page], figrects[page][1],figrects[page][2], figrects[page][5],figrects[page][6]);
+		}
+		if (figtexts[page]) {
+			picoText(figtexts[page], figareas[page][0], figareas[page][1],figareas[page][2], figareas[page][3],figareas[page][4], figareas[page][5],figareas[page][6]);
+		}
+		if (figtexts4[page]) {
+			picoCharLeading(4,8);
+			picoText(figtexts4[page], figareas4[page][0], figareas4[page][1],figareas4[page][2], figareas4[page][3],figareas4[page][4], figareas4[page][5],figareas4[page][6]);
+			picoCharLeading(8,8);
+		}
 	}
 	if (texts[page]) {
 		if (count >= 0) {
@@ -402,9 +463,9 @@ async function appDrawPage(page, count=-1) {
 		}
 
 	// Draw end page image last page.
-	} else {
+	/*} else {
 		picoRect(endcolor, 0,endpos*endscale, endrect,endrect, 0,endscale);
-		//picoImage(endimage, 0,endpos*endscale);
+		picoImage(endimage, 0,endpos*endscale, 0,endscale);
 		picoCharLeading(endgrid0,8);
 		picoText(endtext0, endcolor0, 0,(endpos+endpos0)*endscale, endrect0,endrect0, 0,endscale);
 		picoCharLeading(endgrid1,8);
@@ -414,7 +475,7 @@ async function appDrawPage(page, count=-1) {
 		picoCharLeading(endgrid3,8);
 		picoChar(endtext3, endcolor3, 0,(endpos+endpos3)*endscale, 0,endscale);
 		picoCharLeading(endgrid4,8);
-		picoChar(endtext4, endcolor4, 0,(endpos+endpos4)*endscale, 0,endscale);
+		picoChar(endtext4, endcolor4, 0,(endpos+endpos4)*endscale, 0,endscale);*/
 	}
 }
 
@@ -503,8 +564,15 @@ async function appLoad() {
 		kiosk = true; // Kiosk mode.
 	}
 
+	// Load image.
+	for (let j = 0; j < maxpage; j++) {
+		if (figdata[j]) {
+			figimages[j] = await picoLoad(figdata[j]);
+		}
+	}
+
 	// Load end page image.
-	endimage = await picoLoad(enddata);
+	//endimage = await picoLoad(enddata);
 }
 
 var landscape = false; // landscape mode.
