@@ -398,24 +398,25 @@ const endcolor4 = -1, endgrid4 = 4, endpos4 = 48,  endtext4 = "1234567.890/0/00"
 var endimage = null; // End page image.
 */
 
-const livepages = [7,0,1,2,3,4,5,6]; // Page numbers for live.
-const sharepages = [0,1,2,3,4,5,6,7];//null; // Page numbers for share. (Share live page if null)
+const livePages = [0,1,2,3,4,5,6]; // Pages for live.
+const demoPages = [0,1,2,3,4,5,6,7]; // Pages for demo.
+const sharePages = [0,1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
 
-var buttondata = {
+var buttonData = {
 	"＞": null,
 	"■": null,
 }; // Button spritedata.
 
-var state = 0; // Playing state.
+var state = ""; // Playing state.
+var number = 0; // Playing page number.
 var playing = 0; // Playing count.
-var kiosk = false; // Kiosk mode.
 
 // Draw page.
-async function appDrawPage(page, count=-1) {
+async function appDrawPage(page, cursor=-1) {
 	picoClear();
 	picoCharLeading(8,8);
 	if (labels[page]) {
-		if (count >= 0) {
+		if (cursor >= 0) {
 			if (landscape) {
 				picoText(labels[page].replaceAll("ー","｜"), -1, -80,0, 8,72, 0,1)
 			} else {
@@ -440,17 +441,17 @@ async function appDrawPage(page, count=-1) {
 		}
 	}
 	if (texts[page]) {
-		if (count >= 0) {
-			if (count > maxtext) {
-				let cursor = "▼";
-				picoText(texts[page].substr(0,maxtext-1)+cursor, -1, 0,48, 136,104, 0,1);
-			} else if (count < maxtext) {
-				let cursor = (texts[page].charCodeAt(count)=="　".charCodeAt(0)?"　":"■");
-				picoText(texts[page].substr(0,count)+cursor, -1, 0,48, 136,104, 0,1);
+		if (cursor >= 0) {
+			if (cursor > maxtext) {
+				let char = "▼";
+				picoText(texts[page].substr(0,maxtext-1)+char, -1, 0,48, 136,104, 0,1);
+			} else if (cursor < maxtext) {
+				let char = (texts[page].charCodeAt(cursor)=="　".charCodeAt(0)?"　":"■");
+				picoText(texts[page].substr(0,cursor)+char, -1, 0,48, 136,104, 0,1);
 			} else {
 				picoText(texts[page], -1, 0,48, 136,104, 0,1);
 			}
-			let dots = "　"+"□".repeat(page)+"■"+"□".repeat(livepages.length-page-1);
+			let dots = "　"+"□".repeat(page)+"■"+"□".repeat(livePages.length-page-1);
 			if (landscape) {
 				picoText(dots, -1, 80,0, 8,72, 0,1);
 			} else {
@@ -459,21 +460,6 @@ async function appDrawPage(page, count=-1) {
 		} else {
 			picoText(texts[page], -1, 0,48, 136,104, 0,1);
 		}
-
-	// Draw end page image last page.
-	/*} else {
-		picoRect(endcolor, 0,endpos*endscale, endrect,endrect, 0,endscale);
-		picoImage(endimage, 0,endpos*endscale, 0,endscale);
-		picoCharLeading(endgrid0,8);
-		picoText(endtext0, endcolor0, 0,(endpos+endpos0)*endscale, endrect0,endrect0, 0,endscale);
-		picoCharLeading(endgrid1,8);
-		picoChar(endtext1, endcolor1, 0,(endpos+endpos1)*endscale, 0,endscale);
-		picoCharLeading(endgrid2,8);
-		picoChar(endtext2, endcolor2, 0,(endpos+endpos2)*endscale, 0,endscale);
-		picoCharLeading(endgrid3,8);
-		picoChar(endtext3, endcolor3, 0,(endpos+endpos3)*endscale, 0,endscale);
-		picoCharLeading(endgrid4,8);
-		picoChar(endtext4, endcolor4, 0,(endpos+endpos4)*endscale, 0,endscale);*/
 	}
 }
 
@@ -488,13 +474,13 @@ async function appSelect(x) {
 
 	} else {
 
-		if (!sharepages) { // Share all page as one image.
+		if (!sharePages) { // Share all page as one image.
 
 			// Draw page by file.
 			let files = [];
 			//for (let i = maxpage-1; i < maxpage; i++) {
 				await picoClear();
-				await appDrawPage(livepages[state]);
+				await appDrawPage(livePages[number]);
 				files[0] = await picoScreenFile();
 				await picoFlip();
 			//}
@@ -508,31 +494,29 @@ async function appSelect(x) {
 			const width = 140, height = 200;
 			picoResize(width, height);
 			let images = [];
-			for (let i = 0; i < sharepages.length; i++) {
-				await appDrawPage(sharepages[i]);
+			for (let i = 0; i < sharePages.length; i++) {
+				await appDrawPage(sharePages[i]);
 				images[i] = await picoScreenImage();
 			}
 
 			// Draw all pages to 7:5(Silveratio) offscreen image.
 			const vcount = 2; // Vertical count.
-			const hcount = picoDiv(sharepages.length+vcount-1,vcount); // Horizontal count.
+			const hcount = picoDiv(sharePages.length+vcount-1,vcount); // Horizontal count.
 			const voffset = height*(vcount-1)/2; // Vertical offset.
 			const hoffset = width*(hcount-1)/2; // Horizontal offset.
 			picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
 			picoClear();
-			for (let i = 0; i < sharepages.length; i++) {
+			for (let i = 0; i < sharePages.length; i++) {
 				picoImage(images[i],
 					picoMod(i,hcount)*width-hoffset,
 					picoDiv(i,hcount)*height-voffset);
 			}
 
-			// Share screen with watermark.
-			//picoCharLeading(4,6);
-			let file = await picoScreenFile(null, -1, 1);//watermark, 2, 1);
+			// Share screen.
+			let file = await picoScreenFile(null, -1, 1);
 			picoShare(null, [file]);
 
 			// Restore settings.
-			//picoCharLeading(8,8);
 			picoResize();
 		}
 	}
@@ -541,17 +525,21 @@ async function appSelect(x) {
 // Action button.
 async function appAction() {
 
-	// Switch kiosk mode.
-	if (kiosk) {
-		kiosk = false;
+	// Switch demo mode.
+	if (state == "demo") {
+		state = "";
+		number = 0;
+		playing = 0;
 		console.log("Unlock screen.");
 		picoLockScreen(false);
 	} else {
-		kiosk = true; // Kiosk mode.
+		state = "demo"; // Demo mode.
+		number = 0;
+		playing = 0;
 		console.log("Lock screen.");
 		picoLockScreen(true);
 	}
-	picoLabel("action", null, buttondata[kiosk?"■":"＞"]);
+	picoLabel("action", null, buttonData[state=="demo"?"■":"＞"]);
 }
 
 // Load.
@@ -579,7 +567,7 @@ async function appLoad() {
 	// Load query params.
 	let value = picoString("k");
 	if (value) {
-		kiosk = true; // Kiosk mode.
+		state = "demo"; // Demo mode.
 		console.log("Lock screen.");
 		picoLockScreen(true);
 	}
@@ -590,17 +578,14 @@ async function appLoad() {
 			figimages[j] = await picoLoad(figdata[j]);
 		}
 	}
-	buttondata["■"] = await picoSpriteData(symbol5x5CharSprites["■"], -1);
-	buttondata["＞"] = await picoSpriteData(extraCharSprites["＞"], -1);
+	buttonData["■"] = await picoSpriteData(symbol5x5CharSprites["■"], -1);
+	buttonData["＞"] = await picoSpriteData(extraCharSprites["＞"], -1);
 
 	// Initialize buttons.
-	picoLabel("action", null, buttondata[kiosk?"■":"＞"]);
+	picoLabel("action", null, buttonData[state=="demo"?"■":"＞"]);
 	picoLabel("select", "&");
 	picoLabel("minus", "*");
 	appResize(); // Initialize positions.
-
-	// Load end page image.
-	//endimage = await picoLoad(enddata);
 }
 
 var landscape = false; // landscape mode.
@@ -614,10 +599,10 @@ async function appResize() {
 // Main.
 async function appMain() {
 
-	// Kiosk mode.
-	if (kiosk) {
-		if (!texts[livepages[state]] || playing >= texts[livepages[state]].length) {
-			state = state + 1 < livepages.length ? state + 1: 0;
+	// Demo mode.
+	if (state == "demo") {
+		if (!texts[demoPages[number]] || playing >= texts[demoPages[number]].length) {
+			number = number + 1 < demoPages.length ? number + 1: 0;
 			playing = 0;
 			await picoWait(5000);
 			picoFlush();
@@ -625,14 +610,14 @@ async function appMain() {
 			playing = playing + 0.2;
 			picoFlush();
 		}
-		appDrawPage(livepages[state], playing<maxtext-1?playing:maxtext);
+		appDrawPage(demoPages[number], playing<maxtext-1?playing:maxtext);
 
 	// Live mode.
 	} else {
 		let pressing = 0;
-		if (!texts[livepages[state]] || playing >= texts[livepages[state]].length) {
+		if (!texts[livePages[number]] || playing >= texts[livePages[number]].length) {
 			if (picoAction()) {
-				state = state + 1 < livepages.length ? state + 1: 0;
+				number = number + 1 < livePages.length ? number + 1: 0;
 				playing = 0;
 				picoFlush();
 			} else if (picoMotion()) {
@@ -640,10 +625,10 @@ async function appMain() {
 			}
 		} else {
 			if (picoMotion()) {
-				if (texts[livepages[state]] && playing + 10 < texts[livepages[state]].length - 1) {
+				if (texts[livePages[number]] && playing + 10 < texts[livePages[number]].length - 1) {
 					playing += 10;
 				} else {
-					playing = texts[livepages[state]].length - 1;
+					playing = texts[livePages[number]].length - 1;
 				}
 				pressing = 1;
 			} else {
@@ -651,6 +636,6 @@ async function appMain() {
 			}
 			picoFlush();
 		}
-		appDrawPage(livepages[state], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
+		appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
 	}
 }
