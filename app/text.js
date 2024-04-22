@@ -335,6 +335,7 @@ const texts = [
 	"　　　　　　　　　　　　　　　　　"+
 	"□□□□□□□□□□□□□□□□□",
 ];
+const items = [];
 const builtinChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#";
 const allChars = builtinChars +
 	Object.keys(katakana5x5CharSprites).join("") +
@@ -387,6 +388,13 @@ figtexts4[7] =
 	"                      "+
 	"   1234567.890/0/00   ";
 
+// Menu items.
+items[0] = [
+	[0,8, 56,8, "app/bank.js", "20x2"],
+	[0,24, 56,8, "app/bank.js", "20x3"],
+	[0,40, 56,8],
+];
+
 /*
 const enddata = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
 const endcolor = 1, endscale = 2, endrect = 64, endpos = 0;//endpos = 24;
@@ -399,8 +407,8 @@ var endimage = null; // End page image.
 */
 
 const livePages = [0,1,2,3,4,5,6]; // Pages for live.
-const demoPages = [0,1,2,3,4,5,6,7]; // Pages for demo.
-const sharePages = [0,1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
+const demoPages = [1,2,3,4,5,6,7]; // Pages for demo.
+const sharePages = [1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
 
 var buttonData = {
 	"＞": null,
@@ -410,6 +418,7 @@ var buttonData = {
 var state = ""; // Playing state.
 var number = 0; // Playing page number.
 var playing = 0; // Playing count.
+var touching = -1; // Touching item index.
 
 // Draw page.
 async function appDrawPage(page, cursor=-1, cursorChar="■") {
@@ -438,6 +447,12 @@ async function appDrawPage(page, cursor=-1, cursorChar="■") {
 			picoCharLeading(4,8);
 			picoText(figtexts4[page], figareas4[page][0], figareas4[page][1],figareas4[page][2], figareas4[page][3],figareas4[page][4], figareas4[page][5],figareas4[page][6]);
 			picoCharLeading(8,8);
+		}
+	}
+	if (items[page]) {
+		for (let i = 0; i < items[page].length; i++) {
+			let s = i==touching?0.8:1;
+			picoRect(4, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,s);
 		}
 	}
 	if (texts[page]) {
@@ -614,28 +629,50 @@ async function appMain() {
 
 	// Live mode.
 	} else {
-		let pressing = 0;
-		if (!texts[livePages[number]] || playing >= texts[livePages[number]].length) {
-			appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
-			if (picoAction()) {
-				number = number + 1 < livePages.length ? number + 1: 0;
-				playing = 0;
-			} else if (picoMotion()) {
-				pressing = 1;
-			}
-		} else {
-			if (picoMotion()) {
-				if (texts[livePages[number]] && playing + 10 < texts[livePages[number]].length - 1) {
-					playing += 10;
-				} else {
-					playing = texts[livePages[number]].length - 1;
+		let pressing = 0, page = livePages[number];
+		if (items[page]) {
+			touching = -1;
+			for (let i = 0; i < items[page].length; i++) {
+				if (picoAction(items[page][i][0],items[page][i][1], items[page][i][2]/2,items[page][i][3])/2) {
+					if (items[page][i][4]) {
+						picoResetParams();
+						picoSetString(items[page][i][5]);
+						picoSwitchApp(items[page][i][4]);
+					} else {
+						number = number + 1 < livePages.length ? number + 1: 0;
+					}
+					playing = 0;
+					picoFlush();
+					break;
+				} else if (picoMotion(items[page][i][0],items[page][i][1], items[page][i][2]/2,items[page][i][3])/2) {
+					touching = i;
+					break;
 				}
-				pressing = 1;
+			}
+			appDrawPage(livePages[number], maxtext);
+		} else {
+			if (!texts[page] || playing >= texts[page].length) {
+				if (picoAction()) {
+					number = number + 1 < livePages.length ? number + 1: 0;
+					playing = 0;
+					picoFlush();
+				} else if (picoMotion()) {
+					pressing = 1;
+				}
 			} else {
-				playing += 0.5;
+				if (picoMotion()) {
+					if (texts[page] && playing + 10 < texts[page].length - 1) {
+						playing += 10;
+					} else {
+						playing = texts[page].length - 1;
+					}
+					pressing = 1;
+				} else {
+					playing += 0.5;
+				}
+				picoFlush();
 			}
 			appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
-			picoFlush();
 		}
 	}
 }
