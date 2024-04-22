@@ -1,5 +1,6 @@
 const title = "Text"; // Title.
-const playjs = "app/dice.js"; // Play script.
+const playjs = "app/bank.js"; // Play script.
+const playparam = "20x2"; // Play parameter.
 
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringCode6("077912922932942923943924934925"),
@@ -280,6 +281,7 @@ const extraCharSprites = { // Extra char sprite table.
 	"④": picoStringCode6("077811815851855"),
 	"⑤": picoStringCode6("077733711715751755"),
 	"⑥": picoStringCode6("077911913915951953955"),
+
 	"＠": picoStringCode6("099900910920930940950960970980901111121131141151161171981902112922132142152962172982903113123133143153163173983904114924134144154964174984905115125135145155165175985906116926136146156966176986907117127137147157167177987908918928938948958968978988"),
 };
 
@@ -399,15 +401,14 @@ var endimage = null; // End page image.
 const livepages = [7,0,1,2,3,4,5,6]; // Page numbers for live.
 const sharepages = [0,1,2,3,4,5,6,7];//null; // Page numbers for share. (Share live page if null)
 
+var buttondata = {
+	"＞": null,
+	"■": null,
+}; // Button spritedata.
+
 var state = 0; // Playing state.
 var playing = 0; // Playing count.
-
-// Select button.
-async function appSelect(x) {
-
-	// Enter to play mode.
-	picoSwitchApp(playjs); // Play.
-}
+var kiosk = false; // Kiosk mode.
 
 // Draw page.
 async function appDrawPage(page, count=-1) {
@@ -476,58 +477,74 @@ async function appDrawPage(page, count=-1) {
 	}
 }
 
-// Action button.
-async function appAction() {
-	if (!sharepages) { // Share all page as one image.
+// Select button.
+async function appSelect(x) {
 
-		// Draw page by file.
-		let files = [];
-		//for (let i = maxpage-1; i < maxpage; i++) {
-			await picoClear();
-			await appDrawPage(livepages[state]);
-			files[0] = await picoScreenFile();
-			await picoFlip();
-		//}
-
-		// Share screen.
-		picoShare(null, files);
+	// Enter to play mode.
+	if (x < 0) {
+		picoResetParams();
+		picoSetString(playparam);
+		picoSwitchApp(playjs); // Play.
 
 	} else {
 
-		// Draw a page to nearly 5:7(Silveratio) offscreen image.
-		const width = 140, height = 200;
-		picoResize(width, height);
-		let images = [];
-		for (let i = 0; i < sharepages.length; i++) {
-			await appDrawPage(sharepages[i]);
-			images[i] = await picoScreenImage();
+		if (!sharepages) { // Share all page as one image.
+
+			// Draw page by file.
+			let files = [];
+			//for (let i = maxpage-1; i < maxpage; i++) {
+				await picoClear();
+				await appDrawPage(livepages[state]);
+				files[0] = await picoScreenFile();
+				await picoFlip();
+			//}
+
+			// Share screen.
+			picoShare(null, files);
+
+		} else {
+
+			// Draw a page to nearly 5:7(Silveratio) offscreen image.
+			const width = 140, height = 200;
+			picoResize(width, height);
+			let images = [];
+			for (let i = 0; i < sharepages.length; i++) {
+				await appDrawPage(sharepages[i]);
+				images[i] = await picoScreenImage();
+			}
+
+			// Draw all pages to 7:5(Silveratio) offscreen image.
+			const vcount = 2; // Vertical count.
+			const hcount = picoDiv(sharepages.length+vcount-1,vcount); // Horizontal count.
+			const voffset = height*(vcount-1)/2; // Vertical offset.
+			const hoffset = width*(hcount-1)/2; // Horizontal offset.
+			picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
+			picoClear();
+			for (let i = 0; i < sharepages.length; i++) {
+				picoImage(images[i],
+					picoMod(i,hcount)*width-hoffset,
+					picoDiv(i,hcount)*height-voffset);
+			}
+
+			// Share screen with watermark.
+			//picoCharLeading(4,6);
+			let file = await picoScreenFile(null, -1, 1);//watermark, 2, 1);
+			picoShare(null, [file]);
+
+			// Restore settings.
+			//picoCharLeading(8,8);
+			picoResize();
 		}
-
-		// Draw all pages to 7:5(Silveratio) offscreen image.
-		const vcount = 2; // Vertical count.
-		const hcount = picoDiv(sharepages.length+vcount-1,vcount); // Horizontal count.
-		const voffset = height*(vcount-1)/2; // Vertical offset.
-		const hoffset = width*(hcount-1)/2; // Horizontal offset.
-		picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
-		picoClear();
-		for (let i = 0; i < sharepages.length; i++) {
-			picoImage(images[i],
-				picoMod(i,hcount)*width-hoffset,
-				picoDiv(i,hcount)*height-voffset);
-		}
-
-		// Share screen with watermark.
-		//picoCharLeading(4,6);
-		let file = await picoScreenFile(null, -1, 1);//watermark, 2, 1);
-		picoShare(null, [file]);
-
-		// Restore settings.
-		//picoCharLeading(8,8);
-		picoResize();
 	}
 }
 
-var kiosk = false; // Kiosk mode.
+// Action button.
+async function appAction() {
+
+	// Enter to kiosk mode.
+	kiosk = !kiosk;
+	picoLabel("action", null, buttondata[kiosk?"■":"＞"]);
+}
 
 // Load.
 async function appLoad() {
@@ -551,10 +568,6 @@ async function appLoad() {
 	}
 	picoCharLeading(8,8);
 
-	picoLabel("action", "&");
-	picoLabel("select", "*");
-	appResize(); // Initialize positions.
-
 	// Load query params.
 	let value = picoString("k");
 	if (value) {
@@ -567,6 +580,14 @@ async function appLoad() {
 			figimages[j] = await picoLoad(figdata[j]);
 		}
 	}
+	buttondata["■"] = await picoSpriteData(symbol5x5CharSprites["■"], -1);
+	buttondata["＞"] = await picoSpriteData(extraCharSprites["＞"], -1);
+
+	// Initialize buttons.
+	picoLabel("action", null, buttondata[kiosk?"■":"＞"]);
+	picoLabel("select", "&");
+	picoLabel("minus", "*");
+	appResize(); // Initialize positions.
 
 	// Load end page image.
 	//endimage = await picoLoad(enddata);
