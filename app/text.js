@@ -350,11 +350,11 @@ for (let i = 1; i < maxpage-1; i++) {
 // First page.
 figtexts[0] = "";
 for (let j = 0; j < maxfigtext; j++) {
-	figtexts[0] += j < allChars.length ? allChars[j] : " ";
+	figtexts[0] += j < allChars.length ? allChars[j] : "　";
 }
 texts[0] = "";
 for (let j = 0; j < maxtext; j++) {
-	texts[0] += j+maxfigtext < allChars.length ? allChars[j+maxfigtext] : " ";
+	texts[0] += j+maxfigtext < allChars.length ? allChars[j+maxfigtext] : "　";
 }
 
 // Last page.
@@ -603,28 +603,44 @@ async function appResize() {
 
 // Main.
 async function appMain() {
-	let pressing = 0;
-	if (!texts[livepages[state]] || playing >= texts[livepages[state]].length) {
-		if (picoAction() || kiosk) {
+
+	// Kiosk mode.
+	if (kiosk) {
+		if (!texts[livepages[state]] || playing >= texts[livepages[state]].length) {
 			state = state + 1 < livepages.length ? state + 1: 0;
 			playing = 0;
+			await picoWait(5000);
 			picoFlush();
-		} else if (picoMotion()) {
-			pressing = 1;
-		}
-	} else {
-		if (picoMotion()) {
-			if (texts[livepages[state]] && playing + 10 < texts[livepages[state]].length - 1) {
-				playing = playing + 10;
-			} else {
-				playing = texts[livepages[state]].length - 1;
-			}
-			pressing = 1;
 		} else {
-			playing += 0.5;
+			playing = playing + 0.2;
+			picoFlush();
 		}
-		picoFlush();
-	}
+		appDrawPage(livepages[state], playing<maxtext-1?playing:maxtext);
 
-	appDrawPage(livepages[state], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
+	// Live mode.
+	} else {
+		let pressing = 0;
+		if (!texts[livepages[state]] || playing >= texts[livepages[state]].length) {
+			if (picoAction()) {
+				state = state + 1 < livepages.length ? state + 1: 0;
+				playing = 0;
+				picoFlush();
+			} else if (picoMotion()) {
+				pressing = 1;
+			}
+		} else {
+			if (picoMotion()) {
+				if (texts[livepages[state]] && playing + 10 < texts[livepages[state]].length - 1) {
+					playing += 10;
+				} else {
+					playing = texts[livepages[state]].length - 1;
+				}
+				pressing = 1;
+			} else {
+				playing += 0.5;
+			}
+			picoFlush();
+		}
+		appDrawPage(livepages[state], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
+	}
 }
