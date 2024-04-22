@@ -403,19 +403,7 @@ items[8] = [
 	[0,40, 56,8, -1, "app/bank.js", "30x2"],
 ];
 
-/*
-const enddata = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
-const endcolor = 1, endscale = 2, endrect = 64, endpos = 0;//endpos = 24;
-const endcolor0 = 3, endgrid0 = 8, endrect0 = 88, endpos0 = 0, endtext0 = "□あ□い□う□え□お□\n□か□き□く□け□こ□\n□さ□し□す□せ□そ□\n□た□ち□つ□て□と□\n□な□に□ぬ□ね□の□\n□は□ひ□ふ□へ□ほ□\n□ま□み□む□め□も□\n□や□■□ゆ□■□よ□\n□ら□り□る□れ□ろ□\n□わ□■□を□■□ん□\n□□□□□□□□□□□\n";
-const endcolor1 = -1, endgrid1 = 4, endpos1 = -48,  endtext1 = "1234567.890/0/00";
-const endcolor2 = -1, endgrid2 = 8, endpos2 = -40,  endtext2 = "いろはにほへと";
-const endcolor3 = -1, endgrid3 = 8, endpos3 = 40,  endtext3 = "＠";
-const endcolor4 = -1, endgrid4 = 4, endpos4 = 48,  endtext4 = "1234567.890/0/00";
-var endimage = null; // End page image.
-*/
-
 const livePages = [8,0,1,2,3,4,5,6]; // Pages for live.
-const demoPages = [0,1,2,3,4,5,6]; // Pages for demo.
 const sharePages = [0,1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
 
 var buttonData = {
@@ -483,7 +471,7 @@ async function appDrawPage(page, cursor=-1, cursorChar="■") {
 			} else {
 				picoText(texts[page], -1, 0,48, 136,104, 0,1);
 			}
-			let dots = "　"+"□".repeat(page)+cursorChar+"□".repeat(demoPages.length-page-1);
+			let dots = "　"+"□".repeat(page)+cursorChar+"□".repeat(livePages.length-page-2);
 			if (landscape) {
 				picoText(dots, -1, 80,0, 8,72, 0,1);
 			} else {
@@ -566,8 +554,8 @@ async function appAction() {
 		picoLockScreen(false);
 	} else {
 		state = "demo"; // Demo mode.
-		number = 0;
-		playing = 0;
+		//number = 0;
+		//playing = 0;
 		console.log("Lock screen.");
 		picoLockScreen(true);
 	}
@@ -633,15 +621,15 @@ async function appMain() {
 
 	// Demo mode.
 	if (state == "demo") {
-		if (!texts[demoPages[number]] || playing >= picoDiv(texts[demoPages[number]].length,10)*10 + 20) {
-			appDrawPage(demoPages[number], maxtext, "■");
-			number = number + 1 < demoPages.length ? number + 1: 0;
+		await picoWait(100);
+		if (items[livePages[number]] || !texts[livePages[number]] || playing >= picoDiv(texts[livePages[number]].length,10)*10 + 20) {
+			number = number + 1 < livePages.length ? number + 1: 0;
 			playing = 0;
+			appDrawPage(livePages[number], 0, "＞");
 		} else {
 			playing += 1;
-			appDrawPage(demoPages[number], playing<maxtext-1?playing:maxtext, !picoMod(playing/5,2)?"＞":"　");
+			appDrawPage(livePages[number], playing<maxtext-1?playing:maxtext, !picoMod(playing/5,2)?"＞":"　");
 		}
-		await picoWait(100);
 		picoFlush();
 
 	// Live mode.
