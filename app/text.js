@@ -412,7 +412,7 @@ var number = 0; // Playing page number.
 var playing = 0; // Playing count.
 
 // Draw page.
-async function appDrawPage(page, cursor=-1) {
+async function appDrawPage(page, cursor=-1, cursorChar="■") {
 	picoClear();
 	picoCharLeading(8,8);
 	if (labels[page]) {
@@ -451,7 +451,7 @@ async function appDrawPage(page, cursor=-1) {
 			} else {
 				picoText(texts[page], -1, 0,48, 136,104, 0,1);
 			}
-			let dots = "　"+"□".repeat(page)+"■"+"□".repeat(livePages.length-page-1);
+			let dots = "　"+"□".repeat(page)+cursorChar+"□".repeat(livePages.length-page-1);
 			if (landscape) {
 				picoText(dots, -1, 80,0, 8,72, 0,1);
 			} else {
@@ -601,25 +601,25 @@ async function appMain() {
 
 	// Demo mode.
 	if (state == "demo") {
-		if (!texts[demoPages[number]] || playing >= texts[demoPages[number]].length) {
+		if (!texts[demoPages[number]] || playing >= picoDiv(texts[demoPages[number]].length,10)*10 + 20) {
+			appDrawPage(demoPages[number], maxtext, "■");
 			number = number + 1 < demoPages.length ? number + 1: 0;
 			playing = 0;
-			await picoWait(5000);
-			picoFlush();
 		} else {
-			playing = playing + 0.2;
-			picoFlush();
+			playing += 1;
+			appDrawPage(demoPages[number], playing<maxtext-1?playing:maxtext, !picoMod(playing/5,2)?"＞":"　");
 		}
-		appDrawPage(demoPages[number], playing<maxtext-1?playing:maxtext);
+		await picoWait(100);
+		picoFlush();
 
 	// Live mode.
 	} else {
 		let pressing = 0;
 		if (!texts[livePages[number]] || playing >= texts[livePages[number]].length) {
+			appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
 			if (picoAction()) {
 				number = number + 1 < livePages.length ? number + 1: 0;
 				playing = 0;
-				picoFlush();
 			} else if (picoMotion()) {
 				pressing = 1;
 			}
@@ -634,8 +634,8 @@ async function appMain() {
 			} else {
 				playing += 0.5;
 			}
+			appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
 			picoFlush();
 		}
-		appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
 	}
 }
