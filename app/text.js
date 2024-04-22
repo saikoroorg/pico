@@ -318,12 +318,8 @@ const figareas4 = [null];
 const figtexts4 = [null];
 for (let i = 1; i < maxpage; i++) {
 	figrects[i] = figrects[0];
-	figdata[i] = null;
-	figimages[i] = null;
 	figareas[i] = figareas[0];
 	figtexts[i] = figtexts[0];
-	figareas4[i] = figareas4[0];
-	figtexts4[i] = figtexts4[0];
 }
 const maxtext = 17 * 9;
 const texts = [
@@ -360,9 +356,9 @@ for (let j = 0; j < maxtext; j++) {
 }
 
 // Last page.
-figrects[7] = [4, 0,0, 72,72, 0,2];
+figrects[7] = [4, 0,0, 72,72, 0,1];
 figdata[7] = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
-figareas[7] = [3, 0,0, 88,88, 0,2];
+figareas[7] = [3, 0,0, 88,88, 0,1];
 figtexts[7] = 
 	"□あ□い□う□え□お□"+
 	"□か□き□く□け□こ□"+
@@ -374,8 +370,8 @@ figtexts[7] =
 	"□や□■□ゆ□■□よ□"+
 	"□ら□り□る□れ□ろ□"+
 	"□わ□■□を□■□ん□"+
-	"□□□□□＠□□□□□";
-figareas4[7] = [-1, 0,0, 88,88, 0,2];
+	"□■□■□＠□■□■□";
+figareas4[7] = [-1, 0,0, 88,88, 0,1];
 figtexts4[7] = 
 	"   1234567.890/0/00   "+
 	"                      "+
@@ -400,9 +396,10 @@ const endcolor4 = -1, endgrid4 = 4, endpos4 = 48,  endtext4 = "1234567.890/0/00"
 var endimage = null; // End page image.
 */
 
-const shareall = false; // Share all page as one image.
+const livepages = [7,0,1,2,3,4,5,6]; // Page numbers for live.
+const sharepages = [0,1,2,3,4,5,6,7];//null; // Page numbers for share. (Share live page if null)
 
-var state = 7; // Playing state.
+var state = 0; // Playing state.
 var playing = 0; // Playing count.
 
 // Select button.
@@ -452,7 +449,7 @@ async function appDrawPage(page, count=-1) {
 			} else {
 				picoText(texts[page], -1, 0,48, 136,104, 0,1);
 			}
-			let dots = "　"+"□".repeat(page)+"■"+"□".repeat(maxpage-1-page-1);
+			let dots = "　"+"□".repeat(page)+"■"+"□".repeat(livepages.length-page-1);
 			if (landscape) {
 				picoText(dots, -1, 80,0, 8,72, 0,1);
 			} else {
@@ -481,13 +478,13 @@ async function appDrawPage(page, count=-1) {
 
 // Action button.
 async function appAction() {
-	if (!shareall) { // Share all page as one image.
+	if (!sharepages) { // Share all page as one image.
 
 		// Draw page by file.
 		let files = [];
 		//for (let i = maxpage-1; i < maxpage; i++) {
 			await picoClear();
-			await appDrawPage(state);
+			await appDrawPage(livepages[state]);
 			files[0] = await picoScreenFile();
 			await picoFlip();
 		//}
@@ -501,19 +498,19 @@ async function appAction() {
 		const width = 140, height = 200;
 		picoResize(width, height);
 		let images = [];
-		for (let i = 0; i < maxpage; i++) {
-			await appDrawPage(i);
+		for (let i = 0; i < sharepages.length; i++) {
+			await appDrawPage(sharepages[i]);
 			images[i] = await picoScreenImage();
 		}
 
 		// Draw all pages to 7:5(Silveratio) offscreen image.
 		const vcount = 2; // Vertical count.
-		const hcount = picoDiv(maxpage-1+vcount-1,vcount); // Horizontal count.
+		const hcount = picoDiv(sharepages.length+vcount-1,vcount); // Horizontal count.
 		const voffset = height*(vcount-1)/2; // Vertical offset.
 		const hoffset = width*(hcount-1)/2; // Horizontal offset.
 		picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
 		picoClear();
-		for (let i = 0; i < maxpage; i++) {
+		for (let i = 0; i < sharepages.length; i++) {
 			picoImage(images[i],
 				picoMod(i,hcount)*width-hoffset,
 				picoDiv(i,hcount)*height-voffset);
@@ -586,9 +583,9 @@ async function appResize() {
 // Main.
 async function appMain() {
 	let pressing = 0;
-	if (!texts[state] || playing >= texts[state].length) {
+	if (!texts[livepages[state]] || playing >= texts[livepages[state]].length) {
 		if (picoAction() || kiosk) {
-			state = state + 1 < maxpage-1 ? state + 1: 0;
+			state = state + 1 < livepages.length ? state + 1: 0;
 			playing = 0;
 			picoFlush();
 		} else if (picoMotion()) {
@@ -596,10 +593,10 @@ async function appMain() {
 		}
 	} else {
 		if (picoMotion()) {
-			if (texts[state] && playing + 10 < texts[state].length - 1) {
+			if (texts[livepages[state]] && playing + 10 < texts[livepages[state]].length - 1) {
 				playing = playing + 10;
 			} else {
-				playing = texts[state].length - 1;
+				playing = texts[livepages[state]].length - 1;
 			}
 			pressing = 1;
 		} else {
@@ -608,5 +605,5 @@ async function appMain() {
 		picoFlush();
 	}
 
-	appDrawPage(state, playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
+	appDrawPage(livepages[state], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
 }
