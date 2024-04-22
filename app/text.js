@@ -291,12 +291,10 @@ const extraCharAiliases = [ // Extra char ailiases.
 
 const colors = picoStringCode8("1115553332224440i9p060n4f0i000");
 
-const maxpage = 8;
-const labels = [
-	"いろはにほへと",
-];
-for (let i = 1; i < maxpage-1; i++) {
-	labels[i] = labels[0]+"ー"+i;
+const maxpage = 9;
+const labels = [null];
+for (let i = 0; i < maxpage-2; i++) {
+	labels[i] = "いろはにほへとー"+(i+1);
 }
 const figrects = [
 	[2, 0,-40, 136,60, 0,1],
@@ -318,7 +316,7 @@ const figtexts = [
 ];
 const figareas4 = [null];
 const figtexts4 = [null];
-for (let i = 1; i < maxpage; i++) {
+for (let i = 0; i < maxpage; i++) {
 	figrects[i] = figrects[0];
 	figareas[i] = figareas[0];
 	figtexts[i] = figtexts[0];
@@ -326,11 +324,11 @@ for (let i = 1; i < maxpage; i++) {
 const maxtext = 17 * 9;
 const texts = [
 	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　つづける　　　　　　"+
 	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　アプリ１　　　　　　"+
 	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　アプリ２　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　",
@@ -341,7 +339,7 @@ const allChars = builtinChars +
 	Object.keys(katakana5x5CharSprites).join("") +
 	Object.keys(hiragana5x5CharSprites).join("") +
 	Object.keys(symbol5x5CharSprites).join("");
-for (let i = 1; i < maxpage-1; i++) {
+for (let i = 0; i < maxpage-2; i++) {
 	texts[i] = "";
 	for (let j = 0; j < maxtext; j++) {
 		texts[i] += allChars[picoRandom(allChars.length)];
@@ -349,11 +347,11 @@ for (let i = 1; i < maxpage-1; i++) {
 }
 
 // First page.
-figtexts[0] = "";
+/*figtexts[0] = "";
 for (let j = 0; j < maxfigtext; j++) {
 	figtexts[0] += j < allChars.length ? allChars[j] : "　";
 }
-/*texts[0] = "";
+texts[0] = "";
 for (let j = 0; j < maxtext; j++) {
 	texts[0] += j+maxfigtext < allChars.length ? allChars[j+maxfigtext] : "　";
 }*/
@@ -389,7 +387,17 @@ figtexts4[7] =
 	"   1234567.890/0/00   ";
 
 // Menu items.
-items[0] = [
+texts[8] =
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　つづける　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　アプリ１　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　アプリ２　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　";
+items[8] = [
 	[0,8, 56,8, 1],
 	[0,24, 56,8, -1, "app/bank.js", "0x2"],
 	[0,40, 56,8, -1, "app/bank.js", "30x2"],
@@ -406,9 +414,9 @@ const endcolor4 = -1, endgrid4 = 4, endpos4 = 48,  endtext4 = "1234567.890/0/00"
 var endimage = null; // End page image.
 */
 
-const livePages = [0,1,2,3,4,5,6]; // Pages for live.
-const demoPages = [1,2,3,4,5,6]; // Pages for demo.
-const sharePages = [1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
+const livePages = [8,0,1,2,3,4,5,6]; // Pages for live.
+const demoPages = [0,1,2,3,4,5,6]; // Pages for demo.
+const sharePages = [0,1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
 
 var buttonData = {
 	"＞": null,
@@ -453,14 +461,14 @@ async function appDrawPage(page, cursor=-1, cursorChar="■") {
 		for (let i = 0; i < items[page].length; i++) {
 			if (touching < 0 && i == 0) {
 				let char = "＞" + "　".repeat(items[page][i][2]/8-1);
-				picoRect(2, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
+				//picoRect(2, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
 				picoText(char, -1, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
 			} else if (i == touching) {
 				let char = "＞" + "　".repeat(items[page][i][2]/8-1);
-				picoRect(3, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,0.95);
-				picoText(char, -1, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,0.95);
+				picoRect(0, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
+				picoText(char, -1, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
 			} else {
-				picoRect(2, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
+				//picoRect(2, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
 			}
 		}
 	}
@@ -475,7 +483,7 @@ async function appDrawPage(page, cursor=-1, cursorChar="■") {
 			} else {
 				picoText(texts[page], -1, 0,48, 136,104, 0,1);
 			}
-			let dots = "　"+"□".repeat(page)+cursorChar+"□".repeat(livePages.length-page-1);
+			let dots = "　"+"□".repeat(page)+cursorChar+"□".repeat(demoPages.length-page-1);
 			if (landscape) {
 				picoText(dots, -1, 80,0, 8,72, 0,1);
 			} else {
@@ -491,12 +499,12 @@ async function appDrawPage(page, cursor=-1, cursorChar="■") {
 async function appSelect(x) {
 
 	// Enter to play mode.
-	if (x < 0) {
+	/*if (x < 0) {
 		picoResetParams();
 		picoSetString(playparam);
 		picoSwitchApp(playjs); // Play.
 
-	} else {
+	} else {*/
 
 		if (!sharePages) { // Share all page as one image.
 
@@ -543,7 +551,7 @@ async function appSelect(x) {
 			// Restore settings.
 			picoResize();
 		}
-	}
+	//}
 }
 
 // Action button.
@@ -608,7 +616,7 @@ async function appLoad() {
 	// Initialize buttons.
 	picoLabel("action", null, buttonData[state=="demo"?"■":"＞"]);
 	picoLabel("select", "&");
-	picoLabel("minus", "*");
+	//picoLabel("minus", "*");
 	appResize(); // Initialize positions.
 }
 
