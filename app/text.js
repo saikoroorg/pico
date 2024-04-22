@@ -304,7 +304,7 @@ const figrects = [
 const figdata = [null];
 var figimages = [null];
 const figareas = [
-	[-1, 0,-40, 136,60, 0,1],
+	[-1, 0,-40, 136,56, 0,1],
 ];
 const maxfigtext = 17 * 7;
 const figtexts = [
@@ -325,15 +325,15 @@ for (let i = 1; i < maxpage; i++) {
 }
 const maxtext = 17 * 9;
 const texts = [
-	"□□□□□□□□□□□□□□□□□"+
 	"　　　　　　　　　　　　　　　　　"+
-	"□□□□□□□□□□□□□□□□□"+
+	"　　　　　　　つづける　　　　　　"+
 	"　　　　　　　　　　　　　　　　　"+
-	"□□□□□□□□□□□□□□□□□"+
+	"　　　　　　　アプリ１　　　　　　"+
 	"　　　　　　　　　　　　　　　　　"+
-	"□□□□□□□□□□□□□□□□□"+
+	"　　　　　　　アプリ２　　　　　　"+
 	"　　　　　　　　　　　　　　　　　"+
-	"□□□□□□□□□□□□□□□□□",
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　",
 ];
 const items = [];
 const builtinChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#";
@@ -353,10 +353,10 @@ figtexts[0] = "";
 for (let j = 0; j < maxfigtext; j++) {
 	figtexts[0] += j < allChars.length ? allChars[j] : "　";
 }
-texts[0] = "";
+/*texts[0] = "";
 for (let j = 0; j < maxtext; j++) {
 	texts[0] += j+maxfigtext < allChars.length ? allChars[j+maxfigtext] : "　";
-}
+}*/
 
 // Last page.
 figrects[7] = [4, 0,0, 72,72, 0,1];
@@ -390,9 +390,9 @@ figtexts4[7] =
 
 // Menu items.
 items[0] = [
-	[0,8, 56,8, "app/bank.js", "20x2"],
-	[0,24, 56,8, "app/bank.js", "20x3"],
-	[0,40, 56,8],
+	[0,8, 56,8, 1],
+	[0,24, 56,8, -1, "app/bank.js", "0x2"],
+	[0,40, 56,8, -1, "app/bank.js", "30x2"],
 ];
 
 /*
@@ -407,7 +407,7 @@ var endimage = null; // End page image.
 */
 
 const livePages = [0,1,2,3,4,5,6]; // Pages for live.
-const demoPages = [1,2,3,4,5,6,7]; // Pages for demo.
+const demoPages = [1,2,3,4,5,6]; // Pages for demo.
 const sharePages = [1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
 
 var buttonData = {
@@ -451,8 +451,17 @@ async function appDrawPage(page, cursor=-1, cursorChar="■") {
 	}
 	if (items[page]) {
 		for (let i = 0; i < items[page].length; i++) {
-			let s = i==touching?0.8:1;
-			picoRect(4, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,s);
+			if (touching < 0 && i == 0) {
+				let char = "＞" + "　".repeat(items[page][i][2]/8-1);
+				picoRect(2, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
+				picoText(char, -1, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
+			} else if (i == touching) {
+				let char = "＞" + "　".repeat(items[page][i][2]/8-1);
+				picoRect(3, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,0.95);
+				picoText(char, -1, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,0.95);
+			} else {
+				picoRect(2, items[page][i][0],items[page][i][1], items[page][i][2],items[page][i][3], 0,1);
+			}
 		}
 	}
 	if (texts[page]) {
@@ -631,27 +640,34 @@ async function appMain() {
 	} else {
 		let pressing = 0, page = livePages[number];
 		if (items[page]) {
-			touching = -1;
-			for (let i = 0; i < items[page].length; i++) {
-				if (picoAction(items[page][i][0],items[page][i][1], items[page][i][2]/2,items[page][i][3])/2) {
-					if (items[page][i][4]) {
+			appDrawPage(livePages[number], maxtext);
+			if (picoAction()) {
+				if (touching >= 0) {
+					if (items[page][touching][4] >= 0) {
+						number = items[page][touching][4] < livePages.length ? items[page][touching][4]: 0;
+					} else if (items[page][touching][5]) {
 						picoResetParams();
-						picoSetString(items[page][i][5]);
-						picoSwitchApp(items[page][i][4]);
-					} else {
-						number = number + 1 < livePages.length ? number + 1: 0;
+						if (items[page][touching][6]) {
+							picoSetString(items[page][touching][7]);
+						}
+						picoSwitchApp(items[page][touching][5]);
 					}
-					playing = 0;
-					picoFlush();
-					break;
-				} else if (picoMotion(items[page][i][0],items[page][i][1], items[page][i][2]/2,items[page][i][3])/2) {
-					touching = i;
-					break;
+				}
+				touching = -1;
+				playing = 0;
+				picoFlush();
+			} else {
+				touching = -1;
+				for (let i = 0; i < items[page].length; i++) {
+					if (picoMotion(items[page][i][0],items[page][i][1], items[page][i][2]/2,items[page][i][3]/2)) {
+						touching = i;
+						break;
+					}
 				}
 			}
-			appDrawPage(livePages[number], maxtext);
 		} else {
 			if (!texts[page] || playing >= texts[page].length) {
+				appDrawPage(livePages[number], maxtext+1);
 				if (picoAction()) {
 					number = number + 1 < livePages.length ? number + 1: 0;
 					playing = 0;
@@ -670,9 +686,9 @@ async function appMain() {
 				} else {
 					playing += 0.5;
 				}
+				appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
 				picoFlush();
 			}
-			appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
 		}
 	}
 }
