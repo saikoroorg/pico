@@ -282,6 +282,7 @@ const extraCharSprites = { // Extra char sprite table.
 	"⑤": picoStringCode6("077733711715751755"),
 	"⑥": picoStringCode6("077911913915951953955"),
 
+	"△": picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"),
 	"＠": picoStringCode6("099900910920930940950960970980901111121131141151161171981902112922132142152962172982903113123133143153163173983904114924134144154964174984905115125135145155165175985906116926136146156966176986907117127137147157167177987908918928938948958968978988"),
 };
 
@@ -412,6 +413,7 @@ const sharePages = [0,1,2,3,4,5,6,7];//null; // Pages for share. (Share live pag
 var buttonData = {
 	"＞": null,
 	"■": null,
+	"△": null,
 }; // Button spritedata.
 
 var state = ""; // Playing state.
@@ -490,65 +492,6 @@ async function appDrawPage(page, cursor=-1, dotsText=null) {
 // Select button.
 async function appSelect(x) {
 
-	// Enter to play mode.
-	/*if (x < 0) {
-		picoResetParams();
-		picoSetString(playparam);
-		picoSwitchApp(playjs); // Play.
-
-	} else {*/
-
-		if (!sharePages) { // Share all page as one image.
-
-			// Draw page by file.
-			let files = [];
-			//for (let i = maxpage-1; i < maxpage; i++) {
-				await picoClear();
-				await appDrawPage(livePages[number]);
-				files[0] = await picoScreenFile();
-				await picoFlip();
-			//}
-
-			// Share screen.
-			picoShare(null, files);
-
-		} else {
-
-			// Draw a page to nearly 5:7(Silveratio) offscreen image.
-			const width = 140, height = 200;
-			picoResize(width, height);
-			let images = [];
-			for (let i = 0; i < sharePages.length; i++) {
-				await appDrawPage(sharePages[i]);
-				images[i] = await picoScreenImage();
-			}
-
-			// Draw all pages to 7:5(Silveratio) offscreen image.
-			const vcount = 2; // Vertical count.
-			const hcount = picoDiv(sharePages.length+vcount-1,vcount); // Horizontal count.
-			const voffset = height*(vcount-1)/2; // Vertical offset.
-			const hoffset = width*(hcount-1)/2; // Horizontal offset.
-			picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
-			picoClear();
-			for (let i = 0; i < sharePages.length; i++) {
-				picoImage(images[i],
-					picoMod(i,hcount)*width-hoffset,
-					picoDiv(i,hcount)*height-voffset);
-			}
-
-			// Share screen.
-			let file = await picoScreenFile(null, -1, 1);
-			picoShare(null, [file]);
-
-			// Restore settings.
-			picoResize();
-		}
-	//}
-}
-
-// Action button.
-async function appAction() {
-
 	// Switch demo mode.
 	if (state == "demo") {
 		state = "";
@@ -556,14 +499,64 @@ async function appAction() {
 		//playing = 0;
 		console.log("Unlock screen.");
 		picoLockScreen(false);
-		picoLabel("action", null, buttonData["＞"]);
+		picoLabel("select", null, buttonData["＞"]);
 	} else {
 		state = "demo"; // Demo mode.
 		//number = 0;
 		//playing = 0;
 		console.log("Lock screen.");
 		picoLockScreen(true);
-		picoLabel("action");
+		picoLabel("select", null, figdata[7]);
+	}
+}
+
+// Action button.
+async function appAction(x) {
+
+	if (!sharePages) { // Share all page as one image.
+
+		// Draw page by file.
+		let files = [];
+		//for (let i = maxpage-1; i < maxpage; i++) {
+			await picoClear();
+			await appDrawPage(livePages[number]);
+			files[0] = await picoScreenFile();
+			await picoFlip();
+		//}
+
+		// Share screen.
+		picoShare(null, files);
+
+	} else {
+
+		// Draw a page to nearly 5:7(Silveratio) offscreen image.
+		const width = 140, height = 200;
+		picoResize(width, height);
+		let images = [];
+		for (let i = 0; i < sharePages.length; i++) {
+			await appDrawPage(sharePages[i]);
+			images[i] = await picoScreenImage();
+		}
+
+		// Draw all pages to 7:5(Silveratio) offscreen image.
+		const vcount = 2; // Vertical count.
+		const hcount = picoDiv(sharePages.length+vcount-1,vcount); // Horizontal count.
+		const voffset = height*(vcount-1)/2; // Vertical offset.
+		const hoffset = width*(hcount-1)/2; // Horizontal offset.
+		picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
+		picoClear();
+		for (let i = 0; i < sharePages.length; i++) {
+			picoImage(images[i],
+				picoMod(i,hcount)*width-hoffset,
+				picoDiv(i,hcount)*height-voffset);
+		}
+
+		// Share screen.
+		let file = await picoScreenFile(null, -1, 1);
+		picoShare(null, [file]);
+
+		// Restore settings.
+		picoResize();
 	}
 }
 
@@ -605,10 +598,11 @@ async function appLoad() {
 	}
 	buttonData["■"] = await picoSpriteData(symbol5x5CharSprites["■"], -1);
 	buttonData["＞"] = await picoSpriteData(extraCharSprites["＞"], -1);
+	buttonData["△"] = await picoSpriteData(extraCharSprites["△"], -1);
 
 	// Initialize buttons.
-	picoLabel("action", null, state=="demo"?null:buttonData["＞"]);
-	picoLabel("select", "&");
+	picoLabel("action", null, buttonData["△"]);
+	picoLabel("select", null, state=="demo"?figdata[7]:buttonData["＞"]);
 	appResize(); // Initialize positions.
 }
 
@@ -631,7 +625,7 @@ async function appMain() {
 		//if (picoAction(areas[0][1],areas[0][2], areas[0][3]/2,areas[0][4]/2)) {
 			state = "";
 			console.log("Unlock screen.");
-			picoLabel("action", null, buttonData["＞"]);
+			picoLabel("select", null, buttonData["＞"]);
 			picoLockScreen(false);
 		//} else if (picoMotion(areas[0][1],areas[0][2], areas[0][3]/2,areas[0][4]/2)) {
 		//	pressing = 1;
