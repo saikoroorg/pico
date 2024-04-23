@@ -456,7 +456,7 @@ const shareVcount = 2; // Vertical count.
 
 var buttonData = {
 	"＞": null,
-	"■": null,
+	"■": figdata[8],
 	"△": null,
 }; // Button spritedata.
 
@@ -546,6 +546,7 @@ async function appSelect(x) {
 		//playing = 0;
 		console.log("Unlock screen.");
 		picoLockScreen(false);
+		picoLabel("action", null, buttonData["△"]);
 		picoLabel("select", null, buttonData["＞"]);
 	} else {
 		state = "demo"; // Demo mode.
@@ -553,7 +554,8 @@ async function appSelect(x) {
 		//playing = 0;
 		console.log("Lock screen.");
 		picoLockScreen(true);
-		picoLabel("select", null, figdata[7]);
+		picoLabel("action", null);
+		picoLabel("select", null, buttonData["■"]);
 	}
 }
 
@@ -642,12 +644,12 @@ async function appLoad() {
 			figimages[j] = await picoLoad(figdata[j]);
 		}
 	}
-	buttonData["■"] = await picoSpriteData(symbol5x5CharSprites["■"], -1);
+	//buttonData["■"] = await picoSpriteData(symbol5x5CharSprites["■"], -1);
 	buttonData["＞"] = await picoSpriteData(extraCharSprites["＞"], -1);
 	buttonData["△"] = await picoSpriteData(extraCharSprites["△"], -1);
 
 	// Initialize buttons.
-	picoLabel("action", null, buttonData["△"]);
+	picoLabel("action", null, state=="demo"?null:buttonData["△"]);
 	picoLabel("select", null, state=="demo"?figdata[7]:buttonData["＞"]);
 	appResize(); // Initialize positions.
 }
@@ -671,6 +673,7 @@ async function appMain() {
 		//if (picoAction(areas[0][1],areas[0][2], areas[0][3]/2,areas[0][4]/2)) {
 			state = "";
 			console.log("Unlock screen.");
+			picoLabel("action", null, buttonData["△"]);
 			picoLabel("select", null, buttonData["＞"]);
 			picoLockScreen(false);
 		//} else if (picoMotion(areas[0][1],areas[0][2], areas[0][3]/2,areas[0][4]/2)) {
