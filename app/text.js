@@ -417,7 +417,7 @@ var playing = 0; // Playing count.
 var touching = -1; // Touching item index.
 
 // Draw page.
-async function appDrawPage(page, cursor=-1, cursorChar="■") {
+async function appDrawPage(page, cursor=-1, dotsText=null) {
 	picoClear();
 	picoCharLeading(8,8);
 	if (labels[page]) {
@@ -471,11 +471,12 @@ async function appDrawPage(page, cursor=-1, cursorChar="■") {
 			} else {
 				picoText(texts[page], -1, 0,48, 136,104, 0,1);
 			}
-			let dots = "　"+"□".repeat(page)+cursorChar+"□".repeat(livePages.length-page-2);
-			if (landscape) {
-				picoText(dots, -1, 80,0, 8,72, 0,1);
-			} else {
-				picoText(dots, -1, 0,80, 72,8, 0,1);
+			if (dotsText) {
+				if (landscape) {
+					picoText(dotsText, -1, 80,0, 8,72, 0,1);
+				} else {
+					picoText(dotsText, -1, 0,80, 72,8, 0,1);
+				}
 			}
 		} else {
 			picoText(texts[page], -1, 0,48, 136,104, 0,1);
@@ -548,8 +549,8 @@ async function appAction() {
 	// Switch demo mode.
 	if (state == "demo") {
 		state = "";
-		number = 0;
-		playing = 0;
+		//number = 0;
+		//playing = 0;
 		console.log("Unlock screen.");
 		picoLockScreen(false);
 	} else {
@@ -625,18 +626,22 @@ async function appMain() {
 		if (items[livePages[number]] || !texts[livePages[number]] || playing >= picoDiv(texts[livePages[number]].length,10)*10 + 20) {
 			number = number + 1 < livePages.length ? number + 1: 0;
 			playing = 0;
-			appDrawPage(livePages[number], 0, "＞");
+			let dotsText = "　"+"□".repeat(number)+"　"+"□".repeat(livePages.length-number-1);
+			appDrawPage(livePages[number], 0, dotsText);
 		} else {
 			playing += 1;
-			appDrawPage(livePages[number], playing<maxtext-1?playing:maxtext, !picoMod(playing/5,2)?"＞":"　");
+			let cursorChar = !picoMod(playing/5,2)?"＞":"　";
+			let dotsText = "　"+"□".repeat(number)+cursorChar+"□".repeat(livePages.length-number-1);
+			appDrawPage(livePages[number], playing<maxtext-1?playing:maxtext, dotsText);
 		}
 		picoFlush();
 
 	// Live mode.
 	} else {
 		let pressing = 0, page = livePages[number];
+		let dotsText = "　"+"□".repeat(number)+"■"+"□".repeat(livePages.length-number-1);
 		if (items[page]) {
-			appDrawPage(livePages[number], maxtext);
+			appDrawPage(livePages[number], maxtext, dotsText);
 			if (picoAction()) {
 				if (touching >= 0) {
 					if (items[page][touching][4] >= 0) {
@@ -663,7 +668,7 @@ async function appMain() {
 			}
 		} else {
 			if (!texts[page] || playing >= texts[page].length) {
-				appDrawPage(livePages[number], maxtext+1);
+				appDrawPage(livePages[number], maxtext+1, dotsText);
 				if (picoAction()) {
 					number = number + 1 < livePages.length ? number + 1: 0;
 					playing = 0;
@@ -682,7 +687,7 @@ async function appMain() {
 				} else {
 					playing += 0.5;
 				}
-				appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1);
+				appDrawPage(livePages[number], playing<maxtext-1?playing:pressing?maxtext:maxtext+1, dotsText);
 				picoFlush();
 			}
 		}
