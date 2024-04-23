@@ -287,7 +287,9 @@ const extraCharSprites = { // Extra char sprite table.
 };
 
 const extraCharAiliases = [ // Extra char ailiases.
-	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
+	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９",
+	"-−", "+＋", "*×", "=＝", ":：", "$＄", ".．",
+	"/／", "?？",
 ];
 
 const colors = picoStringCode8("1115553332224440i9p060n4f0i000");
@@ -324,6 +326,7 @@ for (let i = 0; i < maxpage; i++) {
 	figareas[i] = figareas[0];
 	figtexts[i] = figtexts[0];
 }
+const rects = [];
 const areas = [
 	[-1, 0,48, 136,104, 0,1],
 ];
@@ -362,7 +365,25 @@ for (let j = 0; j < maxtext; j++) {
 	texts[0] += j+maxfigtext < allChars.length ? allChars[j+maxfigtext] : "　";
 }*/
 
-// Last page.
+// Menu items for live.
+texts[0] =
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　つづける　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　アプリ１　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　アプリ２　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　";
+items[0] = [
+	[0,8, 64,16, 1],
+	[0,24, 64,16, -1, "app/bank.js", "0x2"],
+	[0,40, 64,16, -1, "app/bank.js", "30x2"],
+];
+
+// Last page for share.
+rects[8] = [2, 0,-40, 136,60, 0,1];
 figrects[8] = [4, 0,0, 72,72, 0,1];
 figdata[8] = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
 figareas[8] = [3, 0,0, 88,88, 0,1];
@@ -392,25 +413,46 @@ figtexts4[8] =
 	"                      "+
 	"   1234567.890/0/00   ";
 
-// Menu items.
-texts[0] =
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　つづける　　　　　　"+
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　アプリ１　　　　　　"+
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　アプリ２　　　　　　"+
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　　　　　　　　　　　";
-items[0] = [
-	[0,8, 64,16, 1],
-	[0,24, 64,16, -1, "app/bank.js", "0x2"],
-	[0,40, 64,16, -1, "app/bank.js", "30x2"],
-];
+//*// Additional page for package.
+rects[9] = [2, 0,0, 72,144, 0,1];
+figrects[9] = [4, 0,0, 72,72, 0,1];
+figdata[9] = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
+figareas[9] = [-1, 0,-40, 136,56, 0,1];
+figtexts[9] = "";
+figareas4[9] = [-1, 0,0, 84,128, 0,1];
+figtexts4[9] = 
+	"　　　　　　　　　　＠　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　い　ろ　は　に　ほ　へ　と　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　１２３４５６７．８９０　　　　　"+
+	"　　　　　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　＠　　　　　　　　　　";
+const livePages = [9,0,1,2,3,4,5,6,7]; // Pages for live.
+const sharePages = [9,9,9,9,9,9,9,9,9,9,9,9]; // Pages for share. (Share live page if null)
+const shareWidth = 400, shareHeight = 560; // Page width/height.
+const shareVcount = 3; // Vertical count.
+/*/
 
 const livePages = [0,1,2,3,4,5,6,7]; // Pages for live.
 const sharePages = [1,2,3,4,5,6,7,8];//null; // Pages for share. (Share live page if null)
+const shareWidth = 560, shareHeight = 400; // Page width/height.
+const shareVcount = 2; // Vertical count.
+//*/
 
 var buttonData = {
 	"＞": null,
@@ -437,6 +479,9 @@ async function appDrawPage(page, cursor=-1, dotsText=null) {
 		} else {
 			picoText(labels[page], -1, 0,-80, 72,8, 0,1)
 		}
+	}
+	if (rects[page]) {
+		picoRect(rects[page][0], rects[page][1],rects[page][2], rects[page][3],rects[page][4], rects[page][5],rects[page][6]);
 	}
 	if (figrects[page]) {
 		picoRect(figrects[page][0], figrects[page][1],figrects[page][2], figrects[page][3],figrects[page][4], figrects[page][5],figrects[page][6]);
@@ -532,7 +577,7 @@ async function appAction(x) {
 	} else {
 
 		// Draw a page to nearly 5:7(Silveratio) offscreen image.
-		const width = 140, height = 200;
+		const width = shareWidth*shareVcount/sharePages.length, height = shareHeight/shareVcount;
 		picoResize(width, height);
 		let images = [];
 		for (let i = 0; i < sharePages.length; i++) {
@@ -541,11 +586,10 @@ async function appAction(x) {
 		}
 
 		// Draw all pages to 7:5(Silveratio) offscreen image.
-		const vcount = 2; // Vertical count.
-		const hcount = picoDiv(sharePages.length+vcount-1,vcount); // Horizontal count.
-		const voffset = height*(vcount-1)/2; // Vertical offset.
+		const hcount = picoDiv(sharePages.length+shareVcount-1,shareVcount); // Horizontal count.
+		const voffset = height*(shareVcount-1)/2; // Vertical offset.
 		const hoffset = width*(hcount-1)/2; // Horizontal offset.
-		picoResize(width*hcount, height*vcount); // 560x400 if vcount = 2.
+		picoResize(width*hcount, height*shareVcount); // 560x400 if shareVcount = 2.
 		picoClear();
 		for (let i = 0; i < sharePages.length; i++) {
 			picoImage(images[i],
