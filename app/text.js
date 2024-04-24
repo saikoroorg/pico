@@ -488,7 +488,7 @@ async function appDrawPage(page, cursor=-1, dotsText=null) {
 	if (figrects[page]) {
 		picoRect(figrects[page][0], figrects[page][1],figrects[page][2], figrects[page][3],figrects[page][4], figrects[page][5],figrects[page][6]);
 		if (figimages[page]) {
-			picoImage(figimages[page], figareas[page][1],figareas[page][2], figareas[page][5],figareas[page][6]);
+			picoImage(figimages[page], figrects[page][1],figrects[page][2], figrects[page][5],figrects[page][6]);
 		}
 		if (figtexts[page]) {
 			picoText(figtexts[page], figareas[page][0], figareas[page][1],figareas[page][2], figareas[page][3],figareas[page][4], figareas[page][5],figareas[page][6]);

@@ -334,16 +334,6 @@ pico.App = class {
 
 		// Jump to next page.
 		} else if (target) {
-			if (returl && !picoString("u")) {
-				picoSetString(returl, "u");
-			} else if (this.returl && !picoString("u")) {
-				picoSetString(this.returl, "u");
-			}
-			if (this.title && !picoString("t")) {
-				picoSetString(this.title, "t");
-			}
-			picoSetString("", "s");
-			picoSetString("", "r");
 			await picoReload(target);
 			return true;
 		}
