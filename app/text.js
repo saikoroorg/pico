@@ -377,7 +377,7 @@ texts[0] =
 	"　　　　　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　";
 items[0] = [
-	[0,8, 64,16, 1],
+	[0,8, 64,16],
 	[0,24, 64,16, -1, "app/bank.js", "0x2"],
 	[0,40, 64,16, -1, "app/bank.js", "30x2"],
 ];
@@ -453,6 +453,12 @@ const sharePages = [1,2,3,4,5,6,7,8];//null; // Pages for share. (Share live pag
 const shareWidth = 560, shareHeight = 400; // Page width/height.
 const shareVcount = 2; // Vertical count.
 //*/
+
+var buttonData = {
+	"＞": null,
+	"■": figdata[8],
+	"△": null,
+}; // Button spritedata.
 
 var buttonData = {
 	"＞": null,
@@ -548,14 +554,16 @@ async function appSelect(x) {
 		picoLockScreen(false);
 		picoLabel("action", null, buttonData["△"]);
 		picoLabel("select", null, buttonData["＞"]);
+		await picoTitle(title);
 	} else {
 		state = "demo"; // Demo mode.
 		//number = 0;
 		//playing = 0;
 		console.log("Lock screen.");
 		picoLockScreen(true);
-		picoLabel("action", null);
-		picoLabel("select", null, buttonData["■"]);
+		picoLabel("action", null, buttonData["■"]);
+		picoLabel("select", null);
+		await picoTitle();
 	}
 }
 
@@ -649,8 +657,9 @@ async function appLoad() {
 	buttonData["△"] = await picoSpriteData(extraCharSprites["△"], -1);
 
 	// Initialize buttons.
-	picoLabel("action", null, state=="demo"?null:buttonData["△"]);
-	picoLabel("select", null, state=="demo"?figdata[7]:buttonData["＞"]);
+	picoLabel("action", null, state=="demo"?buttonData["■"]:buttonData["△"]);
+	picoLabel("select", null, state=="demo"?null:buttonData["＞"]);
+	await picoTitle(state=="demo"?null:title);
 	appResize(); // Initialize positions.
 }
 
@@ -675,6 +684,7 @@ async function appMain() {
 			console.log("Unlock screen.");
 			picoLabel("action", null, buttonData["△"]);
 			picoLabel("select", null, buttonData["＞"]);
+			await picoTitle(title);
 			picoLockScreen(false);
 		//} else if (picoMotion(areas[0][1],areas[0][2], areas[0][3]/2,areas[0][4]/2)) {
 		//	pressing = 1;
@@ -707,6 +717,8 @@ async function appMain() {
 							picoSetString(items[page][touching][7]);
 						}
 						picoSwitchApp(items[page][touching][5]);
+					} else {
+						number = number + 1 < livePages.length ? number + 1: 0;
 					}
 				}
 				touching = -1;
