@@ -321,6 +321,8 @@ const figtexts = [
 ];
 const figareas4 = [null];
 const figtexts4 = [null];
+const figareas4b = [null];
+const figtexts4b = [null];
 for (let i = 0; i < maxpage; i++) {
 	figrects[i] = figrects[0];
 	figareas[i] = figareas[0];
@@ -439,9 +441,9 @@ figtexts4[9] =
 	"　　　　　　　　　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　　　　　"+
-	"　　　　　１２３４５６７．８９０　　　　　"+
+	"　　　　　　　　　　＠　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　　　　＠　　　　　　　　　　";
+	"　　　　　１２３４５６７．８９０　　　　　";
 const livePages = [9,0,1,2,3,4,5,6,7]; // Pages for live.
 const sharePages = [9,9,9,9,9,9,9,9,9,9,9,9]; // Pages for share. (Share live page if null)
 const shareWidth = 400, shareHeight = 560; // Page width/height.
@@ -453,12 +455,6 @@ const sharePages = [1,2,3,4,5,6,7,8];//null; // Pages for share. (Share live pag
 const shareWidth = 560, shareHeight = 400; // Page width/height.
 const shareVcount = 2; // Vertical count.
 //*/
-
-var buttonData = {
-	"＞": null,
-	"■": figdata[8],
-	"△": null,
-}; // Button spritedata.
 
 var buttonData = {
 	"＞": null,
@@ -492,7 +488,7 @@ async function appDrawPage(page, cursor=-1, dotsText=null) {
 	if (figrects[page]) {
 		picoRect(figrects[page][0], figrects[page][1],figrects[page][2], figrects[page][3],figrects[page][4], figrects[page][5],figrects[page][6]);
 		if (figimages[page]) {
-			picoImage(figimages[page], figrects[page][1],figrects[page][2], figrects[page][5],figrects[page][6]);
+			picoImage(figimages[page], figareas[page][1],figareas[page][2], figareas[page][5],figareas[page][6]);
 		}
 		if (figtexts[page]) {
 			picoText(figtexts[page], figareas[page][0], figareas[page][1],figareas[page][2], figareas[page][3],figareas[page][4], figareas[page][5],figareas[page][6]);
@@ -500,6 +496,11 @@ async function appDrawPage(page, cursor=-1, dotsText=null) {
 		if (figtexts4[page]) {
 			picoCharLeading(4,6);
 			picoText(figtexts4[page], figareas4[page][0], figareas4[page][1],figareas4[page][2], figareas4[page][3],figareas4[page][4], figareas4[page][5],figareas4[page][6]);
+			picoCharLeading(8,8);
+		}
+		if (figtexts4b[page]) {
+			picoCharLeading(4,6);
+			picoText(figtexts4b[page], figareas4b[page][0], figareas4b[page][1],figareas4b[page][2], figareas4b[page][3],figareas4b[page][4], figareas4b[page][5],figareas4b[page][6]);
 			picoCharLeading(8,8);
 		}
 	}
