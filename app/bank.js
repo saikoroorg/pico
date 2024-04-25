@@ -16,8 +16,8 @@ var players = []; // Player.
 // Button.
 const buttonMax = playerMax + 1; // Maximum button count.
 const buttonWidth = 8, buttonHeight = 6; // Button sizes.
-const centerButton1Sprite = [0,19,19, 3,3,6,0,12,6, 3,5,4,0,8,10]; // Cneter button sprite for solo/3+ players.
-const centerButton2Sprite = [0,19,19, 3,3,6,0,12,6, 3,5,4,0,8,10, 1,7,12,0,4,0]; // Cneter button sprite for 2 players.
+const centerButton1Sprite = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10]; // Cneter button sprite for solo/3+ players.
+const centerButton2Sprite = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10, 1,7,12,0,4,0]; // Cneter button sprite for 2 players.
 const centerButtonColor = 2; // Cneter number color.
 const centerButtonScale = 4; // Cneter button scale.
 const playerButton1Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Player button sprite for solo player.
