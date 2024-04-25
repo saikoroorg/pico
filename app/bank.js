@@ -16,20 +16,28 @@ var players = []; // Player.
 // Button.
 const buttonMax = playerMax + 1; // Maximum button count.
 const buttonWidth = 8, buttonHeight = 6; // Button sizes.
-const buttonBall1Sprite = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10]; // Button ball sprite for solo/3+ players.
-const buttonBall2Sprite = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10, 1,7,12,0,4,0]; // Button ball sprite for 2 players.
-const buttonBallColor = 1;
-const buttonRect1Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Button ball sprite for solo player.
-const buttonRect2Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Button ball sprite for 2 players.
-const buttonRect3Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8, 4,7,1,0,4,0]; // Button ball sprite for 3+ players.
-const buttonRectColor = 0;
-const buttonScale = 6; // Button base scale.
-const numberScale = 0.5; // Button number scale.
-const buttonPosX = 50; // Button position X on landscape mode.
-const buttonPosY = 50; // Button position Y on portrait mode.
-const buttonGridX = 125; // Button position grid base width for 3+ players.
-const buttonGridY = [-15, 15]; // Button position grid base height for 3+ players.
-var buttonCount = 3; // Button count.
+const centerButton1Sprite = [0,19,19, 3,3,6,0,12,6, 3,5,4,0,8,10]; // Cneter button sprite for solo/3+ players.
+const centerButton2Sprite = [0,19,19, 3,3,6,0,12,6, 3,5,4,0,8,10, 1,7,12,0,4,0]; // Cneter button sprite for 2 players.
+const centerButtonColor = 2; // Cneter number color.
+const centerButtonScale = 4; // Cneter button scale.
+const playerButton1Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Player button sprite for solo player.
+const playerButton2Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Player button sprite for 2 players.
+const playerButton3Sprite = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8, 4,7,1,0,4,0]; // Player button sprite for 3+ players.
+const playerButtonColor = 0; // Player button number color.
+const playerButtonScale = 12; // Player button base scale.
+const playerButtonScaleL = 16; // Player button base scale on landscape mode.
+const numberScale = 0.5; // Player button number scale.
+const buttonPos = 48; // Player button position for solo player.
+const buttonPosY1 = 64; // Player button position Y on portrait mode.
+const buttonPosY2 = 80; // Player button position Y on portrait mode.
+const buttonPosLX = 48; // Player button position X on landscape mode.
+const buttonPosLY0 = 32; // Cneter button position Y on landscape mode.
+const buttonPosLY1 = 32; // Player button position Y on landscape mode.
+const buttonPosLY2 = 48; // Player button position Y on landscape mode.
+const buttonGridX = 128; // Player button position grid base width for 3+ players.
+const buttonGridLX = 192; // Player button position grid base width for 3+ players on landscape mode.
+const buttonGridY = [-15, 15]; // Player button position grid base height for 3+ players.
+var buttonCount = 3; // Player button count.
 
 // Button class.
 Button = class {
@@ -133,88 +141,50 @@ async function appLoad() {
 async function appResize() {
 	landscape = picoWideScreen();
 
-	// Reset layouts for 1 screen for solo player.
-	if (buttonCount <= 1) {
-		for (let j = 0; j < 1; j++) {
-			buttons[j].centerx = buttons[j].centery = 0;
-			buttons[j].scale = buttonScale;
-			buttons[j].angle = 0;
-			buttons[j].width = buttonWidth * buttonScale;
-			buttons[j].height = buttonHeight * buttonScale;
-		}
-
-	// Reset layouts for 2 screens for solo player.
-	} else if (buttonCount <= 2) {
-		let centerx = [landscape ? -buttonPosX : 0, landscape ? buttonPosX : 0];
-		let centery = [landscape ? 0 : -buttonPosY, landscape ? 0 : buttonPosY];
-
-		for (let j = 0; j < buttonCount; j++) {
-			buttons[j].centerx = centerx[j];
-			buttons[j].centery = centery[j];
-			buttons[j].scale = !j ? buttonScale : buttonScale;
-			buttons[j].angle = 0;
-			buttons[j].width = buttonWidth * buttonScale;
-			buttons[j].height = buttonHeight * buttonScale;
-		}
-
-	// 2 Screens for 2 players.
-	} else if (buttonCount <= 3) {
-		let centerx = [0, landscape ? buttonPosX*1.5 : 0, landscape ? -buttonPosX*1.5 : 0];
-		let centery = [0, landscape ? 0 : buttonPosY*1.5, landscape ? 0 : -buttonPosY*1.5];
-
-		for (let j = 0; j < buttonCount; j++) {
-			buttons[j].centerx = centerx[j];
-			buttons[j].centery = centery[j];
-			buttons[j].scale = !j ? buttonScale : buttonScale;
-			if (landscape) {
-				buttons[j].angle = 0;
-			} else {
-				buttons[j].angle = j>=2 ? 180 : 0; // Upsidedown for portrait mode.
-			}
-			buttons[j].width = buttonWidth * buttonScale;
-			buttons[j].height = buttonHeight * buttonScale;
-		}
-
-	// 2 Screens for 3+ players.
-	} else {
-		let centerx = [landscape ? -buttonPosX : 0, landscape ? buttonPosX : 0];
-		let centery = [landscape ? 0 : -buttonPosY, landscape ? 0 : buttonPosY];
-
-		buttons[0].centerx = centerx[0];
-		buttons[0].centery = centery[0];
-		buttons[0].scale = buttonScale;
+	// Reset layouts on landscape mode.
+	if (landscape) {
+		buttons[0].centerx = 0;
+		buttons[0].centery = -buttonPosLY0;
+		buttons[0].scale = centerButtonScale;
 		buttons[0].angle = 0;
-		buttons[0].width = buttonWidth * buttonScale;
-		buttons[0].height = buttonHeight * buttonScale;
+		buttons[0].width = buttonWidth * centerButtonScale;
+		buttons[0].height = buttonHeight * centerButtonScale;
 
-		if (playerCount <= 4) {
-			for (let j = 1; j <= playerCount; j++) {
-				buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount/2 + 0.5) / (playerCount + 1);
-				buttons[j].centery = centery[1];
-				buttons[j].scale = buttonScale / playerCount;
-				buttons[j].angle = 0;
-				buttons[j].width = buttonWidth * buttonScale / playerCount;
-				buttons[j].height = buttonHeight * buttonScale / playerCount;
-			}
-		} else {
-			let playerCount2 = picoDiv(playerCount, 2);
-			let playerCount1 = playerCount - playerCount2;
-			for (let j = 1; j <= playerCount1; j++) {
-				buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount1/2 + 0.5) / (playerCount1 + 1);
-				buttons[j].centery = centery[1] + buttonGridY[0];
-				buttons[j].scale = buttonScale / playerCount1;
-				buttons[j].angle = 0;
-				buttons[j].width = buttonWidth * buttonScale / playerCount1;
-				buttons[j].height = buttonHeight * buttonScale / playerCount1;
-			}
-			for (let j = playerCount1+1; j <= playerCount; j++) {
-				buttons[j].centerx = centerx[1] + buttonGridX * (j-1 - playerCount2/2 - playerCount1 + 0.5) / (playerCount2 + 1);
-				buttons[j].centery = centery[1] + buttonGridY[1];
-				buttons[j].scale = buttonScale / playerCount1;
-				buttons[j].angle = 0;
-				buttons[j].width = buttonWidth * buttonScale / playerCount1;
-				buttons[j].height = buttonHeight * buttonScale / playerCount1;
-			}
+		for (let j = 1; j <= playerCount; j++) {
+			buttons[j].centerx = buttonGridLX * (j-1 - (playerCount-1)/2) / playerCount;
+			buttons[j].centery = j > 1 && j < playerCount ? buttonPosLY2 : buttonPosLY1;
+			buttons[j].scale = playerButtonScaleL / (playerCount+1);
+			buttons[j].angle = 0;
+			buttons[j].width = buttonWidth * playerButtonScaleL / (playerCount+1);
+			buttons[j].height = buttonHeight * playerButtonScaleL / (playerCount+1);
+		}
+
+	// Reset layouts on portrait mode.
+	} else {
+		buttons[0].centerx = 0;
+		buttons[0].centery = 0;
+		buttons[0].scale = centerButtonScale;
+		buttons[0].angle = 0;
+		buttons[0].width = buttonWidth * centerButtonScale;
+		buttons[0].height = buttonHeight * centerButtonScale;
+
+		let playerCount2 = picoDiv(playerCount+1, 2);
+		for (let j = 1; j <= playerCount2; j++) {
+			buttons[j].centerx = buttonGridX * (j-1 - (playerCount2-1)/2) / playerCount2;
+			buttons[j].centery = j > 1 && j < playerCount2 ? buttonPosY2 : buttonPosY1;
+			buttons[j].scale = playerButtonScale / (playerCount2+1);
+			buttons[j].angle = 0;
+			buttons[j].width = buttonWidth * playerButtonScale / (playerCount2+1);
+			buttons[j].height = buttonHeight * playerButtonScale / (playerCount2+1);
+		}
+		let playerCount1 = playerCount - playerCount2;
+		for (let j = playerCount2+1; j <= playerCount; j++) {
+			buttons[j].centerx = buttonGridX * (playerCount-j - (playerCount1-1)/2) / playerCount1;
+			buttons[j].centery = j > playerCount2+1 && j < playerCount ? -buttonPosY2 : -buttonPosY1;
+			buttons[j].scale = playerButtonScale / (playerCount2+1);
+			buttons[j].angle = 180; // Upsidedown for portrait mode.
+			buttons[j].width = buttonWidth * playerButtonScale / (playerCount2+1);
+			buttons[j].height = buttonHeight * playerButtonScale / (playerCount2+1);
 		}
 	}
 
@@ -306,22 +276,22 @@ async function appMain() {
 
 		// Draw buttons.
 		if (k == 0) {
-			let a = buttons[k].angle + (playerCount == 2 ? picoMod(playerIndex+1,2)*180 : 0);
-			let sprite = buttons[k].score > 0 ? buttonBall2Sprite : buttonBall1Sprite;
+			let a = buttons[k].angle + (playerCount >= 2 && !landscape && playerIndex > picoDiv(playerCount+1,2) ? 180 : 0);
+			let sprite = buttons[k].score > 0 ? centerButton2Sprite : centerButton1Sprite;
 			let number = buttons[k].score;
 			if (buttons[k].scoreplus) {
 				number = "  " + number + buttons[k].scoreplus;
 			}
 			await picoSprite(sprite, -1, x, y, a, buttons[k].scale*s);
-			await picoChar(number, buttonBallColor, x, y, a, buttons[k].scale*numberScale*s);
+			await picoChar(number, centerButtonColor, x, y, a, buttons[k].scale*numberScale*s);
 		} else {
-			let sprite = k == playerIndex ? (playerCount <= 2 ? buttonRect2Sprite : buttonRect3Sprite) : buttonRect1Sprite;
+			let sprite = k == playerIndex ? (playerCount <= 2 ? playerButton2Sprite : playerButton3Sprite) : playerButton1Sprite;
 			let number = buttons[k].score > 0 ? "+" + buttons[k].score : buttons[k].score;
 			if (buttons[k].scoreplus) {
 				number = "  " + number + buttons[k].scoreplus;
 			}
 			await picoSprite(sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
-			await picoChar(number, buttonRectColor, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
+			await picoChar(number, playerButtonColor, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 		}
 	}
 
