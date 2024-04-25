@@ -292,13 +292,13 @@ const extraCharAiliases = [ // Extra char ailiases.
 	"/／", "?？",
 ];
 
-const colors = picoStringCode8("1115553332224440i9p060n4f0i000");
+const colors = picoStringCode8("1111113332220i9p060n4f0ir00000");
+//const colors = picoStringCode8("1115553332224440i9p060n4f0i000");
 
-const maxpage = 9;
 const labels = [
 	"　いろはにほへと　",
 ];
-for (let i = 1; i < maxpage-1; i++) {
+for (let i = 1; i < 7; i++) {
 	labels[i] = "いろはにほへとー"+i;
 }
 const figrects = [
@@ -319,14 +319,18 @@ const figtexts = [
 	"ごえで、あざぎゆめみじゑびもぜず。"+
 	"ぱぴぷぺぽんぁぃぅぇぉっゃゅょー　",
 ];
+for (let i = 1; i < 7; i++) {
+	figtexts[i] = figtexts[0];
+}
 const figareas4 = [null];
 const figtexts4 = [null];
 const figareas4b = [null];
 const figtexts4b = [null];
-for (let i = 0; i < maxpage; i++) {
+for (let i = 1; i < figtexts.length; i++) {
 	figrects[i] = figrects[0];
+}
+for (let i = 1; i < figtexts.length; i++) {
 	figareas[i] = figareas[0];
-	figtexts[i] = figtexts[0];
 }
 const rects = [];
 const areas = [
@@ -350,46 +354,19 @@ const allChars = builtinChars +
 	Object.keys(katakana5x5CharSprites).join("") +
 	Object.keys(hiragana5x5CharSprites).join("") +
 	Object.keys(symbol5x5CharSprites).join("");
-for (let i = 0; i < maxpage-1; i++) {
+for (let i = 0; i < 7; i++) {
 	texts[i] = "";
 	for (let j = 0; j < maxtext; j++) {
 		texts[i] += allChars[picoRandom(allChars.length)];
 	}
 }
 
-// First page.
-/*figtexts[0] = "";
-for (let j = 0; j < maxfigtext; j++) {
-	figtexts[0] += j < allChars.length ? allChars[j] : "　";
-}
-texts[0] = "";
-for (let j = 0; j < maxtext; j++) {
-	texts[0] += j+maxfigtext < allChars.length ? allChars[j+maxfigtext] : "　";
-}*/
-
-// Menu items for live.
-texts[0] =
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　つづける　　　　　　"+
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　アプリ１　　　　　　"+
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　アプリ２　　　　　　"+
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　　　　　　　　　　　"+
-	"　　　　　　　　　　　　　　　　　";
-items[0] = [
-	[0,8, 64,16],
-	[0,24, 64,16, -1, "app/bank.js", "0x2"],
-	[0,40, 64,16, -1, "app/bank.js", "30x2"],
-];
-
 // Last page for share.
-rects[8] = [2, 0,-40, 136,60, 0,1];
-figrects[8] = [4, 0,0, 72,72, 0,1];
-figdata[8] = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
-figareas[8] = [3, 0,0, 88,88, 0,1];
-figtexts[8] = 
+rects[7] = [2, 0,-40, 136,60, 0,1];
+figrects[7] = [0, 0,0, 72,72, 0,1];
+figdata[7] = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
+figareas[7] = [-1, 0,0, 88,88, 0,1];
+figtexts[7] = 
 	"□あ□い□う□え□お□"+
 	"□か□き□く□け□こ□"+
 	"□さ□し□す□せ□そ□"+
@@ -401,8 +378,8 @@ figtexts[8] =
 	"□ら□り□る□れ□ろ□"+
 	"□わ□■□を□■□ん□"+
 	"□■□■□＠□■□■□";
-figareas4[8] = [-1, 0,0, 88,88, 0,1];
-figtexts4[8] = 
+figareas4[7] = [-1, 0,0, 88,88, 0,1];
+figtexts4[7] = 
 	"   1234567.890/0/00   "+
 	"                      "+
 	"                      "+
@@ -415,14 +392,14 @@ figtexts4[8] =
 	"                      "+
 	"   1234567.890/0/00   ";
 
-//*// Additional page for package.
-rects[9] = [2, 0,0, 72,144, 0,1];
-figrects[9] = [4, 0,0, 72,72, 0,1];
-figdata[9] = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
-figareas[9] = [-1, 0,-40, 136,56, 0,1];
-figtexts[9] = "";
-figareas4[9] = [-1, 0,0, 84,128, 0,1];
-figtexts4[9] = 
+/*// Additional page for package.
+rects[10] = [2, 0,0, 72,144, 0,1];
+figrects[10] = [0, 0,0, 72,72, 0,1];
+figdata[10] = "data:image/svg;base64," + "iVBORw0KGgoAAAANSUhEUgAAAQAAAAEACAYAAABccqhmAAAAAXNSR0IArs4c6QAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAABAKADAAQAAAABAAABAAAAAABEIjhzAAAGUElEQVR4Ae3UwQ0AIAwDscL+OwMPtjgjMUCcKmtmzvseAQJBgR3MLDIBAl/AADgFAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QkYADdAICxgAMLli07AALgBAmEBAxAuX3QCBsANEAgLGIBw+aITMABugEBYwACEyxedgAFwAwTCAgYgXL7oBAyAGyAQFjAA4fJFJ2AA3ACBsIABCJcvOgED4AYIhAUMQLh80QlcdCIC/6vZJW8AAAAASUVORK5CYII=";
+figareas[10] = [-1, 0,-40, 136,56, 0,1];
+figtexts[10] = "";
+figareas4[10] = [-1, 0,0, 84,128, 0,1];
+figtexts4[10] = 
 	"　　　　　　　　　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　　　　　"+
 	"　　　　い　ろ　は　に　ほ　へ　と　　　　"+
@@ -444,21 +421,39 @@ figtexts4[9] =
 	"　　　　　　　　　　　　　　　　　　　　　"+
 	"　　　　　　　　　　　　　　　　　　　　　"+
 	"　　　　　１２３４５６７．８９０　　　　　";
-const livePages = [9,0,1,2,3,4,5,6,7]; // Pages for live.
-const sharePages = [9,9,9,9,9,9,9,9,9,9,9,9]; // Pages for share. (Share live page if null)
+const livePages = [10,0,1,2,3,4,5,6,7]; // Pages for live.
+const sharePages = [10,10,10,10,10,10,10,10,10,10,10,10]; // Pages for share. (Share live page if null)
 const shareWidth = 400, shareHeight = 560; // Page width/height.
 const shareVcount = 3; // Vertical count.
 /*/
 
-const livePages = [0,1,2,3,4,5,6,7]; // Pages for live.
-const sharePages = [1,2,3,4,5,6,7,8];//null; // Pages for share. (Share live page if null)
+
+// Menu items for live.
+texts[9] =
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　つづける　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　アプリ１　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　アプリ２　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　"+
+	"　　　　　　　　　　　　　　　　　";
+items[9] = [
+	[0,8, 64,16],
+	[0,24, 64,16, -1, "app/bank.js", "0x2"],
+	[0,40, 64,16, -1, "app/bank.js", "30x2"],
+];
+
+const livePages = [9, 0,1,2,3,4,5,6,7]; // Pages for live.
+const sharePages = [0,1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
 const shareWidth = 560, shareHeight = 400; // Page width/height.
 const shareVcount = 2; // Vertical count.
 //*/
 
 var buttonData = {
 	"＞": null,
-	"■": figdata[8],
+	"■": figdata[7],
 	"△": null,
 }; // Button spritedata.
 
@@ -575,7 +570,7 @@ async function appAction(x) {
 
 		// Draw page by file.
 		let files = [];
-		//for (let i = maxpage-1; i < maxpage; i++) {
+		//for (let i = 0; i < livePages.length; i++) {
 			await picoClear();
 			await appDrawPage(livePages[number]);
 			files[0] = await picoScreenFile();
@@ -648,7 +643,7 @@ async function appLoad() {
 	}
 
 	// Load image.
-	for (let j = 0; j < maxpage; j++) {
+	for (let j = 0; j < figdata.length; j++) {
 		if (figdata[j]) {
 			figimages[j] = await picoLoad(figdata[j]);
 		}
@@ -727,17 +722,20 @@ async function appMain() {
 				picoFlush();
 			} else {
 				touching = -1;
-				for (let i = 0; i < items[page].length; i++) {
+				for (let i = 1; i < items[page].length; i++) {
 					if (picoMotion(items[page][i][0],items[page][i][1], items[page][i][2]/2,items[page][i][3]/2)) {
 						touching = i;
 						break;
 					}
 				}
+				if (touching < 0 && picoMotion(areas[0][1],areas[0][2], areas[0][3]/2,areas[0][4]/2)) {
+					touching = 0;
+				}
 			}
 		} else {
 			if (!texts[page] || playing >= texts[page].length) {
 				appDrawPage(livePages[number], maxtext+1, dotsText);
-				if (picoAction()) {
+				if (picoAction(areas[0][1],areas[0][2], areas[0][3]/2,areas[0][4]/2)) {
 					number = number + 1 < livePages.length ? number + 1: 0;
 					playing = 0;
 					picoFlush();
@@ -745,7 +743,7 @@ async function appMain() {
 					pressing = 1;
 				}
 			} else {
-				if (picoMotion()) {
+				if (picoMotion(areas[0][1],areas[0][2], areas[0][3]/2,areas[0][4]/2)) {
 					if (texts[page] && playing + 10 < texts[page].length - 1) {
 						playing += 10;
 					} else {
