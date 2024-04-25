@@ -111,17 +111,18 @@ async function appLoad() {
 	if (value) {
 		let numbers = picoNumbers();
 
-		// Simple multi players mode.
+		// Multi players mode.
 		if (value.match(/x/i)) {
 			score = numbers[0] < 0 ? 0 : numbers[0] < scoreMax ? numbers[0] : scoreMax;
 			playerCount = numbers[1] <= 0 ? 2 : numbers[1] < playerMax ? numbers[1] : playerMax;
 
-		// Simple 2 players mode.
+		// 2 players mode.
 		} else if (numbers[0] > 0) {
 			score = numbers[0] < 0 ? 0 : numbers[0] < scoreMax ? numbers[0] : scoreMax;
 			playerCount = 2;
 		}
 	}
+	buttonCount = playerCount + 1;
 
 	state = "";
 	appResize(); // Initialize positions.
