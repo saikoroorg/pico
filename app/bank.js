@@ -4,6 +4,9 @@ const title = "Bank"; // Title.
 const playerMax = 8; // Maximum player count.
 var playerCount = 2; // Player count.
 var playerIndex = 0; // Current player index.
+var touchIndex = -1; // Touching player index.
+var touchCount = 0; // Touching count.
+var touchState = ""; // Touch holding state.
 
 // Score.
 const scoreMax = 9999; // Maximum score.
@@ -39,9 +42,7 @@ Button = class {
 		this.posy = 0; // Sprite position Y.
 		this.width = buttonWidth; // Button touchable width.
 		this.height = buttonHeight; // Button touchable height.
-		this.touching = 0; // Touching count.
 		this.score = 0; // Score count for each player.
-		this.addition = 0; // Score additional count.
 	}
 };
 var buttons = []; // Button.
@@ -71,9 +72,10 @@ async function appSelect(x) {
 
 		// Change count of player.
 		if ((x > 0 && playerCount + x <= playerMax) || (x < 0 && playerCount + x >= 0)) {
-			playerCount = playerCount + x;
+			playerCount = playerCount + x
+			// Change count but do not adjust index. Therefore, the index may deviate from the original number.
 			//playerIndex = buttons[0].score > 0 ? picoMod(buttons[0].score, playerCount) + 1 : 0;
-			buttonCount = playerCount + 1; // Add playing button on 3+ players mode.
+			buttonCount = playerCount + 1;
 			//playing = -1; // Restart.
 			picoBeep(1.2, 0.1);
 			appResize();
@@ -194,7 +196,7 @@ async function appMain() {
 		state = "";
 		playerIndex = 0;
 		buttons[0].score = 0;
-		for (let k = 1; k < buttonCount; k++) {
+		for (let k = 1; k < buttonMax; k++) {
 			buttons[k].score = scoreCount;
 		}
 
@@ -209,58 +211,65 @@ async function appMain() {
 		let w = buttons[k].width, h = buttons[k].height;
 
 		// Score++.
-		if (buttons[k].touching >= 0 && picoAction(x,y,w,h)) {
-			buttons[k].score = buttons[k].score+1 < scoreMax ? buttons[k].score+1 : scoreMax;
-			buttons[k].addition = 0;
-			buttons[k].touching = 0;
-			if (k == 0) {
-				playerIndex = playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
-				//playerIndex = buttons[k].score > 0 ? picoMod(buttons[k].score, playerCount) + 1 : 0;
+		if (touchIndex == k && picoAction(x,y,w,h)) {
+			if (touchCount >= 0) {
+				buttons[k].score = buttons[k].score+1 < scoreMax ? buttons[k].score+1 : scoreMax;
+				touchState = "";
+				touchCount = 0;
+				if (k == 0) {
+					playerIndex = playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
+				}
 			}
 
 		// Score--.
-		} else if (buttons[k].touching > 0 && picoAction()) {
-			buttons[k].score = buttons[k].score-1 > -scoreMax ? buttons[k].score-1 : -scoreMax;
-			buttons[k].addition = 0;
-			buttons[k].touching = 0;
-			if (k == 0) {
-				if (buttons[k].score <= 0) {
-					buttons[k].score = 0;
-					playerIndex = 0;
-				} else {
-					playerIndex = playerIndex - 1 >= 1 ? playerIndex - 1 : playerCount;
-					//playerIndex = buttons[k].score > 0 ? picoMod(buttons[k].score, playerCount) + 1 : 0;
+		} else if (touchIndex == k && picoAction()) {
+			if (touchCount > -60) {
+				buttons[k].score = buttons[k].score-1 > -scoreMax ? buttons[k].score-1 : -scoreMax;
+				touchState = "";
+				touchCount = 0;
+				if (k == 0) {
+					if (buttons[k].score <= 0) {
+						buttons[k].score = 0;
+						playerIndex = 0;
+					} else {
+						playerIndex = playerIndex - 1 >= 1 ? playerIndex - 1 : playerCount;
+					}
 				}
 			}
 
 		// Holding.
-		} else if (picoMotion(x,y,w,h)) {
-			buttons[k].addition = 0;
-			if (buttons[k].touching >= 60) {
+		} else if ((touchIndex < 0 || touchIndex == k) && picoMotion(x,y,w,h)) {
+			touchIndex = k;
+			touchState = "";
+			if (touchCount >= 60) {
 				buttons[k].score = 0;
-				buttons[k].touching = -1;
+				touchCount = -1;
 				if (k == 0) {
 					playerIndex = 0;
 				}
-			} else if (buttons[k].touching >= 0) {
-				buttons[k].touching++;
+			} else if (touchCount >= 0) {
+				touchCount++;
 				s = 0.8;
 			}
 
 		// Swiping.
-		} else if (buttons[k].touching > 0 && picoMotion()) {
-			buttons[k].addition = -1;
-			if (k == 0) {
-				if (buttons[k].score <= 0) {
-					buttons[k].addition = 0;
+		} else if (touchIndex == k && picoMotion()) {
+			if (touchCount > -60) {
+				touchState = "-";
+				if (k == 0) {
+					if (buttons[k].score <= 0) {
+						touchState = "";
+					}
 				}
+				s = 0.6;
+				if (touchCount >= 0) {
+					touchCount = -1;
+				} else {
+					touchCount--;
+				}
+			} else {
+				touchState = "";
 			}
-			s = 0.6;
-
-		// Do nothing.
-		} else {
-			buttons[k].addition = 0;
-			buttons[k].touching = 0;
 		}
 
 		// Draw buttons.
@@ -268,20 +277,27 @@ async function appMain() {
 			let a = buttons[k].angle + (playerCount >= 2 && !landscape && playerIndex > picoDiv(playerCount+1,2) ? 180 : 0);
 			let sprite = buttons[k].score > 0 ? dealerSprite1 : dealerSprite0;
 			let number = buttons[k].score;
-			if (buttons[k].addition) {
-				number = "  " + number + buttons[k].addition;
+			if (touchIndex == k && touchState) {
+				number = " " + number + touchState;
 			}
 			await picoSprite(sprite, -1, x, y, a, buttons[k].scale*s);
 			await picoChar(number, dealerColor, x, y, a, buttons[k].scale*numberScale*s);
 		} else {
 			let sprite = (k == playerIndex && playerCount > (landscape?1:2)) ? playerSprite1 : playerSprite0;
 			let number = buttons[k].score > 0 ? "+" + buttons[k].score : buttons[k].score;
-			if (buttons[k].addition) {
-				number = "  " + number + buttons[k].addition;
+			if (touchIndex == k && touchState) {
+				number = " " + number + touchState;
 			}
 			await picoSprite(sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 			await picoChar(number, playerColor, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 		}
+	}
+
+	// Reset touching state.
+	if (picoAction()) {
+		touchIndex = -1;
+		touchState = "";
+		touchCount = 0;
 	}
 
 	// Increment playing count.
