@@ -30,8 +30,8 @@ const playerPosY1 = 64, playerPosY2 = 80; // Player position Y on portrait mode.
 const playerPosLX = 48; // Player position X on landscape mode.
 const dealerPosLY = 32; // Dealer position Y on landscape mode.
 const playerPosLY1 = 24, playerPosLY2 = 32; // Player position Y on landscape mode.
-const playerGridX = 128; // Player position grid base width.
-const playerGridLX = 192; // Player position grid base width on landscape mode.
+const playerGridX = -128; // Player position grid base width.
+const playerGridLX = -192; // Player position grid base width on landscape mode.
 var buttonCount = 3; // Player count.
 
 // Button class.
