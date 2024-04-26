@@ -422,6 +422,7 @@ figtexts4[10] =
 	"　　　　　　　　　　　　　　　　　　　　　"+
 	"　　　　　１２３４５６７．８９０　　　　　";
 const livePages = [10,0,1,2,3,4,5,6,7]; // Pages for live.
+const dotsStart = 2; // Dots progress bar start index.
 const sharePages = [10,10,10,10,10,10,10,10,10,10,10,10]; // Pages for share. (Share live page if null)
 const shareWidth = 400, shareHeight = 560; // Page width/height.
 const shareVcount = 3; // Vertical count.
@@ -446,6 +447,7 @@ items[9] = [
 ];
 
 const livePages = [9, 0,1,2,3,4,5,6,7]; // Pages for live.
+const dotsStart = 1; // Dots progress bar start index.
 const sharePages = [0,1,2,3,4,5,6,7];//null; // Pages for share. (Share live page if null)
 const shareWidth = 560, shareHeight = 400; // Page width/height.
 const shareVcount = 2; // Vertical count.
@@ -693,14 +695,14 @@ async function appMain() {
 			}
 		}
 		let cursorChar = pressing?"■":!picoMod(playing/5,2)?"＞":"　";
-		let dotsText = "□".repeat(number)+cursorChar+"□".repeat(livePages.length-number-1);
+		let dotsText = number>=dotsStart?"□".repeat(number-dotsStart)+cursorChar+"□".repeat(livePages.length-number-1):null;
 		appDrawPage(livePages[number], playing<maxtext-1?playing:maxtext, dotsText);
 		picoFlush();
 
 	// Live mode.
 	} else {
-		let pressing = 0, page = livePages[number];
-		let dotsText = "□".repeat(number)+"■"+"□".repeat(livePages.length-number-1);
+		let pressing = 0, page = livePages[number], cursorChar = "■";
+		let dotsText = number>=dotsStart?"□".repeat(number-dotsStart)+cursorChar+"□".repeat(livePages.length-number-1):null;
 		if (items[page]) {
 			appDrawPage(livePages[number], maxtext, dotsText);
 			if (picoAction()) {
