@@ -143,6 +143,8 @@ async function appResize() {
 
 	// Reset layouts on landscape mode.
 	if (landscape) {
+
+		// Center button.
 		buttons[0].centerx = 0;
 		buttons[0].centery = -buttonPosLY0;
 		buttons[0].scale = centerButtonScale;
@@ -150,6 +152,7 @@ async function appResize() {
 		buttons[0].width = buttonWidth * centerButtonScale;
 		buttons[0].height = buttonHeight * centerButtonScale;
 
+		// Player button.
 		for (let j = 1; j <= playerCount; j++) {
 			buttons[j].centerx = buttonGridLX * (j-1 - (playerCount-1)/2) / playerCount;
 			buttons[j].centery = j > 1 && j < playerCount ? buttonPosLY2 : buttonPosLY1;
@@ -161,6 +164,8 @@ async function appResize() {
 
 	// Reset layouts on portrait mode.
 	} else {
+
+		// Center button.
 		buttons[0].centerx = 0;
 		buttons[0].centery = 0;
 		buttons[0].scale = centerButtonScale;
@@ -168,6 +173,7 @@ async function appResize() {
 		buttons[0].width = buttonWidth * centerButtonScale;
 		buttons[0].height = buttonHeight * centerButtonScale;
 
+		// Lower player buttons.
 		let playerCount2 = picoDiv(playerCount+1, 2);
 		for (let j = 1; j <= playerCount2; j++) {
 			buttons[j].centerx = buttonGridX * (j-1 - (playerCount2-1)/2) / playerCount2;
@@ -177,12 +183,14 @@ async function appResize() {
 			buttons[j].width = buttonWidth * playerButtonScale / (playerCount2+1);
 			buttons[j].height = buttonHeight * playerButtonScale / (playerCount2+1);
 		}
+
+		// Upper player buttons.
 		let playerCount1 = playerCount - playerCount2;
 		for (let j = playerCount2+1; j <= playerCount; j++) {
 			buttons[j].centerx = buttonGridX * (playerCount-j - (playerCount1-1)/2) / playerCount1;
 			buttons[j].centery = j > playerCount2+1 && j < playerCount ? -buttonPosY2 : -buttonPosY1;
 			buttons[j].scale = playerButtonScale / (playerCount2+1);
-			buttons[j].angle = 180; // Upsidedown for portrait mode.
+			buttons[j].angle = 180; // Upsidedown on upper players for portrait mode.
 			buttons[j].width = buttonWidth * playerButtonScale / (playerCount2+1);
 			buttons[j].height = buttonHeight * playerButtonScale / (playerCount2+1);
 		}
@@ -285,7 +293,7 @@ async function appMain() {
 			await picoSprite(sprite, -1, x, y, a, buttons[k].scale*s);
 			await picoChar(number, centerButtonColor, x, y, a, buttons[k].scale*numberScale*s);
 		} else {
-			let sprite = k == playerIndex ? (playerCount <= 2 ? playerButton2Sprite : playerButton3Sprite) : playerButton1Sprite;
+			let sprite = k == playerIndex ? (playerCount <= (landscape?1:2) ? playerButton2Sprite : playerButton3Sprite) : playerButton1Sprite;
 			let number = buttons[k].score > 0 ? "+" + buttons[k].score : buttons[k].score;
 			if (buttons[k].scoreplus) {
 				number = "  " + number + buttons[k].scoreplus;
