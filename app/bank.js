@@ -19,16 +19,17 @@ const dealerSprite0 = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10]; // Dealer sprite.
 const dealerSprite1 = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10, 1,7,12,0,4,0]; // Dealer with cursor sprite.
 const dealerColor = 2; // Cneter number color.
 const dealerScale = 4; // Dealer scale.
+const dealerScaleL = 4; // Dealer scale on landscape mode.
 const playerSprite0 = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Player sprite.
 const playerSprite1 = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8, 4,7,1,0,4,0]; // Player with cursor sprite.
 const playerColor = 0; // Player number color.
-const playerScale = 12; // Player base scale.
-const playerScaleL = 16; // Player base scale on landscape mode.
+const playerScale = 10; // Player base scale.
+const playerScaleL = 8; // Player base scale on landscape mode.
 const numberScale = 0.5; // Button number scale.
 const playerPosY1 = 64, playerPosY2 = 80; // Player position Y on portrait mode.
 const playerPosLX = 48; // Player position X on landscape mode.
 const dealerPosLY = 32; // Dealer position Y on landscape mode.
-const playerPosLY1 = 32, playerPosLY2 = 48; // Player position Y on landscape mode.
+const playerPosLY1 = 24, playerPosLY2 = 32; // Player position Y on landscape mode.
 const playerGridX = 128; // Player position grid base width.
 const playerGridLX = 192; // Player position grid base width on landscape mode.
 var buttonCount = 3; // Player count.
@@ -126,6 +127,7 @@ async function appLoad() {
 // Resize.
 async function appResize() {
 	landscape = picoWideScreen();
+	let playerCount2 = picoDiv(playerCount+1, 2);
 
 	// Reset layouts on landscape mode.
 	if (landscape) {
@@ -133,7 +135,7 @@ async function appResize() {
 		// Center button.
 		buttons[0].posx = 0;
 		buttons[0].posy = -dealerPosLY;
-		buttons[0].scale = dealerScale;
+		buttons[0].scale = dealerScaleL;
 		buttons[0].angle = 0;
 		buttons[0].width = buttonWidth * dealerScale;
 		buttons[0].height = buttonHeight * dealerScale;
@@ -141,11 +143,11 @@ async function appResize() {
 		// Player.
 		for (let j = 1; j <= playerCount; j++) {
 			buttons[j].posx = playerGridLX * (j-1 - (playerCount-1)/2) / playerCount;
-			buttons[j].posy = j > 1 && j < playerCount ? playerPosLY2 : playerPosLY1;
-			buttons[j].scale = playerScaleL / (playerCount+1);
+			buttons[j].posy = playerCount <= 2 || (j > 1 && j < playerCount) ? playerPosLY2 : playerPosLY1;
+			buttons[j].scale = playerScaleL / (playerCount2+1);
 			buttons[j].angle = 0;
-			buttons[j].width = buttonWidth * playerScaleL / (playerCount+1);
-			buttons[j].height = buttonHeight * playerScaleL / (playerCount+1);
+			buttons[j].width = buttonWidth * playerScaleL / (playerCount2+1);
+			buttons[j].height = buttonHeight * playerScaleL / (playerCount2+1);
 		}
 
 	// Reset layouts on portrait mode.
@@ -160,7 +162,6 @@ async function appResize() {
 		buttons[0].height = buttonHeight * dealerScale;
 
 		// Lower player buttons.
-		let playerCount2 = picoDiv(playerCount+1, 2);
 		for (let j = 1; j <= playerCount2; j++) {
 			buttons[j].posx = playerGridX * (j-1 - (playerCount2-1)/2) / playerCount2;
 			buttons[j].posy = j > 1 && j < playerCount2 ? playerPosY2 : playerPosY1;
