@@ -220,6 +220,8 @@ async function appMain() {
 				if (k == 0) {
 					playerIndex = playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
 				}
+				// High beep on increment count.
+				picoBeep(1.2, 0.1);
 			}
 
 		// Score--.
@@ -236,6 +238,8 @@ async function appMain() {
 						playerIndex = playerIndex - 1 >= 1 ? playerIndex - 1 : playerCount;
 					}
 				}
+				// Low beep on decrement count.
+				picoBeep(-1.2, 0.1);
 			}
 
 		// Holding.
@@ -248,6 +252,10 @@ async function appMain() {
 				if (k == 0) {
 					playerIndex = 0;
 				}
+				// High 3 beeps on clear count.
+				picoBeep(1.2, 0.1);
+				picoBeep(1.2, 0.1, 0.2);
+				picoBeep(1.2, 0.1, 0.4);
 			} else if (touchCount >= 0) {
 				touchCount++;
 				s = 0.8;
