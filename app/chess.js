@@ -154,7 +154,8 @@ async function appLoad() {
 		let data = await picoSpriteData(icons[reverse]);
 		picoLabel("select", null, data);
 	}
-	picoLabel("action", "&");
+	let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
+	picoLabel("action", null, data);
 	appResize();
 }
 

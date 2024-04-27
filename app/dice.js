@@ -55,7 +55,8 @@ async function appUpdate() {
 	if (custom) {
 		picoLabel("action", "*");
 	} else if (count > 0 && result > 0) {
-		picoLabel("action", "&");
+		let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
+		picoLabel("action", null, data);
 	} else {
 		picoLabel("action");
 	}
@@ -321,7 +322,8 @@ async function appMain() {
 				angle = 0;
 				playing = 1;
 				//appUpdate();
-				picoLabel("action", "&");
+				let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
+				picoLabel("action", null, data);
 
 				// Number matched beeps on show result.
 				let timing = count <= 2 ? 0.2 : 0.5/count;

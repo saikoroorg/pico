@@ -364,7 +364,8 @@ async function appResult() {
 		}
 
 		// Enable share button.
-		picoLabel("action", "&");
+		let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
+		picoLabel("action", null, data);
 
 		// Reset playing count.
 		playing = 1;
