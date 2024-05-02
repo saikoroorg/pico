@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40412"; // Updatable by package.json.
+pico.version = "0.9.40502"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -578,7 +578,7 @@ pico.Image = class {
 	// Debug print.
 	_debug(text) {
 		if (pico.Image.debug) {
-			console.log(text);
+			;
 		}
 	}
 
@@ -1164,7 +1164,7 @@ pico.Param = class {
 	// Debug print.
 	_debug(text) {
 		if (pico.Param.debug) {
-			console.log(text);
+			;
 		}
 	}
 
@@ -1595,7 +1595,7 @@ pico.Sound = class {
 	// Debug print.
 	_debug(text) {
 		if (pico.Sound.debug) {
-			console.log(text);
+			;
 		}
 	}
 
@@ -2038,7 +2038,7 @@ pico.Touch = class {
 	// Debug print.
 	_debug(text) {
 		if (pico.Touch.debug) {
-			console.log(text);
+			;
 		}
 	}
 
