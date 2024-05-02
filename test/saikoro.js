@@ -15,13 +15,13 @@ const devitems = [ // Menu items for dev.
 	["clock", "app/clock.svg", "app/clock.js"],
 	["bank", "app/bank.svg", "app/bank.js"],
 	["kuku", "app/kuku.svg", "app/kuku.js"],
-	["text", "app/text.svg", "app/text.js"],
-	["hex", "app/hex.svg", "app/hex.js"],
 	["chess", "app/chess.svg", "app/chess.js"],
 	["shogi", "app/shogi.svg", "app/shogi.js"],
 	["voxel", "app/voxel.svg", "app/voxel.js"],
 	["bros", "app/bros.svg", "app/bros.js"],
 	["edit", "app/edit.svg", "app/edit.js"],
+	["text", "test/text.svg", "test/text.js"],
+	["hex", "test/hex.svg", "test/hex.js"],
 ];
 var devreturl = null; // Return url for dev.
 var items = [ // Menu items.

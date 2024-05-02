@@ -1,6 +1,6 @@
 async function appLoad() {
 	picoDevMode(true);
-	picoSwitchApp("app/saikoro.js");
+	picoSwitchApp("test/saikoro.js");
 }
 async function appMain() {
 }
