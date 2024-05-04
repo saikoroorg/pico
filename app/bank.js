@@ -247,11 +247,12 @@ async function appMain() {
 			touchIndex = k;
 			touchState = "";
 			if (touchCount >= 60) {
+				// Fix index for next play.
+				if (k == 0 && buttons[k].score > 0) {
+					playerIndex = playerIndex - 1 >= 1 ? playerIndex - 1 : playerCount;
+				}
 				buttons[k].score = 0;
 				touchCount = -1;
-				if (k == 0) {
-					playerIndex = 0;
-				}
 				// High 3 beeps on clear count.
 				picoBeep(1.2, 0.1);
 				picoBeep(1.2, 0.1, 0.2);
@@ -283,8 +284,9 @@ async function appMain() {
 
 		// Draw buttons.
 		if (k == 0) {
-			let a = buttons[k].angle + (playerCount >= 2 && !landscape && playerIndex > picoDiv(playerCount+1,2) ? 180 : 0);
-			let sprite = buttons[k].score > 0 ? dealerSprite1 : dealerSprite0;
+			let index = buttons[0].score > 0 ? playerIndex : playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
+			let a = buttons[k].angle + (playerCount >= 2 && !landscape && index > picoDiv(playerCount+1,2) ? 180 : 0);
+			let sprite = playerCount == 2 || buttons[k].score > 0 ? dealerSprite1 : dealerSprite0;
 			let number = buttons[k].score;
 			if (touchIndex == k && touchState) {
 				number = " " + number + touchState;
@@ -292,7 +294,8 @@ async function appMain() {
 			await picoSprite(sprite, -1, x, y, a, buttons[k].scale*s);
 			await picoChar(number, dealerColor, x, y, a, buttons[k].scale*numberScale*s);
 		} else {
-			let sprite = (k == playerIndex && playerCount > (landscape?1:2)) ? playerSprite1 : playerSprite0;
+			let index = buttons[0].score > 0 ? playerIndex : playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
+			let sprite = (k == index && playerCount > (landscape?1:2)) ? playerSprite1 : playerSprite0;
 			let number = buttons[k].score > 0 ? "+" + buttons[k].score : buttons[k].score;
 			if (touchIndex == k && touchState) {
 				number = " " + number + touchState;
