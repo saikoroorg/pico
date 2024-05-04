@@ -31,7 +31,6 @@ var pico = pico || {};
 
 // Touch class.
 pico.Touch = class {
-	static debug = false; // Debug print.
 	static count = 0; // Object count.
 	static width = 200; // Touch width.
 	static height = 200; // Touch height.
@@ -42,14 +41,14 @@ pico.Touch = class {
 	read(t=10) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (t >= 0) {
-				this._debug("Wait timeout: " + t);
+				console.log("Wait timeout: " + t);
 				return new Promise(r => setTimeout(r, t)).then(() => {
 					return this._read();
 				}); // end of new Promise.
 
 			// Wait until input.
 			} else {
-				this._debug("Wait until input.");
+				console.log("Wait until input.");
 				return new Promise((resolve) => {
 					const timer = setInterval(() => {
 						if (this.flushing || pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
@@ -99,20 +98,13 @@ pico.Touch = class {
 		}
 	}
 
-	// Debug print.
-	_debug(text) {
-		if (pico.Touch.debug) {
-			console.log(text);
-		}
-	}
-
 	// Setup touch panel.
 	_setup(parent=null) {
 		return new Promise((resolve) => {
 
 			// Create touch panel.
 			if (this.panel == null) {
-				this._debug("Select touch panel.");
+				console.log("Select touch panel.");
 				if (parent && document.getElementsByClassName(parent)[0]) {
 					this.panel = document.getElementsByClassName(parent)[0];
 				} else {
@@ -187,7 +179,7 @@ pico.Touch = class {
 	// Ready to touch.
 	_ready() {
 		if (this.panel == null) {
-			this._debug("No panel.");
+			console.log("No panel.");
 			return Promise.reject();
 		}
 		return Promise.resolve();
@@ -198,13 +190,13 @@ pico.Touch = class {
 		for (let i = 0; i < this.touching[0].length; i++) {
 			if (this.touching[0][i].w == w && this.touching[0][i].motion) {
 				this.touching[0][i] = {w:w, x:x, y:y, motion:1};
-				this._debug("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				console.log("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				return;
 			}
 		}
 		let i = this.touching[0].length;
 		this.touching[0][i] = {w:w, x:x, y:y, motion:1};
-		this._debug("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
+		console.log("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
 	}
 
 	// Touch move event handler.
@@ -214,7 +206,7 @@ pico.Touch = class {
 				this.touching[0][i].motion = 1;
 				this.touching[0][i].x = x;
 				this.touching[0][i].y = y;
-				//this._debug("Touch move: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				//console.log("Touch move: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
 		}
@@ -226,7 +218,7 @@ pico.Touch = class {
 			if (this.touching[0][i].w == w) {
 				this.touching[0][i].motion = 0;
 				this.touching[0][i].action = -1;
-				this._debug("Touch up: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				console.log("Touch up: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
 		}
@@ -237,7 +229,7 @@ pico.Touch = class {
 		for (let i = 0; i < this.touching[0].length; i++) {
 			if (this.touching[0][i].w == w) {
 				this.touching[0][i].motion = -1;
-				this._debug("Touch cancel: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				console.log("Touch cancel: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
 		}
@@ -254,7 +246,7 @@ pico.Touch = class {
 			if (this.touching[0][i].action < 0) {
 				for (let j = 0; j < this.touching[1].length; j++) {
 					if (this.touching[1][j].w == this.touching[0][i].w) {
-						this._debug("Up: " + j + ":" + JSON.stringify(this.touching[0][i]));
+						console.log("Up: " + j + ":" + JSON.stringify(this.touching[0][i]));
 						touching1[touching1.length] = {w:this.touching[0][i].w, x:this.touching[0][i].x, y:this.touching[0][i].y, action:1};
 						break;
 					}
@@ -269,7 +261,7 @@ pico.Touch = class {
 				let trigger = true;
 				for (let j = 0; j < this.touching[1].length; j++) {
 					if (this.touching[1][j].w == this.touching[0][i].w) {
-						this._debug("Holding: " + j);// + ":" + JSON.stringify(this.touching[0][i]));
+						console.log("Holding: " + j);// + ":" + JSON.stringify(this.touching[0][i]));
 						touching1[touching1.length] = {w:this.touching[0][i].w, x:this.touching[0][i].x, y:this.touching[0][i].y, motion:this.touching[0][i].motion};
 
 						trigger = false;;
@@ -279,7 +271,7 @@ pico.Touch = class {
 
 				// Touch down trigger.
 				if (trigger) {
-					this._debug("Down: " + i + ":" + JSON.stringify(this.touching[0][i]));
+					console.log("Down: " + i + ":" + JSON.stringify(this.touching[0][i]));
 					touching1[touching1.length] = {w:this.touching[0][i].w, x:this.touching[0][i].x, y:this.touching[0][i].y, motion:1};
 				}
 			}
@@ -299,7 +291,7 @@ pico.Touch = class {
 				} else if (h <= 0) {
 					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
 					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-					//this._debug("Motion: " + x2 + "," + y2 + "<=" + (r*r));
+					//console.log("Motion: " + x2 + "," + y2 + "<=" + (r*r));
 					if (x2 + y2 <= r * r) {
 						return i + 1;
 					}
@@ -325,7 +317,7 @@ pico.Touch = class {
 				} else if (h <= 0) {
 					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
 					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-					//this._debug("Action: " + x2 + "," + y2 + "<=" + (r*r));
+					//console.log("Action: " + x2 + "," + y2 + "<=" + (r*r));
 					if (x2 + y2 <= r * r) {
 						return i + 1;
 					}

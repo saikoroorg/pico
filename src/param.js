@@ -126,7 +126,6 @@ var pico = pico || {};
 
 // Param class.
 pico.Param = class {
-	static debug = false; // Debug print.
 
 	// Get random count.
 	random(max, seed=0) {
@@ -169,7 +168,7 @@ pico.Param = class {
 		try {
 			const blob = new Blob([text], {type: type ? type : "text/plain"});
 			const file = new File([blob], name ? name : "text.txt", {type: type});
-			this._debug("Text file: " + file.size);
+			console.log("Text file: " + file.size);
 			return file;
 		} catch (error) {
 			console.error(error);
@@ -252,13 +251,6 @@ pico.Param = class {
 		//});
 	}
 
-	// Debug print.
-	_debug(text) {
-		if (pico.Param.debug) {
-			console.log(text);
-		}
-	}
-
 	// Setup param.
 	_setup() {
 		return new Promise((resolve) => {
@@ -266,7 +258,7 @@ pico.Param = class {
 			// Loadd query.
 			let query = window.location.search;
 			if (query != null && query != "") {
-				this._debug("Load query: " + query);
+				console.log("Load query: " + query);
 				let text = query.slice(1);
 				this._deserialize(text);
 			}
@@ -287,10 +279,10 @@ pico.Param = class {
 				let separator = url && url.indexOf("?") < 0 ? "?" : "";
 				let query = text ? separator + text : "";
 				if (url) {
-					this._debug("Jump: " + query);
+					console.log("Jump: " + query);
 					window.location.href = url + query;
 				} else {
-					this._debug("Reload: " + query);
+					console.log("Reload: " + query);
 					window.location.search = query;
 				}
 			}
@@ -307,11 +299,11 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "";
 					let query = text ? separator + text : "";
-					this._debug("Share query: " + query);
+					console.log("Share query: " + query);
 					data.url = url + query;
 				} else if (!files) {
 					let query = text ? "?" + text : "";
-					this._debug("Flush query: " + query);
+					console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					data.url = window.location.href.replace(/[\?\#].*$/, "") + query;
 				}
@@ -319,18 +311,18 @@ pico.Param = class {
 					data.files = files;
 				}
 				if (navigator.canShare) {
-					this._debug("Sharing: " + JSON.stringify(data));
+					console.log("Sharing: " + JSON.stringify(data));
 					if (navigator.canShare(data) && navigator.share) {
 						await navigator.share(data).then(() => {
-							this._debug("Successful share");
+							console.log("Successful share");
 						}).catch((error) => {
-							this._debug("Error sharing:" + error);
+							console.log("Error sharing:" + error);
 						});
 					} else {
-						this._debug("Not supported file");
+						console.log("Not supported file");
 					}
 				} else {
-					this._debug("Not supported share");
+					console.log("Not supported share");
 				}
 			}
 			return resolve();
@@ -452,7 +444,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = r ^ maxmask; // Bit flip.
-			this._debug("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			console.log("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
 		return results;
@@ -474,7 +466,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = (r + 1) % (1 << (maxbit - compression)); // Plus 1 to reserve 0.
-			this._debug("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
 		return results;

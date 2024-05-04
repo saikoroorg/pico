@@ -210,7 +210,6 @@ var pico = pico || {};
 
 // Image class.
 pico.Image = class {
-	static debug = false; // Debug print.
 	static count = 0; // Object count.
 	static width = 200; // Image width. (-width/2 .. width/2)
 	static height = 200; // Image height. (-height/2 .. height/2)
@@ -568,16 +567,9 @@ pico.Image = class {
 		}
 	}
 
-	// Debug print.
-	_debug(text) {
-		if (pico.Image.debug) {
-			console.log(text);
-		}
-	}
-
 	// Resize canvas.
 	_resize(width=0, height=0) {
-		this._debug("Resize.");
+		console.log("Resize.");
 		for (let i = 0; i < 2; i++) {
 			this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
 			this.canvas[i].height = (width ? height : pico.Image.height) * pico.Image.ratio;
@@ -590,7 +582,7 @@ pico.Image = class {
 
 			// Create canvas.
 			if (this.context == null) {
-				this._debug("Create canvas.");
+				console.log("Create canvas.");
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i] = document.createElement("canvas");
 					this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
@@ -616,7 +608,7 @@ pico.Image = class {
 	// Flip image.
 	_flip() {
 		return this._ready().then(() => {
-			this._debug("Flip.");
+			console.log("Flip.");
 			return new Promise((resolve) => {
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i].style.display = i == this.primary ? "flex" : "none";
@@ -631,7 +623,7 @@ pico.Image = class {
 	// Clear image.
 	_clear() {
 		return this._ready().then(() => {
-			this._debug("Clear.");
+			console.log("Clear.");
 			return new Promise((resolve) => {
 
 				// Clear image.
@@ -664,7 +656,7 @@ pico.Image = class {
 	// Ready to draw.
 	_ready() {
 		if (this.context == null) {
-			this._debug("No context.");
+			console.log("No context.");
 			return Promise.reject();
 		}
 		return Promise.resolve();
@@ -672,7 +664,7 @@ pico.Image = class {
 
 	// Reset image transform (scale, rotate, move).
 	_reset(x=0, y=0, angle=0, scale=1, vscale=0) {
-		//this._debug("Reset transform matrix.");
+		//console.log("Reset transform matrix.");
 		return new Promise(async (resolve) => {
 			this.context.setTransform(1, 0, 0, 1, 0, 0);
 			await this._move(x, y);
@@ -684,7 +676,7 @@ pico.Image = class {
 
 	// Scale image.
 	_scale(scale=1, vscale=0) {
-		//this._debug("Scale: " + scale + "," + vscale);
+		//console.log("Scale: " + scale + "," + vscale);
 		return new Promise((resolve) => {
 			if (scale != 1) {
 				this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
@@ -697,7 +689,7 @@ pico.Image = class {
 
 	// Rotate image.
 	_rotate(angle=0) {
-		//this._debug("Rotate: " + angle);
+		//console.log("Rotate: " + angle);
 		return new Promise((resolve) => {
 			if (angle) {
 				this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
@@ -710,7 +702,7 @@ pico.Image = class {
 
 	// Move image.
 	_move(x, y) {
-		//this._debug("Move: " + x + "," + y);
+		//console.log("Move: " + x + "," + y);
 		return new Promise((resolve) => {
 			if (x || y) {
 				this.context.translate(pico.Image.ratio * x, pico.Image.ratio * y);
@@ -721,13 +713,13 @@ pico.Image = class {
 
 	// Draw pixel to image.
 	_draw(c=-1, x=0, y=0, dx=0, dy=0) {
-		this._debug("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
+		console.log("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
-		////this._debug("Center: " + cx + "," + cy + " / " + u);
+		//console.log("Center: " + cx + "," + cy + " / " + u);
 		return new Promise((resolve) => {
 			let k = c >= 0 && c < this.colors.length/3 ? c : this.colors.length/3 - 1;
 			let r = this.colors[k*3], g = this.colors[k*3+1], b = this.colors[k*3+2];
-			////this._debug("Color: " + r + "," + g + "," + b);
+			//console.log("Color: " + r + "," + g + "," + b);
 			this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
 			this.context.fillRect(cx + u * x, cy + u * y, u * (dx + 1), u * (dy + 1));
 			resolve();
@@ -756,13 +748,13 @@ pico.Image = class {
 		const ux = this.leading, uy = this.vleading;
 		let mx = width > 0 ? width / ux - 1 : this.canvas[0].width / (ux * u * scale) - 1;
 		let my = height > 0 ? height / uy - 1 : this.canvas[0].height / (uy * u * scale) - 1;
-		//this._debug("Textarea: " + mx + "," + my + " / " + ux + "," + uy);
+		//console.log("Textarea: " + mx + "," + my + " / " + ux + "," + uy);
 		return new Promise(async (resolve) => {
 			await this._reset(x, y, angle, scale);
 			await this._move((-ux * mx) / 2 , (-uy * my) / 2);
 			for (let i = 0, ix = 0, iy = 0; i < text.length && iy <= my; i++) {
 				let char = text.charCodeAt(i);
-				//this._debug("Char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
+				//console.log("Char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
 				if (char == "\r".charCodeAt(0) || char == "\n".charCodeAt(0)) {
 					await this._move(-ux * ix, uy);
 					ix = 0;
@@ -784,7 +776,7 @@ pico.Image = class {
 
 	// Draw sprite to image.
 	_sprite(cells=[-1,0,0], fgcolor=-1, bgcolor=-1) {
-		this._debug("Sprite: " + cells.join(","));
+		console.log("Sprite: " + cells.join(","));
 		return new Promise(async (resolve) => {
 			let i = 0, x0 = 0, y0 = 0;
 			if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
@@ -798,11 +790,11 @@ pico.Image = class {
 			for (; i < cells.length; i += 3) {
 				let c = fgcolor >= 0 ? fgcolor : cells[i];
 				if (cells[i+3] == 0) {
-					this._debug("SpriteDraw: " + c + "," + cells[i+1]+ "+" + cells[i+4] + "," + cells[i+2] + "+" + cells[i+5]);
+					console.log("SpriteDraw: " + c + "," + cells[i+1]+ "+" + cells[i+4] + "," + cells[i+2] + "+" + cells[i+5]);
 					await this._draw(c, cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
 					i += 3;
 				} else {
-					this._debug("SpriteDraw: " + c + "," + cells[i+1] + "," + cells[i+2]);
+					console.log("SpriteDraw: " + c + "," + cells[i+1] + "," + cells[i+2]);
 					await this._draw(c, cells[i+1] + x0, cells[i+2] + y0);
 				}
 			}
@@ -843,18 +835,18 @@ pico.Image = class {
 	_image(image, sx=0, sy=0, width=0, height=0) {
 		const u = 0;//pico.Image.ratio * 4;
 		const cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
-		//this._debug("Center: " + cx + "," + cy);
+		//console.log("Center: " + cx + "," + cy);
 		return new Promise((resolve) => {
 			if (width > 0) {
 				height = (height > 0 ? height : width);
 				let cx = (this.canvas[0].width - width) / 2;
 				let cy = (this.canvas[0].height - height) / 2;
-				this._debug("DrawImage: " + cx + "," + cy + " " + sx + "," + sy + " " + width + "," + height);
+				console.log("DrawImage: " + cx + "," + cy + " " + sx + "," + sy + " " + width + "," + height);
 				this.context.drawImage(image.canvas[image.primary], sx, sy, width, height, cx, cy, width, height);
 			} else {
 				let cx = (this.canvas[0].width - image.canvas[0].width) / 2;
 				let cy = (this.canvas[0].height - image.canvas[0].height) / 2;
-				this._debug("DrawImage: " + cx + "," + cy + " " + image.canvas[0].width + "," + image.canvas[0].height);
+				console.log("DrawImage: " + cx + "," + cy + " " + image.canvas[0].width + "," + image.canvas[0].height);
 				this.context.drawImage(image.canvas[image.primary], cx, cy);
 			}
 			resolve();
@@ -888,7 +880,7 @@ pico.Image = class {
 		try {
 			const blob = new Blob([buffers.buffer], {type: "image/png"});
 			const file = new File([blob], name ? name : "image.png", {type: blob.type});
-			this._debug("Image data file: " + file.size);
+			console.log("Image data file: " + file.size);
 			return file;
 		} catch (error) {
 			console.error(error);

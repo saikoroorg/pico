@@ -7,7 +7,7 @@
 		"update": "",
 
 		"build:ver": "sed -i '' \"s#version *= *\".*\" *;#version = \\\"${npm_package_version}\\\";#\" src/api.js",
-		"build:nolog": "sed -i '' \"s#console.log.*;#;#g\" pico.js",
+		"build:nolog": "sed -i '' \"s#\\(console.log.*;\\)#//\\1#g\" pico.js",
 		"build:lib": "npm run build:ver; find src -name \"*.js\" | sort | xargs cat > ./pico.js; npm run build:nolog",
 		"build:app": "if [ -n \"${npm_config_main}\" ]; then mkdir -p ../${npm_config_main}; cp pico.* index.* ../${npm_config_main}; for app in app/${npm_config_main}.js*; do cp $app ../${npm_config_main}/app.${app##*.}; done; fi",
 		"build:sub": "if [ -n \"${npm_config_main}\" ] && [ -n  \"${npm_config_sub}\" ]; then mkdir -p ../${npm_config_main}/app; for sub in ${npm_config_sub//,/ }; do cp app/$sub.js ../${npm_config_main}/app/; done; fi;",

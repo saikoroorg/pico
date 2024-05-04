@@ -217,7 +217,6 @@ var pico = pico || {};
 
 // Image class.
 pico.Image = class {
-	static debug = false; // Debug print.
 	static count = 0; // Object count.
 	static width = 200; // Image width. (-width/2 .. width/2)
 	static height = 200; // Image height. (-height/2 .. height/2)
@@ -575,16 +574,9 @@ pico.Image = class {
 		}
 	}
 
-	// Debug print.
-	_debug(text) {
-		if (pico.Image.debug) {
-			;
-		}
-	}
-
 	// Resize canvas.
 	_resize(width=0, height=0) {
-		this._debug("Resize.");
+		//console.log("Resize.");
 		for (let i = 0; i < 2; i++) {
 			this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
 			this.canvas[i].height = (width ? height : pico.Image.height) * pico.Image.ratio;
@@ -597,7 +589,7 @@ pico.Image = class {
 
 			// Create canvas.
 			if (this.context == null) {
-				this._debug("Create canvas.");
+				//console.log("Create canvas.");
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i] = document.createElement("canvas");
 					this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
@@ -623,7 +615,7 @@ pico.Image = class {
 	// Flip image.
 	_flip() {
 		return this._ready().then(() => {
-			this._debug("Flip.");
+			//console.log("Flip.");
 			return new Promise((resolve) => {
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i].style.display = i == this.primary ? "flex" : "none";
@@ -638,7 +630,7 @@ pico.Image = class {
 	// Clear image.
 	_clear() {
 		return this._ready().then(() => {
-			this._debug("Clear.");
+			//console.log("Clear.");
 			return new Promise((resolve) => {
 
 				// Clear image.
@@ -671,7 +663,7 @@ pico.Image = class {
 	// Ready to draw.
 	_ready() {
 		if (this.context == null) {
-			this._debug("No context.");
+			//console.log("No context.");
 			return Promise.reject();
 		}
 		return Promise.resolve();
@@ -679,7 +671,7 @@ pico.Image = class {
 
 	// Reset image transform (scale, rotate, move).
 	_reset(x=0, y=0, angle=0, scale=1, vscale=0) {
-		//this._debug("Reset transform matrix.");
+		////console.log("Reset transform matrix.");
 		return new Promise(async (resolve) => {
 			this.context.setTransform(1, 0, 0, 1, 0, 0);
 			await this._move(x, y);
@@ -691,7 +683,7 @@ pico.Image = class {
 
 	// Scale image.
 	_scale(scale=1, vscale=0) {
-		//this._debug("Scale: " + scale + "," + vscale);
+		////console.log("Scale: " + scale + "," + vscale);
 		return new Promise((resolve) => {
 			if (scale != 1) {
 				this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
@@ -704,7 +696,7 @@ pico.Image = class {
 
 	// Rotate image.
 	_rotate(angle=0) {
-		//this._debug("Rotate: " + angle);
+		////console.log("Rotate: " + angle);
 		return new Promise((resolve) => {
 			if (angle) {
 				this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
@@ -717,7 +709,7 @@ pico.Image = class {
 
 	// Move image.
 	_move(x, y) {
-		//this._debug("Move: " + x + "," + y);
+		////console.log("Move: " + x + "," + y);
 		return new Promise((resolve) => {
 			if (x || y) {
 				this.context.translate(pico.Image.ratio * x, pico.Image.ratio * y);
@@ -728,13 +720,13 @@ pico.Image = class {
 
 	// Draw pixel to image.
 	_draw(c=-1, x=0, y=0, dx=0, dy=0) {
-		this._debug("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
+		//console.log("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
-		////this._debug("Center: " + cx + "," + cy + " / " + u);
+		////console.log("Center: " + cx + "," + cy + " / " + u);
 		return new Promise((resolve) => {
 			let k = c >= 0 && c < this.colors.length/3 ? c : this.colors.length/3 - 1;
 			let r = this.colors[k*3], g = this.colors[k*3+1], b = this.colors[k*3+2];
-			////this._debug("Color: " + r + "," + g + "," + b);
+			////console.log("Color: " + r + "," + g + "," + b);
 			this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
 			this.context.fillRect(cx + u * x, cy + u * y, u * (dx + 1), u * (dy + 1));
 			resolve();
@@ -763,13 +755,13 @@ pico.Image = class {
 		const ux = this.leading, uy = this.vleading;
 		let mx = width > 0 ? width / ux - 1 : this.canvas[0].width / (ux * u * scale) - 1;
 		let my = height > 0 ? height / uy - 1 : this.canvas[0].height / (uy * u * scale) - 1;
-		//this._debug("Textarea: " + mx + "," + my + " / " + ux + "," + uy);
+		////console.log("Textarea: " + mx + "," + my + " / " + ux + "," + uy);
 		return new Promise(async (resolve) => {
 			await this._reset(x, y, angle, scale);
 			await this._move((-ux * mx) / 2 , (-uy * my) / 2);
 			for (let i = 0, ix = 0, iy = 0; i < text.length && iy <= my; i++) {
 				let char = text.charCodeAt(i);
-				//this._debug("Char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
+				////console.log("Char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
 				if (char == "\r".charCodeAt(0) || char == "\n".charCodeAt(0)) {
 					await this._move(-ux * ix, uy);
 					ix = 0;
@@ -791,7 +783,7 @@ pico.Image = class {
 
 	// Draw sprite to image.
 	_sprite(cells=[-1,0,0], fgcolor=-1, bgcolor=-1) {
-		this._debug("Sprite: " + cells.join(","));
+		//console.log("Sprite: " + cells.join(","));
 		return new Promise(async (resolve) => {
 			let i = 0, x0 = 0, y0 = 0;
 			if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
@@ -805,11 +797,11 @@ pico.Image = class {
 			for (; i < cells.length; i += 3) {
 				let c = fgcolor >= 0 ? fgcolor : cells[i];
 				if (cells[i+3] == 0) {
-					this._debug("SpriteDraw: " + c + "," + cells[i+1]+ "+" + cells[i+4] + "," + cells[i+2] + "+" + cells[i+5]);
+					//console.log("SpriteDraw: " + c + "," + cells[i+1]+ "+" + cells[i+4] + "," + cells[i+2] + "+" + cells[i+5]);
 					await this._draw(c, cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
 					i += 3;
 				} else {
-					this._debug("SpriteDraw: " + c + "," + cells[i+1] + "," + cells[i+2]);
+					//console.log("SpriteDraw: " + c + "," + cells[i+1] + "," + cells[i+2]);
 					await this._draw(c, cells[i+1] + x0, cells[i+2] + y0);
 				}
 			}
@@ -850,18 +842,18 @@ pico.Image = class {
 	_image(image, sx=0, sy=0, width=0, height=0) {
 		const u = 0;//pico.Image.ratio * 4;
 		const cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
-		//this._debug("Center: " + cx + "," + cy);
+		////console.log("Center: " + cx + "," + cy);
 		return new Promise((resolve) => {
 			if (width > 0) {
 				height = (height > 0 ? height : width);
 				let cx = (this.canvas[0].width - width) / 2;
 				let cy = (this.canvas[0].height - height) / 2;
-				this._debug("DrawImage: " + cx + "," + cy + " " + sx + "," + sy + " " + width + "," + height);
+				//console.log("DrawImage: " + cx + "," + cy + " " + sx + "," + sy + " " + width + "," + height);
 				this.context.drawImage(image.canvas[image.primary], sx, sy, width, height, cx, cy, width, height);
 			} else {
 				let cx = (this.canvas[0].width - image.canvas[0].width) / 2;
 				let cy = (this.canvas[0].height - image.canvas[0].height) / 2;
-				this._debug("DrawImage: " + cx + "," + cy + " " + image.canvas[0].width + "," + image.canvas[0].height);
+				//console.log("DrawImage: " + cx + "," + cy + " " + image.canvas[0].width + "," + image.canvas[0].height);
 				this.context.drawImage(image.canvas[image.primary], cx, cy);
 			}
 			resolve();
@@ -895,7 +887,7 @@ pico.Image = class {
 		try {
 			const blob = new Blob([buffers.buffer], {type: "image/png"});
 			const file = new File([blob], name ? name : "image.png", {type: blob.type});
-			this._debug("Image data file: " + file.size);
+			//console.log("Image data file: " + file.size);
 			return file;
 		} catch (error) {
 			console.error(error);
@@ -1035,7 +1027,6 @@ var pico = pico || {};
 
 // Param class.
 pico.Param = class {
-	static debug = false; // Debug print.
 
 	// Get random count.
 	random(max, seed=0) {
@@ -1078,7 +1069,7 @@ pico.Param = class {
 		try {
 			const blob = new Blob([text], {type: type ? type : "text/plain"});
 			const file = new File([blob], name ? name : "text.txt", {type: type});
-			this._debug("Text file: " + file.size);
+			//console.log("Text file: " + file.size);
 			return file;
 		} catch (error) {
 			console.error(error);
@@ -1161,13 +1152,6 @@ pico.Param = class {
 		//});
 	}
 
-	// Debug print.
-	_debug(text) {
-		if (pico.Param.debug) {
-			;
-		}
-	}
-
 	// Setup param.
 	_setup() {
 		return new Promise((resolve) => {
@@ -1175,7 +1159,7 @@ pico.Param = class {
 			// Loadd query.
 			let query = window.location.search;
 			if (query != null && query != "") {
-				this._debug("Load query: " + query);
+				//console.log("Load query: " + query);
 				let text = query.slice(1);
 				this._deserialize(text);
 			}
@@ -1196,10 +1180,10 @@ pico.Param = class {
 				let separator = url && url.indexOf("?") < 0 ? "?" : "";
 				let query = text ? separator + text : "";
 				if (url) {
-					this._debug("Jump: " + query);
+					//console.log("Jump: " + query);
 					window.location.href = url + query;
 				} else {
-					this._debug("Reload: " + query);
+					//console.log("Reload: " + query);
 					window.location.search = query;
 				}
 			}
@@ -1216,11 +1200,11 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "";
 					let query = text ? separator + text : "";
-					this._debug("Share query: " + query);
+					//console.log("Share query: " + query);
 					data.url = url + query;
 				} else if (!files) {
 					let query = text ? "?" + text : "";
-					this._debug("Flush query: " + query);
+					//console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					data.url = window.location.href.replace(/[\?\#].*$/, "") + query;
 				}
@@ -1228,18 +1212,18 @@ pico.Param = class {
 					data.files = files;
 				}
 				if (navigator.canShare) {
-					this._debug("Sharing: " + JSON.stringify(data));
+					//console.log("Sharing: " + JSON.stringify(data));
 					if (navigator.canShare(data) && navigator.share) {
 						await navigator.share(data).then(() => {
-							this._debug("Successful share");
+							//console.log("Successful share");
 						}).catch((error) => {
-							this._debug("Error sharing:" + error);
+							//console.log("Error sharing:" + error);
 						});
 					} else {
-						this._debug("Not supported file");
+						//console.log("Not supported file");
 					}
 				} else {
-					this._debug("Not supported share");
+					//console.log("Not supported share");
 				}
 			}
 			return resolve();
@@ -1361,7 +1345,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = r ^ maxmask; // Bit flip.
-			this._debug("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			//console.log("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
 		return results;
@@ -1383,7 +1367,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = (r + 1) % (1 << (maxbit - compression)); // Plus 1 to reserve 0.
-			this._debug("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
 			results[i] = r;
 		}
 		return results;
@@ -1510,7 +1494,6 @@ var pico = pico || {};
 
 // Sound class.
 pico.Sound = class {
-	static debug = false; // Debug print.
 	static volume = 0.1; // Master volume.
 	static frequency = 440; // Master frequency.
 
@@ -1535,10 +1518,10 @@ pico.Sound = class {
 		return new Promise(async (resolve) => {
 			for (let i = 0; i < repeat || repeat <= 0; i++) {
 				for (let j = 0; j < kcents.length; j++) {
-					this._debug("Pulse melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
+					//console.log("Pulse melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
 					await this._pulse(kcents[j], length, pattern);
 					if (this.stopped) {
-						this._debug("Pulse melody End.");
+						//console.log("Pulse melody End.");
 						resolve();
 					}
 				}
@@ -1551,10 +1534,10 @@ pico.Sound = class {
 		return new Promise(async (resolve) => {
 			for (let i = 0; i < repeat || repeat <= 0; i++) {
 				for (let j = 0; j < kcents.length; j++) {
-					this._debug("Triangle melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
+					//console.log("Triangle melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
 					await this._triangle(kcents[j], length, pattern);
 					if (this.stopped) {
-						this._debug("Triangle melody End.");
+						//console.log("Triangle melody End.");
 						resolve();
 					}
 				}
@@ -1592,20 +1575,13 @@ pico.Sound = class {
 		});
 	}
 
-	// Debug print.
-	_debug(text) {
-		if (pico.Sound.debug) {
-			;
-		}
-	}
-
 	// Setup sound.
 	_setup() {
 		return new Promise((resolve) => {
 
 			// Create audio.
 			if (this.context == null) {
-				this._debug("Create audio.");
+				//console.log("Create audio.");
 				this.context = new window.AudioContext();
 				this.master = this.context.createGain();
 				//this.master.gain.value = pico.Sound.volume;
@@ -1615,7 +1591,7 @@ pico.Sound = class {
 
 				// Close audio.
 				this.oscillator.onended = () => {
-					this._debug("Close audio.");
+					//console.log("Close audio.");
 					this.master.gain.value = 0;
 					this.master.disconnect(this.context.destination);
 					this.context.close();
@@ -1631,18 +1607,18 @@ pico.Sound = class {
 	// Stop sound.
 	_stop() {
 		if (this.context == null) {
-			this._debug("No audio.");
+			//console.log("No audio.");
 			return Promise.reject();
 		} else if (!this.started) {
-			this._debug("Not started.");
+			//console.log("Not started.");
 			return Promise.resolve();
 		}
 
 		// Stop audio.
 		let restTime = this.endTime - Date.now();
-		this._debug("Stop: " + restTime);
+		//console.log("Stop: " + restTime);
 		if (restTime >= 0) {
-			//this._debug("Disconnect.")
+			//console.log("Disconnect.")
 			this.master.gain.value = 0;
 			//this.oscillator.disconnect(this.master);
 			this.stopped = true; // Wait for end on start function.
@@ -1653,10 +1629,10 @@ pico.Sound = class {
 	// Ready to start sound.
 	_ready() {
 		if (this.context == null) {
-			this._debug("No audio.");
+			//console.log("No audio.");
 			return Promise.reject();
 		//} else if (!this.started) {
-		//	this._debug("Not started.");
+		//	//console.log("Not started.");
 		//	return Promise.resolve();
 		}
 		return Promise.resolve();
@@ -1665,10 +1641,10 @@ pico.Sound = class {
 		return new Promise((resolve) => {
 			let restTime = this.endTime - Date.now();
 			if (restTime > 0) {
-				this._debug("Wait for previous end: " + restTime);
+				//console.log("Wait for previous end: " + restTime);
 				setTimeout(resolve, restTime);
 			} else {
-				this._debug("Ready: " + restTime);
+				//console.log("Ready: " + restTime);
 				resolve();
 			}
 		}); // end of new Promise.
@@ -1678,10 +1654,10 @@ pico.Sound = class {
 	// Play sound.
 	_play(type=null, kcents=[0], length=0.1, delay=0, volume=1) {
 		if (this.context == null) {
-			this._debug("No audio.");
+			//console.log("No audio.");
 			return Promise.reject();
 		} else if (this.endTime < 0 || this.endTime > Date.now() + delay * 1000) {
-			this._debug("Not end previous sound.");
+			//console.log("Not end previous sound.");
 			return Promise.resolve();
 		}
 
@@ -1690,7 +1666,7 @@ pico.Sound = class {
 			return new Promise((resolve) => {
 
 				// Wait to play.
-				this._debug("Wait to play: " + Date.now() + " -> " + this.endTime);
+				//console.log("Wait to play: " + Date.now() + " -> " + this.endTime);
 				//let endTime = Date.now() + length * 1000 + delay * 1000;
 				//this.endTime = endTime > this.endTime ? endTime : this.endTime;
 				this.endTime = Date.now() + length * 1000 + delay * 1000;
@@ -1698,12 +1674,12 @@ pico.Sound = class {
 				setTimeout(() => {
 
 					// Play sound.
-					this._debug("Play: " + kcents + " x " + length * kcents.length + " + " + delay);
+					//console.log("Play: " + kcents + " x " + length * kcents.length + " + " + delay);
 					if (type) {
 
 						// Connect.
 						let startTime = Date.now();
-						this._debug("Connect: " + startTime)
+						console.log("Connect: " + startTime)
 						this.oscillator.type = type;
 						for (let i = 0; i < kcents.length; i++) {
 							this.oscillator.detune.setValueAtTime(kcents[i] * 1000, this.context.currentTime + length * i);
@@ -1713,7 +1689,7 @@ pico.Sound = class {
 						// Set volume and start audio.
 						this.master.gain.value = pico.Sound.volume * volume;
 						if (!this.started) {
-							this._debug("Start audio.");
+							//console.log("Start audio.");
 							this.oscillator.start();
 							this.started = true;
 						}
@@ -1721,18 +1697,18 @@ pico.Sound = class {
 						// Wait to end.
 						setTimeout(() => {
 							/*if (this.stopped) { // Stopped on stop function.
-								this._debug("Stopped.");
+								//console.log("Stopped.");
 								//this.endTime = 0;
 							} else {*/
 								// End.
-								this._debug("End: " + kcents + " x " + length * kcents.length);
+								//console.log("End: " + kcents + " x " + length * kcents.length);
 								//if (type) {
-								//	this._debug("EndTime: " + Date.now() + " -> " + this.endTime);
+								//	//console.log("EndTime: " + Date.now() + " -> " + this.endTime);
 									this.master.gain.value = 0;
 
 									// Disconnect.
 									if (Date.now() >= this.endTime) {
-										this._debug("Disconnect: " + startTime)
+										console.log("Disconnect: " + startTime)
 										this.oscillator.disconnect(this.master);
 										//this.endTime = 0;
 									}
@@ -1749,10 +1725,10 @@ pico.Sound = class {
 						// Wait to end.
 						setTimeout(() => {
 							//if (this.stopped) { // Stopped on stop function.
-							//	this._debug("Stopped.");
+							//	//console.log("Stopped.");
 							//} else {
 								// End.
-								this._debug("End: " + kcents + " x " + length * kcents.length);
+								//console.log("End: " + kcents + " x " + length * kcents.length);
 								this.master.gain.value = 0;
 							//}
 							resolve();
@@ -1766,10 +1742,10 @@ pico.Sound = class {
 	// Start pulse sound.
 	_pulse(kcent=0, length=0.1, pattern=0, volume=1) {
 		if (this.context == null) {
-			this._debug("No audio.");
+			//console.log("No audio.");
 			return Promise.reject();
 		}
-		this._debug("Pulse" + pattern + ": " + kcent + " x " + length);
+		//console.log("Pulse" + pattern + ": " + kcent + " x " + length);
 
 		// 8bit original argorithm and parameter: pattern=0.125,0.25,0.5
 		if (pattern > 0) {
@@ -1786,7 +1762,7 @@ pico.Sound = class {
 			// Connect pulse filters to master volume.
 			this.oscillator.connect(pulseFilters[0]).connect(pulseFilters[1]).connect(this.master);
 			setTimeout(() => {
-				this._debug("Disconnect pulse filters.");
+				//console.log("Disconnect pulse filters.");
 				this.oscillator.disconnect(pulseFilters[0]);
 				pulseFilters[0].disconnect(pulseFilters[1]);
 				pulseFilters[0] = null;
@@ -1808,10 +1784,10 @@ pico.Sound = class {
 	// Start triangle sound.
 	_triangle(kcent=0, length=0.1, pattern=0, volume=1) {
 		if (this.context == null) {
-			this._debug("No audio.");
+			//console.log("No audio.");
 			return Promise.reject();
 		}
-		this._debug("Triangle" + pattern + ": " + kcent + " x " + length);
+		//console.log("Triangle" + pattern + ": " + kcent + " x " + length);
 
 		// 8bit original argorithm and parameter: pattern=16
 		if (pattern > 0) {
@@ -1844,7 +1820,7 @@ pico.Sound = class {
 					buffering[i] = Math.ceil(value * pattern) / pattern;
 				}
 				//if (!Math.floor(i % 100)) {
-				//	this._debug("buffering" + i + ": " + value + " -> " + buffering[i]);
+				//	//console.log("buffering" + i + ": " + value + " -> " + buffering[i]);
 				//}
 			}
 
@@ -1855,7 +1831,7 @@ pico.Sound = class {
 			triangleGenerator.connect(this.master);
 			triangleGenerator.start();
 			setTimeout(() => {
-				this._debug("Disconnect triangle generator.");
+				//console.log("Disconnect triangle generator.");
 				triangleGenerator.disconnect(this.master);
 				triangleGenerator = null;
 				triangleBuffer = null;
@@ -1875,13 +1851,13 @@ pico.Sound = class {
 	// Start noise sound.
 	_noise(length=0.1, pattern=0, delay=0, volume=1) {
 		if (this.context == null) {
-			this._debug("No audio.");
+			//console.log("No audio.");
 			return Promise.reject();
 		}/* else if (this.endTime < 0 || this.endTime > Date.now() + delay * 1000) {
-			this._debug("Not end previous sound.");
+			//console.log("Not end previous sound.");
 			return Promise.resolve();
 		}*/
-		this._debug("Noise" + pattern + ": " + length + " + " + delay);
+		//console.log("Noise" + pattern + ": " + length + " + " + delay);
 		setTimeout(() => {
 
 			// Create noise buffers.
@@ -1917,7 +1893,7 @@ pico.Sound = class {
 			noiseGenerator.connect(this.master);
 			noiseGenerator.start();
 			setTimeout(() => {
-				this._debug("Disconnect noise generator.");
+				//console.log("Disconnect noise generator.");
 				noiseGenerator.disconnect(this.master);
 				noiseGenerator = null;
 				noiseBuffer = null;
@@ -1967,7 +1943,6 @@ var pico = pico || {};
 
 // Touch class.
 pico.Touch = class {
-	static debug = false; // Debug print.
 	static count = 0; // Object count.
 	static width = 200; // Touch width.
 	static height = 200; // Touch height.
@@ -1978,14 +1953,14 @@ pico.Touch = class {
 	read(t=10) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (t >= 0) {
-				this._debug("Wait timeout: " + t);
+				//console.log("Wait timeout: " + t);
 				return new Promise(r => setTimeout(r, t)).then(() => {
 					return this._read();
 				}); // end of new Promise.
 
 			// Wait until input.
 			} else {
-				this._debug("Wait until input.");
+				//console.log("Wait until input.");
 				return new Promise((resolve) => {
 					const timer = setInterval(() => {
 						if (this.flushing || pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
@@ -2035,20 +2010,13 @@ pico.Touch = class {
 		}
 	}
 
-	// Debug print.
-	_debug(text) {
-		if (pico.Touch.debug) {
-			;
-		}
-	}
-
 	// Setup touch panel.
 	_setup(parent=null) {
 		return new Promise((resolve) => {
 
 			// Create touch panel.
 			if (this.panel == null) {
-				this._debug("Select touch panel.");
+				//console.log("Select touch panel.");
 				if (parent && document.getElementsByClassName(parent)[0]) {
 					this.panel = document.getElementsByClassName(parent)[0];
 				} else {
@@ -2123,7 +2091,7 @@ pico.Touch = class {
 	// Ready to touch.
 	_ready() {
 		if (this.panel == null) {
-			this._debug("No panel.");
+			//console.log("No panel.");
 			return Promise.reject();
 		}
 		return Promise.resolve();
@@ -2134,13 +2102,13 @@ pico.Touch = class {
 		for (let i = 0; i < this.touching[0].length; i++) {
 			if (this.touching[0][i].w == w && this.touching[0][i].motion) {
 				this.touching[0][i] = {w:w, x:x, y:y, motion:1};
-				this._debug("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				//console.log("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				return;
 			}
 		}
 		let i = this.touching[0].length;
 		this.touching[0][i] = {w:w, x:x, y:y, motion:1};
-		this._debug("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
+		//console.log("Touch down: " + i + ":" + JSON.stringify(this.touching[0][i]));
 	}
 
 	// Touch move event handler.
@@ -2150,7 +2118,7 @@ pico.Touch = class {
 				this.touching[0][i].motion = 1;
 				this.touching[0][i].x = x;
 				this.touching[0][i].y = y;
-				//this._debug("Touch move: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				////console.log("Touch move: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
 		}
@@ -2162,7 +2130,7 @@ pico.Touch = class {
 			if (this.touching[0][i].w == w) {
 				this.touching[0][i].motion = 0;
 				this.touching[0][i].action = -1;
-				this._debug("Touch up: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				//console.log("Touch up: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
 		}
@@ -2173,7 +2141,7 @@ pico.Touch = class {
 		for (let i = 0; i < this.touching[0].length; i++) {
 			if (this.touching[0][i].w == w) {
 				this.touching[0][i].motion = -1;
-				this._debug("Touch cancel: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				//console.log("Touch cancel: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
 		}
@@ -2190,7 +2158,7 @@ pico.Touch = class {
 			if (this.touching[0][i].action < 0) {
 				for (let j = 0; j < this.touching[1].length; j++) {
 					if (this.touching[1][j].w == this.touching[0][i].w) {
-						this._debug("Up: " + j + ":" + JSON.stringify(this.touching[0][i]));
+						//console.log("Up: " + j + ":" + JSON.stringify(this.touching[0][i]));
 						touching1[touching1.length] = {w:this.touching[0][i].w, x:this.touching[0][i].x, y:this.touching[0][i].y, action:1};
 						break;
 					}
@@ -2205,7 +2173,7 @@ pico.Touch = class {
 				let trigger = true;
 				for (let j = 0; j < this.touching[1].length; j++) {
 					if (this.touching[1][j].w == this.touching[0][i].w) {
-						this._debug("Holding: " + j);// + ":" + JSON.stringify(this.touching[0][i]));
+						//console.log("Holding: " + j);// + ":" + JSON.stringify(this.touching[0][i]));
 						touching1[touching1.length] = {w:this.touching[0][i].w, x:this.touching[0][i].x, y:this.touching[0][i].y, motion:this.touching[0][i].motion};
 
 						trigger = false;;
@@ -2215,7 +2183,7 @@ pico.Touch = class {
 
 				// Touch down trigger.
 				if (trigger) {
-					this._debug("Down: " + i + ":" + JSON.stringify(this.touching[0][i]));
+					//console.log("Down: " + i + ":" + JSON.stringify(this.touching[0][i]));
 					touching1[touching1.length] = {w:this.touching[0][i].w, x:this.touching[0][i].x, y:this.touching[0][i].y, motion:1};
 				}
 			}
@@ -2235,7 +2203,7 @@ pico.Touch = class {
 				} else if (h <= 0) {
 					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
 					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-					//this._debug("Motion: " + x2 + "," + y2 + "<=" + (r*r));
+					////console.log("Motion: " + x2 + "," + y2 + "<=" + (r*r));
 					if (x2 + y2 <= r * r) {
 						return i + 1;
 					}
@@ -2261,7 +2229,7 @@ pico.Touch = class {
 				} else if (h <= 0) {
 					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
 					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-					//this._debug("Action: " + x2 + "," + y2 + "<=" + (r*r));
+					////console.log("Action: " + x2 + "," + y2 + "<=" + (r*r));
 					if (x2 + y2 <= r * r) {
 						return i + 1;
 					}
