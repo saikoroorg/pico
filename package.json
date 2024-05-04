@@ -3,8 +3,29 @@
 	"version": "0.9.40502",
 	"description": "pico",
 	"scripts": {
-		"install": "",
-		"update": "",
+		"@Usage:@": [
+			"@                                                                                                @",
+			"@ npm run build                                                                                  @",
+			"@                                                                                                @",
+			"@   Build pico.js from src/*.js to current directory.                                            @",
+			"@                                                                                                @",
+			"@ npm run build --main=<main-app> [--sub=<sub-app> --out=<output-dir>]                           @",
+			"@                                                                                                @",
+			"@   1. Build pico.js from src/*.js to <output-dir>/<main-app>.                                   @",
+			"@   2. Build app.js from <main-app>.js to <output-dir>/<main-app>.                               @",
+			"@   3. Build <sub-app>.js from <sub-app>.js to <output-dir>/<main-app>/app.                      @",
+			"@   4. Copy pico.css, index.html and index.js to <output-dir>/<main-app>.                        @",
+			"@                                                                                                @",
+			"@   Example: npm run build --main=app/dice --out=../build                                        @",
+			"@                                                                                                @",
+			"@ npm run clean --main=<main-app> [--sub=<sub-app> --out=<output-dir>]                           @",
+			"@                                                                                                @",
+			"@   1. Delete pico.js pico.css index.html index.js from <output-dir>/<main-app>.                 @",
+			"@   2. Delete app.js and app/<sub-app>.js from <output-dir>/<main-app>.                          @",
+			"@                                                                                                @",
+			"@   Example: npm run clean --main=app/dice --out=../build                                        @",
+			"@                                                                                                @"],
+		"usage": "sed -n \"s#.*\\\"@\\(.*\\)@\\\".*#\\1#p\" package.json",
 
 		"build:ver": "sed -i '' \"s#version *= *\".*\" *;#version = \\\"${npm_package_version}\\\";#\" src/api.js",
 		"build:nolog": "sed -i '' \"s#\\(console.log.*;\\)#//\\1#g\" pico.js",
@@ -14,10 +35,13 @@
 		"build": "npm run build:lib; npm run build:app; npm run build:sub",
 
 		"clean:sub": "if [ -n \"${npm_config_main}\" ] && [ -n  \"${npm_config_sub}\" ]; then for sub in ${npm_config_sub//,/ }; do rm ${npm_config_out:-..}/${npm_config_main##*/}/app/${sub}.js; done; rmdir ${npm_config_out:-..}/${npm_config_main##*/}/app; fi",
-		"clean:app": "if [ -n \"${npm_config_main}\" ]; then rm ${npm_config_out:-..}/${npm_config_main##*/}/pico.*; rm ${npm_config_out:-..}/${npm_config_main##*/}/index.*; rm ${npm_config_out:-..}/${npm_config_main##*/}/app.js*; rmdir ${npm_config_out:-..}/${npm_config_main}; fi",
+		"clean:app": "if [ -n \"${npm_config_main}\" ]; then rm ${npm_config_out:-..}/${npm_config_main##*/}/pico.*; rm ${npm_config_out:-..}/${npm_config_main##*/}/index.*; rm ${npm_config_out:-..}/${npm_config_main##*/}/app.js*; rmdir ${npm_config_out:-..}/${npm_config_main##*/}; fi",
 		"clean": "npm run clean:sub; npm run clean:app",
 
-		"clobber": "rm -rf node_modules; rm -rf package-lock.json"
+		"clobber": "rm -rf node_modules; rm -rf package-lock.json",
+
+		"install": "",
+		"update": ""
 	},
 	"license": "unlicensed",
 	"private": true
