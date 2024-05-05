@@ -15,7 +15,7 @@ var scoreCount = 0; // Initial score.
 // Button.
 const buttonMax = playerMax + 1; // Maximum button count.
 const buttonWidth = 8, buttonHeight = 6; // Button touchable sizes.
-const dealerSprite0 = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10]; // Dealer sprite.
+const dealerSprite0 = [0,19,19, 2,3,6,0,12,6, 2,5,4,0,8,10, 1,7,12,0,4,0]; // Dealer sprite.
 const dealerSprite1 = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10, 1,7,12,0,4,0]; // Dealer with cursor sprite.
 const dealerColor = 2; // Cneter number color.
 const dealerScale = 4; // Dealer scale.
@@ -49,7 +49,7 @@ Button = class {
 var buttons = []; // Button.
 
 // Global variables.
-var state = ""; // Playing state.
+var state = "waiting"; // Playing state.
 var playing = -1; // Playing count.
 
 var landscape = false; // landscape mode.
@@ -119,7 +119,7 @@ async function appLoad() {
 	}
 	buttonCount = playerCount + 1;
 
-	state = "";
+	state = "waiting";
 	appResize(); // Initialize positions.
 	appUpdate(); // Initialize buttons.
 }
@@ -194,7 +194,7 @@ async function appMain() {
 		console.log("Initialize playing states.");
 
 		// Reset playing states.
-		state = "";
+		state = "waiting";
 		playerIndex = 0;
 		buttons[0].score = 0;
 		for (let k = 1; k < buttonMax; k++) {
@@ -218,6 +218,7 @@ async function appMain() {
 				touchState = "";
 				touchCount = 0;
 				if (k == 0) {
+					state = "playing";
 					playerIndex = playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
 				}
 				// High beep on increment count.
@@ -249,6 +250,7 @@ async function appMain() {
 			if (touchCount >= 60) {
 				// Fix index for next play.
 				if (k == 0 && buttons[k].score > 0) {
+					state = "pausing";
 					playerIndex = playerIndex - 1 >= 1 ? playerIndex - 1 : playerCount;
 				}
 				buttons[k].score = 0;
@@ -286,7 +288,7 @@ async function appMain() {
 		if (k == 0) {
 			let index = buttons[0].score > 0 ? playerIndex : playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
 			let a = buttons[k].angle + (playerCount >= 2 && !landscape && index > picoDiv(playerCount+1,2) ? 180 : 0);
-			let sprite = dealerSprite1;//playerCount == 2 || buttons[k].score > 0 ? dealerSprite1 : dealerSprite0;
+			let sprite = state == "pausing" ? dealerSprite0 : dealerSprite1;//playerCount == 2 || buttons[k].score > 0 ? dealerSprite1 : dealerSprite0;
 			await picoSprite(sprite, -1, x, y, a, buttons[k].scale*s);
 			if (buttons[0].score > 0) {
 				let number = buttons[k].score;
