@@ -286,21 +286,23 @@ async function appMain() {
 		if (k == 0) {
 			let index = buttons[0].score > 0 ? playerIndex : playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
 			let a = buttons[k].angle + (playerCount >= 2 && !landscape && index > picoDiv(playerCount+1,2) ? 180 : 0);
-			let sprite = playerCount == 2 || buttons[k].score > 0 ? dealerSprite1 : dealerSprite0;
-			let number = buttons[k].score;
-			if (touchIndex == k && touchState) {
-				number = " " + number + touchState;
-			}
+			let sprite = dealerSprite1;//playerCount == 2 || buttons[k].score > 0 ? dealerSprite1 : dealerSprite0;
 			await picoSprite(sprite, -1, x, y, a, buttons[k].scale*s);
-			await picoChar(number, dealerColor, x, y, a, buttons[k].scale*numberScale*s);
+			if (buttons[0].score > 0) {
+				let number = buttons[k].score;
+				if (touchIndex == k && touchState) {
+					number = " " + number + touchState;
+				}
+				await picoChar(number, dealerColor, x, y, a, buttons[k].scale*numberScale*s);
+			}
 		} else {
 			let index = buttons[0].score > 0 ? playerIndex : playerIndex + 1 <= playerCount ? playerIndex + 1 : 1;
 			let sprite = (k == index && playerCount > (landscape?1:2)) ? playerSprite1 : playerSprite0;
+			await picoSprite(sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 			let number = buttons[k].score > 0 ? "+" + buttons[k].score : buttons[k].score;
 			if (touchIndex == k && touchState) {
 				number = " " + number + touchState;
 			}
-			await picoSprite(sprite, -1, x, y, buttons[k].angle, buttons[k].scale*s);
 			await picoChar(number, playerColor, x, y, buttons[k].angle, buttons[k].scale*numberScale*s);
 		}
 	}
