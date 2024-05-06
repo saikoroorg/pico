@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico";
-pico.version = "0.9.40502"; // Updatable by package.json.
+pico.version = "0.9.40507"; // Updatable by package.json.
 
 /* PICO Image module */
 
@@ -1679,7 +1679,7 @@ pico.Sound = class {
 
 						// Connect.
 						let startTime = Date.now();
-						console.log("Connect: " + startTime)
+						//console.log("Connect: " + startTime);
 						this.oscillator.type = type;
 						for (let i = 0; i < kcents.length; i++) {
 							this.oscillator.detune.setValueAtTime(kcents[i] * 1000, this.context.currentTime + length * i);
@@ -1708,7 +1708,7 @@ pico.Sound = class {
 
 									// Disconnect.
 									if (Date.now() >= this.endTime) {
-										console.log("Disconnect: " + startTime)
+										//console.log("Disconnect: " + startTime);
 										this.oscillator.disconnect(this.master);
 										//this.endTime = 0;
 									}
