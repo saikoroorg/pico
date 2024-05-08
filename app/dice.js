@@ -1,5 +1,5 @@
 const title = "Dice"; // Title.
-const editjs = "app/edit.js"; // Editor script.
+//const editjs = "app/edit.js"; // Editor script.
 const dots = [ // Dotted design pixels.
 	[0,7,7, 5,3,3],
 	[0,7,7, 4,1,5, 4,5,1],
@@ -52,9 +52,9 @@ var result = 0; // Result.
 
 // Update buttons.
 async function appUpdate() {
-	if (custom) {
+	/*if (custom) {
 		picoLabel("action", "*");
-	} else if (count > 0 && result > 0) {
+	} else*/ if (count > 0 && result > 0) {
 		let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
 		picoLabel("action", null, data);
 	} else {
@@ -112,7 +112,7 @@ async function appAction() {
 		// Back or edit.
 		if (!picoReturnApp()) {
 			// Enter to edit mode.
-			picoSwitchApp(editjs); // Open editor.
+			//picoSwitchApp(editjs); // Open editor.
 		}
 
 	// Share screen.
@@ -141,28 +141,30 @@ async function appSelect(x) {
 	// Do nothing on customize dice.
 	} else if (pixels.length > 0) {
 		custom = true;
-		picoLabel("action", "*");
+		//picoLabel("action", "*");
 		picoBeep(-1.2, 0.1);
 
 	// Change custom mode.
-	} else if (!custom) {
+	/*} else if (!custom) {
 		custom = true;
 		picoLabel("action", "*");
 		picoBeep(1.2, 0.1);
-		appResize(); // Update positions.
+		appResize(); // Update positions.*/
 		//appUpdate(); // Update buttons.
 
 	// Change maximum of dice faces.
 	} else {
-		custom = true;
-		picoLabel("action", "*");
+		//custom = true;
+		//picoLabel("action", "*");
+		custom = false;
+		picoLabel("action");
 
 		maximum = maximum < 8 ? 8 : maximum < 10 ? 10 : 6;
 		playing = -1; // Reroll.
 		result = 0;
 		picoBeep(1.2, 0.1);
 		appResize(); // Update positions.
-		//appUpdate(); // Update buttons.
+		appUpdate(); // Update buttons.
 	}
 }
 
