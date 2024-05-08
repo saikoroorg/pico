@@ -76,7 +76,7 @@ var landscape = false; // landscape mode.
 // Update buttons.
 async function appUpdate() {
 	if (state == "playing") {
-		picoTitle();
+		picoTitle(title, true); // No title label.
 		picoLabel("select");
 		picoLabel("minus");
 		picoLabel("plus");
@@ -89,7 +89,7 @@ async function appUpdate() {
 		} else if (bonus < 0) {
 			picoLabel("select", "*");
 		} else {
-			picoLabel("select", "#");
+			picoLabel("select", "0");
 		}
 		picoLabel("minus", "-");
 		picoLabel("plus", "+");
