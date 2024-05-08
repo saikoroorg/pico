@@ -47,7 +47,7 @@ var scale = 1; // Rolling scale.
 async function appSelect() {
 	if (count == mincount) {
 		picoTitle(title); // Title.
-		picoSpriteData(dots[random], -1).then((image) => {
+		picoSpriteData(dots[random], 0).then((image) => {
 			picoLabel("select", null, image); // Lazy loading.
 		});//*/
 		count = items.length;
@@ -129,13 +129,13 @@ async function appMain() {
 
 	// Menu.
 	const itemcolor = 2, itemscale = 2;
-	const itemwidth = 38, itemgrid = 42, imagescale = 0.5;
+	const itemwidth = 38, itemvgrid = 42, itemhgrid = 58, imagescale = 0.5;
 	const itemoffset = count <= mincount ? 52 : 0;
 	let xcount = count < 6 ? 3 : !landscape ? 3 : picoSqrt(count - 1) + 1;
 	let ycount = picoDiv(count - 1, xcount) + 1;
 	for (let i = 0; i < count; i++) {
-		let x = (picoMod(i, xcount) - (xcount - 1) / 2) * itemgrid;
-		let y = (picoDiv(i, xcount) - (ycount - 1) / 2) * itemgrid + itemoffset;
+		let x = (picoMod(i, xcount) - (xcount - 1) / 2) * itemvgrid;
+		let y = (picoDiv(i, xcount) - (ycount - 1) / 2) * itemhgrid + itemoffset;
 		let s = picoMotion(x,y, itemwidth/2,itemwidth/2) ? 0.9 : 1;
 		if (picoAction(x,y, itemwidth/2,itemwidth/2)) {
 			if (items[i][2]) {
