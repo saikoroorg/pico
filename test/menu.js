@@ -93,8 +93,8 @@ async function appResize() {
 async function appMain() {
 
 	// Bg.
-	//const bgcolor = 1;
-	//picoRect(bgcolor, 0,0, 200,200, 0,1);
+	const bgcolor = 1;
+	picoRect(bgcolor, 0,0, landscape?200:116,landscape?140:200, 0,1);
 
 	// Dice.
 	if (count <= mincount) {
@@ -123,13 +123,13 @@ async function appMain() {
 
 	// Logo.
 	if (count <= mincount) {
-		const logocolor = 5, logooffset = 16, logoscale = 2.5;
+		const logocolor = 5, logooffset = 14, logoscale = 2.5;
 		picoChar(title, logocolor, 0,logooffset, 0,logoscale);
 	}
 
 	// Menu.
-	const itemcolor = 2, itemscale = 2;
-	const itemwidth = 38, itemvgrid = 42, itemhgrid = 58, imagescale = 0.5;
+	const itemcolor = 2, itemscale = 1.5;
+	const itemwidth = 32, itemvgrid = 40, itemhgrid = 52, imagescale = 0.4;
 	const itemoffset = count <= mincount ? 52 : 0;
 	let xcount = count < 6 ? 3 : !landscape ? 3 : picoSqrt(count - 1) + 1;
 	let ycount = picoDiv(count - 1, xcount) + 1;
@@ -145,7 +145,9 @@ async function appMain() {
 		picoRect(itemcolor, x,y, itemwidth,itemwidth, 0,s);
 		if (images[i]) {
 			picoImage(images[i], x,y, 0,imagescale*s)
-			picoChar(items[i][0], 2, x,y+itemwidth/2+8, 0,itemscale);
+			if (count > mincount) {
+				picoChar(items[i][0], 2, x,y+itemwidth/2+8, 0,itemscale);
+			}
 		} else if (items[i][0].length <= 5) {
 			picoChar(items[i][0], 0, x,y, 0,itemscale*s);
 		} else if (items[i][0].length <= 8) {
