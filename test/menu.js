@@ -35,7 +35,7 @@ var items = [ // Menu items.
 	["chess", "chess/icon.svg", "chess/"],
 	["shogi", "shogi/icon.svg", "shogi/"],
 ];
-var returl = ".."; // Return url.
+var returl = "../"; // Return url.
 var images = []; // Menu images.
 var playing = 0; // Playing count.
 const mincount = 3; // Minumum item count.
