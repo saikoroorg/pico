@@ -64,8 +64,8 @@ async function picoLabel(id, text=null, icon=null) {
 }
 
 // Change title.
-async function picoTitle(text=null, nolabel=false) {
-	await pico.app.setTitle(text, nolabel);
+async function picoTitle(text=null, nolabel=false, noheader=false) {
+	await pico.app.setTitle(text, nolabel, noheader);
 }
 
 // Switch app script.
@@ -291,20 +291,19 @@ pico.App = class {
 	}
 
 	// Change title.
-	async setTitle(text=null, nolabel=false) {
-		let e = document.getElementsByTagName("title");
-		if (e && e[0]) {
+	async setTitle(text=null, nolabel=false, noheader=false) {
+		for (let e of document.getElementsByTagName("title")) {
 			if (text) {
-				e[0].style.display = "flex";
-				e[0].innerText = text;
+				e.style.display = "flex";
+				e.innerText = text;
 			} else {
-				e[0].style.display = "none";
-				e[0].innerText = "";
+				e.style.display = "none";
+				e.innerText = "";
 			}
 		}
-		e = document.getElementsByClassName("logo");
-		if (e && e[0]) {
-			e[0].style.display = (text && !nolabel) ? "flex" : "none";
+		let e = document.getElementById("header")
+		if (e) {
+			e.style.display = (text && !noheader) ? "flex" : "none";
 		}
 		if (!nolabel) {
 			this.title = text;
@@ -315,6 +314,10 @@ pico.App = class {
 				await picoLabel("title", this.title);
 				await picoLabel("subtitle");
 			}
+		} else {
+			this.title = null;
+			await picoLabel("title");
+			await picoLabel("subtitle");
 		}
 	}
 
@@ -328,8 +331,8 @@ pico.App = class {
 
 		// Change and reload script.
 		if (target && target.match(/js$/)) {
-			if (this.returl && !picoString("u")) {
-				picoSetString(this.returl, "u");
+			if (returl && !picoString("u")) {
+				picoSetString(returl, "u");
 			}
 			if (title && !picoString("t")) {
 				picoSetString(title, "t");
@@ -343,6 +346,12 @@ pico.App = class {
 
 		// Jump to next page.
 		} else if (target) {
+			if (returl && !picoString("u")) {
+				picoSetString(returl, "u");
+			}
+			if (title && !picoString("t")) {
+				picoSetString(title, "t");
+			}
 			await picoReload(target);
 			return true;
 		}
