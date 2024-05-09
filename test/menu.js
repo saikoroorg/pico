@@ -11,32 +11,31 @@ const dots = [ // Dotted design pixels.
 	[0,7,7, 0,0,0,0,6,6, 9,1,1, 9,1,3, 9,3,1, 9,3,5, 9,1,5, 9,5,1, 9,5,3, 9,5,5],
 	[0,7,7, 0,0,0,0,6,6, 9,3,3, 9,1,1, 9,1,3, 9,3,1, 9,3,5, 9,1,5, 9,5,1, 9,5,3, 9,5,5],
 ];
-const devitems = [ // Menu items for dev.
+
+var items = [ // Menu items.
 	["dice", "app/dice.svg", "app/dice.js"],
 	["clock", "app/clock.svg", "app/clock.js"],
 	["bank", "app/bank.svg", "app/bank.js"],
 	["kuku", "app/kuku.svg", "app/kuku.js"],
 	["chess", "app/chess.svg", "app/chess.js"],
 	["shogi", "app/shogi.svg", "app/shogi.js"],
-//*/
 	["voxel", "app/voxel.svg", "app/voxel.js"],
 	["bros", "app/bros.svg", "app/bros.js"],
 	["edit", "app/edit.svg", "app/edit.js"],
 	["text", "test/text.svg", "test/text.js"],
 	["hex", "test/hex.svg", "test/hex.js"],
 	["demo", "test/demo.svg", "test/demo.js"],
-//*/
-];
-const devreturl = null; // Return url for dev.
-var items = [ // Menu items.
+/*/
 	["dice", "dice/icon.svg", "dice/"],
 	["clock", "clock/icon.svg", "clock/"],
 	["bank", "bank/icon.svg", "bank/"],
 	["kuku", "kuku/icon.svg", "kuku/"],
 	["chess", "chess/icon.svg", "chess/"],
 	["shogi", "shogi/icon.svg", "shogi/"],
+//*/
 ];
-var returl = ".."; // Return url.
+var returl = null;//"../"; // Return url.
+
 var images = []; // Menu images.
 var state = "demo"; // Playing state.
 var playing = 0; // Playing count.
@@ -47,19 +46,19 @@ var scale = 1; // Rolling scale.
 // Update buttons.
 async function appUpdate() {
 	if (state != "demo") {
-		picoTitle(title, true); // No label.
+		picoTitle(title);
 		picoSpriteData(dots[index], -1).then((image) => {
-			picoLabel("action", null, image); // Lazy loading.
+			picoLabel("select", null, image); // Lazy loading.
 		});
 	} else {
 		picoTitle(title, true, true); // No label and header.
-		picoLabel("action", null);
+		picoLabel("select", null);
 	}
 	picoFlush();
 }
 
-// Action button.
-async function appAction() {
+// Select button.
+async function appSelect() {
 	if (state != "demo") {
 		state = "demo";
 		playing = -1; // Reroll.
@@ -72,10 +71,6 @@ async function appAction() {
 
 // Load.
 async function appLoad() {
-	if (picoDevMode()) {
-		items = devitems;
-		returl = devreturl;
-	}
 
 	// Load images.
 	for (let i = 0; i < items.length; i++) {
@@ -167,11 +162,11 @@ async function appMain() {
 				picoChar(items[i][0], 2, x,y+textoffset, 0,itemscale);
 			} else {
 				if (items[i][0].length <= 5) {
-					picoChar(items[i][0], 0, x,y+textoffset, 0,itemscale*s);
+					picoChar(items[i][0], 0, x,y+itemoffset, 0,itemscale);
 				} else if (items[i][0].length <= 8) {
-					picoText(items[i][0], 0, x,y+textoffset,4*4,6*2, 0,itemscale*s);
+					picoText(items[i][0], 0, x,y+itemoffset,4*4,6*2, 0,itemscale);
 				} else {
-					picoText(items[i][0], 0, x,y+textoffset,4*4,6*3, 0,itemscale*s);
+					picoText(items[i][0], 0, x,y+itemoffset,4*4,6*3, 0,itemscale);
 				}
 			}
 		}
