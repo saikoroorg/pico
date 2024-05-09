@@ -188,9 +188,7 @@ pico.App = class {
 			// Back to previous page.
 			if (this.returl) {
 				picoResetParams();
-				if (this.ver > 0) {
-					picoSetString(this.ver, "v");
-				}
+				picoSetString(this.ver, "v");
 				await picoReload(this.returl);
 
 			// Reload this page.
@@ -244,7 +242,8 @@ pico.App = class {
 				await picoTitle(this.apptitle);
 			}
 			this.returl = picoString("u");
-			this.ver = picoNumbers("v")[0];
+			let ver = picoNumbers("v");
+			this.ver = ver.length > 0 ? ver[0] : "0";
 			if (typeof appLoad === "function") {
 				await navigator.locks.request(this.lock, async (lock) => {
 					await appLoad();
