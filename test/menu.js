@@ -37,7 +37,7 @@ var items = [ // Menu items.
 var returl = null;//"../"; // Return url.
 
 var images = []; // Menu images.
-var state = "demo"; // Playing state.
+var state = ""; // Playing state.
 var playing = 0; // Playing count.
 var index = 0; // Sprite index.
 var angle = 0; // Rolling angle.
@@ -45,15 +45,13 @@ var scale = 1; // Rolling scale.
 
 // Update buttons.
 async function appUpdate() {
-	if (state != "demo") {
-		picoTitle(title);
-		picoSpriteData(dots[index], -1).then((image) => {
-			picoLabel("select", null, image); // Lazy loading.
-		});
-	} else {
-		picoTitle(title, true, true); // No label and header.
-		picoLabel("select", null);
+	if (state == "demo") {
+		index = 0; // Reset icon.
 	}
+	picoTitle(title);
+	picoSpriteData(dots[index], -1).then((image) => {
+		picoLabel("select", null, image); // Lazy loading.
+	});
 	picoFlush();
 }
 
@@ -71,6 +69,10 @@ async function appSelect() {
 
 // Load.
 async function appLoad() {
+	picoTitle(title);
+	picoSpriteData(dots[index], -1).then((image) => {
+		picoLabel("select", null, image); // Lazy loading.
+	});
 
 	// Load images.
 	for (let i = 0; i < items.length; i++) {
@@ -84,8 +86,12 @@ async function appLoad() {
 
 	// Skip demo on continuous start.
 	let keys = picoKeys();
-	if (keys.length > 0) {
+	if (keys.length > 0 && !picoDevMode()) {
 		state = "menu";
+		playing = 5;
+	} else {
+		state = "demo";
+		playing = 0;
 	}
 
 	appResize(); // Initialize positions.
@@ -105,15 +111,20 @@ async function appMain() {
 
 	// Bg.
 	const bgcolor = 1, bgscale = 1;
-	picoRect(bgcolor, 0,0, landscape?200:140,landscape?140:200, 0,bgscale);
+	if (state == "demo") {
+		picoRect(bgcolor, 0,0, 140,140, 0,bgscale);
+	} else {
+		picoRect(bgcolor, 0,0, landscape?200:140,landscape?140:200, 0,bgscale);
+	}
 
 	// Dice.
 	if (state == "demo") {
-		const maximum = 6, dicescale = 8, diceoffset = -12;
+		const maximum = 6, dicescale = 8, diceoffset = 0;
 		if (playing > 60 && picoAction()) {
-			state = "menu";
-			//playing = -1; // Reroll.
-			appUpdate(); // Show menu.
+			playing = -1; // Reroll.
+			picoFlush(); // Update animation without input.
+			//state = "menu";
+			//appUpdate(); // Show menu.
 			return;
 		} else if (picoMotion()) {
 			if (playing <= 60) {
@@ -134,13 +145,15 @@ async function appMain() {
 	}
 
 	// Logo.
-	if (state == "demo") {
+	/*if (state == "demo") {
 		const logocolor = 5, logoscale = 2.5, logooffset = 38;
 		picoChar(title, logocolor, 0,logooffset, 0,logoscale);
-	}
+	}*/
 
 	// Menu.
 	if (state == "menu") {
+		// Scale animation at start.
+		let s = playing < 5 ? (1.2 - 0.04 * playing) : 1;
 		// 300(Image size) * 0.4(Image scale) / 4(Pixel ratio) = 30(Pixel size)
 		const itemcolor = 2, itemscale = 1.5, imagescale = 0.4;
 		const itemwidth = 30, itemvgrid = 44, itemhgrid = 44;
@@ -150,25 +163,30 @@ async function appMain() {
 		for (let i = 0; i < items.length; i++) {
 			let x = (picoMod(i, xcount) - (xcount - 1) / 2) * itemvgrid;
 			let y = (picoDiv(i, xcount) - (ycount - 1) / 2) * itemhgrid;
-			let s = picoMotion(x,y, itemwidth/2,itemwidth/2) ? 0.9 : 1;
+			let m = picoMotion(x,y, itemwidth/2,itemwidth/2) ? 0.9 : 1;
 			if (picoAction(x,y, itemwidth/2,itemwidth/2)) {
 				if (items[i][2]) {
 					picoSwitchApp(items[i][2], returl);
 				}
 			}
-			picoRect(itemcolor, x,y+itemoffset, itemwidth,itemwidth, 0,s);
+			picoRect(itemcolor, x*s,(y+itemoffset)*s, itemwidth,itemwidth, 0,s*m);
 			if (images[i]) {
-				picoImage(images[i], x,y+itemoffset, 0,imagescale*s)
-				picoChar(items[i][0], 2, x,y+textoffset, 0,itemscale);
+				picoImage(images[i], x*s,(y+itemoffset)*s, 0,imagescale*s*m)
+				picoChar(items[i][0], 2, x*s,(y+textoffset)*s, 0,itemscale*s);
 			} else {
 				if (items[i][0].length <= 5) {
-					picoChar(items[i][0], 0, x,y+itemoffset, 0,itemscale);
+					picoChar(items[i][0], 0, x*s,(y+itemoffset)*s, 0,itemscale*s);
 				} else if (items[i][0].length <= 8) {
-					picoText(items[i][0], 0, x,y+itemoffset,4*4,6*2, 0,itemscale);
+					picoText(items[i][0], 0, x*s,(y+itemoffset)*s,4*4,6*2, 0,itemscale*s);
 				} else {
-					picoText(items[i][0], 0, x,y+itemoffset,4*4,6*3, 0,itemscale);
+					picoText(items[i][0], 0, x*s,(y+itemoffset)*s,4*4,6*3, 0,itemscale*s);
 				}
 			}
+		}
+
+		// Update animation without input.
+		if (playing < 5) {
+			picoFlush();
 		}
 	}
 
