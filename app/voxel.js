@@ -1,5 +1,6 @@
 const title = "Voxel"; // Title.
 const editjs = "app/edit.js"; // Editor script.
+const returl = "index.html?s=app/voxel.js"; // Return url.
 const maxdepth = 40; // Maximum of depth.
 const adddepth = 1; // Additions of depth.
 const depth0 = 4; // Initial depth.
@@ -163,7 +164,7 @@ async function appAction() {
 	}
 
 	// Enter to edit mode.
-	picoSwitchApp(editjs); // Open editor.
+	picoSwitchApp(editjs, returl); // Open editor.
 
 	// Share screen.
 	//picoShareScreen(); // Start sharing screen.
