@@ -132,24 +132,14 @@ a {
 	}
 	.center {
 		position: absolute;
-		top: 20px;
-	}
-	@media (min-aspect-ratio: 1) {
-		#screen {
-			height: 100%;
-		}
-		#widescreen {
-			height: 140%;
-		}
+		top: 18px;
 	}
 	@media (min-aspect-ratio: 0.7) {
-		@media (max-aspect-ratio: 1) {
-			#screen {
-				width: 100%;
-			}
-			#widescreen {
-				height: 100%;
-			}
+		#screen {
+			width: 100%;
+		}
+		#widescreen {
+			height: 100%;
 		}
 	}
 }
