@@ -128,7 +128,6 @@ pico.App = class {
 		this.lock = "picoAppLock" + pico.App.count + Date.now(); // Lock object identifier.
 		this.returl = null; // Return url.
 		this.script = pico.App.script; // App script.
-		this.retscript = null; // Return script.
 		this.title = ""; // Page title.
 		this.apptitle = ""; // App title.
 		this.ver = 0; // Protocol version.
@@ -188,7 +187,9 @@ pico.App = class {
 			// Back to previous page.
 			if (this.returl) {
 				picoResetParams();
-				picoSetString(this.ver, "v");
+				if (this.ver > 0) {
+					picoSetString(this.ver, "v");
+				}
 				await picoReload(this.returl);
 
 			// Reload this page.
@@ -232,18 +233,13 @@ pico.App = class {
 	// On load event.
 	async onLoad() {
 		try {
-			let retscript = picoString("r");
-			if (retscript) {
-				this.retscript = retscript;
-			}
 			let title = picoString("t");
 			if (title) {
 				this.apptitle = title;
 				await picoTitle(this.apptitle);
 			}
 			this.returl = picoString("u");
-			let ver = picoNumbers("v");
-			this.ver = ver.length > 0 ? ver[0] : "0";
+			this.ver = picoString("v") ? picoString("v") : "0";
 			if (typeof appLoad === "function") {
 				await navigator.locks.request(this.lock, async (lock) => {
 					await appLoad();
@@ -337,9 +333,6 @@ pico.App = class {
 				picoSetString(title, "t");
 			}
 			picoSetString(target, "s");
-			if (this.script && !picoString("r")) {
-				picoSetString(this.script, "r");
-			}
 			await picoReload();
 			return true;
 
@@ -365,23 +358,11 @@ pico.App = class {
 			picoSetString(this.ver, "v");
 		}
 
-		// Back to previous script.
-		if (this.retscript) {
-			if (this.returl && !picoString("u")) {
-				picoSetString(this.returl, "u");
-			}
-			picoSetString("", "t");
-			picoSetString(this.retscript, "s");
-			picoSetString("", "r");
-			await picoReload();
-			return true;
-
 		// Back to previous page.
-		} else if (this.returl) {
+		if (this.returl) {
 			picoSetString("", "u");
 			picoSetString("", "t");
 			picoSetString("", "s");
-			picoSetString("", "r");
 			await picoReload(this.returl);
 			return true;
 		}

@@ -276,14 +276,14 @@ pico.Param = class {
 		return new Promise(async (resolve) => {
 			let text = this._serialize();
 			if (text != null) {
-				let separator = url && url.indexOf("?") < 0 ? "?" : "";
-				let query = text ? separator + text : "";
 				if (url) {
+					let separator = url && url.indexOf("?") < 0 ? "?" : "&";
+					let query = text ? separator + text : "";
 					console.log("Jump: " + query);
 					window.location.href = url + query;
 				} else {
-					console.log("Reload: " + query);
-					window.location.search = query;
+					console.log("Reload: " + text);
+					window.location.search = text;
 				}
 			}
 			return resolve();
@@ -478,9 +478,10 @@ pico.Param = class {
 		if (context.includes('&')) {
 			context.split('&').forEach((q) => {
 				if (q.includes('=')) {
-					let keyvalue = q.split('=');
-					if (keyvalue[0] != null && keyvalue[1] != null) {
-						this.context[keyvalue[0]] = keyvalue[1];
+					let key = q.substr(0, q.indexOf('='));
+					let value = q.substr(q.indexOf('=') + 1);
+					if (key != null && value != null) {
+						this.context[key] = value;
 					}
 				} else if (q.includes('+')) {
 					let qs = q.split('+');
@@ -492,9 +493,10 @@ pico.Param = class {
 				}
 			});
 		} else if (context.includes('=')) {
-			let keyvalue = context.split('=');
-			if (keyvalue[0] != null && keyvalue[1] != null) {
-				this.context[keyvalue[0]] = keyvalue[1];
+			let key = context.substr(0, context.indexOf('='));
+			let value = context.substr(context.indexOf('=') + 1);
+			if (key != null && value != null) {
+				this.context[key] = value;
 			}
 		} else if (context.includes('+')) {
 			this.context = context.split('+');

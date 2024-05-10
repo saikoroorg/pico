@@ -34,7 +34,7 @@ var items = [ // Menu items.
 	["shogi", "shogi/icon.svg", "shogi/"],
 //*/
 ];
-var returl = null;//"../"; // Return url.
+var returl = "index.html?s=test/menu.js&w=1";//"../?w=1"; // Return url.
 
 var images = []; // Menu images.
 var state = ""; // Playing state.
@@ -84,9 +84,8 @@ async function appLoad() {
 		}
 	}
 
-	// Skip demo on continuous start.
-	let keys = picoKeys();
-	if (keys.length > 0 && !picoDevMode()) {
+	// Skip demo on app mode or continuous start.
+	if (picoString("v") || picoString("w")) {
 		state = "menu";
 		playing = 5;
 	} else {
@@ -166,6 +165,7 @@ async function appMain() {
 			let m = picoMotion(x,y, itemwidth/2,itemwidth/2) ? 0.9 : 1;
 			if (picoAction(x,y, itemwidth/2,itemwidth/2)) {
 				if (items[i][2]) {
+					picoResetParams();
 					picoSwitchApp(items[i][2], returl);
 				}
 			}
