@@ -1373,6 +1373,9 @@ pico.Param = class {
 		return results;
 	}
 
+	// Percent encode/decode table.
+	static percents = {"%":"%25","&":"%26","?":"%3F",/*"/":"%2F",*/};
+
 	// Deserialize context to parameters.
 	_deserialize(context) {
 		this.context = [];
@@ -1381,9 +1384,11 @@ pico.Param = class {
 				if (q.includes('=')) {
 					let key = q.substr(0, q.indexOf('='));
 					let value = q.substr(q.indexOf('=') + 1);
-					if (key != null && value != null) {
-						this.context[key] = value;
+					// Percent decode.
+					for (let p in pico.Param.percents) {
+						value = value.replaceAll(pico.Param.percents[p], p);
 					}
+					this.context[key] = value;
 				} else if (q.includes('+')) {
 					let qs = q.split('+');
 					for (var i = 0; i < qs.length; i++) {
@@ -1396,9 +1401,11 @@ pico.Param = class {
 		} else if (context.includes('=')) {
 			let key = context.substr(0, context.indexOf('='));
 			let value = context.substr(context.indexOf('=') + 1);
-			if (key != null && value != null) {
-				this.context[key] = value;
+			// Percent decode.
+			for (let p in pico.Param.percents) {
+				value = value.replaceAll(pico.Param.percents[p], p);
 			}
+			this.context[key] = value;
 		} else if (context.includes('+')) {
 			this.context = context.split('+');
 		} else {
@@ -1412,7 +1419,12 @@ pico.Param = class {
 		for (let key in this.context) {
 			if (key != null && this.context[key] != null && this.context[key] != "") {
 				if (isNaN(key)) {
-					params.push(key + "=" + this.context[key]);
+					let value = "" + this.context[key];
+					// Percent encode.
+					for (let p in pico.Param.percents) {
+						value = value.replaceAll(p, pico.Param.percents[p]);
+					}
+					params.push(key + "=" + value);
 				} else if (param0.length > 0) {
 					param0 = param0 + "+" + this.context[key];
 				} else {

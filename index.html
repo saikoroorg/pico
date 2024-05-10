@@ -185,19 +185,9 @@ pico.App = class {
 		await navigator.locks.request(this.lock, async (lock) => {
 
 			// Back to previous page.
-			if (this.returl) {
+			if (!await picoReturnApp()) {
+				// Reload top page.
 				picoResetParams();
-				if (this.ver > 0) {
-					picoSetString(this.ver, "v");
-				}
-				await picoReload(this.returl);
-
-			// Reload this page.
-			} else {
-				picoResetParams();
-				if (this.ver > 0) {
-					picoSetString(this.ver, "v");
-				}
 				await picoReload();
 			}
 		}); // end of lock.
