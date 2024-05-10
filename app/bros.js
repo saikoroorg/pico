@@ -1,6 +1,6 @@
 const title = "Bros"; // Title.
-const editjs = "app/edit.js"; // Editor script.
-const returl = "index.html?s=app/bros.js"; // Return url.
+const callto = "app/edit.js"; // Call script.
+const backto = "app/bros.js"; // Back script.
 var levels = [ // Level data.
 	[], //"Extra"
 	[0,7,7,1,0,0,2,6,6], //"Bros",
@@ -81,7 +81,7 @@ async function appAction() {
 			picoShareApp(); // Share.
 		} else {
 			picoSetCode8(colors, 1);
-			picoSwitchApp(editjs, returl); // Open editor.
+			picoSwitchApp(callto, backto, title);
 		}
 	}
 }
