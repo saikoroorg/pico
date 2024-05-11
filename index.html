@@ -414,8 +414,7 @@ pico.App = class {
 		}
 
 		// True if landscape mode.
-		return window.matchMedia("(max-height: 479px)").matches &&
-			window.matchMedia("(min-aspect-ratio: 1.4)").matches;
+		return window.matchMedia("(min-aspect-ratio: 1.4)").matches;
 	}
 }
 
