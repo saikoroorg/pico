@@ -113,7 +113,7 @@ async function appMain() {
 	if (state == "demo") {
 		picoRect(bgcolor, 0,0, 140,140, 0,bgscale);
 	} else {
-		//picoRect(bgcolor, 0,0, landscape?200:140,landscape?140:200, 0,bgscale);
+		picoRect(bgcolor, 0,0, landscape?200:140,landscape?140:200, 0,bgscale);
 	}
 
 	// Dice.
