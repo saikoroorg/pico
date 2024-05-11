@@ -229,7 +229,7 @@ pico.App = class {
 				this.title = title;
 				await picoTitle(this.title);
 			}
-			this.refer = picoString("u");
+			this.refer = picoString("r");
 			this.version = picoString("v") ? picoString("v") : "0";
 			if (typeof appLoad === "function") {
 				await navigator.locks.request(this.lock, async (lock) => {
@@ -315,8 +315,8 @@ pico.App = class {
 
 		// Change and reload script.
 		if (target && target.match(/[^=]*js$/)) {
-			if (refer && !picoString("u")) {
-				picoSetString(refer, "u");
+			if (refer && !picoString("r")) {
+				picoSetString(refer, "r");
 			}
 			if (title && !picoString("t")) {
 				picoSetString(title, "t");
@@ -327,8 +327,8 @@ pico.App = class {
 
 		// Jump to target page.
 		} else if (target) {
-			if (refer && !picoString("u")) {
-				picoSetString(refer, "u");
+			if (refer && !picoString("r")) {
+				picoSetString(refer, "r");
 			}
 			if (title && !picoString("t")) {
 				picoSetString(title, "t");
@@ -347,7 +347,7 @@ pico.App = class {
 			picoSetString(this.version, "v");
 		}
 		if (this.refer) {
-			picoSetString("", "u");
+			picoSetString("", "r");
 			picoSetString("", "t");
 
 			// Back to refer script.
