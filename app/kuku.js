@@ -153,7 +153,6 @@ async function appTitle() {
 		state = "probrem";
 		playing = 0;
 		startTime = picoTime();
-		picoFlush();
 	}
 }
 
@@ -285,7 +284,6 @@ async function appProbrem() {
 			choose = i;
 			state = "answer";
 			playing = 0;
-			picoFlush();
 		}
 		picoRect(3, x,y,square,square, angle,s);
 		picoChar("" + choices[i], 0, x,y, 0,scale*s);
@@ -348,7 +346,6 @@ async function appAnswer() {
 
 		choose = -1;
 		playing = 0;
-		picoFlush();
 	}
 	picoRect(0, x,y,square,square, angle,s);
 	picoChar("" + choices[i], -1, x,y, 0,scale*s);
@@ -419,7 +416,6 @@ async function appResult() {
 		playing = 0;
 		number = 1;
 		seed = 0;
-		picoFlush();
 	}
 }
 

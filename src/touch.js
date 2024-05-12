@@ -39,11 +39,12 @@ pico.Touch = class {
 
 	// Read touch event.
 	read(t=10) {
-		return navigator.locks.request(this.lock, async (lock) => {
 			if (t >= 0) {
 				console.log("Wait timeout: " + t);
 				return new Promise(r => setTimeout(r, t)).then(() => {
-					return this._read();
+					return navigator.locks.request(this.lock, async (lock) => {
+						return this._read();
+					}); // end of lock.
 				}); // end of new Promise.
 
 			// Wait until input.
@@ -51,17 +52,27 @@ pico.Touch = class {
 				console.log("Wait until input.");
 				return new Promise((resolve) => {
 					const timer = setInterval(() => {
-						if (this.flushing || pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
+						if (this.flushing) {
 							clearInterval(timer);
 							this.flushing = false;
-							this._read();
-							resolve();
+							return navigator.locks.request(this.lock, async (lock) => {
+								this._read();
+								resolve();
+							}); // end of lock.
+						} else {
+								if (pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
+									clearInterval(timer);
+									this.flushing = false;
+									return navigator.locks.request(this.lock, async (lock) => {
+										this._read();
+										resolve();
+									}); // end of lock.
+								}
 						}
 						pico.touch.allscreen._read();
 					}, 10); // end of setInterval.
 				}); // end of new Promise.
 			}
-		}); // end of lock.
 	}
 
 	// Flush touch event.
