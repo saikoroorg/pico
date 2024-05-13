@@ -12,29 +12,38 @@ const dots = [ // Dotted design pixels.
 	[0,7,7, 0,0,0,0,6,6, 9,3,3, 9,1,1, 9,1,3, 9,3,1, 9,3,5, 9,1,5, 9,5,1, 9,5,3, 9,5,5],
 ];
 
-var items = [ // Menu items.
-	["dice", "app/dice.svg", "app/dice.js"],
-	["clock", "app/clock.svg", "app/clock.js"],
-	["bank", "app/bank.svg", "app/bank.js"],
-	["kuku", "app/kuku.svg", "app/kuku.js"],
-	["chess", "app/chess.svg", "app/chess.js"],
-	["shogi", "app/shogi.svg", "app/shogi.js"],
-	["voxel", "app/voxel.svg", "app/voxel.js"],
-	["bros", "app/bros.svg", "app/bros.js"],
-	["edit", "app/edit.svg", "app/edit.js"],
-	["text", "test/text.svg", "test/text.js"],
-	["hex", "test/hex.svg", "test/hex.js"],
-	["demo", "test/demo.svg", "test/demo.js"],
-/*/
-	["dice", "dice/icon.svg", "dice/"],
-	["clock", "clock/icon.svg", "clock/"],
-	["bank", "bank/icon.svg", "bank/"],
-	["kuku", "kuku/icon.svg", "kuku/"],
-	["chess", "chess/icon.svg", "chess/"],
-	["shogi", "shogi/icon.svg", "shogi/"],
-//*/
-];
-var refer = "test/menu.js";//"../?w=1"; // Return url.
+var items = {
+"-1": [ // Menu items for dev mode.
+	["dice", "app/dice.svg", "app/dice.js", "test/menu.js"],
+	["clock", "app/clock.svg", "app/clock.js", "test/menu.js"],
+	["bank", "app/bank.svg", "app/bank.js", "test/menu.js"],
+	["kuku", "app/kuku.svg", "app/kuku.js", "test/menu.js"],
+	["chess", "app/chess.svg", "app/chess.js", "test/menu.js"],
+	["shogi", "app/shogi.svg", "app/shogi.js", "test/menu.js"],
+	["voxel", "app/voxel.svg", "app/voxel.js", "test/menu.js"],
+	["bros", "app/bros.svg", "app/bros.js", "test/menu.js"],
+	["edit", "app/edit.svg", "app/edit.js", "test/menu.js"],
+	["text", "test/text.svg", "test/text.js", "test/menu.js"],
+	["hex", "test/hex.svg", "test/hex.js", "test/menu.js"],
+	["demo", "test/demo.svg", "test/demo.js", "test/menu.js"],
+],
+"0": [ // Menu items for web mode.
+	["dice", "dice/icon.svg", "dice/", "../?v=0"],
+	["clock", "clock/icon.svg", "clock/", "../?v=0"],
+	["bank", "bank/icon.svg", "bank/", "../?v=0"],
+	["kuku", "kuku/icon.svg", "kuku/", "../?v=0"],
+	["chess", "chess/icon.svg", "chess/", "../?v=0"],
+	["shogi", "shogi/icon.svg", "shogi/", "../?v=0"],
+],
+"1": [ // Menu items for app mode.
+	["dice", "dice/icon.svg", "dice/app.js"],
+	["clock", "clock/icon.svg", "clock/app.js"],
+	["bank", "bank/icon.svg", "bank/app.js"],
+	["kuku", "kuku/icon.svg", "kuku/app.js"],
+	["chess", "chess/icon.svg", "chess/app.js"],
+	["shogi", "shogi/icon.svg", "shogi/app.js"],
+],
+};
 
 var images = []; // Menu images.
 var state = ""; // Playing state.
@@ -42,6 +51,7 @@ var playing = 0; // Playing count.
 var index = 0; // Sprite index.
 var angle = 0; // Rolling angle.
 var scale = 1; // Rolling scale.
+var version = 0; // Version.
 
 // Update buttons.
 async function appUpdate() {
@@ -73,11 +83,12 @@ async function appLoad() {
 	picoSpriteData(dots[index], -1).then((image) => {
 		picoLabel("select", null, image); // Lazy loading.
 	});
+	version = picoString("v") ? picoString("v") : "0";
 
 	// Load images.
-	for (let i = 0; i < items.length; i++) {
-		if (items[i][1]) {
-			picoLoad(items[i][1]).then((image) => {
+	for (let i = 0; i < items[version].length; i++) {
+		if (items[version][i][1]) {
+			picoLoad(items[version][i][1]).then((image) => {
 				images[i] = image; // Lazy loading.
 				picoFlush();
 			});
@@ -85,7 +96,7 @@ async function appLoad() {
 	}
 
 	// Skip demo on app mode or continuous start.
-	if (picoString("v") || picoString("w")) {
+	if (picoString("v") != null) {
 		state = "menu";
 		playing = 5;
 	} else {
@@ -157,29 +168,29 @@ async function appMain() {
 		const itemcolor = 2, itemscale = 1.5, imagescale = 0.4;
 		const itemwidth = 30, itemvgrid = 44, itemhgrid = 44;
 		const itemoffset = -4, textoffset = 16;
-		let xcount = items.length < 6 ? 3 : !landscape ? 3 : picoSqrt(items.length - 1) + 1;
-		let ycount = picoDiv(items.length - 1, xcount) + 1;
-		for (let i = 0; i < items.length; i++) {
+		let xcount = items[version].length < 6 ? 3 : !landscape ? 3 : picoSqrt(items[version].length - 1) + 1;
+		let ycount = picoDiv(items[version].length - 1, xcount) + 1;
+		for (let i = 0; i < items[version].length; i++) {
 			let x = (picoMod(i, xcount) - (xcount - 1) / 2) * itemvgrid;
 			let y = (picoDiv(i, xcount) - (ycount - 1) / 2) * itemhgrid;
 			let m = picoMotion(x,y, itemwidth/2,itemwidth/2) ? 0.9 : 1;
 			if (picoAction(x,y, itemwidth/2,itemwidth/2)) {
-				if (items[i][2]) {
+				if (items[version][i][2]) {
 					picoResetParams();
-					picoSwitchApp(items[i][2], refer);
+					picoSwitchApp(items[version][i][2], items[version][i][3]);
 				}
 			}
 			picoRect(itemcolor, x*s,(y+itemoffset)*s, itemwidth,itemwidth, 0,s*m);
 			if (images[i]) {
 				picoImage(images[i], x*s,(y+itemoffset)*s, 0,imagescale*s*m)
-				picoChar(items[i][0], 2, x*s,(y+textoffset)*s, 0,itemscale*s);
+				picoChar(items[version][i][0], 2, x*s,(y+textoffset)*s, 0,itemscale*s);
 			} else {
-				if (items[i][0].length <= 5) {
-					picoChar(items[i][0], 0, x*s,(y+itemoffset)*s, 0,itemscale*s*m);
-				} else if (items[i][0].length <= 8) {
-					picoText(items[i][0], 0, x*s,(y+itemoffset)*s,4*4,6*2, 0,itemscale*s*m);
+				if (items[version][i][0].length <= 5) {
+					picoChar(items[version][i][0], 0, x*s,(y+itemoffset)*s, 0,itemscale*s*m);
+				} else if (items[version][i][0].length <= 8) {
+					picoText(items[version][i][0], 0, x*s,(y+itemoffset)*s,4*4,6*2, 0,itemscale*s*m);
 				} else {
-					picoText(items[i][0], 0, x*s,(y+itemoffset)*s,4*4,6*3, 0,itemscale*s*m);
+					picoText(items[version][i][0], 0, x*s,(y+itemoffset)*s,4*4,6*3, 0,itemscale*s*m);
 				}
 			}
 		}

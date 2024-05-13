@@ -1,7 +1,7 @@
 {
 	"name": "Menu",
 	"short_name": "Menu",
-	"version": "0.9.40511a",
+	"version": "0.9.40513a",
 	"author": "saikoro.org/menu",
 	"background_color": "#fff",
 	"theme_color": "#fff",
@@ -17,5 +17,7 @@
 	}],
 	"display": "standalone",
 	"start_url": "./?v=1",
-	"contents": ["./", "./pico.css", "./pico.js", "./app.js", "./index.js"]
+	"contents": ["./", "./pico.css", "./pico.js", "./app.js", "./index.js",
+		"dice/app.js", "clock/app.js", "bank/app.js", "kuku/app.js", "chess/app.js", "shogi/app.js",
+		"dice/app.svg", "clock/app.svg", "bank/app.svg", "kuku/app.svg", "chess/app.svg", "shogi/app.svg"]
 }
