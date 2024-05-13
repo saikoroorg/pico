@@ -29,15 +29,13 @@
 			"@                                                                              @"],
 		"usage": "sed -n \"s#.*\\\"@\\(.*\\)@\\\".*#\\1#p\" package.json",
 
-		"build:libver": "sed -i '' \"s#version *= *\".*\" *;#version = \\\"${npm_package_version}\\\";#\" src/api.js",
-		"build:liblog": "sed -i '' \"s#\\(console.log.*;\\)#//\\1#g\" pico.js",
-		"build:lib": "npm run build:libver; find src -name \"*.js\" | sort | xargs cat > ./pico.js; npm run build:liblog",
+		"build:lib": "find src -name \"*.js\" | sort | xargs cat > ./pico.js; sed -i '' \"s#pico.name *= *\".*\" *;#pico.name = \\\"${npm_package_name}\\\";#\" pico.js; sed -i '' \"s#pico.version *= *\".*\" *;#pico.version = \\\"${npm_package_version}\\\";#\" pico.js; sed -i '' \"s#\\(console.log.*;\\)#//\\1#g\" pico.js",
 		"build:out": "if [ -n \"${npm_config_out}\" ]; then mkdir -p ${npm_config_out}; cp pico.* index.* ${npm_config_out}; fi",
-		"build:app": "if [ -n \"${npm_config_main}\" ]; then for app in ${npm_config_main}.js*; do cp $app ${npm_config_out}/app.${app##*.}; done; fi",
-		"build:sub": "if [ -n \"${npm_config_main}\" ] && [ -n  \"${npm_config_sub}\" ]; then for sub in ${npm_config_sub//,/ }; do mkdir -p ${npm_config_out}/${sub%/*}; cp $sub.js ${npm_config_out}/${sub%/*}/; done; fi;",
+		"build:app": "if [ -n \"${npm_config_out}\" ] && [ -n \"${npm_config_main}\" ]; then for app in ${npm_config_main}.js*; do cp $app ${npm_config_out}/app.${app##*.}; done; fi",
+		"build:sub": "if [ -n \"${npm_config_out}\" ] && [ -n \"${npm_config_sub}\" ]; then for sub in ${npm_config_sub//,/ }; do mkdir -p ${npm_config_out}/${sub%/*}; cp $sub.js ${npm_config_out}/${sub%/*}/; done; fi;",
 		"build": "npm run build:lib; npm run build:out; npm run build:app; npm run build:sub",
 
-		"clean:sub": "if [ -n \"${npm_config_main}\" ] && [ -n  \"${npm_config_sub}\" ]; then for sub in ${npm_config_sub//,/ }; do rm ${npm_config_out}/$sub.js; done; fi",
+		"clean:sub": "if [ -n \"${npm_config_out}\" ] && [ -n \"${npm_config_sub}\" ]; then for sub in ${npm_config_sub//,/ }; do rm ${npm_config_out}/$sub.js; done; fi",
 		"clean:out": "if [ -n \"${npm_config_out}\" ]; then rm ${npm_config_out}/pico.*; rm ${npm_config_out}/index.*; rm ${npm_config_out}/app.js*; rm -r ${npm_config_out}; fi",
 		"clean": "npm run clean:sub; npm run clean:out",
 
