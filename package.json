@@ -17,7 +17,7 @@
 			"@   3. Copy <main-app> to <output-dir>/app.js                                  @",
 			"@   4. Copy <sub-apps> to <output-dir>/<sub-apps>.                             @",
 			"@                                                                              @",
-			"@   Example: npm run build --out=../build --main=app.js --sub=app/edit.js      @",
+			"@   Example: npm run build --out=../build --main=app/bros.js --sub=app/edit.js @",
 			"@                                                                              @",
 			"@ npm run clean --out=<target-dir>                                             @",
 			"@              [--main=<main-app> --sub=<sub-app1>,<sub-app2>,...]             @",
@@ -25,7 +25,7 @@
 			"@   1. Delete pico.js/css, index.html/js from <target-dir>.                    @",
 			"@   2. Delete app.js, <sub-apps> from <target-dir>.                            @",
 			"@                                                                              @",
-			"@   Example: npm run clean --out=../build --main=app.js --sub=app/edit.js      @",
+			"@   Example: npm run clean --out=../build --main=app/bros.js --sub=app/edit.js @",
 			"@                                                                              @"],
 		"usage": "sed -n \"s#.*\\\"@\\(.*\\)@\\\".*#\\1#p\" package.json",
 

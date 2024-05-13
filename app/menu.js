@@ -12,21 +12,7 @@ const dots = [ // Dotted design pixels.
 	[0,7,7, 0,0,0,0,6,6, 9,3,3, 9,1,1, 9,1,3, 9,3,1, 9,3,5, 9,1,5, 9,5,1, 9,5,3, 9,5,5],
 ];
 
-var items = {
-"-1": [ // Menu items for dev mode.
-	["dice", "app/dice.svg", "app/dice.js", "test/menu.js"],
-	["clock", "app/clock.svg", "app/clock.js", "test/menu.js"],
-	["bank", "app/bank.svg", "app/bank.js", "test/menu.js"],
-	["kuku", "app/kuku.svg", "app/kuku.js", "test/menu.js"],
-	["chess", "app/chess.svg", "app/chess.js", "test/menu.js"],
-	["shogi", "app/shogi.svg", "app/shogi.js", "test/menu.js"],
-	["voxel", "app/voxel.svg", "app/voxel.js", "test/menu.js"],
-	["bros", "app/bros.svg", "app/bros.js", "test/menu.js"],
-	["edit", "app/edit.svg", "app/edit.js", "test/menu.js"],
-	["text", "test/text.svg", "test/text.js", "test/menu.js"],
-	["hex", "test/hex.svg", "test/hex.js", "test/menu.js"],
-	["demo", "test/demo.svg", "test/demo.js", "test/menu.js"],
-],
+const items = {
 "0": [ // Menu items for web mode.
 	["dice", "dice/icon.svg", "dice/", "../?v=0"],
 	["clock", "clock/icon.svg", "clock/", "../?v=0"],
@@ -43,6 +29,20 @@ var items = {
 	["chess", "chess/icon.svg", "chess/app.js"],
 	["shogi", "shogi/icon.svg", "shogi/app.js"],
 ],
+"-1": [ // Menu items for dev mode.
+	["dice", "app/dice/icon.svg", "app/dice/app.js"],
+	["clock", "app/clock/icon.svg", "app/clock/app.js"],
+	["bank", "app/bank/icon.svg", "app/bank/app.js"],
+	["kuku", "app/kuku/icon.svg", "app/kuku/app.js"],
+	["chess", "app/chess/icon.svg", "app/chess/app.js"],
+	["shogi", "app/shogi/icon.svg", "app/shogi/app.js"],
+	["voxel", "app/voxel.svg", "app/voxel.js"],
+	["bros", "app/bros.svg", "app/bros.js"],
+	["edit", "app/edit.svg", "app/edit.js"],
+	["text", "app/text.svg", "app/text.js"],
+	["hex", "app/hex.svg", "app/hex.js"],
+	["demo", "app/demo.svg", "app/demo.js"],
+],
 };
 
 var images = []; // Menu images.
@@ -51,7 +51,7 @@ var playing = 0; // Playing count.
 var index = 0; // Sprite index.
 var angle = 0; // Rolling angle.
 var scale = 1; // Rolling scale.
-var version = 0; // Version.
+var version = 0; // Version flag.
 
 // Update buttons.
 async function appUpdate() {
@@ -177,7 +177,7 @@ async function appMain() {
 			if (picoAction(x,y, itemwidth/2,itemwidth/2)) {
 				if (items[version][i][2]) {
 					picoResetParams();
-					picoSwitchApp(items[version][i][2], items[version][i][3]);
+					picoSwitchApp(items[version][i][2], null, items[version][i][3]);
 				}
 			}
 			picoRect(itemcolor, x*s,(y+itemoffset)*s, itemwidth,itemwidth, 0,s*m);

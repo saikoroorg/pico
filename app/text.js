@@ -1,6 +1,5 @@
 const title = "Text"; // Title.
-const playjs = "app/bank.js"; // Play script.
-const playparam = "20x2"; // Play parameter.
+const editjs = "app/edit.js"; // Call script.
 
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringCode6("077912922932942923943924934925"),
@@ -442,8 +441,8 @@ texts[9] =
 	"　　　　　　　　　　　　　　　　　";
 items[9] = [
 	[0,8, 64,16],
-	[0,24, 64,16, -1, "app/bank.js", "0x2"],
-	[0,40, 64,16, -1, "app/bank.js", "30x2"],
+	[0,24, 64,16, -1, editjs, ""],
+	[0,40, 64,16, -1, editjs, ""],
 ];
 
 const livePages = [9, 0,1,2,3,4,5,6,7]; // Pages for live.
