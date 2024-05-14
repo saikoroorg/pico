@@ -162,9 +162,7 @@ a {
 	#logo {
 		margin: 0px 16px;
 	}
-	@media (max-width: 419px) {
-	}
-	@media (min-width: 420px) {
+	@media (min-width: 320px) {
 		.center {
 			position: absolute;
 			left: 50%; transform: translate(-50%, 0);
