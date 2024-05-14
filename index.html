@@ -182,14 +182,9 @@ pico.App = class {
 	async onReset() {
 		await navigator.locks.request(this.lock, async (lock) => {
 
-			// Back to refer script/page.
-			if (this.refer) {
-				await picoReturnApp();
-
-			// Reload top page.
-			} else {
-				picoResetParams();
-				await picoReload();
+			// Back to refer script/page or reload top page.
+			if (!await this.returnApp()) {
+				await this.resetApp();
 			}
 		}); // end of lock.
 	}
@@ -341,12 +336,12 @@ pico.App = class {
 
 	// Return app script.
 	async returnApp() {
-		if (picoDevMode()) {
-			picoSetString(-1, "v");
-		} else if (this.version > 0) {
-			picoSetString(this.version, "v");
-		}
 		if (this.refer) {
+			if (picoDevMode()) {
+				picoSetString(-1, "v");
+			} else if (this.version > 0) {
+				picoSetString(this.version, "v");
+			}
 			picoSetString("", "r");
 			picoSetString("", "t");
 
@@ -362,8 +357,21 @@ pico.App = class {
 				await picoReload(this.refer);
 				return true;
 			}
+
 		}
 		return false;
+	}
+
+	// Reload top page.
+	async resetApp() {
+		picoResetParams();
+		if (picoDevMode()) {
+			picoSetString(-1, "v");
+		} else if (this.version > 0) {
+			picoSetString(this.version, "v");
+		}
+		await picoReload();
+		return true;
 	}
 
 	// Share app url.
