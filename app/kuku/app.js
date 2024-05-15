@@ -58,6 +58,9 @@ var startTime = 0; // Start time of the problem.
 var resultTime = 0; // Result time of the problem.
 const clearTime = 60 * 1000; // Clear time of the problem.
 const grid = 48; // Answer sprite grid.
+const numberoffset = -60; // Draw number offset.
+const seedoffset = -50; // Draw seed offset.
+const probremoffset = -35; // Draw probrem offset.
 
 // Select button.
 async function appSelect(x) {
@@ -269,11 +272,11 @@ async function appProbrem() {
 	}
 
 	// Draw number.
-	picoChar("" + number + "/" + maxnumber, 0, 0,-85, 0,2);
+	picoChar("" + number + "/" + maxnumber, 0, 0,numberoffset, 0,2);
 
 	// Draw probrem.
 	let probrem = appProbremText(operator, probrem1, probrem2);
-	picoChar(probrem, -1, 0,-50, 0,scale);
+	picoChar(probrem, -1, 0,probremoffset, 0,scale);
 
 	// Draw answer.
 	for (let i = 0; i < 3; i++) {
@@ -312,11 +315,11 @@ async function appAnswer() {
 	}
 
 	// Draw number.
-	picoChar("" + number + "/" + maxnumber, 0, 0,-85, 0,2);
+	picoChar("" + number + "/" + maxnumber, 0, 0,numberoffset, 0,2);
 
 	// Draw probrem.
 	let probrem = appProbremText(operator, probrem1, probrem2);
-	picoChar(probrem, -1, 0,-50, 0,scale);
+	picoChar(probrem, -1, 0,probremoffset, 0,scale);
 
 	// Draw choose answer.
 	if (choose != correct) {
@@ -374,12 +377,12 @@ async function appResult() {
 
 	// Draw probrem title.
 	let probrem = appProbremText(levels[level][0], levels[level][1], levels[level][2]);
-	picoChar(probrem, -1, 0,-85, 0,2);
-	picoChar(seed, 0, 0,-75, 0,1);
+	picoChar(probrem, -1, 0,numberoffset, 0,2);
+	picoChar(seed, 0, 0,seedoffset, 0,1);
 
 	// Draw result.
 	let result = appResultText(resultTime);
-	picoChar(result, -1, 0,0, 0,8);
+	picoChar(result, -1, 0,0, 0,6);
 
 	// Wait result.
 	if (playing <= 72) {
