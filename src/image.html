@@ -7,7 +7,7 @@
 <script src="image.js"></script>
 <script src="param.js"></script>
 <!--Main--><script>
-const builtinChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?*&%$#"; // Built in chars.
+const builtinChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?!*&%$#"; // Built in chars.
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringCode6("077912922932942923943924934925"),
 	"ア": picoStringCode6("077911921931941951932952933943934925"),
@@ -263,19 +263,19 @@ const symbol5x5CharSprites = { // Symbol5x5 char sprite table.
 	"「": picoStringCode6("077931941951932933"),
 	"」": picoStringCode6("077933934915925935"),
 	"×": picoStringCode6("077911951922942933924944915955"),
-	"○": picoStringCode6("077921931941912952913953914954925935945"),
 	"△": picoStringCode6("077931922942923943914954915925935945955"),
+	"▽": picoStringCode6("077911921931941951912952923943924944935"),
+	"○": picoStringCode6("077921931941912952913953914954925935945"),
 	"□": picoStringCode6("077911921931941951912952913953914954915925935945955"),
+	"▲": picoStringCode6("077931922932942923933943914924934944954915925935945955"),
+	"▼": picoStringCode6("077911921931941951912922932942952923933943924934944935"),
 	"●": picoStringCode6("077921931941912922932942952913923933943953914924934944954925935945"),
 	"■": picoStringCode6("077911921931941951912922932942952913923933943953914924934944954915925935945955"),
-	"＆": picoStringCode6("077931922932942913923933943953914924934944954925935945"),
-	"％": picoStringCode6("077921941912922932942952913923933943953924934944935"),
-	"＄": picoStringCode6("077931922932942913923933943953924934944935"),
-	"＃": picoStringCode6("077921931941922932942913923933943953914924934944954935"),
 };
 
 const extraCharAiliases = [ // Extra char ailiases.
-	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９", "-−", "+＋", "/／", ":：", "?？",
+	"0０", "1１", "2２", "3３", "4４", "5５", "6６", "7７", "8８", "9９",
+	".．", "-−", "/／", ":：", "+＋", "=＝", "?？", "!！", "*＊",
 ];
 
 const colors64 = [
@@ -351,7 +351,7 @@ window.addEventListener("load", async (evt) => {
 	picoRect(1, 0,0,150,150, 0,1);
 	picoText(builtinChars + extraChars, -1, 0,0,120,120, 0,1);
 });
-var count = -4;
+var count = 0;
 document.addEventListener("click", async (evt) => {
 if (count <= 0) {
 	count = -count + 1;
@@ -375,7 +375,7 @@ if (count <= 0) {
 		for (let i = 0; i < builtinChars.length; i++) {
 			picoClear();
 			picoRect(1, 0,0,42,42, 0,4);
-			picoText(builtinChars.substr(0, picoMod(i,builtinChars.length)), -1, 0,0,42,42, 0,4);
+			picoText(builtinChars.substr(0, picoMod(i,builtinChars.length)+1), -1, 0,0,42,42, 0,4);
 			await picoFlip(20);
 		}
 //*/
