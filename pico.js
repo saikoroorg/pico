@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.9.40512"; // Update by package.json.
+pico.version = "0.9.40515"; // Update by package.json.
 
 /* PICO Image module */
 
@@ -1139,7 +1139,6 @@ pico.Param = class {
 
 	// constructor.
 	constructor() {
-		//this.lock = "picoParamLock" + Date.now(); // Lock object identifier.
 		this.context = [];
 		this.rand = Date.now(); // Random seed.
 
@@ -1154,17 +1153,14 @@ pico.Param = class {
 
 	// Setup param.
 	_setup() {
-		return new Promise((resolve) => {
 
-			// Loadd query.
-			let query = window.location.search;
-			if (query != null && query != "") {
-				//console.log("Load query: " + query);
-				let text = query.slice(1);
-				this._deserialize(text);
-			}
-			return Promise.resolve();
-		}); // end of new Promise.
+		// Load query.
+		let query = window.location.search;
+		if (query != null && query != "") {
+			//console.log("Load query: " + query);
+			let text = query.slice(1);
+			this._deserialize(text);
+		}
 	}
 
 	// Reset param.
