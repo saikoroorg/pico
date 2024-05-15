@@ -23,6 +23,7 @@ const extraCharSprites = { // Extra char sprite table.
 	"↓": picoStringCode6("077931932913933953924934944935"),
 	"→": picoStringCode6("077931942913923933943953944935"),
 	"←": picoStringCode6("077931922913923933943953924935"),
+	"＠": picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"),
 };
 
 // Voxel class.
@@ -174,7 +175,8 @@ async function appAction() {
 async function appSelect(x) {
 	if (x) {
 		depth = depth + (x*adddepth) < 0 ? 0 : depth + (x*adddepth) < maxdepth ? depth + (x*adddepth) : maxdepth;
-		picoLabel("select", depth>0?""+depth:"&");
+	let data = await picoSpriteData(extraCharSprites["＠"], -1);
+	picoLabel("select", null, data);
 		picoFlush();
 	} else {
 
@@ -216,7 +218,8 @@ async function appLoad() {
 	picoColor(voxel.colors);
 
 	picoLabel("action", "*");
-	picoLabel("select", "&");
+	let data = await picoSpriteData(extraCharSprites["＠"], -1);
+	picoLabel("select", null, data);
 //	picoLabel("minus", "-");
 //	picoLabel("plus", "+");
 }
