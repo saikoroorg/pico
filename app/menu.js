@@ -56,7 +56,6 @@ async function appUpdate() {
 	if (state == "demo") {
 		index = 0; // Reset icon.
 	}
-	picoTitle(title);
 	picoSpriteData(dots[index], -1).then((image) => {
 		picoLabel("select", null, image); // Lazy loading.
 	});
@@ -78,17 +77,16 @@ async function appSelect() {
 // Load.
 async function appLoad() {
 	picoTitle(title);
-	picoSpriteData(dots[index], -1).then((image) => {
-		picoLabel("select", null, image); // Lazy loading.
-	});
 
 	// Skip demo on app mode or continuous start.
 	if (picoString("v") != null) {
 		state = "menu";
 		playing = 5;
+		index = 6;
 	} else {
 		state = "demo";
 		playing = 0;
+		index = 0;
 	}
 
 	// Load images.
@@ -128,10 +126,10 @@ async function appMain() {
 	if (state == "demo") {
 		const maximum = 6, dicescale = 8, diceoffset = 0;
 		if (playing > 60 && picoAction()) {
-			playing = -1; // Reroll.
-			picoFlush(); // Update animation without input.
-			//state = "menu";
-			//appUpdate(); // Show menu.
+			//playing = -1; // Reroll.
+			//picoFlush(); // Update animation without input.
+			state = "menu";
+			appUpdate(); // Show menu.
 			return;
 		} else if (picoMotion()) {
 			if (playing <= 60) {
@@ -160,7 +158,7 @@ async function appMain() {
 	// Menu.
 	if (state == "menu") {
 		// Scale animation at start.
-		let s = playing < 5 ? (1.2 - 0.04 * playing) : 1;
+		let s = playing < 5 ? (0.8 + 0.04 * playing) : 1;
 		// 300(Image size) * 0.4(Image scale) / 4(Pixel ratio) = 30(Pixel size)
 		const itemcolor = 2, itemscale = 1.5, imagescale = 0.4;
 		const itemwidth = 30, itemvgrid = 44, itemhgrid = 44;
