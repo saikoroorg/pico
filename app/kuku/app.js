@@ -53,10 +53,11 @@ var choices = [0, 0, 0]; // Choices of answer.
 var choose = -1; // Answer you chose.
 var angle = 0; // Angle of number.
 var scale = 6; // Scale of number.
-const square = 54; // Width of base square.
+const square = 42; // Width of base square.
 var startTime = 0; // Start time of the problem.
 var resultTime = 0; // Result time of the problem.
 const clearTime = 60 * 1000; // Clear time of the problem.
+const grid = 48; // Answer sprite grid.
 
 // Select button.
 async function appSelect(x) {
@@ -135,7 +136,7 @@ async function appTitle() {
 
 	// Draw probrem title.
 	let probrem = appProbremText(levels[level][0], levels[level][1], levels[level][2]);
-	picoChar(probrem, -1, 0,0, 0,8);
+	picoChar(probrem, -1, 0,0, 0,6);
 	if (seed) {
 		picoChar(seed, 0, 0,-75, 0,1);
 	}
@@ -189,7 +190,7 @@ async function appProbrem() {
 			}
 
 			// Add/Sub probrem (under 99).
-			scale = 6;
+			scale = 4;
 
 			// Generate wrong answer.
 			correct = answer > 2 ? picoRandom(3) : answer > 1 ? picoRandom(2) : 0;
@@ -210,11 +211,11 @@ async function appProbrem() {
 
 			// Mul probrem (under 99).
 			if (levels[level][1] * levels[level][2] <= 99) {
-				scale = 6;
+				scale = 4;
 
 			// Mul probrem (over 100).
 			} else {
-				scale = 4;
+				scale = 3;
 			}
 
 			// Generate wrong answer.
@@ -236,11 +237,11 @@ async function appProbrem() {
 
 			// Mul probrem (under 999).
 			if (levels[level][1] * levels[level][2] <= 999) {
-				scale = 4;
+				scale = 3;
 
 			// Mul probrem (over 1000).
 			} else {
-				scale = 3;
+				scale = 2.5;
 			}
 
 			// Generate wrong answer.
@@ -276,7 +277,7 @@ async function appProbrem() {
 
 	// Draw answer.
 	for (let i = 0; i < 3; i++) {
-		let x = (i-1)*60, y = 35;
+		let x = (i-1)*grid, y = 35;
 		let s = picoMotion(x, y, square/2, square/2) ? 0.8 : 1;
 
 		// Choose answer.
@@ -320,13 +321,13 @@ async function appAnswer() {
 	// Draw choose answer.
 	if (choose != correct) {
 		let i = choose;
-		let x = (i-1)*60, y = 35;
+		let x = (i-1)*grid, y = 35;
 		picoChar("*", -1, x,y, 0,scale);
 	}
 
 	// Draw correct answer.
 	let i = correct;
-	let x = (i-1)*60, y = 35;
+	let x = (i-1)*grid, y = 35;
 	let s = picoMotion(x, y, square/2, square/2) ? 0.8 : 1;
 	if (picoAction(x, y, square/2, square/2)) {
 

@@ -38,9 +38,6 @@ a {
 #screen {
 	aspect-ratio: 1;
 }
-#widescreen {
-	aspect-ratio: 1;
-}
 .offscreen {
 	display: none;
 }
@@ -129,16 +126,8 @@ a {
 		top: 18px;
 	}
 	#screen {
-		@media (min-aspect-ratio: 1.0) {
-			height: 70%;
-		}
-		@media (max-aspect-ratio: 1.0) {
-			width: 100%;
-		}
-	}
-	#widescreen {
 		@media (min-aspect-ratio: 0.7) {
-			height: 140%;
+			height: 130%;
 		}
 		@media (max-aspect-ratio: 0.7) {
 			width: 130%;
@@ -169,14 +158,6 @@ a {
 		}
 	}
 	#screen {
-		@media (min-aspect-ratio: 1) {
-			height: 100%;
-		}
-		@media (max-aspect-ratio: 1) {
-			width: 100%;
-		}
-	}
-	#widescreen {
 		@media (min-aspect-ratio: 0.7) {
 			height: 100%;
 		}

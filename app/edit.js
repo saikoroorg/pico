@@ -45,7 +45,7 @@ async function appUpdate(force = true) {
 		let data = await picoSpriteData(buffers[frame], bgcolor);
 		picoLabel("action", null, data);
 	} else {
-		picoLabel("action", "&");
+		picoLabel("action", "*");
 	}
 
 	// Update select button.
@@ -135,6 +135,13 @@ var colorselecting = depth - 1; // Touching color index.
 //var colorselected = -1; // Previous touched color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var frameselecting = -1; // Selecting frame index.
+var landscape = false; // landscape mode.
+
+// Resize.
+async function appResize() {
+	landscape = picoWideScreen();
+	picoFlush();
+}
 
 // Load.
 async function appLoad() {
@@ -189,6 +196,8 @@ async function appLoad() {
 			}
 		}
 	}
+
+	appResize();
 }
 
 // Main.
@@ -261,18 +270,18 @@ async function appMain() {
 	}
 
 	// Positions.
-	let pixelswidth = 168; // Size of pixels.
+	let pixelswidth = (!animeflag && !landscape) ? 168 : 140; // Size of pixels.
 	let pixelsposx = !animeflag ? 0 : 14; // Position x of pixels.
 	let pixelsposy = -14; // Position y of pixels.
 	let colorsposx = 0; // Position x of colors/coloreditor.
-	let colorsposy = pico.Image.height/2 - 16; // Position y of colors/coloreditor.
+	let colorsposy = pico.Image.height/2 - (!landscape ? 16 : 32); // Position y of colors/coloreditor.
 	let fgcolorsposx = 0; // Position x of bgcolors/coloreditor.
 	let bgcolorsposx = -pico.Image.width/2 + 28; // Position x of bgcolors/coloreditor.
-	let framesposx = -pico.Image.width/2 + 14; // Offset of buffer.
+	let framesposx = -pico.Image.width/2 + 28; // Offset of buffer.
 
 	// Draw background.
 	picoColor();
-	picoRect(1, 0, pixelsposy, pixelswidth, pixelswidth);
+	picoRect(1, pixelsposx, pixelsposy, pixelswidth, pixelswidth);
 
 	// Touching background.
 	{

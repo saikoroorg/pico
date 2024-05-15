@@ -93,9 +93,9 @@ function picoLockScreen(enable=true) {
 	pico.app.lockScreen(enable);
 }
 
-// Enable wide screen and return true if landscape mode.
-function picoWideScreen(enable=true) {
-	return pico.app.wideScreen(enable);
+// Check wide screen and return true if landscape mode.
+function picoWideScreen() {
+	return pico.app.wideScreen();
 }
 
 // App mode.
@@ -414,14 +414,8 @@ pico.App = class {
 		}
 	}
 
-	// Enable wide screen and return true if landscape mode.
-	wideScreen(enable) {
-		let e = document.getElementById(enable ? "screen" : "wideScreen");
-		if (e) {
-			e.id = enable ? "wideScreen" : "screen";
-		}
-
-		// True if landscape mode.
+	// Check wide screen and return true if landscape mode.
+	wideScreen() {
 		return window.matchMedia("(min-aspect-ratio: 1.0)").matches;
 	}
 }
