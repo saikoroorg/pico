@@ -339,7 +339,7 @@ async function appMain() {
 
 		// Update angle.
 		if (result <= 0) {
-			angle = picoMod(angle + 40, 360);
+			angle = picoMod(angle + 20, 360);
 			for (let i = 0; i < count; i++) {
 				randoms[i] = picoMod(picoTime(), maximum);
 			}
