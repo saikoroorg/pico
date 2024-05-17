@@ -76,7 +76,6 @@ async function appSelect() {
 
 // Load.
 async function appLoad() {
-	picoTitle(title);
 
 	// Skip demo on app mode or continuous start.
 	if (picoString("v") != null) {
@@ -99,6 +98,9 @@ async function appLoad() {
 		}
 	}
 
+	await picoWait(500000); // Dummy loading wait.
+
+	picoTitle(title); // Initialize header.
 	appResize(); // Initialize positions.
 	appUpdate(); // Initialize buttons.
 }
