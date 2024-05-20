@@ -84,6 +84,12 @@ function picoNumbers(key=0) {
 	return pico.param.numbers(key);
 }
 
+// Get param as one number.
+function picoNumber(key=0) {
+	let n = pico.param.numbers(key);
+	return n.length > 0 ? n[0] : 0;
+}
+
 // Set param as numbers.
 function picoSetNumbers(numbers, key=0, separator=".") {
 	return pico.param.setNumbers(numbers, key, separator);

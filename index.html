@@ -135,17 +135,19 @@ pico.App = class {
 	constructor() {
 		pico.App.count++;
 		this.lock = "picoAppLock" + pico.App.count + Date.now(); // Lock object identifier.
-		this.refer = null; // Refer script/url.
-		this.script = pico.App.script; // App script.
-		this.title = ""; // App title.
-		this.version = 0; // App version.
-		this.author = "*"; // App author.
-		this.timestamp = ""; // Timestamp.
 		this.wakeLock = null; // Wake lock object.
 		this.image = new pico.Image(""); // App offscreen image.
 		this.loading = 1; // App loading count.
 		this.angle = 0; // App loading icon angle.
 		this.frame = 0; // App loading icon frame.
+
+		this.refer = picoString("r"); // Refer script/url.
+		this.script = picoString("s") ? picoString("s") : pico.App.script; // App script.
+		this.title = picoString("t"); // App title.
+		this.version = picoNumber("v"); // App version.
+
+		this.author = "*"; // App author.
+		this.timestamp = ""; // Timestamp.
 
 		// Load app information.
 		let e = document.getElementById("author");
@@ -175,10 +177,6 @@ pico.App = class {
 		}
 
 		// Load app script.
-		let script = picoString("s");
-		if (script) {
-			this.script = script;
-		}
 		e = document.createElement('script');
 		e.src = this.script;
 		document.body.appendChild(e);
@@ -186,6 +184,7 @@ pico.App = class {
 		window.addEventListener("resize", async () => {
 			await this.onResize()
 		}); // Resize.
+
 		window.addEventListener("load", async () => {
 			await this.onLoaded();
 		}); // Loaded.
@@ -268,9 +267,6 @@ pico.App = class {
 	// On loaded event.
 	async onLoaded() {
 		try {
-			this.title = picoString("t");
-			this.refer = picoString("r");
-			this.version = picoString("v");
 			if (typeof appLoad === "function") {
 				await appLoad();
 			}

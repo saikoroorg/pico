@@ -29,7 +29,7 @@ var items = picoString("v") && picoString("v") != "0" ? [ // Items for app mode.
 ];
 
 // Add and fix items for dev mode.
-if (picoString("v") == "-1") {
+if (picoDevMode()) {
 	items = items.concat([
 		["voxel", "voxel.svg", "voxel.js"],
 		["bros", "bros.svg", "bros.js"],
