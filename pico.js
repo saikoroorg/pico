@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.9.40515"; // Update by package.json.
+pico.version = "0.9.40520"; // Update by package.json.
 
 /* PICO Image module */
 
@@ -175,9 +175,9 @@ async function picoScreenImage() {
 }
 
 // Load image file.
-async function picoLoad(url) {
+async function picoLoad(url, timeout=10000) {
 	try {
-		return await pico.image.loadImage(url);
+		return await pico.image.loadImage(url, timeout);
 	} catch (error) {
 		console.error(error);
 	}
@@ -521,10 +521,10 @@ pico.Image = class {
 	}
 
 	// Load image file and get image.
-	loadImage(url) {
+	loadImage(url, timeout=10000) {
 		return new Promise(async (resolve) => {
 			let image = new pico.Image("");
-			resolve(image._load(url));
+			resolve(image._load(url, timeout));
 		}); // end of new Promise.
 	}
 
@@ -820,23 +820,39 @@ pico.Image = class {
 	}
 
 	// Load image from data url.
-	_load(url) {
+	_load(url, timeout=10000) {
 		return new Promise(async (resolve) => {
 			let image = new Image();
 			//image.crossOrigin = "anonymous";
 			image.onload = () => {
-				for (let i = 0; i < 2; i++) {
-					this.canvas[i].width = image.width;// * pico.Image.ratio;
-					this.canvas[i].height = image.height;// * pico.Image.ratio;
-				}
-			  this.context.drawImage(image, 0,0);/*
-			  	0, 0, image.width, image.height,
-			  	0, 0, this.canvas[0].width, this.canvas[0].height);*/
-			  //image.style.display = "none";
-			  //document.body.appendChild(image);
-				resolve(this);
+				navigator.locks.request(this.lock, async (lock) => {
+					if (timeout > 0) {
+						for (let i = 0; i < 2; i++) {
+							this.canvas[i].width = image.width;// * pico.Image.ratio;
+							this.canvas[i].height = image.height;// * pico.Image.ratio;
+						}
+					  this.context.drawImage(image, 0,0);/*
+					  	0, 0, image.width, image.height,
+					  	0, 0, this.canvas[0].width, this.canvas[0].height);*/
+					  //image.style.display = "none";
+					  //document.body.appendChild(image);
+						//console.log("Loaded: " + url);
+						timeout = 0;
+						resolve(this);
+					}
+				}); // end of lock.
 			};
-			image.src = url; // To avoid onload hook timing bug.
+			setTimeout(() => {
+				navigator.locks.request(this.lock, async (lock) => {
+					if (timeout > 0) {
+						//console.log("Load timed out: " + url);
+						image.src = null; // Load cancel.
+						timeout = 0;
+						resolve();
+					}
+				}); // end of lock.
+			}, timeout);
+			image.src = url; // Set url after onload event handler to avoid onload hook timing bug.
 		});
 	}
 

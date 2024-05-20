@@ -39,7 +39,7 @@ if (picoString("v") == "-1") {
 		["demo", "demo.svg", "demo.js"],
 	]);
 	for (let i = 0; i < items.length; i++) {
-		items[i][1] = null;//"app/" + items[i][1];
+		items[i][1] = "app/" + items[i][1];
 		items[i][2] = "app/" + items[i][2];
 	}
 }
@@ -56,7 +56,7 @@ async function appUpdate() {
 	if (state == "demo") {
 		index = 0; // Reset icon.
 	}
-	// No "await" for lazy loading.
+	// No await for async loading.
 	picoSpriteData(dots[index], -1).then((image) => {
 		picoLabel("select", null, image);
 	});
@@ -93,15 +93,14 @@ async function appLoad() {
 	// Load images.
 	for (let i = 0; i < items.length; i++) {
 		if (items[i][1]) {
-			// Wait for loading (or remove "await" for lazy loading).
-			await picoLoad(items[i][1]).then(async (image) => {
+			// Wait for loading.
+			await picoLoad(items[i][1], 500).then((image) => {
+			// No await for async loading.
+			//picoLoad(items[i][1]).then((image) => {
 				images[i] = image;
 				picoFlush();
 			});
 		}
-	}
-	if (picoString("v") == "-1") {
-		await picoWait(5000); // Dummy loading wait.
 	}
 
 	await appResize(); // Initialize positions.
