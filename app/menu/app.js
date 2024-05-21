@@ -28,22 +28,6 @@ var items = picoString("v") && picoString("v") != "0" ? [ // Items for app mode.
 	["shogi", "shogi/icon.svg", "shogi/", "../?v=0"],
 ];
 
-// Add and fix items for dev mode.
-if (picoDevMode()) {
-	items = items.concat([
-		["voxel", "voxel.svg", "voxel.js"],
-		["bros", "bros.svg", "bros.js"],
-		["edit", "edit.svg", "edit.js"],
-		["text", "text.svg", "text.js"],
-		["hex", "hex.svg", "hex.js"],
-		["demo", "demo.svg", "demo.js"],
-	]);
-	for (let i = 0; i < items.length; i++) {
-		items[i][1] = "app/" + items[i][1];
-		items[i][2] = "app/" + items[i][2];
-	}
-}
-
 var images = []; // Menu images.
 var state = ""; // Playing state.
 var playing = 0; // Playing count.
@@ -82,7 +66,7 @@ async function appLoad() {
 	// Skip demo on app mode or continuous start.
 	if (picoString("v") != null) {
 		state = "menu";
-		playing = 0;//5;
+		playing = 5;
 		index = 6;
 	} else {
 		state = "demo";
@@ -101,10 +85,6 @@ async function appLoad() {
 				picoFlush();
 			});
 		}
-	}
-	// Dummy wait.
-	if (picoDevMode()) {
-		await picoWait(5000);
 	}
 
 	await appResize(); // Initialize positions.

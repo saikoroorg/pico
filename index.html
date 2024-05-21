@@ -103,14 +103,6 @@ function picoAppMode() {
 	return pico.app.version > 0;
 }
 
-// Dev mode.
-function picoDevMode(enable=false) {
-	if (enable) {
-		pico.app.version = -1;
-	}
-	return pico.app.version < 0;
-}
-
 //************************************************************/
 
 // Namespace.
@@ -177,9 +169,7 @@ pico.App = class {
 		}
 
 		// Load app script.
-		e = document.createElement('script');
-		e.src = this.script;
-		document.body.appendChild(e);
+		this.loadScripts(this.script.split(/,/));
 
 		window.addEventListener("resize", async () => {
 			await this.onResize()
@@ -191,6 +181,22 @@ pico.App = class {
 
 		// On loading.
 		this.onLoading();
+	}
+
+	// Load script.
+	async loadScripts(scripts, index=0) {
+		return new Promise(async (resolve) => {
+			console.log("Load" + index + ": " + scripts[index]);
+			let e = document.createElement('script');
+			e.src = scripts[index];
+			document.body.appendChild(e);
+			e.onload = async () => {
+				if (index + 1 < scripts.length) {
+					await this.loadScripts(scripts, index + 1);
+				}
+				return resolve();
+			};
+		}); // end of new Promise.
 	}
 
 	// On reset button.
@@ -346,9 +352,7 @@ pico.App = class {
 
 	// Switch app script.
 	async switchApp(target=null, refer=null, title=null) {
-		if (picoDevMode()) {
-			picoSetString(-1, "v");
-		} else if (this.version > 0) {
+		if (this.version > 0) {
 			picoSetString(this.version, "v");
 		}
 
@@ -381,9 +385,7 @@ pico.App = class {
 	// Return app script.
 	async returnApp() {
 		if (this.refer) {
-			if (picoDevMode()) {
-				picoSetString(-1, "v");
-			} else if (this.version > 0) {
+			if (this.version > 0) {
 				picoSetString(this.version, "v");
 			}
 			picoSetString("", "r");
@@ -409,9 +411,7 @@ pico.App = class {
 	// Reload top page.
 	async resetApp() {
 		picoResetParams();
-		if (picoDevMode()) {
-			picoSetString(-1, "v");
-		} else if (this.version > 0) {
+		if (this.version > 0) {
 			picoSetString(this.version, "v");
 		}
 		await picoReload();
