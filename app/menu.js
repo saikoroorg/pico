@@ -94,13 +94,17 @@ async function appLoad() {
 	for (let i = 0; i < items.length; i++) {
 		if (items[i][1]) {
 			// Wait for loading.
-			await picoLoad(items[i][1], 500).then((image) => {
+			//await picoLoad(items[i][1], 500).then((image) => {
 			// No await for async loading.
-			//picoLoad(items[i][1]).then((image) => {
+			picoLoad(items[i][1]).then((image) => {
 				images[i] = image;
 				picoFlush();
 			});
 		}
+	}
+	// Dummy wait.
+	if (picoDevMode()) {
+		await picoWait(5000);
 	}
 
 	await appResize(); // Initialize positions.

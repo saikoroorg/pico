@@ -524,8 +524,38 @@ pico.Image = class {
 	loadImage(url, timeout=10000) {
 		return new Promise(async (resolve) => {
 			let image = new pico.Image("");
-			resolve(image._load(url, timeout));
-		}); // end of new Promise.
+			let loader = new Image();
+			//loader.crossOrigin = "anonymous";
+			loader.onload = () => {
+				navigator.locks.request(image.lock, async (lock) => {
+					if (timeout > 0) {
+						for (let i = 0; i < 2; i++) {
+							image.canvas[i].width = loader.width;// * pico.Image.ratio;
+							image.canvas[i].height = loader.height;// * pico.Image.ratio;
+						}
+					  image.context.drawImage(loader, 0,0);/*
+					  	0, 0, loader.width, loader.height,
+					  	0, 0, image.canvas[0].width, image.canvas[0].height);*/
+					  //loader.style.display = "none";
+					  //document.body.appendChild(loader);
+						//console.log("Loaded: " + url);
+						timeout = 0;
+						resolve(image);
+					}
+				}); // end of lock.
+			};
+			setTimeout(() => {
+				navigator.locks.request(image.lock, async (lock) => {
+					if (timeout > 0) {
+						//console.log("Load timed out: " + url);
+						loader.src = null; // Load cancel.
+						timeout = 0;
+						resolve();
+					}
+				}); // end of lock.
+			}, timeout);
+			loader.src = url; // Set url after onload event handler to avoid onload hook timing bug.
+		});
 	}
 
 	// Draw other image to this image.
@@ -817,43 +847,6 @@ pico.Image = class {
 			return (cells[1] > cells[2] ? cells[1] : cells[2]);
 		}
 		return 0;
-	}
-
-	// Load image from data url.
-	_load(url, timeout=10000) {
-		return new Promise(async (resolve) => {
-			let image = new Image();
-			//image.crossOrigin = "anonymous";
-			image.onload = () => {
-				navigator.locks.request(this.lock, async (lock) => {
-					if (timeout > 0) {
-						for (let i = 0; i < 2; i++) {
-							this.canvas[i].width = image.width;// * pico.Image.ratio;
-							this.canvas[i].height = image.height;// * pico.Image.ratio;
-						}
-					  this.context.drawImage(image, 0,0);/*
-					  	0, 0, image.width, image.height,
-					  	0, 0, this.canvas[0].width, this.canvas[0].height);*/
-					  //image.style.display = "none";
-					  //document.body.appendChild(image);
-						//console.log("Loaded: " + url);
-						timeout = 0;
-						resolve(this);
-					}
-				}); // end of lock.
-			};
-			setTimeout(() => {
-				navigator.locks.request(this.lock, async (lock) => {
-					if (timeout > 0) {
-						//console.log("Load timed out: " + url);
-						image.src = null; // Load cancel.
-						timeout = 0;
-						resolve();
-					}
-				}); // end of lock.
-			}, timeout);
-			image.src = url; // Set url after onload event handler to avoid onload hook timing bug.
-		});
 	}
 
 	// Draw other image to this image.
