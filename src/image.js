@@ -520,7 +520,7 @@ pico.Image = class {
 			let loader = new Image();
 			//loader.crossOrigin = "anonymous";
 			loader.onload = () => {
-				navigator.locks.request(image.lock, async (lock) => {
+				navigator.locks.request(image.lock, async (imagelock) => {
 					if (timeout > 0) {
 						for (let i = 0; i < 2; i++) {
 							image.canvas[i].width = loader.width;// * pico.Image.ratio;
@@ -538,7 +538,7 @@ pico.Image = class {
 				}); // end of lock.
 			};
 			setTimeout(() => {
-				navigator.locks.request(image.lock, async (lock) => {
+				navigator.locks.request(image.lock, async (imagelock) => {
 					if (timeout > 0) {
 						console.log("Load timed out: " + url);
 						loader.src = null; // Load cancel.
@@ -556,22 +556,24 @@ pico.Image = class {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
 			await this._reset(x, y, angle, scale);
-			if (width > 0 && yframe < 0) {
-				let nx = image.canvas[0].width / width;
-				if (frame < 0) {
-					let sx = image.canvas[0].width - (Math.floor((-frame - 1) % nx) + 1) * width;
-					let sy = image.canvas[0].height - (Math.floor((-frame - 1) / nx) + 1) * height;
-					await this._image(image, sx, sy, width, height);
+			await navigator.locks.request(image.lock, async (imagelock) => {
+				if (width > 0 && yframe < 0) {
+					let nx = image.canvas[0].width / width;
+					if (frame < 0) {
+						let sx = image.canvas[0].width - (Math.floor((-frame - 1) % nx) + 1) * width;
+						let sy = image.canvas[0].height - (Math.floor((-frame - 1) / nx) + 1) * height;
+						await this._image(image, sx, sy, width, height);
+					} else {
+						let sx = Math.floor(frame % nx) * width;
+						let sy = Math.floor(frame / nx) * height;
+						await this._image(image, sx, sy, width, height);
+					}
 				} else {
-					let sx = Math.floor(frame % nx) * width;
-					let sy = Math.floor(frame / nx) * height;
+					let sx = frame * width;
+					let sy = yframe * height;
 					await this._image(image, sx, sy, width, height);
 				}
-			} else {
-				let sx = frame * width;
-				let sy = yframe * height;
-				await this._image(image, sx, sy, width, height);
-			}
+			}); // end of lock.
 		}); // end of lock.
 	}
 
