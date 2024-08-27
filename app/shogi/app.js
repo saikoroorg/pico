@@ -72,6 +72,7 @@ const faces = {
 const movable = ".", holding = "*", nothing = " ";
 const width = 13, height = 13, inside = 9, offset = 1;
 const grid = 12, margin = 6, scale = 1, scale2 = 2.5, yflip = 0;
+const logscales = [[-1,1+9,1,0],[1,0,-1,1+9]]; // Playlog transform matrixes.
 
 // Global variables.
 var hands = [null,null], indexes = [-1,-1]; // Hand pieces and indexes of the piece table.
@@ -106,7 +107,22 @@ Playlog = class {
 	code6() {
 		let code6 = [];
 		for (let k = 0; k < this.moves.length; k++) {
-			code6 = code6.concat(this.moves[k]);
+			let m = this.moves[k];
+			let p0 = m[0];
+				// Transform to logcode.
+				if (p0 < pieces.length) {
+				for (let j = 0; j < m.length; j+=3) {
+					if (m[j+1] > inside) {
+						let m1 = m[j+1];
+						m[j+1] = m[j+2];
+						m[j+2] = m1;
+					} if (m[j+2] <= inside) {
+						m[j+1] = m[j+1] * logscales[p0][0] + logscales[p0][1];
+						m[j+2] = m[j+2] * logscales[p0][2] + logscales[p0][3];
+					}
+				}
+			}
+			code6 = code6.concat(m);
 		}
 		return code6;
 	}
@@ -118,8 +134,18 @@ Playlog = class {
 		let l = code6.length;
 		for (let k = code6.length; k >=0; k-=3) {
 			if (code6[k] < pieces.length) {
-				let p = code6.slice(k, l);
-				this.moves.unshift(p);
+				let m = code6.slice(k, l);
+				let p0 = m[0];
+				// Transform from logcode.
+				if (p0 < pieces.length) {
+					for (let j = 0; j < m.length; j+=3) {
+						if (m[j+1] <= inside && m[j+2] <= inside) {
+							m[j+1] = (m[j+1] - logscales[p0][1]) * logscales[p0][0];
+							m[j+2] = (m[j+2] - logscales[p0][3]) * logscales[p0][2];
+						}
+					}
+				}
+				this.moves.unshift(m);
 				l = k;
 			}
 		}
@@ -232,12 +258,12 @@ Playlog = class {
 				this.moves.push(m);
 				// New flip piece.
 				this._add(p0, i0, piece, i0);
-				console.log("Not modify and new flip piece.");
+				console.log("Not modify and new flip piece:" + p0 + " " + l0 + " " + piece + "->" + i1);
 			}
 		} else {
 			// New flip piece.
 			this._add(p0, i0, piece, i0);
-				console.log("New flip piece.");
+				console.log("New flip piece:" + p0 + " " + l0 + " " + piece + "->" + i1);
 		}
 	}
 
@@ -252,7 +278,7 @@ Playlog = class {
 				if (i1 != i0) {
 					// New move piece.
 					this._add(p0, i0, piece, i1);
-					console.log("Not modify and new move piece.");
+					console.log("Not modify and new move piece:" + p0 + " " + l0 + " " + piece + "->" + i1);
 				}
 			} else {
 				let x0 = m[1] + offset;
@@ -264,7 +290,7 @@ Playlog = class {
 				let l1 = x1 + y1*width;
 				if (i0 == l1 && i1 != l0) { // l0->l1(i0)->i1
 					// Change move.
-					console.log("Change move.");
+					console.log("Change move:" + p0 + " " + l0 + " " + z + "->" + i1);
 					this._add(p0, l0, z, i1);
 				} else if (i0 == l1 && i1 == l0 && z == piece) { // l0->l1->l0(i1)
 					// Cancel move.
@@ -275,7 +301,7 @@ Playlog = class {
 					if (i1 != i0) {
 						// New move piece.
 						this._add(p0, i0, piece, i1);
-						console.log("Not modify and new move piece.");
+						console.log("Not modify and new move piece:" + p0 + " " + l0 + " " + piece + "->" + i1);
 					}
 				}
 			}
@@ -479,6 +505,7 @@ async function appMain() {
 				if (hands[j]) {
 					// Drop and catch target pieces.
 					if (pieces[j?0:1][pieces[j].length-1-i] != movable && pieces[j?0:1][pieces[j].length-1-i] != nothing) {
+						console.log("Drop and catch target pieces:" + j + " " + pieces[j][i]);
 						// Catch target pieces.
 						let target = pieces[j?0:1][pieces[j].length-1-i];
 						pieces[j?0:1] = pieces[j?0:1].slice(0,pieces[j].length-1-i) + movable + pieces[j?0:1].slice(pieces[j].length-1-i+1);
@@ -499,15 +526,19 @@ async function appMain() {
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = target;
 					// Drop and flip holding piece.
-					} else if (pieces[j][i] == holding && faces[hands[j]] != hands[j]) {
-						// Add flip playlog.
-						playlog.addFlip(j, indexes0[j], hands[j]);
-						picoLabel("select", ""+playlog.count());
+					} else if (pieces[j][i] == holding && faces[hands[j]]) {
+						console.log("Drop and flip holding piece:" + j + " " + pieces[j][i]);
+						if (faces[hands[j]] != hands[j]) {
+							// Add flip playlog.
+							playlog.addFlip(j, indexes0[j], hands[j]);
+							picoLabel("select", ""+playlog.count());
+						}
 						// Move and flip holding pieces.
 						pieces[j] = pieces[j].slice(0,i) + faces[hands[j]] + pieces[j].slice(i+1);
 						hands[j] = null;
 					// Drop to empty square.
 					} else if (pieces[j][i] == movable) {
+						console.log("Drop to empty square:" + j + " " + pieces[j][i]);
 						// Add move playlog.
 						playlog.addMove(j, indexes0[j], hands[j], indexes[j]);
 						picoLabel("select", ""+playlog.count());
@@ -519,6 +550,7 @@ async function appMain() {
 			} else if (picoMotion(x,y, grid-margin,grid-margin)) {
 				// Move holding pieces to empty square.
 				if (hands[j] && pieces[j][i] != nothing && pieces[j][i] != holding) {
+					console.log("Move holding pieces to empty square:" + j + " " + pieces[j][i]);
 					if (pieces[j][indexes[j]] == holding) { // Reset holding square.
 						pieces[j] = pieces[j].slice(0,indexes[j]) + movable + pieces[j].slice(indexes[j]+1);
 					}
@@ -528,11 +560,13 @@ async function appMain() {
 					pieces[j?0:1][pieces[j].length-1-i] == movable && 
 					(picoMod(i,width) < (width-inside)/2 || picoMod(i,width) > width-(width-inside)/2 ||
 					 picoDiv(i,width) < (height-inside)/2 || picoDiv(i,width) > height-(height-inside)/2)) {
+					console.log("Reverse holding pieces on enemy square:" + j + " " + pieces[j][i]);
 					hands[j?0:1] = hands[j];
 					indexes[j?0:1] = indexes[j];
 					hands[j] = null;
 				// Hold pieces.
 				} else if (!hands[j] && !hands[j?0:1] && pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
+					console.log("Hold pieces:" + j + " " + pieces[j][i]);
 					hands[j] = pieces[j][i];
 					indexes[j] = indexes0[j] = i;
 					pieces[j] = pieces[j].slice(0,i) + holding + pieces[j].slice(i+1);
@@ -541,6 +575,7 @@ async function appMain() {
 		}
 		// Cancel holding pieces.
 		if (hands[j] && pieces[j][indexes[j]] == movable && picoAction()) {
+			console.log("Cancel holding pieces:" + j + " " + indexes[j]);
 			pieces[j] = pieces[j].slice(0,indexes[j]) + hands[j] + pieces[j].slice(indexes[j]+1);
 			hands[j] = null;
 		}
