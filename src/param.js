@@ -387,31 +387,29 @@ pico.Param = class {
 		this.context[key] = numbers.join(separator);
 	}
 
-	// Get number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
+	// Get number 6bit array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
 	_stringCode(str) {
 		let results = [];
 		if (str) {
 			for (let i = 0; i < str.length; i++) {
 				let c = str.charCodeAt(i);
 				if ("0".charCodeAt(0) <= c && c <= "9".charCodeAt(0)) {
-					results[i] = c - "0".charCodeAt(0);
+					results.push(c - "0".charCodeAt(0));
 				} else if ("a".charCodeAt(0) <= c && c <= "z".charCodeAt(0)) {
-					results[i] = c - "a".charCodeAt(0) + 10;
+					results.push(c - "a".charCodeAt(0) + 10);
 				} else if ("A".charCodeAt(0) <= c && c <= "Z".charCodeAt(0)) {
-					results[i] = c - "A".charCodeAt(0) + 36;
+					results.push(c - "A".charCodeAt(0) + 36);
 				} else if (c == ".".charCodeAt(0)) {
-					results[i] = 62;
+					results.push(62);
 				} else if (c == "-".charCodeAt(0)) {
-					results[i] = 63;
-				} else {
-					results[i] = 64;
+					results.push(63);
 				}
 			}
 		}
 		return results;
 	}
 
-	// Set number 6bit+1(0-64) array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63) _(64)
+	// Set number 6bit array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
 	_code2str(code6) {
 		let result = "";
 		for (let i = 0; i < code6.length; i++) {
@@ -425,8 +423,6 @@ pico.Param = class {
 				result += ".";
 			} else if (code6[i] == 63) {
 				result += "-";
-			} else {
-				result += "_";
 			}
 		}
 		return result;
