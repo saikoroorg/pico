@@ -8,8 +8,9 @@ var random = 1; // Random number.
 
 // Load.
 async function appLoad() {
-	await picoWait(5000); // Dummy loading wait.
+	await picoWait(2500); // Dummy loading wait.
 	picoTitle(title);
+	await picoWait(5000); // Dummy loading wait.
 }
 
 // Main.
