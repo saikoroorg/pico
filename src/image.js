@@ -519,7 +519,7 @@ pico.Image = class {
 			let image = new pico.Image("");
 			let loader = new Image();
 			//loader.crossOrigin = "anonymous";
-			loader.onload = () => {
+			loader.addEventListener("load", async () => {
 				navigator.locks.request(image.lock, async (imagelock) => {
 					if (timeout > 0) {
 						for (let i = 0; i < 2; i++) {
@@ -536,7 +536,7 @@ pico.Image = class {
 						resolve(image);
 					}
 				}); // end of lock.
-			};
+			}); // Loaded.
 			setTimeout(() => {
 				navigator.locks.request(image.lock, async (imagelock) => {
 					if (timeout > 0) {

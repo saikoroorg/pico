@@ -169,33 +169,60 @@ pico.App = class {
 		}
 
 		// Load app script.
-		this.loadScripts(this.script.split(/,/));
+		this.loadScripts(this.script.split(/,/)).then(async () => {
+			window.addEventListener("resize", async () => {
+				console.log("Window resized.");
+				await this.onResize()
+			}); // Resize.
 
-		window.addEventListener("resize", async () => {
-			await this.onResize()
-		}); // Resize.
-
-		window.addEventListener("load", async () => {
-			await this.onLoaded();
-		}); // Loaded.
+			this.onLoaded(); // Loaded.
+		});
 
 		// On loading.
 		this.onLoading();
 	}
 
-	// Load script.
+	// Load scripts.
 	async loadScripts(scripts, index=0) {
-		return new Promise(async (resolve) => {
-			console.log("Load" + index + ": " + scripts[index]);
-			let e = document.createElement('script');
-			e.src = scripts[index];
-			document.body.appendChild(e);
-			e.onload = async () => {
+		return new Promise(async (resolve, reject) => {
+			console.log("Load scripts: " + (index+1) + "/" + scripts.length);
+			this.loadScript(scripts[index]).then(async () => {
 				if (index + 1 < scripts.length) {
 					await this.loadScripts(scripts, index + 1);
 				}
-				return resolve();
-			};
+				resolve();
+			}).catch(() => {
+				reject();
+			});
+		}); // end of new Promise.
+	}
+
+	// Load script.
+	async loadScript(script, timeout=10000) {
+		return new Promise(async (resolve, reject) => {
+			console.log("Load script: " + script);
+			let loader = document.createElement('script');
+			loader.addEventListener("load", async () => {
+				navigator.locks.request(this.lock, async (lock) => {
+					if (timeout > 0) {
+						console.log("Load completed: " + script);
+						timeout = 0;
+						resolve();
+					}
+				}); // end of lock.
+			}); // Loaded.
+			setTimeout(() => {
+				navigator.locks.request(this.lock, async (lock) => {
+					if (timeout > 0) {
+						console.log("Load timed out: " + script);
+						loader.src = null; // Load cancel.
+						timeout = 0;
+						reject();
+					}
+				}); // end of lock.
+			}, timeout);
+			loader.src = script; // Set url after onload event handler to avoid onload hook timing bug.
+			document.body.appendChild(loader);
 		}); // end of new Promise.
 	}
 
@@ -274,11 +301,13 @@ pico.App = class {
 	async onLoaded() {
 		try {
 			if (typeof appLoad === "function") {
+				console.log("Load app.");
 				await appLoad();
 			}
 			if (typeof appMain === "function") {
 				this.loading = -1; // End loading.
 				picoFlush(); // Flush to skip first read.
+				console.log("Start app.");
 				for (;;) {
 					await picoRead();
 					await navigator.locks.request(this.lock, async (lock) => {
