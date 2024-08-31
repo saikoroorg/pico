@@ -38,8 +38,8 @@ if (picoString("v") == "-1") {
 		["hex", "hex.svg", "hex.js"],
 		["demo", "demo.svg", "demo.js"],
 	]);
-	for (let i = items.length-1; i >= 0; i--) {
-		items[i][1] = "app/" + items[i][1];
+	for (let i = 0; i < items.length; i++) {
+		items[i][1] = null;//"app/" + items[i][1];
 		items[i][2] = "app/" + items[i][2];
 	}
 }
@@ -56,8 +56,9 @@ async function appUpdate() {
 	if (state == "demo") {
 		index = 0; // Reset icon.
 	}
+	// No "await" for lazy loading.
 	picoSpriteData(dots[index], -1).then((image) => {
-		picoLabel("select", null, image); // Lazy loading.
+		picoLabel("select", null, image);
 	});
 	picoFlush();
 }
@@ -76,11 +77,12 @@ async function appSelect() {
 
 // Load.
 async function appLoad() {
+	picoTitle(title); // Initialize header.
 
 	// Skip demo on app mode or continuous start.
 	if (picoString("v") != null) {
 		state = "menu";
-		playing = 5;
+		playing = 0;//5;
 		index = 6;
 	} else {
 		state = "demo";
@@ -91,18 +93,19 @@ async function appLoad() {
 	// Load images.
 	for (let i = 0; i < items.length; i++) {
 		if (items[i][1]) {
-			picoLoad(items[i][1]).then((image) => {
-				images[i] = image; // Lazy loading.
+			// Wait for loading (or remove "await" for lazy loading).
+			await picoLoad(items[i][1]).then(async (image) => {
+				images[i] = image;
 				picoFlush();
 			});
 		}
 	}
+	if (picoString("v") == "-1") {
+		await picoWait(5000); // Dummy loading wait.
+	}
 
-	await picoWait(500000); // Dummy loading wait.
-
-	picoTitle(title); // Initialize header.
-	appResize(); // Initialize positions.
-	appUpdate(); // Initialize buttons.
+	await appResize(); // Initialize positions.
+	await appUpdate(); // Initialize buttons.
 }
 
 var landscape = false; // landscape mode.

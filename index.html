@@ -121,7 +121,7 @@ pico.App = class {
 	static count = 0; // Object count.
 	static script = "app.js"; // Default script.
 	static pixels = [ // App loading pixels.
-		[0,7,7, 0,0,0,0,6,6, 9,1,1, 9,5,1, 9,2,2, 9,4,2, 9,3,3, 9,2,4, 9,4,4, 9,1,5, 9,5,5],
+		[0,7,7, 9,1,1, 9,5,1, 9,2,2, 9,4,2, 9,3,3, 9,2,4, 9,4,4, 9,1,5, 9,5,5],
 		[0,7,7, 0,0,0,0,6,6, 9,3,3],
 		[0,7,7, 0,0,0,0,6,6, 9,5,1, 9,1,5],
 		[0,7,7, 0,0,0,0,6,6, 9,5,1, 9,3,3, 9,1,5],
@@ -129,6 +129,7 @@ pico.App = class {
 		[0,7,7, 0,0,0,0,6,6, 9,1,1, 9,5,1, 9,3,3, 9,1,5, 9,5,5],
 		[0,7,7, 0,0,0,0,6,6, 9,1,1, 9,5,1, 9,1,3, 9,5,3, 9,1,5, 9,5,5],
 	];
+	static timeout = 1200; // Loading maximum time.
 
 	// constructor.
 	constructor() {
@@ -236,24 +237,28 @@ pico.App = class {
 		try {
 			for (this.loading = 1; this.loading > 0; this.loading++) {
 				await picoRead(0);
-				picoClear();
-				if (this.loading < 1254) {
-					if (picoMod(this.loading-1, 120) < 54) {
-						this.angle = picoMod(this.angle + 20, 360);
-						this.frame = picoRandom(pico.App.pixels.length - 1) + 1;
-					}
-					picoSprite(pico.App.pixels[this.frame], 0, 0,0, this.angle,picoMotion()?1.6:2);
-					picoChar(this.loading<120?"":"LOADING", -1, 0,16, 0,1);
-				} else {
-					if (picoAction()) {
-						await this.resetApp();
-						this.loading = 0;
+				await navigator.locks.request(this.lock, async (lock) => {
+					picoClear();
+					const speed = 20, oneroll = 360/speed * 3, oneloop = 120, delay = 120;
+					if (this.loading < pico.App.timeout) {
+						let rolling = picoMod(this.loading-1, oneloop) < oneroll;
+						if (rolling) {
+							this.angle = picoMod(this.angle + speed, 360);
+							this.frame = picoRandom(pico.App.pixels.length - 1) + 1;
+						}
+						picoSprite(pico.App.pixels[this.frame], -1, 0,0, this.angle,picoMotion()?1.6:2);
+						picoChar(this.loading<delay||rolling?"":"LOADING", 3, 0,16, 0,1);
 					} else {
-						picoSprite(pico.App.pixels[0], -1, 0,0, 0,picoMotion()?1.6:2);
-						picoChar("ERROR", -1, 0,16, 0,1);
+						if (picoAction()) {
+							await this.resetApp();
+							this.loading = 0;
+						} else {
+							picoSprite(pico.App.pixels[0], -1, 0,0, 0,picoMotion()?1.6:2);
+							picoChar("ERROR", -1, 0,16, 0,1);
+						}
 					}
-				}
-				await picoFlip(10);
+					await picoFlip(10);
+				}); // end of lock.
 			}
 		} catch (error) {
 			console.error(error.name, error.message);
@@ -269,15 +274,19 @@ pico.App = class {
 			if (typeof appLoad === "function") {
 				await appLoad();
 			}
-			this.loading = -1; // End loading.
-			picoFlush(); // Flush to skip first read.
-			for (;;) {
-				await picoRead();
-				await navigator.locks.request(this.lock, async (lock) => {
-					picoClear();
-					await appMain();
-					await picoFlip(0);
-				}); // end of lock.
+			if (typeof appMain === "function") {
+				this.loading = -1; // End loading.
+				picoFlush(); // Flush to skip first read.
+				for (;;) {
+					await picoRead();
+					await navigator.locks.request(this.lock, async (lock) => {
+						picoClear();
+						await appMain();
+						await picoFlip(0);
+					}); // end of lock.
+				}
+			} else {
+				this.loading = pico.App.timeout; // No app main function.
 			}
 		} catch (error) {
 			console.error(error.name, error.message);

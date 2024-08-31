@@ -20,7 +20,7 @@ a {
 	z-index: 100;
 	margin: 0px;
 	flex: 0 1 auto;
-	display: flex; display: -webkit-flex;
+	display: none;
 	flex-direction: row; -webkit-flex-direction: row;
 	justify-content: space-between; -webkit-justify-content: space-between;
 	align-items: center; -webkit-align-items: center;
