@@ -116,12 +116,12 @@ Playlog = class {
 					if (j >= 3) {
 						c[j] = m[j];
 					}
-					if (m[j+1] > inside) {
-						c[j+1] = m[j+2];
-						c[j+2] = m[j+1];
-					} else if (m[j+2] <= inside) {
+					if (m[j+1] <= inside && m[j+2] <= inside) {
 						c[j+1] = m[j+1] * trans[p0][0] + trans[p0][1];
 						c[j+2] = m[j+2] * trans[p0][2] + trans[p0][3];
+					} else if (m[j+1] > inside) {
+						c[j+1] = m[j+2];
+						c[j+2] = m[j+1];
 					} else {
 						c[j+1] = m[j+1];
 						c[j+2] = m[j+2];
@@ -151,12 +151,12 @@ Playlog = class {
 						if (j >= 3) {
 							m[j] = c[j];
 						}
-						if (c[j+1] > inside) {
-							m[j+1] = c[j+1];
-							m[j+2] = c[j+2];
-						} else if (c[j+2] <= inside) {
+						if (c[j+1] <= inside && c[j+2] <= inside) {
 							m[j+1] = (c[j+1] - trans[p0][1]) * trans[p0][0];
 							m[j+2] = (c[j+2] - trans[p0][3]) * trans[p0][2];
+						} else if ((c[j+1] > inside && !landscape) || (c[j+2] > inside && landscape)) {
+							m[j+1] = c[j+2];
+							m[j+2] = c[j+1];
 						} else {
 							m[j+1] = c[j+1];
 							m[j+2] = c[j+2];
@@ -282,7 +282,7 @@ Playlog = class {
 	addFlip(p0, i0, piece) {
 		this.undos = [];
 		let m = this.moves.pop();
-		if (m && m[0] == p0) {
+		if (m) {
 			let x0 = m[1] + offset;
 			let y0 = m[2] + offset;
 			let l0 = x0 + y0*width;
@@ -305,9 +305,9 @@ Playlog = class {
 				console.log("Not modify and new flip piece:" + p0 + " " + i0 + " " + piece);
 			}
 		} else {
-			// New flip piece.
+			// First flip piece.
 			this._add(p0, i0, piece, i0);
-				console.log("New flip piece:" + p0 + " " + i0 + " " + piece);
+			console.log("First flip piece:" + p0 + " " + i0 + " " + piece);
 		}
 	}
 
@@ -350,9 +350,9 @@ Playlog = class {
 				}
 			}
 		} else if (i1 != i0) {
-			// New move piece.
+			// First move piece.
 			this._add(p0, i0, piece, i1);
-			console.log("New move piece:" + p0 + " " + i0 + " " + piece + "->" + i1);
+			console.log("First move piece:" + p0 + " " + i0 + " " + piece + "->" + i1);
 		}
 	}
 
@@ -390,9 +390,9 @@ Playlog = class {
 				}
 			}
 		} else {
-			// New catch target.
+			// First catch target.
 			this._add(p0, i0, piece, i1, target, i2);
-			console.log("New catch target:" + p0 + " " + i0 + " " + piece + "->" + i1 + " " + target + "->" + i2);
+			console.log("First catch target:" + p0 + " " + i0 + " " + piece + "->" + i1 + " " + target + "->" + i2);
 		}
 	}
 };
@@ -527,6 +527,24 @@ async function appResize() {
 				if ((landscape && piece0 != movable) || (!landscape && piece1 != movable)) {
 					pieces[j] = pieces[j].slice(0,l0) + piece1 + pieces[j].slice(l0+1);
 					pieces[j] = pieces[j].slice(0,l1) + piece0 + pieces[j].slice(l1+1);
+				}
+			}
+		}
+		for (let i = 0; i < playlog.moves.length; i++) {
+			for (let j = 0; j < playlog.moves[i].length; j+=3) {
+				if ((playlog.moves[i][j+1] > inside && !landscape) || (playlog.moves[i][j+2] > inside && landscape)) {
+					let t = playlog.moves[i][j+1];;
+					playlog.moves[i][j+1] = playlog.moves[i][j+2];
+					playlog.moves[i][j+2] = t;
+				}
+			}
+		}
+		for (let i = 0; i < playlog.undos.length; i++) {
+			for (let j = 0; j < playlog.undos[i].length; j+=3) {
+				if ((playlog.undos[i][j+1] > inside && !landscape) || (playlog.undos[i][j+2] > inside && landscape)) {
+					let t = playlog.undos[i][j+1];;
+					playlog.undos[i][j+1] = playlog.undos[i][j+2];
+					playlog.undos[i][j+2] = t;
 				}
 			}
 		}
