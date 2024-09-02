@@ -84,6 +84,11 @@ Playlog = class {
 
 	// constructor.
 	constructor() {
+		this.clear();
+	}
+
+	// Clear log.
+	clear() {
 		this.moves = [];
 		this.undos = [];
 	}
@@ -421,7 +426,13 @@ async function appSelect(x) {
 			picoFlush();
 		}
 
-	// Reverse board.
+	// Clear logs.
+	} else {
+		playlog.clear();
+		picoLabel("select", ""+playlog.count());
+	}
+
+	/*// Reverse board.
 	} else {
 		reverse = reverse ? 0 : 1;
 		if (yflip) {
@@ -430,7 +441,7 @@ async function appSelect(x) {
 			}
 		}
 		picoFlush();
-	}
+	}*/
 }
 
 // Action button.
