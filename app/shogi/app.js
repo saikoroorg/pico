@@ -442,16 +442,20 @@ async function appAction() {
 		for (let i = 0; i < pieces[j].length; i++) {
 			if (pieces[j][i] != movable && pieces[j][i] != holding && pieces[j][i] != nothing) {
 				let l = code6.length;
+				let x1 = picoMod(i,width) - offset;
+				let y1 = picoDiv(i,width) - offset;
 				code6[l] = picoCharCode6(pieces[j][i]);
-				code6[l+1] = picoMod(i,width) - offset;
-				code6[l+2] = picoDiv(i,width) - offset;
+				code6[l+1] = x1 * trans[j][0] + trans[j][1];
+				code6[l+2] = y1 * trans[j][2] + trans[j][3];
 			}
 		}
 		if (hands[j]) {
 			let l = code6.length;
+			let x1 = picoMod(indexes[j],width) - offset;
+			let y1 = picoDiv(indexes[j],width) - offset;
 			code6[l] = picoCharCode6(hands[j]);
-			code6[l+1] = picoMod(indexes[j],width) - offset;
-			code6[l+2] = picoDiv(indexes[j],width) - offset;
+			code6[l+1] = x1 * trans[j][0] + trans[j][1];
+			code6[l+2] = y1 * trans[j][2] + trans[j][3];
 		}
 		picoSetCode6(code6, j);
 	}
@@ -481,8 +485,8 @@ async function appLoad() {
 					pieces[j] = pieces[j].replaceAll(char, movable);
 				}
 				for (let k = 0; k < params.length; k+=3) {
-					let x = params[k+1] + offset;
-					let y = params[k+2] + offset;
+					let x = (params[k+1] - trans[j][1]) * trans[j][0] + offset;
+					let y = (params[k+2] - trans[j][3]) * trans[j][2] + offset;
 					let l =	x + y*width;
 					if (l >= 0 && l < pieces[j].length) {
 						if (pieces[j][l] == movable) {
