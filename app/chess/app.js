@@ -230,13 +230,13 @@ Playlog = class {
 				let x1 = m[k+1] + offset;
 				let y1 = m[k+2] + offset;
 				let l1 = x1 + y1*width;
+				if (k == 0) {
+					m[k+3] = picoCharCode6(pieces[p0][l1]); // Change log for flip face.
+				}
 				let p2 = picoCode6Char(m[k+3]);
 				let x2 = m[k+4] + offset;
 				let y2 = m[k+5] + offset;
 				let l2 = x2 + y2*width;
-				if (k == 0) {
-					m[k+3] = picoCharCode6(pieces[p0][l1]); // Change log for flip face.
-				}
 				// Move P2.
 				console.log("Move P2:" + p0 + " " + p2 + " " + l2 + "(" + x2 + "," + y2);
 				pieces[p0] = pieces[p0].slice(0,l2) + p2 + pieces[p0].slice(l2+1);
