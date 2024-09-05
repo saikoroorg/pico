@@ -132,7 +132,7 @@ Playlog = class {
 						c[j+2] = m[j+2];
 					}
 				}
-				console.log("GetCode" + k + ": " + m + " -> " + c);
+				console.log("LoadCode" + k + ": " + m + " -> " + c);
 				code6 = code6.concat(c);
 			}
 		}
@@ -168,7 +168,7 @@ Playlog = class {
 						}
 					}
 				}
-				console.log("SetCode" + k + ": " + c + " -> " + m);
+				console.log("StoreCode" + k + ": " + c + " -> " + m);
 				this.moves.unshift(m);
 				l = k;
 			}
@@ -489,8 +489,17 @@ async function appAction() {
 				let x1 = picoMod(i,width) - offset;
 				let y1 = picoDiv(i,width) - offset;
 				code6[l] = picoCharCode6(pieces[j][i]);
-				code6[l+1] = x1 * trans[j][0] + trans[j][1];
-				code6[l+2] = y1 * trans[j][2] + trans[j][3];
+				if (x1 <= inside && y1 <= inside) {
+					code6[l+1] = x1 * trans[j][0] + trans[j][1];
+					code6[l+2] = y1 * trans[j][2] + trans[j][3];
+				} else if (x1 > inside) {
+					code6[l+1] = y1;
+					code6[l+2] = x1;
+				} else {
+					code6[l+1] = x1;
+					code6[l+2] = y1;
+				}
+				console.log("Store " + j + ": " + x1 + " " + y1 + "<-" + pieces[j][i]);
 			}
 		}
 		if (hands[j]) {
@@ -498,8 +507,17 @@ async function appAction() {
 			let x1 = picoMod(indexes[j],width) - offset;
 			let y1 = picoDiv(indexes[j],width) - offset;
 			code6[l] = picoCharCode6(hands[j]);
-			code6[l+1] = x1 * trans[j][0] + trans[j][1];
-			code6[l+2] = y1 * trans[j][2] + trans[j][3];
+			if (x1 <= inside && y1 <= inside) {
+				code6[l+1] = x1 * trans[j][0] + trans[j][1];
+				code6[l+2] = y1 * trans[j][2] + trans[j][3];
+			} else if (x1 > inside) {
+				code6[l+1] = y1;
+				code6[l+2] = x1;
+			} else {
+				code6[l+1] = x1;
+				code6[l+2] = y1;
+			}
+			console.log("Store " + l + ": " + x1 + " " + y1 + "<-" + hands[j]);
 		}
 		picoSetCode6(code6, j);
 	}
@@ -529,9 +547,20 @@ async function appLoad() {
 					pieces[j] = pieces[j].replaceAll(char, movable);
 				}
 				for (let k = 0; k < params.length; k+=3) {
-					let x = (params[k+1] - trans[j][1]) * trans[j][0] + offset;
-					let y = (params[k+2] - trans[j][3]) * trans[j][2] + offset;
+					let x, x1 = params[k+1];
+					let y, y1 = params[k+2];
+					if (x1 <= inside && y1 <= inside) {
+						x = (x1 - trans[j][1]) * trans[j][0] + offset;
+						y = (y1 - trans[j][3]) * trans[j][2] + offset;
+					} else if ((x1 > inside && !landscape) || (y1 > inside && landscape)) {
+						x = y1 + offset;
+						y = x1 + offset;
+					} else {
+						x = x1 + offset;
+						y = y1 + offset;
+					}
 					let l =	x + y*width;
+					console.log("Load " + j + ": " + x + " " + y + "->" + value[k]);
 					if (l >= 0 && l < pieces[j].length) {
 						if (pieces[j][l] == movable) {
 							pieces[j] = pieces[j].slice(0,l) + value[k] + pieces[j].slice(l+1);
