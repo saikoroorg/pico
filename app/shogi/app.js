@@ -67,6 +67,8 @@ var pieces = [
 ];
 const faces = {
 	"P":"p","L":"l","N":"n","S":"s","B":"b","R":"r","G":"G","K":"K","k":"k",
+};
+const backs = {
 	"p":"P","l":"L","n":"N","s":"S","b":"B","r":"R",
 };
 const movable = ".", holding = "*", nothing = " ";
@@ -246,6 +248,12 @@ Playlog = class {
 				let x2 = m[k+4] + offset;
 				let y2 = m[k+5] + offset;
 				let l2 = x2 + y2*width;
+				if (x2 > inside || y2 > inside) {
+					// Auto flip on outside piece.
+					if (backs[p2] && backs[p2] != p2) {
+						p2 = backs[p2];
+					}
+				}
 				// Move P2.
 				console.log("Redo/Move:" + p0 + " " + p2 + " " + l2 + "(" + x2 + "," + y2 + ")");
 				pieces[p0] = pieces[p0].slice(0,l2) + p2 + pieces[p0].slice(l2+1);
@@ -546,26 +554,36 @@ async function appLoad() {
 				for (let char in faces) {
 					pieces[j] = pieces[j].replaceAll(char, movable);
 				}
+				for (let char in backs) {
+					pieces[j] = pieces[j].replaceAll(char, movable);
+				}
 				for (let k = 0; k < params.length; k+=3) {
 					let x, x1 = params[k+1];
 					let y, y1 = params[k+2];
+					let target = value[k];
 					if (x1 <= inside && y1 <= inside) {
 						x = (x1 - trans[j][1]) * trans[j][0] + offset;
 						y = (y1 - trans[j][3]) * trans[j][2] + offset;
-					} else if ((x1 > inside && !landscape) || (y1 > inside && landscape)) {
-						x = y1 + offset;
-						y = x1 + offset;
 					} else {
-						x = x1 + offset;
-						y = y1 + offset;
+						if ((x1 > inside && !landscape) || (y1 > inside && landscape)) {
+							x = y1 + offset;
+							y = x1 + offset;
+						} else {
+							x = x1 + offset;
+							y = y1 + offset;
+						}
+						// Auto flip on outside piece.
+						if (backs[target] && backs[target] != target) {
+							target = backs[target];
+						}
 					}
 					let l =	x + y*width;
-					console.log("Load " + j + ": " + x + " " + y + "->" + value[k]);
+					console.log("Load " + j + ": " + x + " " + y + "->" + target);
 					if (l >= 0 && l < pieces[j].length) {
 						if (pieces[j][l] == movable) {
-							pieces[j] = pieces[j].slice(0,l) + value[k] + pieces[j].slice(l+1);
+							pieces[j] = pieces[j].slice(0,l) + target + pieces[j].slice(l+1);
 						} else if (hands[j] == null) {
-							hands[j] = value[k];
+							hands[j] = target;
 							indexes[j] = l;
 						}
 					}
@@ -656,6 +674,10 @@ async function appMain() {
 							if (pieces[j][l] == movable) {
 								playlog.addCatch(j, indexes0[j], hands[j], indexes[j], target, l);
 								picoLabel("select", ""+playlog.count());
+								// Auto flip on outside piece.
+								if (backs[target] && backs[target] != target) {
+									target = backs[target];
+								}
 								pieces[j] = pieces[j].slice(0,l) + target + pieces[j].slice(l+1);
 								target = null;
 								break;
@@ -665,15 +687,21 @@ async function appMain() {
 						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = target;
 					// Drop and flip holding piece.
-					} else if (pieces[j][i] == holding && faces[hands[j]]) {
+					} else if (pieces[j][i] == holding) {
 						console.log("Drop and flip holding piece:" + j + " " + pieces[j][i]);
-						if (faces[hands[j]] != hands[j]) {
+						if (faces[hands[j]] && faces[hands[j]] != hands[j]) {
 							// Add flip playlog.
 							playlog.addFlip(j, indexes0[j], hands[j], faces[hands[j]]);
+							hands[j] = faces[hands[j]];
+							picoLabel("select", ""+playlog.count());
+						} else if (backs[hands[j]] && backs[hands[j]] != hands[j]) {
+							// Add flip playlog.
+							playlog.addFlip(j, indexes0[j], hands[j], backs[hands[j]]);
+							hands[j] = backs[hands[j]];
 							picoLabel("select", ""+playlog.count());
 						}
 						// Move and flip holding pieces.
-						pieces[j] = pieces[j].slice(0,i) + faces[hands[j]] + pieces[j].slice(i+1);
+						pieces[j] = pieces[j].slice(0,i) + hands[j] + pieces[j].slice(i+1);
 						hands[j] = null;
 					// Drop on enemy square and reverse holding pieces.
 					} else if (pieces[j?0:1][pieces[j].length-1-i] == movable && 
