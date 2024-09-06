@@ -186,8 +186,8 @@ Playlog = class {
 			console.log("Undo:" + m);
 
 			let p0 = m[0];
-			for (let k = 0; k <= m.length - 6; k+=3) {
-			//for (let k = m.length-6; k >= 0; k-=3) {
+			//for (let k = 0; k <= m.length - 6; k+=3) {
+			for (let k = m.length-6; k >= 0; k-=3) {
 				// W3 moves X2Y2 to X3Y3, so W3 unmoves X3Y3 to X2Y2 and remove U3.
 				let x2 = m[k+1] + offset;
 				let y2 = m[k+2] + offset;
@@ -196,20 +196,23 @@ Playlog = class {
 				let x3 = m[k+4] + offset;
 				let y3 = m[k+5] + offset;
 				let l3 = x3 + y3*width;
-				m[k+3] = picoCharCode6(pieces[p0][l3]); // Change log for flip face.
+				//m[k+3] = picoCharCode6(pieces[p0][l3]); // Change log for flip face.
 				// Delete U3.
-				console.log("Delete U3:" + p0 + " " + l3 + "(" + x3 + "," + y3);
+				console.log("Undo/Delete:" + p0 + " " + l3 + "(" + x3 + "," + y3 + ")");
 				if (l3 != l2) {
 					pieces[p0] = pieces[p0].slice(0,l3) + movable + pieces[p0].slice(l3+1);
 				}
 				// Change piece side on last move.
-				if (k >= 3) {
-					p0 = p0 ? 0 : 1;
-					l2 = pieces[p0].length-1-l2; // Transform positions for enemy pieces.
+				if (m.length >= 9 && k >= m.length - 6 && l2 != l3) {
+					let p0x = p0 ? 0 : 1;
+					let l2x = pieces[p0x].length-1-l2; // Transform positions for enemy pieces.
+					console.log("Undo/Unmove on enemy side:" + p0x + " " + l2x); // @todo; bugs on flipped.
+					pieces[p0x] = pieces[p0x].slice(0,l2x) + p2 + pieces[p0x].slice(l2x+1);
+				} else {
+					// Unmove W3.
+					console.log("Undo/Unmove:" + p0 + " " + l2 + "(" + x2 + "," + y2 + ") <- " + p2 + " " + l3 + "(" + x3 + "," + y3 + ")");
+					pieces[p0] = pieces[p0].slice(0,l2) + p2 + pieces[p0].slice(l2+1);
 				}
-				// Unmove W3.
-				console.log("Unmove W3:" + p0 + " " + l2 + "(" + x2 + "," + y2 + " <- " + p2 + " " + l3 + "(" + x3 + "," + y3);
-				pieces[p0] = pieces[p0].slice(0,l2) + p2 + pieces[p0].slice(l2+1);
 				//if (k == 0) {
 				//	m[k+3] = picoCharCode6(pieces[p0][l3]); // Update flip face for redo.
 				//}
@@ -236,26 +239,31 @@ Playlog = class {
 				let x1 = m[k+1] + offset;
 				let y1 = m[k+2] + offset;
 				let l1 = x1 + y1*width;
-				if (k == 0) {
-					m[k+3] = picoCharCode6(pieces[p0][l1]); // Change log for flip face.
-				}
+				//if (k == 0) {
+				//	m[k+3] = picoCharCode6(pieces[p0][l1]); // Change log for flip face.
+				//}
 				let p2 = picoCode6Char(m[k+3]);
 				let x2 = m[k+4] + offset;
 				let y2 = m[k+5] + offset;
 				let l2 = x2 + y2*width;
 				// Move P2.
-				console.log("Move P2:" + p0 + " " + p2 + " " + l2 + "(" + x2 + "," + y2);
+				console.log("Redo/Move:" + p0 + " " + p2 + " " + l2 + "(" + x2 + "," + y2 + ")");
 				pieces[p0] = pieces[p0].slice(0,l2) + p2 + pieces[p0].slice(l2+1);
 				// Change piece side on last move.
-				if (k >= 3) {
-					p0 = p0 ? 0 : 1;
-					l1 = pieces[p0].length-1-l1; // Transform positions for enemy pieces.
-				}
-				//m[k+3] = picoCharCode6(pieces[p0][l1]); // Update flip face for undo.
-				// Delete U1.
-				console.log("Delete U1:" + p0 + " " + l1 + "(" + x1 + "," + y1 + " -> " + p2 + " " + l2 + "(" + x2 + "," + y2);
-				if (l1 != l2) {
-					pieces[p0] = pieces[p0].slice(0,l1) + movable + pieces[p0].slice(l1+1);
+				if (m.length >= 9 && k >= m.length - 6 && l1 != l2) {
+					let p0x = p0 ? 0 : 1;
+					let l1x = pieces[p0x].length-1-l1; // Transform positions for enemy pieces.
+					console.log("Redo/Delete on enemy side:" + p0x + " " + l1x + "(" + x1 + "," + y1 + ") -> " + p2 + " " + l2 + "(" + x2 + "," + y2 + ")");
+					if (l1x != l2) {
+						pieces[p0x] = pieces[p0x].slice(0,l1x) + movable + pieces[p0x].slice(l1x+1);
+					}
+				} else {
+					//m[k+3] = picoCharCode6(pieces[p0][l1]); // Update flip face for undo.
+					// Delete U1.
+					console.log("Redo/Delete:" + p0 + " " + l1 + "(" + x1 + "," + y1 + ") -> " + p2 + " " + l2 + "(" + x2 + "," + y2 + ")");
+					if (l1 != l2) {
+						pieces[p0] = pieces[p0].slice(0,l1) + movable + pieces[p0].slice(l1+1);
+					}
 				}
 			}
 			this.moves.push(m);
@@ -265,54 +273,94 @@ Playlog = class {
 	}
 
 	// Add log.
-	_add(p0, i0, piece, i1, target=null, i2=0) {
+	_add(p0, i0, piece, i1, target1=null, i2=0, target2=null) {
 		console.log("Add log:" + this.moves.length +
-			" " + p0 + " " + i0 + " " + piece + " " + i1 + " " + target + " " + i2);
+			" " + p0 + " " + i0 + " " + piece + " " + i1 + " " + target1 + " " + i2 + " " + target2);
 		let m = [p0];
 		m[1] = picoMod(i0,width) - offset;
 		m[2] = picoDiv(i0,width) - offset;
 		m[3] = picoCharCode6(piece);
 		m[4] = picoMod(i1,width) - offset;
 		m[5] = picoDiv(i1,width) - offset;
-		if (target) {
-			m[6] = picoCharCode6(target);
+		if (target1 && target2) {
+			m[6] = picoCharCode6(target1);
+			m[7] = picoMod(i1,width) - offset;
+			m[8] = picoDiv(i1,width) - offset;
+			m[9] = picoCharCode6(target2);
+			m[10] = picoMod(i2,width) - offset;
+			m[11] = picoDiv(i2,width) - offset;
+		} else if (target1) {
+			m[6] = picoCharCode6(target1);
 			m[7] = picoMod(i2,width) - offset;
 			m[8] = picoDiv(i2,width) - offset;
 		}
 		this.moves.push(m);
-		console.log("Added:" + this.moves.length);
+		console.log("Added " + this.moves.length + ": " + m);
 	}
 
 	// Add flip piece log.
-	addFlip(p0, i0, piece) {
+	addFlip(p0, i0, piece, after) {
 		this.undos = [];
 		let m = this.moves.pop();
 		if (m) {
 			let x0 = m[1] + offset;
 			let y0 = m[2] + offset;
 			let l0 = x0 + y0*width;
-			let z = picoCode6Char(m[3]);
 			let x1 = m[4] + offset;
 			let y1 = m[5] + offset;
 			let l1 = x1 + y1*width;
-			if (m[0] == p0 && l0 != l1 && (l0 == i0 || l1 == i0)) {
-				// Modify move.
-				this.moves.push(m);
-				console.log("Modify flip:" + p0 + " " + i0 + " " + piece);
-			} else if (m[0] == p0 && i0 == l0 && l0 == l1) {
-				// Cancel flip.
-				console.log("Cancel flip:" + p0 + " " + i0 + " " + piece);
+			let x2 = m[7] + offset;
+			let y2 = m[8] + offset;
+			let l2 = x2 + y2*width;
+			// Log formats.
+			// Move:      P0 X0Y0 P1 X1Y1 (P1 moves XY0 -> XY1 by player P0)
+			// MoveFlip:  P0 X0Y0 P1 X1Y1 Q2 X1Y1 (P1 moves XY0 -> XY1 and flips P1 -> Q2 by player P0)
+			// Catch:     P0 X0Y0 P1 X1Y1 E2 X2Y2 (P1 moves XY0 -> XY1 and catches E2(enemy) XY1 -> XY2 by player P0)
+			// CatchFlip: P0 X0Y0 P1 X1Y1 Q2 X1Y1 E3 X3Y3 (P1 moves XY0 -> XY1=XY2, flips P1 -> Q2 and catches E3(enemy) XY1=XY2 -> XY3 by player P0)
+			//             0  1 2  3  4 5  6  7 8  9 1011
+			if (m[0] == p0 && l1 == i0 && m[6] && m[4] == m[7] && m[5] == m[8]) {
+				let p1 = picoCode6Char(m[3]);
+				let p2 = picoCode6Char(m[6]);
+				if (piece == p2 && after == p1) {
+					if (m[9]) {
+						// Cancel flip.
+						this.moves.push(m.slice(0,5).concat(m.slice(9)));
+						console.log("Canceled flip " + this.moves.length + ":" + m);
+					} else {
+						// Remove flip log.
+						console.log("Removed flip " + this.moves.length + ":" + m);
+					}
+				} else {
+					// Modify MoveFlip or CatchFlip.
+					m[3] = piece;
+					m[6] = after;
+					this.moves.push(m);
+					console.log("Modified flip " + this.moves.length + ":" + m);
+				}
+			} else if (m[0] == p0 && l1 == i0 && m[6]) {
+				let target = picoCode6Char(m[6]);
+				// Modify Catch.
+				this._add(p0, l0, piece, l1, after, l2, target);
+				console.log("Modified catch to flip " + this.moves.length + ":" + p0 + " " + i0 + " " + piece + " " + after + " " + l2 + " " + target);
+			} else if (m[0] == p0 && l1 == i0 && !m[6]) {
+				// Modify Move.
+				this._add(p0, l0, piece, l1, after, l1);
+				console.log("Modified move to flip " + this.moves.length + ":" + p0 + " " + i0 + " " + piece + " " + after + " " + l1);
 			} else {
 				// Not modify.
 				this.moves.push(m);
 				// New flip piece.
-				this._add(p0, i0, piece, i0);
-				console.log("Not modify and new flip piece:" + p0 + " " + i0 + " " + piece);
+				if (piece != after) {
+					this._add(p0, i0, piece, i0, after, i0);
+					console.log("New flip piece:" + p0 + " " + i0 + " " + piece + " " + after);
+				}
 			}
 		} else {
 			// First flip piece.
-			this._add(p0, i0, piece, i0);
-			console.log("First flip piece:" + p0 + " " + i0 + " " + piece);
+			if (piece != after) {
+				this._add(p0, i0, piece, i0, after, i0);
+				console.log("First flip piece:" + p0 + " " + i0 + " " + piece + " " + after);
+			}
 		}
 	}
 
@@ -321,43 +369,33 @@ Playlog = class {
 		this.undos = [];
 		let m = this.moves.pop();
 		if (m) {
-			if (m[0] == p0 && m.length >= 9) {
-				// Not modify for catching.
+			// Log formats.
+			// Move:      P0 X0Y0 P1 X1Y1 (P1 moves XY0 -> XY1 by player P0)
+			// MoveFlip:  P0 X0Y0 P1 X1Y1 Q2 X1Y1 (P1 moves XY0 -> XY1 and flips P1 -> Q2 by player P0)
+			// Catch:     P0 X0Y0 P1 X1Y1 E2 X2Y2 (P1 moves XY0 -> XY1 and catches E2(enemy) XY1 -> XY2 by player P0)
+			// CatchFlip: P0 X0Y0 P1 X1Y1 Q2 X1Y1 E3 X3Y3 (P1 moves XY0 -> XY1=XY2, flips P1 -> Q2 and catches E3(enemy) XY1=XY2 -> XY3 by player P0)
+			//             0  1 2  3  4 5  6  7 8  9 1011
+			if (m[0] == p0 && !m[9] && !(m[4] != m[7] && m[5] != m[8])) {
+				// Modify Move or MoveFlip.
+				m[4] = m[7] = picoMod(i1,width) - offset;
+				m[5] = m[8] = picoDiv(i1,width) - offset;
 				this.moves.push(m);
-				if (i1 != i0) {
-					// New move piece.
-					this._add(p0, i0, piece, i1);
-					console.log("Not modify for catching and new move piece:" + p0 + " " + i0 + " " + piece + "->" + i1);
-				}
+				console.log("Modified move " + this.moves.length + ":" + m);
 			} else {
-				let x0 = m[1] + offset;
-				let y0 = m[2] + offset;
-				let l0 = x0 + y0*width;
-				let z = picoCode6Char(m[3]);
-				let x1 = m[4] + offset;
-				let y1 = m[5] + offset;
-				let l1 = x1 + y1*width;
-				if (m[0] == p0 && i0 == l1 && i1 != l0) { // l0->l1(i0)->i1
-					// Change move.
-					console.log("Change move:" + p0 + " " + l0 + "->" + l1 + " " + z + "->" + i1);
-					this._add(p0, l0, z, i1);
-				} else if (m[0] == p0 && i0 == l1 && i1 == l0 && z == piece) { // l0->l1->l0(i1)
-					// Cancel move.
-					console.log("Cancel move:" + p0 + " " + l0 + "->" + l1 + " " + z + "->" + i1);
-				} else {
-					// Not modify.
-					this.moves.push(m);
-					if (i1 != i0) {
-						// New move piece.
-						this._add(p0, i0, piece, i1);
-						console.log("Not modify and new move piece:" + p0 + " " + i0 + " " + piece + "->" + i1);
-					}
+				// Not modify.
+				this.moves.push(m);
+				// New move piece.
+				if (i1 != i0) {
+					this._add(p0, i0, piece, i1);
+					console.log("New move piece:" + p0 + " " + i0 + " " + piece + "->" + i1);
 				}
 			}
-		} else if (i1 != i0) {
+		} else {
 			// First move piece.
-			this._add(p0, i0, piece, i1);
-			console.log("First move piece:" + p0 + " " + i0 + " " + piece + "->" + i1);
+			if (i1 != i0) {
+				this._add(p0, i0, piece, i1);
+				console.log("First move piece:" + p0 + " " + i0 + " " + piece + "->" + i1);
+			}
 		}
 	}
 
@@ -367,32 +405,27 @@ Playlog = class {
 		this.undos = [];
 		let m = this.moves.pop();
 		if (m) {
-			if (m[0] == p0 && m.length >= 9) {
-				// Not modify for catching.
-				this.moves.push(m);
-				if (i1 != i0) {
-					// New catch piece.
-					this._add(p0, i0, piece, i1, target, i2);
-					console.log("Not modify for catching and new catch target:" + p0 + " " + i0 + " " + piece + "->" + i1 + " " + target + "->" + i2);
-				}
+			// Log formats.
+			// Move:      P0 X0Y0 P1 X1Y1 (P1 moves XY0 -> XY1 by player P0)
+			// MoveFlip:  P0 X0Y0 P1 X1Y1 Q2 X1Y1 (P1 moves XY0 -> XY1 and flips P1 -> Q2 by player P0)
+			// Catch:     P0 X0Y0 P1 X1Y1 E2 X2Y2 (P1 moves XY0 -> XY1 and catches E2(enemy) XY1 -> XY2 by player P0)
+			// CatchFlip: P0 X0Y0 P1 X1Y1 Q2 X1Y1 E3 X3Y3 (P1 moves XY0 -> XY1=XY2, flips P1 -> Q2 and catches E3(enemy) XY1=XY2 -> XY3 by player P0)
+			//             0  1 2  3  4 5  6  7 8  9 1011
+			if (m[0] == p0 && m[6] && m[4] == m[7] && m[5] == m[8]) {
+				// Modify MoveFlip.
+				let z2 = picoCode6Char(m[6]);
+				this._add(p0, i0, piece, i1, z2, i2, target);
+				console.log("Modified " + this.moves.length + ":" + p0 + " " + i0 + " " + piece + "->" + i1 + " " + target + "->" + i2);
+			} else if (m[0] == p0 && !m[6]) {
+				// Modify Move.
+				this._add(p0, i0, piece, i1, target, i2);
+				console.log("Modified " + this.moves.length + ":" + p0 + " " + i0 + " " + piece + "->" + i1 + " " + target + "->" + i2);
 			} else {
-				let x0 = m[1] + offset;
-				let y0 = m[2] + offset;
-				let l0 = x0 + y0*width;
-				let z = picoCode6Char(m[3]);
-				let x1 = m[4] + offset;
-				let y1 = m[5] + offset;
-				let l1 = x1 + y1*width;
-				if (m[0] == p0 && i0 == l1) { // l0->l1(i0)->i1
-					// Change catch target.
-					console.log("Change catch target:" + p0 + " " + i0 + " " + piece + "->" + i1 + " " + target + "->" + i2);
-					this._add(p0, l0, z, i1, target, i2);
-				} else if (m[0] != p0 || i1 != i0) {
-					// Not modify and new catch target.
-					this.moves.push(m);
-					this._add(p0, i0, piece, i1, target, i2);
-					console.log("Not modify and new catch piece:" + p0 + " " + i0 + " " + piece + "->" + i1 + " " + target + "->" + i2);
-				}
+				// Not modify.
+				this.moves.push(m);
+				// New catch target.
+				this._add(p0, i0, piece, i1, target, i2);
+				console.log("Not modify and new catch piece:" + p0 + " " + i0 + " " + piece + "->" + i1 + " " + target + "->" + i2);
 			}
 		} else {
 			// First catch target.
@@ -607,7 +640,7 @@ async function appMain() {
 						console.log("Drop and flip holding piece:" + j + " " + pieces[j][i]);
 						if (faces[hands[j]] != hands[j]) {
 							// Add flip playlog.
-							playlog.addFlip(j, indexes0[j], hands[j]);
+							playlog.addFlip(j, indexes0[j], hands[j], faces[hands[j]]);
 							picoLabel("select", ""+playlog.count());
 						}
 						// Move and flip holding pieces.
