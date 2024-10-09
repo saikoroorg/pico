@@ -1,7 +1,7 @@
 const title = "Edit"; // Title.
 var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
 var bgcolor = 0; // Original design bg color.
-const maxwidth = 20, maxheight = 20; // Canvas max size.
+const maxwidth = 36, maxheight = 36; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
 var yoffset = picoDiv(maxheight - height, 2); // Pixels y-index offset.
@@ -12,6 +12,7 @@ var buffers = []; // Pixels buffers.
 var animeflag = 0; // Anime editing flag.
 var playing = 0; // Playing count.
 var pixels = []; // Canvas pixels.
+var canvas = ""; // Canvas pixels by text format.
 var depth = 10; // Color count.
 const maxcolor = 10; // Color max size.
 var colorflag = 0; // Color editing flag.
@@ -146,6 +147,12 @@ async function appResize() {
 // Load.
 async function appLoad() {
 	picoTitle(title);
+
+	// Initialize sprites.
+	for (let i = 0; i < maxcolor; i++) {
+		picoCharSprite(picoCode6Char(i), picoStringCode6("033" + i + "00022"));
+		picoCharSprite(picoCode6Char(i+maxcolor), picoStringCode6("044" + i + "00033"));
+	}
 
 	// Initialize pixels on max size.
 	for (let j = 0; j < maxheight; j++) {
@@ -390,9 +397,14 @@ async function appMain() {
 	{
 		let size = width < height ? width : height;
 		let grid = pixelswidth / size;
-		let margin = size <= 9 ? 2 : 1;
-		let w1 = (grid - margin) - 1; // Width.
-		let w2 = grid - 1; // Width for touching.
+		//let margin = size <= 9 ? 2 : size <= 19 ? 1 : 0;
+		//let w1 = (grid - margin) - 1; // Width.
+		//let w2 = grid - 1; // Width for touching.
+
+		// Clear canvas.
+		canvas = "";
+
+		// Update canvas.
 		for (let j = yoffset; j < yoffset + height; j++) {
 			let y = (j - yoffset - (height - 1) / 2) * grid + pixelsposy;
 			for (let i = xoffset; i < xoffset + width; i++) {
@@ -415,12 +427,20 @@ async function appMain() {
 						//colorselected = -1;
 						picoFlush();
 					}
-					picoRect(pixels[j][i], x, y, w2, w2);
+					//picoRect(pixels[j][i], x, y, w2, w2);
+
+					canvas += picoCode6Char(pixels[j][i]+maxcolor);
 				} else {
-					picoRect(pixels[j][i], x, y, w1, w1);
+				//	picoRect(pixels[j][i], x, y, w1, w1);
+					canvas += picoCode6Char(pixels[j][i]);
 				}
 			}
 		}
+
+		// Draw canvas.
+		const scale = grid/3.5;
+		picoCharLeading(grid/scale,grid/scale);
+		picoText(canvas, -1, pixelsposx, pixelsposy, (pixelswidth+1)/scale,(pixelswidth+1)/scale, 0,scale);
 	}
 
 	// Draw anime editor.
