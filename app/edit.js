@@ -14,7 +14,7 @@ var playing = 0; // Playing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = 10; // Color count.
-const maxcolor = 10; // Color max size.
+const maxcolor = 26; // Color max size.
 var colorflag = 0; // Color editing flag.
 
 // Update icon image.
@@ -83,7 +83,7 @@ async function appAction() {
 	}
 
 	// Back or share.
-	if (!picoReturnApp()) {
+	if (!await picoReturnApp()) {
 		picoShareApp();
 	}
 }
@@ -150,8 +150,8 @@ async function appLoad() {
 
 	// Initialize sprites.
 	for (let i = 0; i < maxcolor; i++) {
-		picoCharSprite(picoCode6Char(i), picoStringCode6("033" + i + "00022"));
-		picoCharSprite(picoCode6Char(i+maxcolor), picoStringCode6("044" + i + "00033"));
+		picoCharSprite(picoCode6Char(10+i), picoStringCode6("066" + i + "00055"));
+		picoCharSprite(picoCode6Char(10+i+maxcolor), picoStringCode6("088" + i + "00077"));
 	}
 
 	// Initialize pixels on max size.
@@ -429,16 +429,16 @@ async function appMain() {
 					}
 					//picoRect(pixels[j][i], x, y, w2, w2);
 
-					canvas += picoCode6Char(pixels[j][i]+maxcolor);
+					canvas += picoCode6Char(10+pixels[j][i]+maxcolor);
 				} else {
 				//	picoRect(pixels[j][i], x, y, w1, w1);
-					canvas += picoCode6Char(pixels[j][i]);
+					canvas += picoCode6Char(10+pixels[j][i]);
 				}
 			}
 		}
 
 		// Draw canvas.
-		const scale = grid/3.5;
+		const scale = grid/7;
 		picoCharLeading(grid/scale,grid/scale);
 		picoText(canvas, -1, pixelsposx, pixelsposy, (pixelswidth+1)/scale,(pixelswidth+1)/scale, 0,scale);
 	}
@@ -668,6 +668,7 @@ async function appMain() {
 				// Draw color numbers.
 				let x = fgcolorsposx + (i*3+2 - 9 / 2) * grid; // Margins for each color number.
 				let s = 4;
+				picoCharLeading(4,6);
 				picoChar(c00, colorselecting, x, colorsposy, 0, s);
 			}
 		}
