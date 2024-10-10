@@ -277,14 +277,14 @@ async function appMain() {
 	}
 
 	// Positions.
-	let pixelswidth = (!animeflag && !landscape) ? 168 : 140; // Size of pixels.
-	let pixelsposx = !animeflag ? 0 : 14; // Position x of pixels.
+	let pixelswidth = landscape ? 168 : 140; // Size of pixels.
+	let pixelsposx = 0;//!animeflag ? 0 : 14; // Position x of pixels.
 	let pixelsposy = -14; // Position y of pixels.
 	let colorsposx = 0; // Position x of colors/coloreditor.
-	let colorsposy = pico.Image.height/2 - (!landscape ? 16 : 32); // Position y of colors/coloreditor.
+	let colorsposy = pico.Image.height/2 - (landscape ? 16 : 32); // Position y of colors/coloreditor.
 	let fgcolorsposx = 0; // Position x of bgcolors/coloreditor.
 	let bgcolorsposx = -pico.Image.width/2 + 28; // Position x of bgcolors/coloreditor.
-	let framesposx = -pico.Image.width/2 + 28; // Offset of buffer.
+	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of buffer.
 
 	// Draw background.
 	picoColor();
@@ -292,7 +292,7 @@ async function appMain() {
 
 	// Touching background.
 	{
-		let w0 = 165, h0 = 25; // Foreground color selector width and height.
+		let w0 = 164, h0 = 25; // Foreground color selector width and height.
 		let w1 = 12, h1 = 12; // Background color selector width and height.
 		let w2 = 10, h2 = 10; // Background color selector width and height for touching.
 
@@ -316,7 +316,7 @@ async function appMain() {
 			} else if (colorselected == -1) {
 				console.log("Single touched background.");*/
 
-				if (colorflag <= 0) {
+				if (!colorflag) {
 					//colorselected = colorselecting;
 					picoBeep(0, 0.1);
 
@@ -345,7 +345,7 @@ async function appMain() {
 			pixeltouching = -1;
 			colortouching = 1;
 
-			if (colorflag <= 0) {
+			if (!colorflag) {
 				// Start to touching background.
 				if (colortouching == 0) {
 					console.log("Touching background.");
@@ -383,14 +383,18 @@ async function appMain() {
 			w1 = w2, h1 = h2;
 		}
 
-		// Draw foreground color selector.
-		picoRect(bgindex ? 3 : 1, colorsposx, colorsposy, w0, h0);
+		if (!animeflag) {
+			// Draw foreground color selector.
+			if (bgindex) {
+				picoRect(3, colorsposx, colorsposy, w0, h0);
+			}
 
-		// Set colors data.
-		picoColor(colors);
+			// Set colors data.
+			picoColor(colors);
 
-		// Draw background color selector.
-		picoRect(colorselecting, bgcolorsposx, colorsposy, w1, h1);
+			// Draw background color selector.
+			picoRect(colorselecting, bgcolorsposx, colorsposy, w1, h1);
+		}
 	}
 
 	// Draw pixels.
@@ -409,7 +413,7 @@ async function appMain() {
 			let y = (j - yoffset - (height - 1) / 2) * grid + pixelsposy;
 			for (let i = xoffset; i < xoffset + width; i++) {
 				let x = (i - xoffset - (width - 1) / 2) * grid + pixelsposx;
-				if (pixeltouching >= 0 && picoMotion(x, y, grid/2)) {
+				if (!animeflag && pixeltouching >= 0 && picoMotion(x, y, grid/2)) {
 					console.log("Touch pixels.");
 					pixeltouching = 1; // Touch pixels.
 					frametouching = -1;
@@ -438,13 +442,13 @@ async function appMain() {
 		}
 
 		// Draw canvas.
-		const scale = grid/7;
+		const scale = !animeflag ? grid/7 : grid/6;
 		picoCharLeading(grid/scale,grid/scale);
 		picoText(canvas, -1, pixelsposx, pixelsposy, (pixelswidth+1)/scale,(pixelswidth+1)/scale, 0,scale);
 	}
 
 	// Draw anime editor.
-	if (animeflag >= 1) {
+	if (animeflag) {
 		let size = anime > 7 ? anime : 7;
 		let grid = pixelswidth / size;
 		let margin = size <= 9 ? 2 : 1;
@@ -453,12 +457,12 @@ async function appMain() {
 		let w3 = grid + margin; // Width for holding.
 		let w4 = grid - margin*2; // Width for copyed.
 		for (let i = 0; i < anime; i++) {
-			let y = pixelsposy + (i - (anime - 1) / 2) * grid;
+			let x = pixelsposx + (i - (anime - 1) / 2) * grid;
 			let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
 			let w0 = grid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
 			// Release touching frame.
-			if (frametouching >= 0 && picoAction(framesposx, y, w0, w0)) {
+			if (frametouching >= 0 && picoAction(x, framesposy, w0, w0)) {
 				console.log("Release touching frame.");
 				frametouching = 0;
 
@@ -474,10 +478,10 @@ async function appMain() {
 				}
 
 				// Release holding frame.
-				picoSprite(sprite, 0, framesposx, y, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
+				picoSprite(sprite, 0, x, framesposy, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
 
 			// Touching frame.
-			} else if (frametouching >= 0 && picoMotion(framesposx, y, w0, w0)) {
+			} else if (frametouching >= 0 && picoMotion(x, framesposy, w0, w0)) {
 				pixeltouching = -1;
 				colortouching = -1;
 
@@ -504,29 +508,29 @@ async function appMain() {
 				}
 
 				// Touch holding frame.
-				picoSprite(sprite, 0, framesposx, y, 0, w3 / picoSpriteSize(sprite)); // Touching frame.
+				picoSprite(sprite, 0, x, framesposy, 0, w3 / picoSpriteSize(sprite)); // Touching frame.
 
 			// Not touching but selecting color.
 			} else if (frameselecting == i) {
 
 				// Touch holding frame.
 				if (frametouching >= 1) {
-					picoSprite(sprite, 0, framesposx, y, 0, w4 / picoSpriteSize(sprite)); // Copyed frame.
+					picoSprite(sprite, 0, x, framesposy, 0, w4 / picoSpriteSize(sprite)); // Copyed frame.
 				} else if (anime >= 2) {
-					picoSprite(sprite, 0, framesposx, y, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
+					picoSprite(sprite, 0, x, framesposy, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
 				} else {
-					picoSprite(sprite, 0, framesposx, y, 0, w1 / picoSpriteSize(sprite)); // Only one frame.
+					picoSprite(sprite, 0, x, framesposy, 0, w1 / picoSpriteSize(sprite)); // Only one frame.
 				}
 
 			// Other frames.
 			} else {
-				picoSprite(sprite, 0, framesposx, y, 0, w1 / picoSpriteSize(sprite)); // Unselecting frames.
+				picoSprite(sprite, 0, x, framesposy, 0, w1 / picoSpriteSize(sprite)); // Unselecting frames.
 			}
 		}
 	}
 
 	// Draw colors.
-	if (colorflag <= 0) {
+	if (!animeflag && !colorflag) {
 		let grid = 16;
 
 		for (let i = 1; i < depth; i++) {
@@ -616,9 +620,10 @@ async function appMain() {
 				}
 			}
 		}
+	}
 
 	// Draw color editor.
-	} else {
+	if (!animeflag && colorflag > 0) {
 		const compression = 2, maxcompresed = (1 << (8 - compression));
 		let grid = 16;
 
