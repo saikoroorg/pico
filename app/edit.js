@@ -119,7 +119,17 @@ function appSelect(x) {
 //		xoffset = picoDiv(maxwidth - width, 2);
 //		yoffset = picoDiv(maxheight - height, 2);
 		xoffset += x>0 ? (picoMod(width,2)?-1:0) : x<0 ? (!picoMod(width,2)?1:0) : 0;
+		if (xoffset < 0) {
+			xoffset = 0;
+		} else if (xoffset > maxwidth-width) {
+			xoffset = maxwidth-width;
+		}
 		yoffset += x>0 ? (picoMod(height,2)?-1:0) : x<0 ? (!picoMod(height,2)?1:0) : 0;
+		if (yoffset < 0) {
+			yoffset = 0;
+		} else if (yoffset > maxheight-height) {
+			yoffset = maxheight-height;
+		}
 			//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
 		//playing = -1; // Restart.
 		appUpdate(false);
