@@ -22,7 +22,7 @@ async function appUpdate(force = true) {
 
 	// Update buffer.
 	if (force || buffers[frame]) {
-		console.log("Update" + frame + ": " + buffers[frame]);
+		////console.log("Update" + frame + ": " + buffers[frame]);
 
 		// Store canvas pixels to buffers.
 		buffers[frame] = [0, width, height];
@@ -116,9 +116,11 @@ function appSelect(x) {
 	} else {
 		width = width + x < 3 ? 3 : width + x > maxwidth ? maxwidth : width + x;
 		height = height + x < 3 ? 3 : height + x > maxheight ? maxheight : height + x;
-		xoffset = picoDiv(maxwidth - width, 2);
-		yoffset = picoDiv(maxheight - height, 2);
-		//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
+//		xoffset = picoDiv(maxwidth - width, 2);
+//		yoffset = picoDiv(maxheight - height, 2);
+		xoffset += x>0 ? (picoMod(width,2)?-1:0) : x<0 ? (!picoMod(width,2)?1:0) : 0;
+		yoffset += x>0 ? (picoMod(height,2)?-1:0) : x<0 ? (!picoMod(height,2)?1:0) : 0;
+			//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
 		//playing = -1; // Restart.
 		appUpdate(false);
 	}
@@ -137,6 +139,8 @@ var colorselecting = depth - 1; // Touching color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var frameselecting = -1; // Selecting frame index.
 var landscape = false; // landscape mode.
+var touchposx = -1; // Position x of on touching.
+var touchposy = -1; // Position y of on touching.
 
 // Resize.
 async function appResize() {
@@ -167,7 +171,7 @@ async function appLoad() {
 	for (let k = 0; k < keys.length; k++) {
 		let value = picoString(k);
 		if (value) {
-			console.log("Param" + k + ": " + keys[k] + " -> " + picoString(k));
+			////console.log("Param" + k + ": " + keys[k] + " -> " + picoString(k));
 
 
 			// Load colors.
@@ -198,7 +202,7 @@ async function appLoad() {
 				if (anime >= 2) {
 					animeflag = 1;
 				}
-				console.log("Load buffer" + keys[k] + ": " + buffers[framecount]);
+				////console.log("Load buffer" + keys[k] + ": " + buffers[framecount]);
 				framecount++;
 			}
 		}
@@ -259,7 +263,7 @@ async function appMain() {
 					}
 				}
 			}
-			console.log("Load pixel: " + pixels);
+			////console.log("Load pixel: " + pixels);
 		}
 		appUpdate();
 
@@ -273,6 +277,8 @@ async function appMain() {
 		pixeltouching = 0;
 		colortouching = 0;
 		frametouching = 0;
+		touchposx = 0;
+		touchposy = 0;
 		appUpdate();
 	}
 
@@ -388,10 +394,12 @@ async function appMain() {
 			if (bgindex) {
 				picoRect(3, colorsposx, colorsposy, w0, h0);
 			}
+		}
 
-			// Set colors data.
-			picoColor(colors);
+		// Set colors data.
+		picoColor(colors);
 
+		if (!animeflag) {
 			// Draw background color selector.
 			picoRect(colorselecting, bgcolorsposx, colorsposy, w1, h1);
 		}
@@ -404,6 +412,7 @@ async function appMain() {
 		//let margin = size <= 9 ? 2 : size <= 19 ? 1 : 0;
 		//let w1 = (grid - margin) - 1; // Width.
 		//let w2 = grid - 1; // Width for touching.
+		let touchmovex = 0, touchmovey = 0;
 
 		// Clear canvas.
 		canvas = "";
@@ -413,32 +422,68 @@ async function appMain() {
 			let y = (j - yoffset - (height - 1) / 2) * grid + pixelsposy;
 			for (let i = xoffset; i < xoffset + width; i++) {
 				let x = (i - xoffset - (width - 1) / 2) * grid + pixelsposx;
-				if (!animeflag && pixeltouching >= 0 && picoMotion(x, y, grid/2)) {
-					console.log("Touch pixels.");
-					pixeltouching = 1; // Touch pixels.
-					frametouching = -1;
-					colortouching = -1;
-
-					// Put pixel.
-					if (pixels[j][i] != colorselecting) {
-						pixels[j][i] = colorselecting;
+				if (animeflag) {
+					if (picoMotion(x, y, grid/2+1)) {
+						let j0 = j - yoffset, i0 = i - xoffset;
+						//console.log("Touch animes" + 
+						//	pixeltouching + " " + xoffset + "," + yoffset + ":" + 
+						//	touchposx + "," + touchposy+"->"+i0+","+j0);
+						if (pixeltouching > 0 && (touchposx != i0 || touchposy != j0)) {
+							touchmovex += touchposx - i0;
+							touchmovey += touchposy - j0;
+							//console.log("Moving:" + touchmovex + "," + touchmovey);
+						}
+						pixeltouching = 1; // Touch pixels.
+						touchposx = i0;
+						touchposy = j0;
 					}
 
-					// Cancel color editing.
-					if (colorflag) {
-						console.log("Cancel color editing.");
-						colorflag = 0;
-						//colorselected = -1;
-						picoFlush();
-					}
-					//picoRect(pixels[j][i], x, y, w2, w2);
-
-					canvas += picoCode6Char(10+pixels[j][i]+maxcolor);
-				} else {
-				//	picoRect(pixels[j][i], x, y, w1, w1);
 					canvas += picoCode6Char(10+pixels[j][i]);
+				} else {
+					if (pixeltouching >= 0 && picoMotion(x, y, grid/2)) {
+						console.log("Touch pixels.");
+						pixeltouching = 1; // Touch pixels.
+						frametouching = -1;
+						colortouching = -1;
+
+						// Put pixel.
+						if (pixels[j][i] != colorselecting) {
+							pixels[j][i] = colorselecting;
+						}
+
+						// Cancel color editing.
+						if (colorflag) {
+							console.log("Cancel color editing.");
+							colorflag = 0;
+							//colorselected = -1;
+							picoFlush();
+						}
+						//picoRect(pixels[j][i], x, y, w2, w2);
+
+						canvas += picoCode6Char(10+pixels[j][i]+maxcolor);
+					} else {
+					//	picoRect(pixels[j][i], x, y, w1, w1);
+						canvas += picoCode6Char(10+pixels[j][i]);
+					}
 				}
 			}
+		}
+
+		// Update offset.
+		if (touchmovex || touchmovey) {
+			xoffset += touchmovex;
+			if (xoffset < 0) {
+				xoffset = 0;
+			} else if (xoffset > maxwidth-width) {
+				xoffset = maxwidth-width;
+			}
+			yoffset += touchmovey;
+			if (yoffset < 0) {
+				yoffset = 0;
+			} else if (yoffset > maxheight-height) {
+				yoffset = maxheight-height;
+			}
+			appUpdate(false);
 		}
 
 		// Draw canvas.
@@ -447,7 +492,7 @@ async function appMain() {
 		picoText(canvas, -1, pixelsposx, pixelsposy, (pixelswidth+1)/scale,(pixelswidth+1)/scale, 0,scale);
 	}
 
-	// Draw anime editor.
+	// Draw animes.
 	if (animeflag) {
 		let size = anime > 7 ? anime : 7;
 		let grid = pixelswidth / size;
