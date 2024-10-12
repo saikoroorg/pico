@@ -433,7 +433,7 @@ async function appMain() {
 			for (let i = xoffset; i < xoffset + width; i++) {
 				let x = (i - xoffset - (width - 1) / 2) * grid + pixelsposx;
 				if (animeflag) {
-					if (picoMotion(x, y, grid/2+1)) {
+					if (pixeltouching >= 0 && picoMotion(x, y, grid/2+1)) {
 						let j0 = j - yoffset, i0 = i - xoffset;
 						//console.log("Touch animes" + 
 						//	pixeltouching + " " + xoffset + "," + yoffset + ":" + 
@@ -443,9 +443,13 @@ async function appMain() {
 							touchmovey += touchposy - j0;
 							//console.log("Moving:" + touchmovex + "," + touchmovey);
 						}
-						pixeltouching = 1; // Touch pixels.
 						touchposx = i0;
 						touchposy = j0;
+
+						console.log("Touch pixels.");
+						pixeltouching = 1; // Touch pixels.
+						frametouching = -1;
+						colortouching = -1;
 					}
 
 					canvas += picoCode6Char(10+pixels[j][i]);
