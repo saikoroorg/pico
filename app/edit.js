@@ -1,5 +1,5 @@
 const title = "Edit"; // Title.
-var colors = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
+var colors = picoStringCode8("111333222444000");//[255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 9, height = 9; // Canvas size.
@@ -13,7 +13,7 @@ var animeflag = 0; // Anime editing flag.
 var playing = 0; // Playing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
-var depth = 10; // Color count.
+var depth = colors.length/3; // Color count.
 const maxcolor = 26; // Color max size.
 var colorflag = 0; // Color editing flag.
 
@@ -308,7 +308,7 @@ async function appMain() {
 	picoRect(1, pixelsposx, pixelsposy, pixelswidth, pixelswidth);
 
 	// Touching background.
-	{
+	if (!animeflag) {
 		let w1 = pixelswidth-3, h1 = 24; // Background color selector width and height.
 		let w2 = pixelswidth-1, h2 = 26; // Background color selector width and height for touching.
 
@@ -333,7 +333,7 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(3, colorsposx, colorsposy, w2, h2);
+			picoRect(bgcolor, colorsposx, colorsposy, w2, h2);
 
 		// Touching background.
 		} else if (colortouching >= 0 && picoMotion() &&
@@ -378,11 +378,11 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(3, colorsposx, colorsposy, w2, h2);
+			picoRect(bgcolor, colorsposx, colorsposy, w2, h2);
 
-		} else if (!animeflag) {
+		} else {
 			// Draw background color selector.
-			picoRect(3, colorsposx, colorsposy, w1, h1);
+			picoRect(bgcolor, colorsposx, colorsposy, w1, h1);
 		}
 
 		// Set colors data.
