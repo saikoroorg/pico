@@ -1,5 +1,5 @@
 const title = "Edit"; // Title.
-var colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 63,63,63]; // Colors.
+var colors = [255,255,255, 223,223,223, 191,191,191, 191,191,127, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 63,63,63]; // Colors.
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
