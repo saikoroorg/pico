@@ -641,12 +641,12 @@ async function appMain() {
 				if (c > 0) {
 					let x = colorsposx + (i*3+1 - 10/2) * colorsgrid; // Margins for each color number.
 					let s = scale;
-					if (colortouching >= 0 && picoAction(x, colorsposy+6, 8, 6)) {
+					if (colortouching >= 0 && picoAction(x, colorsposy+4, 8, 4)) {
 						c = (c + 1) >> compression; // Bit shift for compressed decrease.
 						c = c - 1 > 0 ? c - 1 : 0; // Decrease.
 						c = (c << compression) - 1; // Bit unshift.
 						c = c > 0 ? c : 0;
-					} else if (colortouching >= 0 && picoMotion(x, colorsposy+6, 8, 6)) {
+					} else if (colortouching >= 0 && picoMotion(x, colorsposy+4, 8, 4)) {
 						s = scale * 0.9;
 					}
 
@@ -658,11 +658,11 @@ async function appMain() {
 				if (c < 255) {
 					let x = colorsposx + (i*3+1 - 10/2) * colorsgrid; // Margins for each color number.
 					let s = scale;
-					if (colortouching >= 0 && picoAction(x, colorsposy-6, 8, 6)) {
+					if (colortouching >= 0 && picoAction(x, colorsposy-4, 8, 4)) {
 						c = (c + 1) >> compression; // Bit shift for compressed increase.
 						c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
 						c = (c << compression) - 1; // Bit unshift.
-					} else if (colortouching >= 0 && picoMotion(x, colorsposy-6, 8, 6)) {
+					} else if (colortouching >= 0 && picoMotion(x, colorsposy-4, 8, 4)) {
 						s = scale * 0.9;
 					}
 					colors[colorselecting * 3 + i] = c;
