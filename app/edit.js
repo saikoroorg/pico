@@ -149,8 +149,8 @@ var colorselecting = depth - 1; // Touching color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var frameselecting = -1; // Selecting frame index.
 var landscape = false; // landscape mode.
-var touchposx = -1; // Position x of on touching.
-var touchposy = -1; // Position y of on touching.
+var pixeltouchposx = -1; // Position x of touch starting for frame moving.
+var pixeltouchposy = -1; // Position y of touch starting for frame moving.
 const oneunitwidth0 = 6; // Width of 1 pixel unit.
 const oneunitwidth1 = 8; // Width of 1 pixel unit on touching.
 
@@ -291,8 +291,8 @@ async function appMain() {
 		pixeltouching = 0;
 		colortouching = 0;
 		frametouching = 0;
-		touchposx = 0;
-		touchposy = 0;
+		pixeltouchposx = 0;
+		pixeltouchposy = 0;
 		appUpdate();
 	}
 
@@ -397,7 +397,7 @@ async function appMain() {
 
 	// Draw pixels.
 	{
-		let touchmovex = 0, touchmovey = 0;
+		let pixeltouchmovex = 0, pixeltouchmovey = 0; // Touch position difference for frame moving.
 
 		// Clear canvas.
 		canvas = "";
@@ -412,14 +412,14 @@ async function appMain() {
 						let j0 = j - yoffset, i0 = i - xoffset;
 						//console.log("Touch animes" + 
 						//	pixeltouching + " " + xoffset + "," + yoffset + ":" + 
-						//	touchposx + "," + touchposy+"->"+i0+","+j0);
-						if (pixeltouching > 0 && (touchposx != i0 || touchposy != j0)) {
-							touchmovex += touchposx - i0;
-							touchmovey += touchposy - j0;
-							//console.log("Moving:" + touchmovex + "," + touchmovey);
+						//	pixeltouchposx + "," + pixeltouchposy+"->"+i0+","+j0);
+						if (pixeltouching > 0 && (pixeltouchposx != i0 || pixeltouchposy != j0)) {
+							pixeltouchmovex += pixeltouchposx - i0;
+							pixeltouchmovey += pixeltouchposy - j0;
+							//console.log("Moving:" + pixeltouchmovex + "," + pixeltouchmovey);
 						}
-						touchposx = i0;
-						touchposy = j0;
+						pixeltouchposx = i0;
+						pixeltouchposy = j0;
 
 						console.log("Touch pixels.");
 						pixeltouching = 1; // Touch pixels.
@@ -459,14 +459,14 @@ async function appMain() {
 		}
 
 		// Update offset.
-		if (touchmovex || touchmovey) {
-			xoffset += touchmovex;
+		if (pixeltouchmovex || pixeltouchmovey) {
+			xoffset += pixeltouchmovex;
 			if (xoffset < 0) {
 				xoffset = 0;
 			} else if (xoffset > maxwidth-width) {
 				xoffset = maxwidth-width;
 			}
-			yoffset += touchmovey;
+			yoffset += pixeltouchmovey;
 			if (yoffset < 0) {
 				yoffset = 0;
 			} else if (yoffset > maxheight-height) {
