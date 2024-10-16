@@ -151,8 +151,7 @@ var frameselecting = -1; // Selecting frame index.
 var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
-const oneunitwidth0 = 6; // Width of 1 pixel unit.
-const oneunitwidth1 = 8; // Width of 1 pixel unit on touching.
+const blockwidth = 7; // Width of 1 pixel block.
 
 // Resize.
 async function appResize() {
@@ -165,8 +164,8 @@ async function appLoad() {
 	picoTitle(title);
 
 	// Initialize sprites.
-	let char00 = "0" + oneunitwidth0 + oneunitwidth0, char01 = "00" + "0" + (oneunitwidth0-1) + (oneunitwidth0-1);
-	let char10 = "0" + oneunitwidth1 + oneunitwidth1, char11 = "00" + "0" + (oneunitwidth1-1) + (oneunitwidth1-1);
+	let char00 = "0" + (blockwidth-1) + (blockwidth-1), char01 = "00" + "0" + (blockwidth-2) + (blockwidth-2);
+	let char10 = "0" + (blockwidth-0) + (blockwidth-0), char11 = "00" + "0" + (blockwidth-1) + (blockwidth-1);
 	for (let i = 0; i < maxcolor; i++) {
 		picoCharSprite(picoCode6Char(10+i), picoStringCode6(char00 + i + char01));
 		picoCharSprite(picoCode6Char(10+i+maxcolor), picoStringCode6(char10 + i + char11));
@@ -427,7 +426,7 @@ async function appMain() {
 						colortouching = -1;
 					}
 
-					canvas += picoCode6Char(10+pixels[j][i]);
+					canvas += picoCode6Char(10+pixels[j][i]+maxcolor);
 				} else {
 					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
 						console.log("Touch pixels.");
@@ -476,15 +475,9 @@ async function appMain() {
 		}
 
 		// Draw canvas.
-		if (animeflag) {
-			let s = pixelsgrid/oneunitwidth0, w = pixelswidth/s;
-			picoCharLeading(oneunitwidth0,oneunitwidth0);
-			picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
-		} else {
-			let s = pixelsgrid/oneunitwidth1, w = pixelswidth/s;
-			picoCharLeading(oneunitwidth1,oneunitwidth1);
-			picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
-		}
+		let s = pixelsgrid / blockwidth, w = pixelswidth/s;
+		picoCharLeading(blockwidth, blockwidth);
+		picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
 	}
 
 	// Draw animes.
