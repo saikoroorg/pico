@@ -2,7 +2,7 @@ const title = "Edit"; // Title.
 var colors = picoStringCode8("111333222444000");//[255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
-var width = 9, height = 9; // Canvas size.
+var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
 var yoffset = picoDiv(maxheight - height, 2); // Pixels y-index offset.
 const maxanime = 20; // Buffer max size.
@@ -151,6 +151,8 @@ var frameselecting = -1; // Selecting frame index.
 var landscape = false; // landscape mode.
 var touchposx = -1; // Position x of on touching.
 var touchposy = -1; // Position y of on touching.
+const oneunitwidth0 = 6; // Width of 1 pixel unit.
+const oneunitwidth1 = 8; // Width of 1 pixel unit on touching.
 
 // Resize.
 async function appResize() {
@@ -163,9 +165,11 @@ async function appLoad() {
 	picoTitle(title);
 
 	// Initialize sprites.
+	let char00 = "0" + oneunitwidth0 + oneunitwidth0, char01 = "00" + "0" + (oneunitwidth0-1) + (oneunitwidth0-1);
+	let char10 = "0" + oneunitwidth1 + oneunitwidth1, char11 = "00" + "0" + (oneunitwidth1-1) + (oneunitwidth1-1);
 	for (let i = 0; i < maxcolor; i++) {
-		picoCharSprite(picoCode6Char(10+i), picoStringCode6("066" + i + "00055"));
-		picoCharSprite(picoCode6Char(10+i+maxcolor), picoStringCode6("088" + i + "00077"));
+		picoCharSprite(picoCode6Char(10+i), picoStringCode6(char00 + i + char01));
+		picoCharSprite(picoCode6Char(10+i+maxcolor), picoStringCode6(char10 + i + char11));
 	}
 
 	// Initialize pixels on max size.
@@ -301,7 +305,7 @@ async function appMain() {
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let colorsposx = 0; // Position x of colors/coloreditor.
 	let colorsposy = pico.Image.height/2 - (landscape ? 16 : 32); // Position y of colors/coloreditor.
-	let colorswidth = colors.length/3*pixelsgrid, colorsheight = 12; // Color selector width and height.
+	let colorswidth = depth*pixelsgrid, colorsheight = 12; // Color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
 
 	// Draw background.
@@ -472,9 +476,15 @@ async function appMain() {
 		}
 
 		// Draw canvas.
-		let scale = !animeflag ? pixelsgrid/7 : pixelsgrid/6;
-		picoCharLeading(pixelsgrid/scale,pixelsgrid/scale);
-		picoText(canvas, -1, pixelsposx, pixelsposy, (pixelswidth+1)/scale,(pixelswidth+1)/scale, 0,scale);
+		if (animeflag) {
+			let s = pixelsgrid/oneunitwidth0, w = pixelswidth/s;
+			picoCharLeading(oneunitwidth0,oneunitwidth0);
+			picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
+		} else {
+			let s = pixelsgrid/oneunitwidth1, w = pixelswidth/s;
+			picoCharLeading(oneunitwidth1,oneunitwidth1);
+			picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
+		}
 	}
 
 	// Draw animes.
