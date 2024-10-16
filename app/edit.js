@@ -1,5 +1,5 @@
 const title = "Edit"; // Title.
-var colors = picoStringCode8("111333222444000");//[255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23]; // Colors.
+var colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 63,63,63]; // Colors.
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
@@ -303,7 +303,8 @@ async function appMain() {
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let colorsposx = 0; // Position x of colors/coloreditor.
 	let colorsposy = pico.Image.height/2 - (landscape ? 16 : 32); // Position y of colors/coloreditor.
-	let colorswidth = depth*pixelsgrid, colorsheight = 12; // Color selector width and height.
+	let colorsgrid = landscape ? 16 : 14;
+	let colorswidth = (depth-1)*colorsgrid, colorsheight = colorsgrid; // Color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
 
 	// Draw background.
@@ -318,7 +319,7 @@ async function appMain() {
 		// Release touching background.
 		if (colortouching >= 0 && picoAction() &&
 			!picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			!picoAction(colorsposx, colorsposy, colorswidth, colorsheight)) {
+			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
 			console.log("Release touching background.");
 			colortouching = 0;
 
@@ -341,7 +342,7 @@ async function appMain() {
 		// Touching background.
 		} else if (colortouching >= 0 && picoMotion() &&
 			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			!picoMotion(colorsposx, colorsposy, colorswidth, colorsheight)) {
+			!picoMotion(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
 			frametouching = -1;
 			pixeltouching = -1;
 			colortouching = 1;
@@ -386,7 +387,7 @@ async function appMain() {
 		} else {
 			// Draw background color selector.
 			picoRect(bgcolor, colorsposx, colorsposy, w1, h1);
-			picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
+			//picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
 		}
 	}
 
@@ -564,11 +565,10 @@ async function appMain() {
 
 	// Draw colors.
 	if (!animeflag && !colorflag) {
-		let grid = landscape ? 16 : 14;
 		const scale = 4;
 
 		for (let i = 1; i < depth; i++) {
-			let x = colorsposx + (i - depth/2) * grid; // Margins for each color.
+			let x = colorsposx + (i - depth/2) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
 			if (colortouching >= 0 && picoAction(x, colorsposy, 8, 12)) {
@@ -630,7 +630,6 @@ async function appMain() {
 	// Draw color editor.
 	if (!animeflag && colorflag) {
 		const compression = 2, maxcompresed = (1 << (8 - compression));
-		let grid = landscape ? 16 : 12;
 		const scale = 4;
 
 		// Draw buttons and color numbers.
@@ -640,7 +639,7 @@ async function appMain() {
 
 				// Decrease color number.
 				if (c > 0) {
-					let x = colorsposx + (i*3+1 - 10/2) * grid; // Margins for each color number.
+					let x = colorsposx + (i*3+1 - 10/2) * colorsgrid; // Margins for each color number.
 					let s = scale;
 					if (colortouching >= 0 && picoAction(x, colorsposy+6, 8, 6)) {
 						c = (c + 1) >> compression; // Bit shift for compressed decrease.
@@ -657,7 +656,7 @@ async function appMain() {
 
 				// Increase color number.
 				if (c < 255) {
-					let x = colorsposx + (i*3+1 - 10/2) * grid; // Margins for each color number.
+					let x = colorsposx + (i*3+1 - 10/2) * colorsgrid; // Margins for each color number.
 					let s = scale;
 					if (colortouching >= 0 && picoAction(x, colorsposy-6, 8, 6)) {
 						c = (c + 1) >> compression; // Bit shift for compressed increase.
@@ -677,9 +676,9 @@ async function appMain() {
 				let c00 = c99 >= 99 ? "100" : c99 >= 9 ? " " + (c99 + 1) : c99 >= 1 ? " 0" + (c99 + 1) : " 00";
 
 				// Draw color numbers.
-				let x = colorsposx + (i*3+2 - 10/2) * grid; // Margins for each color number.
+				let x = colorsposx + (i*3+2 - 10/2) * colorsgrid; // Margins for each color number.
 				let s = scale;
-				picoCharLeading(grid/scale,grid/scale);
+				picoCharLeading(colorsgrid/scale,colorsgrid/scale);
 				picoChar(c00, colorselecting, x, colorsposy, 0, s);
 			}
 		}
