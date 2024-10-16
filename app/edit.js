@@ -1,5 +1,5 @@
 const title = "Edit"; // Title.
-var colors = [255,255,255, 223,223,223, 191,191,191, 191,191,127, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 63,63,63]; // Colors.
+var colors = [255,255,255, 191,191,191, 191,191,127, 127,127,127, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 63,63,63]; // Colors.
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
@@ -572,7 +572,7 @@ async function appMain() {
 			let x = colorsposx + (i - depth/2) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
-			if (colortouching >= 0 && picoAction(x, colorsposy, 8, 12)) {
+			if (colortouching >= 0 && picoAction(x, colorsposy, 6, 12)) {
 				console.log("Release touching color.");
 				colortouching = 0;
 				//colorselected = colorselecting;
@@ -580,7 +580,7 @@ async function appMain() {
 				picoChar("+", i, x, colorsposy, 0, scale);
 
 			// Touching color.
-			} else if (colortouching >= 0 && picoMotion(x, colorsposy, 8, 12)) {
+			} else if (colortouching >= 0 && picoMotion(x, colorsposy, 6, 12)) {
 				frametouching = -1;
 				pixeltouching = -1;
 
@@ -652,7 +652,7 @@ async function appMain() {
 					}
 
 					// Draw decrease button.
-					picoChar("&", colorselecting, x, colorsposy+8, 180, s);
+					picoChar("&", colorselecting, x, colorsposy+4, 180, s);
 				}
 
 				// Increase color number.
@@ -669,7 +669,7 @@ async function appMain() {
 					colors[colorselecting * 3 + i] = c;
 
 					// Draw increase button.
-					picoChar("&", colorselecting, x, colorsposy-8, 0, s);
+					picoChar("&", colorselecting, x, colorsposy-4, 0, s);
 				}
 
 				// Convert range 0-255 to 0-100.
