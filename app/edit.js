@@ -14,7 +14,8 @@ var playing = 0; // Playing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = colors.length/3; // Color count.
-const maxcolor = 26; // Color max size.
+const coffset = 36; // Color offset.
+const maxcolor = 26; // Color max count.
 var colorflag = 0; // Color editing flag.
 
 // Update icon image.
@@ -164,11 +165,9 @@ async function appLoad() {
 	picoTitle(title);
 
 	// Initialize sprites.
-	let char00 = "0" + (blockwidth-1) + (blockwidth-1), char01 = "00" + "0" + (blockwidth-2) + (blockwidth-2);
-	let char10 = "0" + (blockwidth-0) + (blockwidth-0), char11 = "00" + "0" + (blockwidth-1) + (blockwidth-1);
+	let char0 = "0" + (blockwidth-1) + (blockwidth-1), char1 = "00" + "0" + (blockwidth-2) + (blockwidth-2);
 	for (let i = 0; i < maxcolor; i++) {
-		picoCharSprite(picoCode6Char(10+i), picoStringCode6(char00 + i + char01));
-		picoCharSprite(picoCode6Char(10+i+maxcolor), picoStringCode6(char10 + i + char11));
+		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(i) + char1));
 	}
 
 	// Initialize pixels on max size.
@@ -389,10 +388,10 @@ async function appMain() {
 			picoRect(bgcolor, colorsposx, colorsposy, w1, h1);
 			picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
 		}
-
-		// Set colors data.
-		picoColor(colors);
 	}
+
+	// Set colors data.
+	picoColor(colors);
 
 	// Draw pixels.
 	{
@@ -426,7 +425,7 @@ async function appMain() {
 						colortouching = -1;
 					}
 
-					canvas += picoCode6Char(10+pixels[j][i]+maxcolor);
+					canvas += picoCode6Char(coffset+pixels[j][i]);
 				} else {
 					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
 						console.log("Touch pixels.");
@@ -446,12 +445,11 @@ async function appMain() {
 							//colorselected = -1;
 							picoFlush();
 						}
-						//picoRect(pixels[j][i], x, y, w2, w2);
 
-						canvas += picoCode6Char(10+pixels[j][i]+maxcolor);
+						picoRect(pixels[j][i], x-0.5, y-0.5, pixelsgrid-0.5, pixelsgrid-0.5);
+						canvas += " ";
 					} else {
-					//	picoRect(pixels[j][i], x, y, w1, w1);
-						canvas += picoCode6Char(10+pixels[j][i]);
+						canvas += picoCode6Char(coffset+pixels[j][i]);
 					}
 				}
 			}
@@ -475,8 +473,10 @@ async function appMain() {
 		}
 
 		// Draw canvas.
-		let s = pixelsgrid / blockwidth, w = (pixelswidth+1) / s;
-		picoCharLeading(blockwidth, blockwidth);
+		let l = animeflag ? blockwidth-1 : blockwidth;
+		let s = pixelsgrid / l;
+		let w = (pixelswidth + 1) / s;
+		picoCharLeading(l, l);
 		picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
 	}
 
@@ -617,7 +617,7 @@ async function appMain() {
 
 				// Not touching but selecting color.
 				if (colorselecting == i) {
-					picoChar(picoCode6Char(10+i), -1, x, colorsposy, 0, scale*0.5);
+					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.5);
 
 				// Other colors.
 				} else {
