@@ -475,7 +475,7 @@ async function appMain() {
 		}
 
 		// Draw canvas.
-		let s = pixelsgrid / blockwidth, w = pixelswidth/s;
+		let s = pixelsgrid / blockwidth, w = (pixelswidth+1) / s;
 		picoCharLeading(blockwidth, blockwidth);
 		picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
 	}
