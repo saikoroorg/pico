@@ -295,14 +295,14 @@ async function appMain() {
 	}
 
 	// Positions.
-	let pixelswidth = landscape ? 168 : 140; // Size of pixels.
+	let pixelswidth = landscape ? 140 : 140; // Size of pixels.
 	let pixelsposx = 0;//!animeflag ? 0 : 14; // Position x of pixels.
-	let pixelsposy = -14; // Position y of pixels.
+	let pixelsposy = landscape ? -6 : -14; // Position y of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let colorsposx = 0; // Position x of colors/coloreditor.
-	let colorsposy = pico.Image.height/2 - (landscape ? 16 : 32); // Position y of colors/coloreditor.
+	let colorsposy = pico.Image.height/2 - (landscape ? 24 : 16); // Position y of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14;
 	let colorswidth = (depth-1)*colorsgrid, colorsheight = colorsgrid; // Color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
@@ -313,7 +313,8 @@ async function appMain() {
 
 	// Touching background.
 	if (!animeflag) {
-		let w1 = pixelswidth-pixelsmargin, h1 = pixelswidth/7; // Background color selector width and height.
+		let w1 = landscape ? pixelswidth+colorsgrid : pixelswidth-pixelsmargin;
+		let h1 = pixelswidth/7; // Background color selector width and height.
 		let w2 = w1+2, h2 = h1+2; // Background color selector width and height for touching.
 
 		// Release touching background.
