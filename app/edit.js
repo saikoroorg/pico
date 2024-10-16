@@ -296,12 +296,13 @@ async function appMain() {
 	let pixelswidth = landscape ? 168 : 140; // Size of pixels.
 	let pixelsposx = 0;//!animeflag ? 0 : 14; // Position x of pixels.
 	let pixelsposy = -14; // Position y of pixels.
+	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
+	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
+	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let colorsposx = 0; // Position x of colors/coloreditor.
 	let colorsposy = pico.Image.height/2 - (landscape ? 16 : 32); // Position y of colors/coloreditor.
-	let fgcolorsposx = 0; // Position x of bgcolors/coloreditor.
-	let bgcolorsposx = -pico.Image.width/2 + 28; // Position x of bgcolors/coloreditor.
-	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of buffer.
-	let colorswidth = pixelswidth-12, colorsheight = 12; // Color selector width and height.
+	let colorswidth = colors.length/3*pixelsgrid, colorsheight = 12; // Color selector width and height.
+	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
 
 	// Draw background.
 	picoColor();
@@ -309,8 +310,8 @@ async function appMain() {
 
 	// Touching background.
 	if (!animeflag) {
-		let w1 = pixelswidth-3, h1 = 24; // Background color selector width and height.
-		let w2 = pixelswidth-1, h2 = 26; // Background color selector width and height for touching.
+		let w1 = pixelswidth-pixelsmargin, h1 = pixelswidth/7; // Background color selector width and height.
+		let w2 = w1+2, h2 = h1+2; // Background color selector width and height for touching.
 
 		// Release touching background.
 		if (colortouching >= 0 && picoAction() &&
@@ -383,6 +384,7 @@ async function appMain() {
 		} else {
 			// Draw background color selector.
 			picoRect(bgcolor, colorsposx, colorsposy, w1, h1);
+			picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
 		}
 
 		// Set colors data.
@@ -391,12 +393,6 @@ async function appMain() {
 
 	// Draw pixels.
 	{
-		let size = width < height ? width : height;
-		let grid = pixelswidth / size;
-		let scale = !animeflag ? grid/7 : grid/6;
-		//let margin = size <= 9 ? 2 : size <= 19 ? 1 : 0;
-		//let w1 = (grid - margin) - 1; // Width.
-		//let w2 = grid - 1; // Width for touching.
 		let touchmovex = 0, touchmovey = 0;
 
 		// Clear canvas.
@@ -404,11 +400,11 @@ async function appMain() {
 
 		// Update canvas.
 		for (let j = yoffset; j < yoffset + height; j++) {
-			let y = (j - yoffset - (height - 1) / 2) * grid + pixelsposy;
+			let y = (j - yoffset - (height - 1) / 2) * pixelsgrid + pixelsposy;
 			for (let i = xoffset; i < xoffset + width; i++) {
-				let x = (i - xoffset - (width - 1) / 2) * grid + pixelsposx;
+				let x = (i - xoffset - (width - 1) / 2) * pixelsgrid + pixelsposx;
 				if (animeflag) {
-					if (pixeltouching >= 0 && picoMotion(x, y, grid/2+1)) {
+					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2+1)) {
 						let j0 = j - yoffset, i0 = i - xoffset;
 						//console.log("Touch animes" + 
 						//	pixeltouching + " " + xoffset + "," + yoffset + ":" + 
@@ -429,7 +425,7 @@ async function appMain() {
 
 					canvas += picoCode6Char(10+pixels[j][i]);
 				} else {
-					if (pixeltouching >= 0 && picoMotion(x, y, grid/2)) {
+					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
 						console.log("Touch pixels.");
 						pixeltouching = 1; // Touch pixels.
 						frametouching = -1;
@@ -476,7 +472,8 @@ async function appMain() {
 		}
 
 		// Draw canvas.
-		picoCharLeading(grid/scale,grid/scale);
+		let scale = !animeflag ? pixelsgrid/7 : pixelsgrid/6;
+		picoCharLeading(pixelsgrid/scale,pixelsgrid/scale);
 		picoText(canvas, -1, pixelsposx, pixelsposy, (pixelswidth+1)/scale,(pixelswidth+1)/scale, 0,scale);
 	}
 
