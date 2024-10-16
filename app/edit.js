@@ -295,16 +295,17 @@ async function appMain() {
 	}
 
 	// Positions.
-	let pixelswidth = landscape ? 140 : 140; // Size of pixels.
+	let pixelswidth = landscape ? 112 : 140; // Size of pixels.
 	let pixelsposx = 0;//!animeflag ? 0 : 14; // Position x of pixels.
-	let pixelsposy = landscape ? -6 : -14; // Position y of pixels.
+	let pixelsposy = landscape ? -12 : -14; // Position y of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let colorsposx = 0; // Position x of colors/coloreditor.
-	let colorsposy = pico.Image.height/2 - (landscape ? 24 : 16); // Position y of colors/coloreditor.
+	let colorsposy = pico.Image.height/2 - (landscape ? 40 : 16); // Position y of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14;
 	let colorswidth = (depth-1)*colorsgrid, colorsheight = colorsgrid; // Color selector width and height.
+	let bgcolorwidth = landscape ? 148 : 132, bgcolorheight = 20; // Background color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
 
 	// Draw background.
@@ -313,9 +314,7 @@ async function appMain() {
 
 	// Touching background.
 	if (!animeflag) {
-		let w1 = landscape ? pixelswidth+colorsgrid : pixelswidth-pixelsmargin;
-		let h1 = pixelswidth/7; // Background color selector width and height.
-		let w2 = w1+2, h2 = h1+2; // Background color selector width and height for touching.
+		let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
 
 		// Release touching background.
 		if (colortouching >= 0 && picoAction() &&
@@ -338,7 +337,7 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(bgcolor, colorsposx, colorsposy, w2, h2);
+			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		// Touching background.
 		} else if (colortouching >= 0 && picoMotion() &&
@@ -383,11 +382,11 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(bgcolor, colorsposx, colorsposy, w2, h2);
+			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		} else {
 			// Draw background color selector.
-			picoRect(bgcolor, colorsposx, colorsposy, w1, h1);
+			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 			//picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
 		}
 	}
