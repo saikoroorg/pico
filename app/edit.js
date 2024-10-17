@@ -296,7 +296,7 @@ async function appMain() {
 	let colorsposx = 0; // Position x of colors/coloreditor.
 	let colorsposy = pico.Image.height/2 - (landscape ? 40 : 16); // Position y of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14;
-	let colorswidth = depth*colorsgrid, colorsheight = colorsgrid; // Color selector width and height.
+	let colorswidth = (colorflag ? maxcolor : depth)*colorsgrid, colorsheight = colorsgrid; // Color selector width and height.
 	let bgcolorwidth = landscape ? 148 : 132, bgcolorheight = 20; // Background color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
 
@@ -384,7 +384,7 @@ async function appMain() {
 			//picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
 		}
 
-		if (depth + 1 < maxcolor) {
+		if (!colorflag && depth + 1 < maxcolor) {
 			// Release touching plus button.
 			const scale = 2;
 			if (colortouching >= 0 && picoAction(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
