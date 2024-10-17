@@ -80,7 +80,7 @@ async function appAction() {
 	}
 	if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-		picoSetCode8(colors, k);
+		picoSetCode8(colors.slice(0,(depth+1)*3), k);
 	}
 
 	// Back or share.
@@ -188,19 +188,21 @@ async function appLoad() {
 
 			// Load colors.
 			if ((value[0] == "1" && value[1] == "1" && value[2] == "1")) {
-				colors = picoCode8(keys[k]);
+				let code8 = picoCode8(keys[k]);
+				colors = code8.concat(colors.slice(code8.length));
+				depth = picoDiv(code8.length,3)-1;
+				colorselecting = depth;
 				bgcolor = 0;
-
-				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
-				console.log("Load color: " + colors);
+				console.log("Load color: " + colors + " " + depth);
 
 			// Load colors with transparent color.
 			} else if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ) {
-				colors = picoCode8(keys[k]);
+				let code8 = picoCode8(keys[k]);
+				colors = code8.concat(colors.slice(code8.length));
+				depth = picoDiv(code8.length,3)-1;
+				colorselecting = depth;
 				bgcolor = -1;
-
-				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
-				console.log("Load color: " + colors);
+				console.log("Load color: " + colors + " " + depth);
 
 			// Load pixels.
 			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
@@ -209,13 +211,6 @@ async function appLoad() {
 				anime = framecount + 1;
 				if (anime >= 2) {
 					animeflag = 1;
-				}
-				// Update color depth.
-				for (let n = 3; n < buffers[frame].length; n += 3) {
-					if (buffers[frame][n] > depth && buffers[frame][n] < maxcolor) {
-						depth = buffers[frame][n];
-						colorselecting = depth;
-					}
 				}
 				////console.log("Load buffer" + keys[k] + ": " + buffers[framecount]);
 				framecount++;
@@ -435,7 +430,7 @@ async function appMain() {
 	}
 
 	// Set colors data.
-	picoColor(colors);
+	picoColor(colors.slice(0,(depth+1)*3));
 
 	// Draw pixels.
 	{
