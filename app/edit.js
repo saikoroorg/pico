@@ -1,5 +1,5 @@
 const title = "Edit"; // Title.
-var colors = [255,255,255, 191,191,191, 191,191,127, 127,127,127, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 63,63,63]; // Colors.
+var colors = [255,255,255, 191,191,191, 127,127,127, 63,63,63, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,0,0]; // Colors.
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
@@ -13,9 +13,9 @@ var animeflag = 0; // Anime editing flag.
 var playing = 0; // Playing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
-var depth = colors.length/3; // Color count.
+var depth = 3;//colors.length/3; // Color count.
 const coffset = 36; // Color offset.
-const maxcolor = 26; // Color max count.
+const maxcolor = 10;//26; // Color max count.
 var colorflag = 0; // Color editing flag.
 
 // Update icon image.
@@ -145,7 +145,7 @@ var bgindex = 0; // Background color index.
 var pixeltouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var colorholding = 0; // 0:untouched, 1+:touching.
-var colorselecting = depth - 1; // Touching color index.
+var colorselecting = depth; // Touching color index.
 //var colorselected = -1; // Previous touched color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var frameselecting = -1; // Selecting frame index.
@@ -192,8 +192,6 @@ async function appLoad() {
 				bgcolor = 0;
 
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
-				depth = colors.length / 3;
-				colorselecting = depth - 1;
 				console.log("Load color: " + colors);
 
 			// Load colors with transparent color.
@@ -202,8 +200,6 @@ async function appLoad() {
 				bgcolor = -1;
 
 				colors.length = colors.length < maxcolor * 3 ? colors.length : maxcolor * 3;
-				depth = colors.length / 3;
-				colorselecting = depth - 1;
 				console.log("Load color: " + colors);
 
 			// Load pixels.
@@ -213,6 +209,13 @@ async function appLoad() {
 				anime = framecount + 1;
 				if (anime >= 2) {
 					animeflag = 1;
+				}
+				// Update color depth.
+				for (let n = 3; n < buffers[frame].length; n += 3) {
+					if (buffers[frame][n + 3] > depth && buffers[frame][n + 3] < maxcolor) {
+						depth = buffers[frame][n + 3];
+						colorselecting = depth;
+					}
 				}
 				////console.log("Load buffer" + keys[k] + ": " + buffers[framecount]);
 				framecount++;
@@ -293,7 +296,7 @@ async function appMain() {
 	let colorsposx = 0; // Position x of colors/coloreditor.
 	let colorsposy = pico.Image.height/2 - (landscape ? 40 : 16); // Position y of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14;
-	let colorswidth = (depth-1)*colorsgrid, colorsheight = colorsgrid; // Color selector width and height.
+	let colorswidth = depth*colorsgrid, colorsheight = colorsgrid; // Color selector width and height.
 	let bgcolorwidth = landscape ? 148 : 132, bgcolorheight = 20; // Background color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
 
@@ -479,8 +482,10 @@ async function appMain() {
 		let w2 = grid - 1; // Width for selecting.
 		let w3 = grid + margin; // Width for holding.
 		let w4 = grid - margin*2; // Width for copyed.
+		let scale = w4 / 4;
+
 		for (let i = 0; i < anime; i++) {
-			let x = pixelsposx + (i - (anime - 1) / 2) * grid;
+			let x = pixelsposx + (i - (anime-1)/2) * grid;
 			let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
 			let w0 = grid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
@@ -555,9 +560,13 @@ async function appMain() {
 	// Draw colors.
 	if (!animeflag && !colorflag) {
 		const scale = 4;
+		let minindex = 1;
+		let maxindex = depth+2 <= maxcolor ? depth+2 : maxcolor;
 
-		for (let i = 1; i < depth; i++) {
-			let x = colorsposx + (i - depth/2) * colorsgrid; // Margins for each color.
+		for (let i = minindex; i < maxindex; i++) {
+			let x = i==depth+1 ? bgcolorwidth/2-6 : colorsposx + (i - (depth+1)/2) * colorsgrid; // Margins for each color.
+			let c = i==depth+1 ? "+" : colorselecting == i ? null : "-";
+			let s = 1;
 
 			// Release touching color.
 			if (colortouching >= 0 && picoAction(x, colorsposy, 6, 12)) {
@@ -565,7 +574,11 @@ async function appMain() {
 				colortouching = 0;
 				//colorselected = colorselecting;
 				picoBeep(0, 0.1);
-				picoChar("+", i, x, colorsposy, 0, scale);
+
+				// Add new color.
+				if (i == depth+1) {
+					depth += 1;
+				}
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, 6, 12)) {
@@ -600,18 +613,16 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				picoChar("+", i, x, colorsposy, 0, scale*0.9);
+				s = 0.9;
+			}
 
+			// Draw colors.
+			if (c == "+") {
+				picoChar(c, 1, x, colorsposy, 0, scale/2*s);
+			} else if (c == "-") {
+				picoChar(c, i, x, colorsposy, 0, scale*s);
 			} else {
-
-				// Not touching but selecting color.
-				if (colorselecting == i) {
-					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.5);
-
-				// Other colors.
-				} else {
-					picoChar("-", i, x, colorsposy, 0, scale);
-				}
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale/2*s);
 			}
 		}
 	}
