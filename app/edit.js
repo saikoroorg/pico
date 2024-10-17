@@ -1,5 +1,5 @@
 const title = "Edit"; // Title.
-var colors = [255,255,255, 191,191,191, 127,127,127, 63,63,63, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,0,0]; // Colors.
+var colors = [255,255,255, 191,191,191, 127,127,127, 63,63,63, 191,191,127, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,0,0]; // Colors.
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
@@ -212,8 +212,8 @@ async function appLoad() {
 				}
 				// Update color depth.
 				for (let n = 3; n < buffers[frame].length; n += 3) {
-					if (buffers[frame][n + 3] > depth && buffers[frame][n + 3] < maxcolor) {
-						depth = buffers[frame][n + 3];
+					if (buffers[frame][n] > depth && buffers[frame][n] < maxcolor) {
+						depth = buffers[frame][n];
 						colorselecting = depth;
 					}
 				}
