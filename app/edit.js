@@ -283,17 +283,6 @@ async function appMain() {
 		playing = 1;
 	}
 
-	// Set touching state to avoid touching another area continuously.
-	if (picoAction()) {
-		console.log("Reset touching state.");
-		pixeltouching = 0;
-		colortouching = 0;
-		frametouching = 0;
-		pixeltouchposx = 0;
-		pixeltouchposy = 0;
-		appUpdate();
-	}
-
 	// Positions.
 	let pixelswidth = landscape ? 112 : 140; // Size of pixels.
 	let pixelsposx = 0;//!animeflag ? 0 : 14; // Position x of pixels.
@@ -682,6 +671,17 @@ async function appMain() {
 				picoChar(c00, colorselecting, x, colorsposy, 0, s);
 			}
 		}
+	}
+
+	// Set touching state to avoid touching another area continuously.
+	if (picoAction()) {
+		console.log("Reset touching state.");
+		pixeltouching = 0;
+		colortouching = 0;
+		frametouching = 0;
+		pixeltouchposx = 0;
+		pixeltouchposy = 0;
+		appUpdate();
 	}
 
 	// Increment playing count.
