@@ -295,8 +295,8 @@ async function appMain() {
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let colorsposx = 0; // Position x of colors/coloreditor.
 	let colorsposy = pico.Image.height/2 - (landscape ? 40 : 16); // Position y of colors/coloreditor.
-	let colorsgrid = landscape ? 16 : 14;
-	let colorswidth = (colorflag ? maxcolor : depth)*colorsgrid, colorsheight = colorsgrid; // Color selector width and height.
+	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
+	let colorswidth = (colorflag ? maxcolor : depth)*colorsgrid, colorsheight = 20; // Color selector width and height.
 	let bgcolorwidth = landscape ? 148 : 132, bgcolorheight = 20; // Background color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
 
@@ -307,12 +307,16 @@ async function appMain() {
 	// Touching background.
 	if (!animeflag) {
 		let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
+		let colorbutton1x = bgcolorwidth2/2+4, colorbutton1y = colorsposy; // Color selector plus button position.
+		let colorbutton2x = -bgcolorwidth2/2-4, colorbutton2y = colorsposy; // Color selector minus button position.
+		let colorbuttonwidth = 6, colorbuttonheight = 4; // Color selector button width and height.
 
 		// Release touching background.
 		if (colortouching >= 0 && picoAction() &&
 			!picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
 			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2) &&
-			!picoAction(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
+			!picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight) &&
+			!picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
 			console.log("Release touching background.");
 			colortouching = 0;
 
@@ -336,7 +340,8 @@ async function appMain() {
 		} else if (colortouching >= 0 && picoMotion() &&
 			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
 			!picoMotion(colorsposx, colorsposy, colorswidth/2, colorsheight/2) &&
-			!picoMotion(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
+			!picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight) &&
+			!picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
 			frametouching = -1;
 			pixeltouching = -1;
 			colortouching = 1;
@@ -384,25 +389,47 @@ async function appMain() {
 			//picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
 		}
 
-		if (!colorflag && depth + 1 < maxcolor) {
-			// Release touching plus button.
-			const scale = 2;
-			if (colortouching >= 0 && picoAction(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
-				console.log("Release touching plus button.");
-				colortouching = 0;
-				depth += 1;
-				colorselecting = depth;
-				picoChar("+", 2, bgcolorwidth2/2-6, colorsposy, 0, scale*0.9);
+		if (!colorflag) {
+			const char1 = "+", char2 = "-", scale = 2;
+			if (depth + 1 < maxcolor) {
+				// Release touching color plus button.
+				if (colortouching >= 0 && picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight)) {
+					console.log("Release touching color plus button.");
+					colortouching = 0;
+					depth += 1;
+					colorselecting = depth;
+					picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
 
-			// Touching plus button.
-			} else if (colortouching >= 0 && picoMotion(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
-				frametouching = -1;
-				pixeltouching = -1;
-				colortouching = 1;
-				picoChar("+", 2, bgcolorwidth2/2-6, colorsposy, 0, scale*0.9);
+				// Touching color plus button.
+				} else if (colortouching >= 0 && picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight)) {
+					frametouching = -1;
+					pixeltouching = -1;
+					colortouching = 1;
+					picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
 
-			} else {
-				picoChar("+", 2, bgcolorwidth2/2-6, colorsposy, 0, scale);
+				} else {
+					picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale);
+				}
+			}
+			if (depth - 1 > 0) {
+				// Release touching color minus button.
+				if (colortouching >= 0 && picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
+					console.log("Release touching color minus button.");
+					colortouching = 0;
+					depth -= 1;
+					colorselecting = colorselecting<depth ? colorselecting : depth;
+					picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
+
+				// Touching color minus button.
+				} else if (colortouching >= 0 && picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
+					frametouching = -1;
+					pixeltouching = -1;
+					colortouching = 1;
+					picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
+
+				} else {
+					picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale);
+				}
 			}
 		}
 	}
@@ -589,7 +616,7 @@ async function appMain() {
 			let x = colorsposx + (i - (depth+1)/2) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
-			if (colortouching >= 0 && picoAction(x, colorsposy, 6, 12)) {
+			if (colortouching >= 0 && picoAction(x, colorsposy, colorsgrid/2, colorsheight/2)) {
 				console.log("Release touching color.");
 				colortouching = 0;
 				//colorselected = colorselecting;
@@ -597,7 +624,7 @@ async function appMain() {
 				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.5);
 
 			// Touching color.
-			} else if (colortouching >= 0 && picoMotion(x, colorsposy, 6, 12)) {
+			} else if (colortouching >= 0 && picoMotion(x, colorsposy, colorsgrid/2, colorsheight/2)) {
 				frametouching = -1;
 				pixeltouching = -1;
 
