@@ -311,7 +311,8 @@ async function appMain() {
 		// Release touching background.
 		if (colortouching >= 0 && picoAction() &&
 			!picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
+			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2) &&
+			!picoAction(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
 			console.log("Release touching background.");
 			colortouching = 0;
 
@@ -334,7 +335,8 @@ async function appMain() {
 		// Touching background.
 		} else if (colortouching >= 0 && picoMotion() &&
 			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			!picoMotion(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
+			!picoMotion(colorsposx, colorsposy, colorswidth/2, colorsheight/2) &&
+			!picoMotion(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
 			frametouching = -1;
 			pixeltouching = -1;
 			colortouching = 1;
@@ -380,6 +382,28 @@ async function appMain() {
 			// Draw background color selector.
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 			//picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
+		}
+
+		if (depth + 1 < maxcolor) {
+			// Release touching plus button.
+			const scale = 2;
+			if (colortouching >= 0 && picoAction(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
+				console.log("Release touching plus button.");
+				colortouching = 0;
+				depth += 1;
+				colorselecting = depth;
+				picoChar("+", 2, bgcolorwidth2/2-6, colorsposy, 0, scale*0.9);
+
+			// Touching plus button.
+			} else if (colortouching >= 0 && picoMotion(bgcolorwidth2/2-6, colorsposy, 6, 12)) {
+				frametouching = -1;
+				pixeltouching = -1;
+				colortouching = 1;
+				picoChar("+", 2, bgcolorwidth2/2-6, colorsposy, 0, scale*0.9);
+
+			} else {
+				picoChar("+", 2, bgcolorwidth2/2-6, colorsposy, 0, scale);
+			}
 		}
 	}
 
@@ -560,13 +584,9 @@ async function appMain() {
 	// Draw colors.
 	if (!animeflag && !colorflag) {
 		const scale = 4;
-		let minindex = 1;
-		let maxindex = depth+2 <= maxcolor ? depth+2 : maxcolor;
 
-		for (let i = minindex; i < maxindex; i++) {
-			let x = i==depth+1 ? bgcolorwidth/2-6 : colorsposx + (i - (depth+1)/2) * colorsgrid; // Margins for each color.
-			let c = i==depth+1 ? "+" : colorselecting == i ? null : "-";
-			let s = 1;
+		for (let i = 1; i <= depth; i++) {
+			let x = colorsposx + (i - (depth+1)/2) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
 			if (colortouching >= 0 && picoAction(x, colorsposy, 6, 12)) {
@@ -574,11 +594,7 @@ async function appMain() {
 				colortouching = 0;
 				//colorselected = colorselecting;
 				picoBeep(0, 0.1);
-
-				// Add new color.
-				if (i == depth+1) {
-					depth += 1;
-				}
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.5);
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, 6, 12)) {
@@ -613,16 +629,18 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				s = 0.9;
-			}
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.45);
 
-			// Draw colors.
-			if (c == "+") {
-				picoChar(c, 1, x, colorsposy, 0, scale/2*s);
-			} else if (c == "-") {
-				picoChar(c, i, x, colorsposy, 0, scale*s);
 			} else {
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale/2*s);
+
+				// Not touching but selecting color.
+				if (colorselecting == i) {
+					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.5);
+
+				// Other colors.
+				} else {
+					picoChar("-", i, x, colorsposy, 0, scale);
+				}
 			}
 		}
 	}
