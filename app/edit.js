@@ -17,6 +17,7 @@ var depth = 3;//colors.length/3; // Color count.
 const coffset = 36; // Color offset.
 const maxcolor = 10;//26; // Color max count.
 var colorflag = 0; // Color editing flag.
+const framecolor = 3; // Frame color.
 
 // Update icon image.
 async function appUpdate(force = true) {
@@ -143,6 +144,7 @@ function appSelect(x) {
 // Touching flags and states.
 var bgindex = 0; // Background color index.
 var pixeltouching = 0; // -1:invalid, 0:untouched, 1:touching.
+var pixeltouchmoving = 0; // Pixel touching on view mode.
 var colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var colorholding = 0; // 0:untouched, 1+:touching.
 var colorselecting = depth; // Touching color index.
@@ -427,6 +429,16 @@ async function appMain() {
 				}
 			}
 		}
+
+	// Frame viewer mode.
+	} else {
+		if (picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
+			let framewidth = pixelswidth + 8;
+			picoRect(framecolor, pixelsposx, pixelsposy, framewidth, framewidth);
+		} else {
+			let framewidth = pixelswidth + 4;
+			picoRect(framecolor, pixelsposx, pixelsposy, framewidth, framewidth);
+		}
 	}
 
 	// Set colors data.
@@ -444,6 +456,8 @@ async function appMain() {
 			let y = (j - yoffset - (height - 1) / 2) * pixelsgrid + pixelsposy;
 			for (let i = xoffset; i < xoffset + width; i++) {
 				let x = (i - xoffset - (width - 1) / 2) * pixelsgrid + pixelsposx;
+
+				// Update canvas on viewer mode.
 				if (animeflag) {
 					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2+1)) {
 						let j0 = j - yoffset, i0 = i - xoffset;
@@ -465,6 +479,8 @@ async function appMain() {
 					}
 
 					canvas += picoCode6Char(coffset+pixels[j][i]);
+
+				// Update canvas on editer mode.
 				} else {
 					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
 						console.log("Touch pixels.");
@@ -496,6 +512,7 @@ async function appMain() {
 
 		// Update offset.
 		if (pixeltouchmovex || pixeltouchmovey) {
+			pixeltouchmoving = 1;
 			xoffset += pixeltouchmovex;
 			if (xoffset < 0) {
 				xoffset = 0;
@@ -511,8 +528,24 @@ async function appMain() {
 			appUpdate(false);
 		}
 
+		let l = blockwidth;
+		if (animeflag) {
+			// Switch view to edit.
+			if (!pixeltouchmoving && picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
+				animeflag = 0;
+
+			} else {
+				// Touching on view mode.
+				if (picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
+
+				// No touching on view mode.
+				} else {
+					l = blockwidth - 1;
+				}
+			}
+		}
+
 		// Draw canvas.
-		let l = animeflag ? blockwidth-1 : blockwidth;
 		let s = pixelsgrid / l;
 		let w = (pixelswidth + 1) / s;
 		picoCharLeading(l, l);
@@ -728,6 +761,7 @@ async function appMain() {
 	if (picoAction()) {
 		console.log("Reset touching state.");
 		pixeltouching = 0;
+		pixeltouchmoving = 0;
 		colortouching = 0;
 		frametouching = 0;
 		pixeltouchposx = 0;
