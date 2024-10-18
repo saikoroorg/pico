@@ -503,7 +503,7 @@ async function appMain() {
 							picoFlush();
 						}
 
-						picoRect(pixels[j][i], x-0.5, y-0.5, pixelsgrid-0.5, pixelsgrid-0.5);
+						picoRect(pixels[j][i], x, y, pixelsgrid, pixelsgrid);
 						canvas += " ";
 					} else {
 						canvas += picoCode6Char(coffset+pixels[j][i]);
@@ -551,7 +551,7 @@ async function appMain() {
 		let s = pixelsgrid / l;
 		let w = (pixelswidth + 1) / s;
 		picoCharLeading(l, l);
-		picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
+		picoText(canvas, -1, pixelsposx+0.5, pixelsposy+0.5, w,w, 0,s);
 	}
 
 	// Draw animes.
