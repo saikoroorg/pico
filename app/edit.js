@@ -191,6 +191,7 @@ async function appLoad() {
 			// Load colors.
 			if ((value[0] == "1" && value[1] == "1" && value[2] == "1")) {
 				let code8 = picoCode8(keys[k]);
+				code8 = code8.slice(0,maxcolor*3);
 				colors = code8.concat(colors.slice(code8.length));
 				depth = picoDiv(code8.length,3)-1;
 				colorselecting = depth;
@@ -200,6 +201,7 @@ async function appLoad() {
 			// Load colors with transparent color.
 			} else if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ) {
 				let code8 = picoCode8(keys[k]);
+				code8 = code8.slice(0,maxcolor*3);
 				colors = code8.concat(colors.slice(code8.length));
 				depth = picoDiv(code8.length,3)-1;
 				colorselecting = depth;
