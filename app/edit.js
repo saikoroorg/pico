@@ -404,8 +404,9 @@ async function appMain() {
 					colortouching = 1;
 					picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
 
-				} else {
-					picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale);
+				// Hidden button.
+				//} else {
+				//	picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale);
 				}
 			}
 			if (depth - 1 > 0) {
@@ -424,8 +425,9 @@ async function appMain() {
 					colortouching = 1;
 					picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
 
-				} else {
-					picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale);
+				// Hidden button.
+				//} else {
+				//	picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale);
 				}
 			}
 		}
