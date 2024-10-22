@@ -151,6 +151,7 @@ var colorholding = 0; // 0:untouched, 1+:touching.
 var colorselecting = depth; // Touching color index.
 //var colorselected = -1; // Previous touched color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
+var framechanging = 0; // 0:not changed, 1:changing.
 var frameselecting = -1; // Selecting frame index.
 var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
@@ -675,7 +676,7 @@ async function appMain() {
 				frametouching = 0;
 
 				// Switch view to edit.
-				if (frame == i) {
+				if (!framechanging) {
 					animeflag = 0;
 				}
 
@@ -704,6 +705,7 @@ async function appMain() {
 					frametouching = 1;
 					if (frame != i) {
 						frame = i;
+						framechanging = 1;
 						playing = -1; // Reset pixels from buffer.
 					}
 					
@@ -875,6 +877,7 @@ async function appMain() {
 		pixeltouchmoving = 0;
 		colortouching = 0;
 		frametouching = 0;
+		framechanging = 0;
 		pixeltouchposx = 0;
 		pixeltouchposy = 0;
 	}
