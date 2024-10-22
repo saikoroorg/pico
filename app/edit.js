@@ -52,11 +52,11 @@ async function appUpdate(force = true) {
 	}
 
 	// Update select button.
-	if (animeflag) {
-		picoLabel("select", "" + anime);
-	} else {
+	//if (animeflag) {
+	//	picoLabel("select", "" + anime);
+	//} else {
 		picoLabel("select", "*" + width);
-	}
+	//}
 	picoLabel("minus", "-");
 	picoLabel("plus", "+");
 }
@@ -104,7 +104,7 @@ function appSelect(x) {
 	//	depth = depth + x < 1 ? 1 : depth + x >= maxcolor ? maxcolor : depth + x;
 
 	// Change canvas frame.
-	} else if (animeflag) {
+	/*} else if (animeflag) {
 		anime = anime + x < 1 ? 1 : anime + x >= maxanime ? maxanime : anime + x;
 		appUpdate();
 
@@ -113,6 +113,7 @@ function appSelect(x) {
 			frame = anime - 1;
 			playing = -1; // Restart.
 		}
+	//*/
 
 	// Change canvas size.
 	} else {
@@ -292,7 +293,6 @@ async function appMain() {
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
-	let bgpixelwidth = pixelswidth+2; // Background of flame selector width and height.
 	let colorsposx = 0; // Position x of colors/coloreditor.
 	let colorsposy = pico.Image.height/2 - (landscape ? 40 : 16); // Position y of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
@@ -300,14 +300,15 @@ async function appMain() {
 	let bgcolorwidth = landscape ? 148 : 132, bgcolorheight = 20; // Background of color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
 	let bgframewidth = 142, bgframeheight = 22; // Background of frame selector width and height.
+	let bgpixelwidth = 148; // Background of flame selector width and height.
 
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
 	let colorbutton1x = bgcolorwidth2/2+4, colorbutton1y = colorsposy; // Color selector plus button position.
 	let colorbutton2x = -bgcolorwidth2/2-4, colorbutton2y = colorsposy; // Color selector minus button position.
 	let colorbuttonwidth = 6, colorbuttonheight = 4; // Color selector button width and height.
 
-	let framebutton1x = bgpixelwidth/2+8, framebutton1y = pixelsposy; // Frame selector plus button position.
-	let framebutton2x = -bgpixelwidth/2-8, framebutton2y = pixelsposy; // Frame selector minus button position.
+	let framebutton1x = pixelswidth/2+8, framebutton1y = pixelsposy; // Frame selector plus button position.
+	let framebutton2x = -pixelswidth/2-8, framebutton2y = pixelsposy; // Frame selector minus button position.
 	let framebuttonwidth = 6, framebuttonheight = 4; // Frame selector button width and height.
 
 	// Draw background.
@@ -319,7 +320,7 @@ async function appMain() {
 
 		// Release touching background.
 		if (colortouching >= 0 && picoAction() &&
-			!picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
+			!picoAction(pixelsposx, pixelsposy, bgpixelwidth/2, bgpixelwidth/2) &&
 			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2) &&
 			!picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight) &&
 			!picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
@@ -344,7 +345,7 @@ async function appMain() {
 
 		// Touching background.
 		} else if (colortouching >= 0 && picoMotion() &&
-			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
+			!picoMotion(pixelsposx, pixelsposy, bgpixelwidth/2, bgpixelwidth/2) &&
 			!picoMotion(colorsposx, colorsposy, colorswidth/2, colorsheight/2) &&
 			!picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight) &&
 			!picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
@@ -393,6 +394,16 @@ async function appMain() {
 			// Draw background of color selector.
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 			//picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
+		}
+
+		// Draw background of pixels.
+		if (!picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
+			picoAction(pixelsposx, pixelsposy, bgpixelwidth/2, bgpixelwidth/2)) {
+			animeflag = 1;
+			picoRect(framecolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelwidth);
+		} else if (!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
+			picoMotion(pixelsposx, pixelsposy, bgpixelwidth/2, bgpixelwidth/2)) {
+			picoRect(framecolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelwidth);
 		}
 
 		// Touching color buttons.
