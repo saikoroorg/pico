@@ -1,12 +1,12 @@
 const title = "Edit"; // Title.
-var colors = [255,255,255, 191,191,191, 127,127,127, 63,63,63, 191,191,127, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,0,0]; // Colors.
+var colors = [255,255,255, 191,191,191, 127,127,127, 63,63,63, 191,191,127, 231,0,95, 0,119,239, 0,151,63, 167,0,0, 143,0,119, 0,0,0]; // Colors.
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
 var yoffset = picoDiv(maxheight - height, 2); // Pixels y-index offset.
-const maxanime = 20; // Buffer max size.
-var anime = 1; // Buffer count.
+const maxanime = 20; // Frame max size.
+var anime = 1; // Frame count.
 var frame = 0; // Anime frame index.
 var buffers = []; // Pixels buffers.
 var animeflag = 0; // Anime editing flag.
@@ -286,29 +286,36 @@ async function appMain() {
 	}
 
 	// Positions.
-	let pixelswidth = landscape ? 112 : 140; // Size of pixels.
+	let pixelswidth = animeflag ? 112 : landscape ? 112 : 140; // Size of pixels.
 	let pixelsposx = 0;//!animeflag ? 0 : 14; // Position x of pixels.
 	let pixelsposy = landscape ? -12 : -14; // Position y of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
+	let bgpixelwidth = pixelswidth+2; // Background of flame selector width and height.
 	let colorsposx = 0; // Position x of colors/coloreditor.
 	let colorsposy = pico.Image.height/2 - (landscape ? 40 : 16); // Position y of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
 	let colorswidth = (colorflag ? maxcolor : depth)*colorsgrid, colorsheight = 20; // Color selector width and height.
-	let bgcolorwidth = landscape ? 148 : 132, bgcolorheight = 20; // Background color selector width and height.
+	let bgcolorwidth = landscape ? 148 : 132, bgcolorheight = 20; // Background of color selector width and height.
 	let framesposy = colorsposy;//-pico.Image.width/2 + 28; // Offset of animeeditor.
+	let bgframewidth = 142, bgframeheight = 22; // Background of frame selector width and height.
+
+	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
+	let colorbutton1x = bgcolorwidth2/2+4, colorbutton1y = colorsposy; // Color selector plus button position.
+	let colorbutton2x = -bgcolorwidth2/2-4, colorbutton2y = colorsposy; // Color selector minus button position.
+	let colorbuttonwidth = 6, colorbuttonheight = 4; // Color selector button width and height.
+
+	let framebutton1x = bgpixelwidth/2+8, framebutton1y = pixelsposy; // Frame selector plus button position.
+	let framebutton2x = -bgpixelwidth/2-8, framebutton2y = pixelsposy; // Frame selector minus button position.
+	let framebuttonwidth = 6, framebuttonheight = 4; // Frame selector button width and height.
 
 	// Draw background.
 	picoColor();
 	picoRect(1, pixelsposx, pixelsposy, pixelswidth, pixelswidth);
 
-	// Touching background.
+	// Pixel editer mode.
 	if (!animeflag) {
-		let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
-		let colorbutton1x = bgcolorwidth2/2+4, colorbutton1y = colorsposy; // Color selector plus button position.
-		let colorbutton2x = -bgcolorwidth2/2-4, colorbutton2y = colorsposy; // Color selector minus button position.
-		let colorbuttonwidth = 6, colorbuttonheight = 4; // Color selector button width and height.
 
 		// Release touching background.
 		if (colortouching >= 0 && picoAction() &&
@@ -383,11 +390,12 @@ async function appMain() {
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		} else {
-			// Draw background color selector.
+			// Draw background of color selector.
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 			//picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
 		}
 
+		// Touching color buttons.
 		if (!colorflag) {
 			const char1 = "+", char2 = "-", scale = 2;
 			if (depth + 1 < maxcolor) {
@@ -406,9 +414,9 @@ async function appMain() {
 					colortouching = 1;
 					picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
 
-				// Hidden button.
-				//} else {
-				//	picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale);
+				// Color plus button.
+				} else {
+					picoChar(char1, bgcolor, colorbutton1x, colorbutton1y, 0, scale);
 				}
 			}
 			if (depth - 1 > 0) {
@@ -427,22 +435,84 @@ async function appMain() {
 					colortouching = 1;
 					picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
 
-				// Hidden button.
-				//} else {
-				//	picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale);
+				// Color minus button.
+				} else {
+					picoChar(char2, bgcolor, colorbutton2x, colorbutton2y, 0, scale);
 				}
 			}
 		}
 
 	// Frame viewer mode.
 	} else {
+
+		// Draw background of pixels.
 		if (picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
-			let framewidth = pixelswidth + 8;
-			picoRect(framecolor, pixelsposx, pixelsposy, framewidth, framewidth);
+			picoRect(framecolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelwidth);
 		} else {
-			let framewidth = pixelswidth + 4;
-			picoRect(framecolor, pixelsposx, pixelsposy, framewidth, framewidth);
+			picoRect(framecolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelwidth);
 		}
+
+		// Touching frame buttons.
+		{
+			const char0 = "&", char1 = "+", char2 = "-", angle1 = 90, angle2 = -90, scale = 2;
+			if (frame + 1 < maxanime) {
+				let char = char0, s = scale;
+				// Release touching frame plus button.
+				if (frametouching >= 0 && picoAction(framebutton1x, framebutton1y, framebuttonwidth, framebuttonheight)) {
+					console.log("Release touching frame plus button.");
+					frametouching = 0;
+					if (frame + 1 < anime) {
+						frame += 1;
+						frameselecting = frame;
+					} else {
+						frame = anime = frame + 1;
+						frameselecting = frame;
+						char = char1;
+					}
+					s = scale * 0.9;
+
+				// Touching frame plus button.
+				} else if (frametouching >= 0 && picoMotion(framebutton1x, framebutton1y, framebuttonwidth, framebuttonheight)) {
+					pixeltouching = -1;
+					colortouching = -1;
+					frametouching = 1;
+					if (frame + 1 >= anime) {
+						char = char1;
+					}
+				}
+				picoChar(char, framecolor, framebutton1x, framebutton1y, angle1, s);
+			}
+			if (frame >= 2 || anime >= 2) {
+				let char = char0, s = scale;
+				// Release touching frame minus button.
+				if (frametouching >= 0 && picoAction(framebutton2x, framebutton2y, framebuttonwidth, framebuttonheight)) {
+					console.log("Release touching frame minus button.");
+					frametouching = 0;
+					if (frame >= 1) {
+						frame -= 1;
+						frameselecting = frameselecting<frame ? frameselecting : frame;
+					} else if (anime >= 2) {
+						anime -= 1;
+						char = char2;
+					}
+					s = scale*0.9;
+
+				// Touching frame minus button.
+				} else if (frametouching >= 0 && picoMotion(framebutton2x, framebutton2y, framebuttonwidth, framebuttonheight)) {
+					pixeltouching = -1;
+					colortouching = -1;
+					frametouching = 1;
+					if (frame <= 1) {
+						char = char2;
+					}
+					s = scale*0.9;
+				}
+				picoChar(char, framecolor, framebutton2x, framebutton2y, angle2, s);
+			}
+		}
+
+		// Draw background of frame selector.
+		picoRect(3, colorsposx, colorsposy, bgframewidth, bgframeheight);
 	}
 
 	// Set colors data.
