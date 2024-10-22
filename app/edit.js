@@ -467,7 +467,7 @@ async function appMain() {
 
 		// Touching frame buttons.
 		{
-			const char0 = "&", char1 = "+", char2 = "-", angle1 = 90, angle2 = -90, scale = 2;
+			const char0 = "&", char1 = "+", char2 = "-", angle1 = 90, angle2 = -90, scale = 2, scale1 = 1;
 			if (frame + 1 < maxanime) {
 				let char = char0, s = scale, a = angle1;
 				// Release touching frame plus button.
@@ -482,7 +482,7 @@ async function appMain() {
 						char = char1;
 					}
 					playing = -1; // Reset pixels from buffer.
-					s = scale * 0.9;
+					s = scale1;
 
 				// Touching frame plus button.
 				} else if (frametouching >= 0 && picoMotion(framebutton1x, framebutton1y, framebuttonwidth, framebuttonheight)) {
@@ -493,6 +493,8 @@ async function appMain() {
 						char = char1;
 						a = 0;
 					}
+					s = scale1;
+
 				} else {
 					if (frame + 1 >= anime) {
 						char = char1;
@@ -517,18 +519,19 @@ async function appMain() {
 							a = 0;
 						}
 					}
-					s = scale*0.9;
+					s = scale1;
 
 				// Touching frame minus button.
 				} else if (frametouching >= 0 && picoMotion(framebutton2x, framebutton2y, framebuttonwidth, framebuttonheight)) {
 					pixeltouching = -1;
 					colortouching = -1;
 					frametouching = 1;
-					if (frame <= 1) {
+					if (frame <= 0) {
 						char = char2;
 						a = 0;
 					}
-					s = scale*0.9;
+					s = scale1;
+
 				} else {
 					if (frame <= 0) {
 						char = char2;
@@ -692,7 +695,7 @@ async function appMain() {
 				}*/
 
 				// Release holding frame.
-				picoSprite(sprite, 0, x, framesposy, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
+				picoSprite(sprite, 0, x, framesposy, 0, w3 / picoSpriteSize(sprite)); // Selecting frame.
 
 			// Touching frame.
 			} else if (frametouching >= 0 && picoMotion(x, framesposy, w0, w0)) {
@@ -731,9 +734,10 @@ async function appMain() {
 			} else if (frameselecting == i) {
 
 				// Touch holding frame.
-				if (frametouching >= 1) {
-					picoSprite(sprite, 0, x, framesposy, 0, w4 / picoSpriteSize(sprite)); // Copyed frame.
-				} else if (anime >= 2) {
+				//if (frametouching >= 1) {
+				//	picoSprite(sprite, 0, x, framesposy, 0, w4 / picoSpriteSize(sprite)); // Copyed frame.
+				//} else 
+				if (anime >= 2) {
 					picoSprite(sprite, 0, x, framesposy, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
 				} else {
 					picoSprite(sprite, 0, x, framesposy, 0, w1 / picoSpriteSize(sprite)); // Only one frame.
