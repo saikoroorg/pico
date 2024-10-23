@@ -298,7 +298,7 @@ async function appMain() {
 	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
 	let colorswidth = (colorflag ? maxcolor : depth) * colorsgrid, colorsheight = 20; // Color selector width and height.
 
-	let bgcolorwidth = landscape ? 180 : 150, bgcolorheight = 24; // Background of color selector width and height.
+	let bgcolorwidth = landscape ? 180 : 148, bgcolorheight = landscape ? 22 : 24; // Background of color selector width and height.
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
 	let colorbutton1x = bgcolorwidth2/2-8, colorbutton1y = colorsposy; // Color selector plus button position.
 	let colorbutton2x = -bgcolorwidth2/2+8, colorbutton2y = colorsposy; // Color selector minus button position.
@@ -306,7 +306,7 @@ async function appMain() {
 	let colorbuttoncolor = 1; // Color selector button color.
 
 	let bgpixelsposx = 0, bgpixelsposy = pixelsposy; // Positions of pixel frame.
-	let bgpixelwidth = landscape ? 180 : 150, bgpixelheight = landscape ? 120 : 150; // Background of pixel frame width and height.
+	let bgpixelwidth = landscape ? 180 : 148, bgpixelheight = landscape ? 118 : 150; // Background of pixel frame width and height.
 	let bgpixelcolor = 1; // Background of pixel frame color.
 
 	let framebutton1x = pixelswidth/2+12, framebutton1y = pixelsposy; // Frame selector plus button position.
@@ -315,7 +315,7 @@ async function appMain() {
 	let framebuttoncolor = 2; // Frame selector button color.
 
 	let framesposx = 0, framesposy = landscape ? 60 : 82; // Offset of animeeditor.
-	let bgframewidth = landscape ? 180 : 150, bgframeheight = 24; // Background of frame selector width and height.
+	let bgframewidth = landscape ? 180 : 148, bgframeheight = landscape ? 22 : 24; // Background of frame selector width and height.
 	let bgframecolor = 2; // Background of frame selector color.
 
 	// Draw background.
