@@ -288,13 +288,13 @@ async function appMain() {
 
 	// Positions.
 	let pixelswidth = animeflag ? 112 : landscape ? 112 : 140; // Size of pixels.
-	let pixelsposx = 0, pixelsposy = landscape ? -14 : -14; // Positions of pixels.
+	let pixelsposx = 0, pixelsposy = landscape ? -12 : -14; // Positions of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let pixelcolor = 1; // Background of pixels color.
 
-	let colorsposx = 0, colorsposy= landscape ? 62 : 82; // Positions of colors/coloreditor.
+	let colorsposx = 0, colorsposy= landscape ? 60 : 82; // Positions of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
 	let colorswidth = (colorflag ? maxcolor : depth) * colorsgrid, colorsheight = 20; // Color selector width and height.
 
@@ -314,7 +314,7 @@ async function appMain() {
 	let framebuttonwidth = 8, framebuttonheight = pixelswidth/2; // Frame selector button width and height.
 	let framebuttoncolor = 2; // Frame selector button color.
 
-	let framesposx = 0, framesposy = landscape ? 62 : 82; // Offset of animeeditor.
+	let framesposx = 0, framesposy = landscape ? 60 : 82; // Offset of animeeditor.
 	let bgframewidth = landscape ? 180 : 150, bgframeheight = 24; // Background of frame selector width and height.
 	let bgframecolor = 2; // Background of frame selector color.
 
