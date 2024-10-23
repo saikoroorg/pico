@@ -302,7 +302,7 @@ async function appMain() {
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
 	let colorbutton1x = bgcolorwidth2/2-8, colorbutton1y = colorsposy; // Color selector plus button position.
 	let colorbutton2x = -bgcolorwidth2/2+8, colorbutton2y = colorsposy; // Color selector minus button position.
-	let colorbuttonwidth = 8, colorbuttonheight = bgcolorheight; // Color selector button width and height.
+	let colorbuttonwidth = 8, colorbuttonheight = bgcolorheight/2; // Color selector button width and height.
 	let colorbuttoncolor = 1; // Color selector button color.
 
 	let bgpixelsposx = 0, bgpixelsposy = pixelsposy; // Positions of pixel frame.
@@ -311,7 +311,7 @@ async function appMain() {
 
 	let framebutton1x = pixelswidth/2+12, framebutton1y = pixelsposy; // Frame selector plus button position.
 	let framebutton2x = -pixelswidth/2-12, framebutton2y = pixelsposy; // Frame selector minus button position.
-	let framebuttonwidth = 8, framebuttonheight = bgpixelheight; // Frame selector button width and height.
+	let framebuttonwidth = 8, framebuttonheight = pixelswidth/2; // Frame selector button width and height.
 	let framebuttoncolor = 2; // Frame selector button color.
 
 	let framesposx = 0, framesposy = landscape ? 62 : 82; // Offset of animeeditor.
