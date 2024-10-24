@@ -291,11 +291,11 @@ async function appMain() {
 	let pixelsposx = 0, pixelsposy = landscape ? -12 : -14; // Positions of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
-	let pixelcolor = 1; // Background of pixels color.
+	let pixelcolor = 2; // Background of pixels color.
 
 	let colorsposx = 0, colorsposy = landscape ? 60 : 82; // Positions of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
-	let colorswidth = (colorflag ? 9 : depth) * colorsgrid, colorsheight = 20; // Color selector width and height.
+	let colorswidth = (colorflag ? 9 : depth) * colorsgrid, colorsheight = colorflag ? 22 : 16; // Color selector width and height.
 
 	let bgcolorwidth = landscape ? 180 : 148, bgcolorheight = landscape ? 22 : 24; // Background of color selector width and height.
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
@@ -304,20 +304,20 @@ async function appMain() {
 	let colorbuttonwidth = 8, colorbuttonheight = bgcolorheight/2; // Color selector button width and height.
 	let colorbuttoncolor = 1; // Color selector button color.
 
-	let bgpixelsposx = 0, bgpixelsposy = pixelsposy; // Positions of pixel frame.
-	let bgpixelwidth = landscape ? 180 : 148, bgpixelheight = landscape ? 118 : 150; // Background of pixel frame width and height.
-	let bgpixelcolor = 1; // Background of pixel frame color.
-
-	let framebutton1x = pixelswidth/2+12, framebutton1y = pixelsposy; // Frame selector plus button position.
-	let framebutton2x = -pixelswidth/2-12, framebutton2y = pixelsposy; // Frame selector minus button position.
 	let framebuttonwidth = 8, framebuttonheight = pixelswidth/2; // Frame selector button width and height.
-	let framebuttoncolor = 2; // Frame selector button color.
+	let framebutton1x = pixelswidth/2+framebuttonwidth, framebutton1y = pixelsposy; // Frame selector plus button position.
+	let framebutton2x = -pixelswidth/2-framebuttonwidth, framebutton2y = pixelsposy; // Frame selector minus button position.
+	let framebuttoncolor = 1; // Frame selector button color.
+
+	let bgpixelsposx = 0, bgpixelsposy = pixelsposy; // Positions of pixel frame.
+	let bgpixelwidth = landscape ? pixelswidth+framebuttonwidth*4 : 148, bgpixelheight = landscape ? 118 : 150; // Background of pixel frame width and height.
+	let bgpixelcolor = 2; // Background of pixel frame color.
 
 	let framesposx = 0, framesposy = landscape ? 60 : 82; // Offset of animeeditor.
 	let bgframewidth = landscape ? 180 : 148, bgframeheight = landscape ? 22 : 24; // Background of frame selector width and height.
-	let bgframecolor = 1; // Background of frame selector color.
+	let bgframecolor = 2; // Background of frame selector color.
 
-	let colorstouchareacolor = bgcolor; // Color selector touch area color.
+	let colorstouchareacolor = 1; // Color selector touch area color.
 	let framestouchareacolor = 1; // Frame selector touch area color.
 
 	// Draw background.
@@ -555,7 +555,7 @@ async function appMain() {
 	}
 
 	let framesgrid = landscape ? (144 / (anime > 9 ? anime : 9)) : (112 / (anime > 7 ? anime : 7)); // Grid length of each colors.
-	let frameswidth = anime * framesgrid, framesheight = 20; // Color selector width and height.
+	let frameswidth = anime * framesgrid, framesheight = framesgrid; // Color selector width and height.
 
 	// Pixel editer mode.
 	if (!animeflag) {
