@@ -294,7 +294,7 @@ async function appMain() {
 	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let pixelcolor = 1; // Background of pixels color.
 
-	let colorsposx = 0, colorsposy= landscape ? 60 : 82; // Positions of colors/coloreditor.
+	let colorsposx = 0, colorsposy = landscape ? 60 : 82; // Positions of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
 	let colorswidth = (colorflag ? 9 : depth) * colorsgrid, colorsheight = 20; // Color selector width and height.
 
@@ -316,7 +316,10 @@ async function appMain() {
 
 	let framesposx = 0, framesposy = landscape ? 60 : 82; // Offset of animeeditor.
 	let bgframewidth = landscape ? 180 : 148, bgframeheight = landscape ? 22 : 24; // Background of frame selector width and height.
-	let bgframecolor = 2; // Background of frame selector color.
+	let bgframecolor = 1; // Background of frame selector color.
+
+	let colorstouchareacolor = bgcolor; // Color selector touch area color.
+	let framestouchareacolor = 1; // Frame selector touch area color.
 
 	// Draw background.
 	picoColor();
@@ -402,7 +405,7 @@ async function appMain() {
 		} else {
 			// Draw background of color selector.
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
-			//picoRect(3, colorsposx, colorsposy, colorswidth, colorsheight);
+			picoRect(colorstouchareacolor, colorsposx, colorsposy, colorswidth, colorsheight);
 		}
 
 		// Draw background of pixels.
@@ -550,9 +553,20 @@ async function appMain() {
 				picoChar(char, framebuttoncolor, framebutton2x, framebutton2y, a, s);
 			}
 		}
+	}
+
+	let framesgrid = (landscape ? 144 / (anime > 9 ? anime : 9) : 112 / (anime > 7 ? anime : 7)); // Grid length of each colors.
+	let frameswidth = anime * framesgrid, framesheight = 20; // Color selector width and height.
+
+	// Pixel editer mode.
+	if (!animeflag) {
+
+	// Frame viewer mode.
+	} else {
 
 		// Draw background of frame selector.
 		picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
+		picoRect(framestouchareacolor, framesposx, framesposy, frameswidth, framesheight);
 	}
 
 	// Set colors data.
@@ -668,9 +682,8 @@ async function appMain() {
 
 	// Draw animes.
 	if (animeflag) {
-		let size = anime > 7 ? anime : 7;
-		let grid = pixelswidth / size;
-		let margin = size <= 9 ? 2 : 1;
+		let grid = framesgrid;
+		let margin = anime <= 9 ? 2 : 1;
 		let w1 = grid - margin - 1; // Width.
 		let w2 = grid - 1; // Width for selecting.
 		let w3 = grid + margin; // Width for holding.
