@@ -296,7 +296,7 @@ async function appMain() {
 
 	let colorsposx = 0, colorsposy= landscape ? 60 : 82; // Positions of colors/coloreditor.
 	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
-	let colorswidth = (colorflag ? maxcolor : depth) * colorsgrid, colorsheight = 20; // Color selector width and height.
+	let colorswidth = (colorflag ? 9 : depth) * colorsgrid, colorsheight = 20; // Color selector width and height.
 
 	let bgcolorwidth = landscape ? 180 : 148, bgcolorheight = landscape ? 22 : 24; // Background of color selector width and height.
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background color selector width and height for touching.
@@ -332,11 +332,9 @@ async function appMain() {
 	if (!animeflag) {
 
 		// Release touching background.
-		if (colortouching >= 0 && picoAction() &&
-			!picoAction(bgpixelsposx, bgpixelsposy, bgpixelwidth/2, bgpixelheight/2) &&
-			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2) &&
-			!picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight) &&
-			!picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
+		if (colortouching >= 0 &&
+			picoAction(colorsposx, colorsposy, bgcolorwidth/2, bgcolorheight/2) &&
+			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
 			console.log("Release touching background.");
 			colortouching = 0;
 
@@ -357,11 +355,9 @@ async function appMain() {
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		// Touching background.
-		} else if (colortouching >= 0 && picoMotion() &&
-			!picoMotion(bgpixelsposx, bgpixelsposy, bgpixelwidth/2, bgpixelheight/2) &&
-			!picoMotion(colorsposx, colorsposy, colorswidth/2, colorsheight/2) &&
-			!picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight) &&
-			!picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
+		} else if (colortouching >= 0 &&
+			picoMotion(colorsposx, colorsposy, bgcolorwidth/2, bgcolorheight/2) &&
+			!picoMotion(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
 			frametouching = -1;
 			pixeltouching = -1;
 			colortouching = 1;
