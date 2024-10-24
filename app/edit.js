@@ -291,7 +291,6 @@ async function appMain() {
 	let pixelsposx = 0, pixelsposy = landscape ? -12 : -14; // Positions of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
-	let pixelsmargin = pixelsgrid/7; // Margin length of each pixels.
 	let pixelcolor = 1; // Background of pixels color.
 
 	let colorsposx = 0, colorsposy = landscape ? 60 : 82; // Positions of colors/coloreditor.
@@ -555,7 +554,7 @@ async function appMain() {
 		}
 	}
 
-	let framesgrid = (landscape ? 144 / (anime > 9 ? anime : 9) : 112 / (anime > 7 ? anime : 7)); // Grid length of each colors.
+	let framesgrid = landscape ? (144 / (anime > 9 ? anime : 9)) : (112 / (anime > 7 ? anime : 7)); // Grid length of each colors.
 	let frameswidth = anime * framesgrid, framesheight = 20; // Color selector width and height.
 
 	// Pixel editer mode.
@@ -682,18 +681,18 @@ async function appMain() {
 
 	// Draw animes.
 	if (animeflag) {
-		let grid = framesgrid;
 		let margin = anime <= 9 ? 2 : 1;
-		let w1 = grid - margin - 1; // Width.
-		let w2 = grid - 1; // Width for selecting.
-		let w3 = grid + margin; // Width for holding.
-		let w4 = grid - margin*2; // Width for copyed.
+		let w1 = framesgrid - margin; // Width.
+		let w2 = framesgrid; // Width for selecting.
+		let w3 = framesgrid + margin*2; // Width for holding.
+		let w4 = framesgrid - margin*2; // Width for copyed.
 		let scale = w4 / 4;
 
 		for (let i = 0; i < anime; i++) {
-			let x = pixelsposx + (i - (anime-1)/2) * grid;
+			let x = (i - (anime - 1) / 2) * framesgrid + framesposx;
 			let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
-			let w0 = grid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
+			let framewidth = picoSpriteSize(sprite); // Width of 1 frame block.
+			let w0 = framesgrid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
 			// Release touching frame.
 			if (frametouching >= 0 && picoAction(x, framesposy, w0, w0)) {
@@ -717,7 +716,7 @@ async function appMain() {
 				}*/
 
 				// Release holding frame.
-				picoSprite(sprite, 0, x, framesposy, 0, w3 / picoSpriteSize(sprite)); // Selecting frame.
+				picoSprite(sprite, 0, x, framesposy, 0, w3 / framewidth); // Selecting frame.
 
 			// Touching frame.
 			} else if (frametouching >= 0 && picoMotion(x, framesposy, w0, w0)) {
@@ -750,24 +749,24 @@ async function appMain() {
 				}
 
 				// Touch holding frame.
-				picoSprite(sprite, 0, x, framesposy, 0, w3 / picoSpriteSize(sprite)); // Touching frame.
+				picoSprite(sprite, 0, x, framesposy, 0, w3 / framewidth); // Touching frame.
 
 			// Not touching but selecting color.
 			} else if (frameselecting == i) {
 
 				// Touch holding frame.
 				//if (frametouching >= 1) {
-				//	picoSprite(sprite, 0, x, framesposy, 0, w4 / picoSpriteSize(sprite)); // Copyed frame.
+				//	picoSprite(sprite, 0, x, framesposy, 0, w4 / framewidth); // Copyed frame.
 				//} else 
 				if (anime >= 2) {
-					picoSprite(sprite, 0, x, framesposy, 0, w2 / picoSpriteSize(sprite)); // Selecting frame.
+					picoSprite(sprite, 0, x, framesposy, 0, w2 / framewidth); // Selecting frame.
 				} else {
-					picoSprite(sprite, 0, x, framesposy, 0, w1 / picoSpriteSize(sprite)); // Only one frame.
+					picoSprite(sprite, 0, x, framesposy, 0, w1 / framewidth); // Only one frame.
 				}
 
 			// Other frames.
 			} else {
-				picoSprite(sprite, 0, x, framesposy, 0, w1 / picoSpriteSize(sprite)); // Unselecting frames.
+				picoSprite(sprite, 0, x, framesposy, 0, w1 / framewidth); // Unselecting frames.
 			}
 		}
 	}
