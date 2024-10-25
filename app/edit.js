@@ -330,7 +330,7 @@ async function appMain() {
 	}//*/
 	//picoRect(1, pixelsposx, pixelsposy, pixelswidth, pixelswidth);
 
-	// Pixel editer mode.
+	// Pixel editor mode.
 	if (!animeflag) {
 
 		// Release touching background.
@@ -557,7 +557,7 @@ async function appMain() {
 	let framesgrid = landscape ? (144 / (anime > 9 ? anime : 9)) : (112 / (anime > 7 ? anime : 7)); // Grid length of each colors.
 	let frameswidth = anime * framesgrid, framesheight = framesgrid; // Color selector width and height.
 
-	// Pixel editer mode.
+	// Pixel editor mode.
 	if (!animeflag) {
 
 	// Frame viewer mode.
@@ -607,7 +607,7 @@ async function appMain() {
 
 					canvas += picoCode6Char(coffset+pixels[j][i]);
 
-				// Update canvas on editer mode.
+				// Update canvas on editor mode.
 				} else {
 					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
 						console.log("Touch pixels.");
