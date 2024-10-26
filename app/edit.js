@@ -519,17 +519,17 @@ async function appMain() {
 		{
 			const char0 = "&", char1 = "+", char2 = "-", angle1 = 90, angle2 = -90, scale = 2, scale1 = 1.5;
 			if (frame + 1 < maxanime) {
-				let char = char0, s = scale, a = angle1;
+				let char = char1, s = scale, a = 0;
 				// Release touching anime plus button.
 				if (animetouching >= 0 && picoAction(animebutton1x, animebutton1y, animebuttonwidth, animebuttonheight)) {
 					console.log("Release touching anime plus button.");
 					animetouching = 0;
-					if (frame + 1 < anime) {
+					/*if (frame + 1 < anime) {
 						frame = frame + 1;
-					} else {
+					} else */{
 						anime = anime + 1;
 						frame = anime - 1;
-						char = char1;
+						//char = char1;
 					}
 					playing = -1; // Reset pixels from buffer.
 					s = scale1;
@@ -540,35 +540,37 @@ async function appMain() {
 					pixeltouching = -1;
 					colortouching = -1;
 					animetouching = 1;
-					if (frame + 1 >= anime) {
+					/*if (frame + 1 >= anime) {
 						char = char1;
 						a = 0;
-					}
+					}*/
 					s = scale1;
 
-				} else {
+				}/* else {
 					if (frame + 1 >= anime) {
 						char = char1;
 						a = 0;
 					}
+				}*/
+				if (anime < maxanime) {
+					picoChar(char, animebuttoncolor, animebutton1x, animebutton1y, a, s);
 				}
-				picoChar(char, animebuttoncolor, animebutton1x, animebutton1y, a, s);
 			}
 			if (frame >= 2 || anime >= 2) {
-				let char = char0, s = scale, a = angle2;
+				let char = char2, s = scale, a = 0;
 				// Release touching anime minus button.
 				if (animetouching >= 0 && picoAction(animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight)) {
 					console.log("Release touching anime minus button.");
 					animetouching = 0;
-					if (frame >= 1) {
+					/*if (frame >= 1) {
 						frame = frame - 1;
 						playing = -1; // Reset pixels from buffer.
-					} else if (anime >= 2) {
+					} else*/ if (anime >= 2) {
 						anime = anime - 1;
-						if (frame <= 0) {
+						/*if (frame <= 0) {
 							char = char2;
 							a = 0;
-						}
+						}*/
 					}
 					s = scale1;
 
@@ -578,19 +580,21 @@ async function appMain() {
 					pixeltouching = -1;
 					colortouching = -1;
 					animetouching = 1;
-					if (frame <= 0) {
+					/*if (frame <= 0) {
 						char = char2;
 						a = 0;
-					}
+					}*/
 					s = scale1;
 
-				} else {
+				}/* else {
 					if (frame <= 0) {
 						char = char2;
 						a = 0;
 					}
+				}*/
+				if (anime >= 2) {
+					picoChar(char, animebuttoncolor, animebutton2x, animebutton2y, a, s);
 				}
-				picoChar(char, animebuttoncolor, animebutton2x, animebutton2y, a, s);
 			}
 		}
 	}
