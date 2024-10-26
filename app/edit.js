@@ -313,12 +313,12 @@ async function appMain() {
 
 	let animesposx = 0, animesposy = landscape ? 60 : 82; // Offset of animeeditor.
 	let bganimewidth = landscape ? 180 : 148, bganimeheight = landscape ? 22 : 24; // Background of animeeditor width and height.
-	let bganimecolor = 2; // Background of animeeditor color.
+	let bganimecolor = 1; // Background of animeeditor color.
 
 	let animebutton1x = bganimewidth/2-6, animebutton1y = colorsposy; // Animeeditor plus button position.
 	let animebutton2x = -bganimewidth/2+6, animebutton2y = colorsposy; // Animeeditor minus button position.
 	let animebuttonwidth = 8, animebuttonheight = bganimeheight/2; // Animeeditor button width and height.
-	let animebuttoncolor = 1; // Animeeditor button color.
+	let animebuttoncolor = 2; // Animeeditor button color.
 
 	//let colorstouchareacolor = 1; // Coloreditor touch area color.
 	//let animestouchareacolor = 1; // Animeeditor touch area color.
@@ -332,6 +332,7 @@ async function appMain() {
 		picoRect(-1, 0, 0, 160, 200);
 	}//*/
 	//picoRect(1, pixelsposx, pixelsposy, pixelswidth, pixelswidth);
+	//picoRect(4, 0, 0, 200, 200);
 
 	// Pixel editor mode.
 	if (!animeflag) {
@@ -411,20 +412,20 @@ async function appMain() {
 		}
 
 		// Draw background of pixels.
-		if (frametouching >= 0 &&
+		if (frametouching >= 0 && picoAction () &&
 			!picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			picoAction(framesposx, framesposy, bgframewidth/2, bgframeheight/2)) {
+			!picoAction(colorsposx, colorsposy, bgcolorwidth/2, bgcolorheight/2)) {
 			frametouching = 0;
 			animeflag = 1;
-			picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
-		} else if (frametouching >= 0 &&
+			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
+		} else if (frametouching >= 0 && picoMotion () &&
 			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			picoMotion(framesposx, framesposy, bgframewidth/2, bgframeheight/2)) {
+			!picoMotion(colorsposx, colorsposy, bgcolorwidth/2, bgcolorheight/2)) {
 			animetouching = -1;
 			pixeltouching = -1;
 			colortouching = -1;
 			frametouching = 1; // Touch frame.
-			picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
+			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
 		} else {
 			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
 		}
@@ -485,25 +486,30 @@ async function appMain() {
 
 		// Draw background of frames.
 		if (frametouching >= 0 &&
+			picoAction(framesposx, framesposy, pixelswidth/2, pixelswidth/2)) {
+			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
+			frametouching = 0;
+		} else if (frametouching >= 0 &&
 			picoMotion(framesposx, framesposy, pixelswidth/2, pixelswidth/2)) {
-			picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
-		} else if (picoAction(framesposx, framesposy, bgframewidth/2, bgframeheight/2) &&
+			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
+		} else if (frametouching >= 0 && picoAction() &&
+			!picoAction(animesposx, animesposy, bganimewidth/2, bganimeheight/2)/* &&
 			!picoAction(animebutton1x, animebutton1y, animebuttonwidth, animebuttonheight) &&
-			!picoAction(animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight)) {
+			!picoAction(animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight)*/) {
 			frametouching = 0;
 			animeflag = 0;
 			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
-		} else if (frametouching >= 0 &&
-			picoMotion(framesposx, framesposy, bgframewidth/2, bgframeheight/2) &&
+		} else if (frametouching >= 0 && picoMotion() &&
+			!picoMotion(animesposx, animesposy, bganimewidth/2, bganimeheight/2)/* &&
 			!picoMotion(animebutton1x, animebutton1y, animebuttonwidth, animebuttonheight) &&
-			!picoMotion(animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight)) {
+			!picoMotion(animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight)*/) {
 			animetouching = -1;
 			pixeltouching = -1;
 			colortouching = -1;
 			frametouching = 1; // Touch frame.
 			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
 		} else {
-			picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
+			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
 		}
 
 		// Draw background of animeeditor.
@@ -939,9 +945,9 @@ async function appMain() {
 	if (picoAction()) {
 		console.log("Reset touching state.");
 		if (pixeltouching > 0) {
-			if (animeflag) {
+			/*if (animeflag) {
 				animeflag = 0;
-			}
+			}*/
 			appUpdate();
 		}
 		frametouching = 0;
