@@ -21,33 +21,41 @@ var colorflag = 0; // Color editing flag.
 // Update icon image.
 async function appUpdate(force = true) {
 
-	// Update buffer.
-	if (force || buffers[frame]) {
-		////console.log("Update" + frame + ": " + buffers[frame]);
+	// Frame viewer mode.
+	if (animeflag) {
+		picoLabel("action", "%");
 
-		// Store canvas pixels to buffers.
-		buffers[frame] = [0, width, height];
-		for (let j = yoffset; j < yoffset + height; j++) {
-			for (let i = xoffset; i < xoffset + width; i++) {
-				if (pixels[j][i]) {
-					let k = buffers[frame].length;
-					buffers[frame][k] = pixels[j][i];
-					buffers[frame][k+1] = i - xoffset;
-					buffers[frame][k+2] = j - yoffset;
+	// Pixel editor mode.
+	} else {
+
+		// Update buffer.
+		if (force || buffers[frame]) {
+			////console.log("Update" + frame + ": " + buffers[frame]);
+
+			// Store canvas pixels to buffers.
+			buffers[frame] = [0, width, height];
+			for (let j = yoffset; j < yoffset + height; j++) {
+				for (let i = xoffset; i < xoffset + width; i++) {
+					if (pixels[j][i]) {
+						let k = buffers[frame].length;
+						buffers[frame][k] = pixels[j][i];
+						buffers[frame][k+1] = i - xoffset;
+						buffers[frame][k+2] = j - yoffset;
+					}
 				}
 			}
+			if (buffers[frame].length <= 3) {
+				buffers[frame] = null;
+			}
 		}
-		if (buffers[frame].length <= 3) {
-			buffers[frame] = null;
-		}
-	}
 
-	// Update icon image.
-	if (buffers[frame]) {
-		let data = await picoSpriteData(buffers[frame], bgcolor);
-		picoLabel("action", null, data);
-	} else {
-		picoLabel("action", "*");
+		// Update icon image.
+		if (buffers[frame]) {
+			let data = await picoSpriteData(buffers[frame], bgcolor);
+			picoLabel("action", null, data);
+		} else {
+			picoLabel("action", "*");
+		}
 	}
 
 	// Update select button.
@@ -62,30 +70,44 @@ async function appUpdate(force = true) {
 
 // Action button.
 async function appAction() {
-	picoResetParams();
 
-	// Create num code to share url.
-	let k = 0;
-	for (let p = 0; p < anime; p++) {
-		if (buffers[p]) {
-			picoSetCode6(buffers[p], k);
-		} else {
-			picoSetCode6([0,7,7], k);
+	// Frame viewer mode.
+	if (animeflag) {
+		let text = await picoReadClipboard();
+		if (text[0] == "0" && text[1] != "0" && text[2] != "0") {
+			buffers[frame] = picoStringCode6(text);
+			animeselecting = -1;
+			playing = -1; // Reset pixels from buffer.
 		}
-		k++;
-	}
-	if (k == 0) {
-		picoSetCode6([0,7,7], k);
-		k++
-	}
-	if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
-		(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-		picoSetCode8(colors.slice(0,(depth+1)*3), k);
-	}
+		console.log("Load from clipboard:" + text);
 
-	// Back or share.
-	if (!await picoReturnApp()) {
-		picoShareApp();
+	// Pixel editor mode.
+	} else {
+		picoResetParams();
+
+		// Create num code to share url.
+		let k = 0;
+		for (let p = 0; p < anime; p++) {
+			if (buffers[p]) {
+				picoSetCode6(buffers[p], k);
+			} else {
+				picoSetCode6([0,7,7], k);
+			}
+			k++;
+		}
+		if (k == 0) {
+			picoSetCode6([0,7,7], k);
+			k++
+		}
+		if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
+			(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
+			picoSetCode8(colors.slice(0,(depth+1)*3), k);
+		}
+
+		// Back or share.
+		if (!await picoReturnApp()) {
+			picoShareApp();
+		}
 	}
 }
 
@@ -151,8 +173,9 @@ var colorselecting = depth; // Touching color index.
 //var colorselected = -1; // Previous touched color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var animetouching = 0; // -1:invalid, 0:untouched, 1:touching.
+var animeholding = 0; // 0:untouched, 1+:touching.
 var framechanging = 0; // 0:not changed, 1:changing.
-var frameselecting = -1; // Selecting frame index.
+var animeselecting = -1; // Selecting frame index.
 var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
@@ -234,9 +257,10 @@ async function appMain() {
 	if (playing <= 0) {
 
 		// Load pixels to canvas.
-		if (frameselecting != frame) {
-			frameselecting = frame;
-			if (frameselecting >= 0 && buffers[frame]) {
+		if (animeselecting != frame) {
+			//console.log("Load pixels to canvas.");
+			animeselecting = frame;
+			if (animeselecting >= 0 && buffers[frame]) {
 				for (let j = 0; j < maxheight; j++) {
 					pixels[j] = [];
 					for (let i = 0; i < maxwidth; i++) {
@@ -761,7 +785,7 @@ async function appMain() {
 					if (buffers[frame]) {
 						sprite = buffers[frame];
 					}
-					frameselecting = frame = i;
+					animeselecting = frame = i;
 					appUpdate(); // Paste pixels to buffers.
 					picoBeep(1.2, 0.1);
 				}*/
@@ -776,7 +800,7 @@ async function appMain() {
 				colortouching = -1;
 
 				// Start to touching frame.
-				//if (animetouching == 0) {
+				if (animetouching == 0) {
 					console.log("Touching frame.");
 					animetouching = 1;
 					if (frame != i) {
@@ -786,25 +810,43 @@ async function appMain() {
 					}
 					
 				// Hovering to another frame.
-				/*} else if (frameselecting != i) {
+				} else if (animeselecting != i) {
 					console.log("Touching another frame.");
 					if (buffers[frame]) {
 						sprite = buffers[frame];
-					}*/
-				//}
+					}
+
+				// Continue touching anime.
+				} else {
+					console.log("Continue touching anime.");//:" + animeselected);
+					animeholding++;
+
+					// Copy to clipboard.
+					if (animeholding >= 30) {
+						picoBeep(1.2, 0.1);
+						animetouching = -1;
+						animeholding = 0;
+						if (buffers[frame]) {
+							picoSetCode6(buffers[frame]);
+							let text = picoString();
+							await picoWriteClipboard(text);
+							console.log("Copy to clipboard:" + text);
+						}
+					}
+				}
 
 				// Cancel color editing.
-				if (colorflag) {
+				/*if (colorflag) {
 					console.log("Cancel color editing.");
 					colorflag = 0;
 					//colorselected = -1;
-				}
+				}*/
 
 				// Touch holding frame.
 				picoSprite(sprite, 0, x, animesposy, 0, w3 / framewidth); // Touching frame.
 
 			// Not touching but selecting color.
-			} else if (frameselecting == i) {
+			} else if (animeselecting == i) {
 
 				// Touch holding frame.
 				//if (animetouching >= 1) {
@@ -888,7 +930,7 @@ async function appMain() {
 		}
 	}
 
-	// Draw color editor.
+	// Draw coloreditor.
 	if (!animeflag && colorflag) {
 		const compression = 2, maxcompresed = (1 << (8 - compression));
 		const scale = 4;

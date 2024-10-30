@@ -87,7 +87,6 @@ async function picoShareScreen(c=0, bg=1) {
 	await pico.app.shareScreen(c, bg);
 }
 
-
 // Lock screen with wakelock.
 function picoLockScreen(enable=true) {
 	pico.app.lockScreen(enable);
@@ -96,6 +95,16 @@ function picoLockScreen(enable=true) {
 // Check wide screen and return true if landscape mode.
 function picoWideScreen() {
 	return pico.app.wideScreen();
+}
+
+// Read from clipboard.
+async function picoReadClipboard() {
+	return await pico.app.readClipboard();
+}
+
+// Write to clipboard.
+async function picoWriteClipboard(text) {
+	await pico.app.writeClipboard(text);
 }
 
 // App mode.
@@ -522,6 +531,24 @@ pico.App = class {
 	// Check wide screen and return true if landscape mode.
 	wideScreen() {
 		return window.matchMedia("(min-aspect-ratio: 1.0)").matches;
+	}
+
+	// Read clipboard.
+	async readClipboard() {
+		try {
+			return await navigator.clipboard.readText();
+		} catch (error) {
+			console.error(error.name, error.message);
+		}
+	}
+
+	// Write clipboard.
+	async writeClipboard(text) {
+		try {
+			await navigator.clipboard.writeText(text);
+		} catch (error) {
+			console.error(error.name, error.message);
+		}
 	}
 }
 
