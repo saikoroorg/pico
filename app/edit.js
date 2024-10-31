@@ -21,33 +21,33 @@ var colorflag = 0; // Color editing flag.
 // Update icon image.
 async function appUpdate(force = true) {
 
+	// Update buffer.
+	if (force || buffers[frame]) {
+		////console.log("Update" + frame + ": " + buffers[frame]);
+
+		// Store canvas pixels to buffers.
+		buffers[frame] = [0, width, height];
+		for (let j = yoffset; j < yoffset + height; j++) {
+			for (let i = xoffset; i < xoffset + width; i++) {
+				if (pixels[j][i]) {
+					let k = buffers[frame].length;
+					buffers[frame][k] = pixels[j][i];
+					buffers[frame][k+1] = i - xoffset;
+					buffers[frame][k+2] = j - yoffset;
+				}
+			}
+		}
+		if (buffers[frame].length <= 3) {
+			buffers[frame] = null;
+		}
+	}
+
 	// Frame viewer mode.
 	if (animeflag) {
 		picoLabel("action", "%");
 
 	// Pixel editor mode.
 	} else {
-
-		// Update buffer.
-		if (force || buffers[frame]) {
-			////console.log("Update" + frame + ": " + buffers[frame]);
-
-			// Store canvas pixels to buffers.
-			buffers[frame] = [0, width, height];
-			for (let j = yoffset; j < yoffset + height; j++) {
-				for (let i = xoffset; i < xoffset + width; i++) {
-					if (pixels[j][i]) {
-						let k = buffers[frame].length;
-						buffers[frame][k] = pixels[j][i];
-						buffers[frame][k+1] = i - xoffset;
-						buffers[frame][k+2] = j - yoffset;
-					}
-				}
-			}
-			if (buffers[frame].length <= 3) {
-				buffers[frame] = null;
-			}
-		}
 
 		// Update icon image.
 		if (buffers[frame]) {
