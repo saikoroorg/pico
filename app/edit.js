@@ -372,6 +372,7 @@ async function appMain() {
 			frametouching = 0;
 			animeflag = 1;
 			appUpdate(true);
+			picoBeep(1.2, 0.1);	
 			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
 		} else if (frametouching >= 0 && picoMotion () &&
 			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
@@ -528,6 +529,7 @@ async function appMain() {
 			frametouching = 0;
 			animeflag = 0;
 			appUpdate(true);
+			picoBeep(1.2, 0.1);	
 			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
 		} else if (frametouching >= 0 && picoMotion() &&
 			!picoMotion(animesposx, animesposy, bganimewidth/2, bganimeheight/2)/* &&
