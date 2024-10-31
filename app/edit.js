@@ -81,6 +81,7 @@ async function appAction() {
 			console.log("Load from clipboard:" + text);
 			picoBeep(1.2, 0.1);
 			picoBeep(1.2, 0.1, 0.2);
+			picoBeep(1.2, 0.1, 0.4);
 		}
 
 	// Pixel editor mode.
@@ -842,6 +843,17 @@ async function appMain() {
 							console.log("Copy to clipboard:" + text);
 							picoBeep(1.2, 0.1);
 							picoBeep(1.2, 0.1, 0.2);
+						} else {
+							let text = await picoClipboard();
+							if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
+								buffers[frame] = picoStringCode6(text);
+								animeselecting = -1;
+								playing = -1; // Reset pixels from buffer.
+								console.log("Load from clipboard:" + text);
+								picoBeep(1.2, 0.1);
+								picoBeep(1.2, 0.1, 0.2);
+								picoBeep(1.2, 0.1, 0.4);
+							}
 						}
 					}
 				}
