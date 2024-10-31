@@ -315,35 +315,36 @@ async function appMain() {
 
 	// Layouts.
 	let pixelswidth = animeflag ? 112 : landscape ? 112 : 140; // Size of pixels.
-	let pixelsposx = 0, pixelsposy = landscape ? -12 : -14; // Positions of pixels.
+	let pixelsposx = 0, pixelsposy = landscape ? -12 : -20; // Positions of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
 	let bgpixelwidth = pixelswidth+4, bgpixelheight = pixelswidth+4; // Background of pixels width and height.
 	let bgpixelcolor = 1; // Background of pixels color.
 
-	let colorsposx = 0, colorsposy = landscape ? 60 : 82; // Offset of coloreditor.
-	let colorsgrid = landscape ? 16 : 14; // Grid length of each colors.
-	let colorswidth = (colorflag ? 9 : depth) * colorsgrid, colorsheight = colorflag ? 22 : 16; // Coloreditor width and height.
-	let bgcolorwidth = landscape ? 180 : 148, bgcolorheight = landscape ? 22 : 24; // Background of coloreditor width and height.
+	let colorsposx = 0, colorsposy = landscape ? 58 : 76; // Offset of coloreditor.
+	let colorsgrid = colorflag ? 14 : landscape ? 14 : 12; // Grid length of each colors.
+	let colorswidth = (colorflag ? 9 : depth) * colorsgrid, colorsheight = colorflag ? 20 : 16; // Coloreditor width and height.
+	let colorsscale = colorflag ? 4 : landscape ? 4 : 3.5; //@todo: 1frame bugs on entering coloreditor mode.
+	let bgcolorwidth = landscape ? 180 : 138, bgcolorheight = landscape ? 24 : 32; // Background of coloreditor width and height.
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background coloreditor width and height for touching.
 
-	let colorbutton1x = bgcolorwidth/2-6, colorbutton1y = colorsposy; // Coloreditor plus button position.
-	let colorbutton2x = -bgcolorwidth/2+6, colorbutton2y = colorsposy; // Coloreditor minus button position.
-	let colorbuttonwidth = 8, colorbuttonheight = bgcolorheight/2; // Coloreditor button width and height.
+	let colorbutton1x = bgcolorwidth/2 - 8, colorbutton1y = colorsposy; // Coloreditor plus button position.
+	let colorbutton2x = -bgcolorwidth/2 + 8, colorbutton2y = colorsposy; // Coloreditor minus button position.
+	let colorbuttonwidth = 8, colorbuttonheight = colorsheight/2; // Coloreditor button width and height.
 	let colorbuttoncolor = 1; // Coloreditor button color.
 
 	let framesposx = 0, framesposy = pixelsposy; // Positions of pixelframes.
-	let bgframewidth = landscape ? 180 : 148;
+	let bgframewidth = landscape ? 180 : 138;
 	let bgframeheight = landscape ? 122 : 168; // Background of pixelframes width and height.
 	let bgframecolor = 2; // Background of pixelframes color.
 
-	let animesposx = 0, animesposy = landscape ? 60 : 82; // Offset of animeeditor.
-	let bganimewidth = landscape ? 180 : 148, bganimeheight = landscape ? 22 : 24; // Background of animeeditor width and height.
+	let animesposx = 0, animesposy = landscape ? 58 : 76; // Offset of animeeditor.
+	let bganimewidth = landscape ? 180 : 138, bganimeheight = landscape ? 24 : 32; // Background of animeeditor width and height.
 	let bganimecolor = 1; // Background of animeeditor color.
 
-	let animebutton1x = bganimewidth/2-6, animebutton1y = colorsposy; // Animeeditor plus button position.
-	let animebutton2x = -bganimewidth/2+6, animebutton2y = colorsposy; // Animeeditor minus button position.
-	let animebuttonwidth = 8, animebuttonheight = bganimeheight/2; // Animeeditor button width and height.
+	let animebutton1x = bganimewidth/2 - 8, animebutton1y = colorsposy; // Animeeditor plus button position.
+	let animebutton2x = -bganimewidth/2 + 8, animebutton2y = colorsposy; // Animeeditor minus button position.
+	let animebuttonwidth = 8, animebuttonheight = colorsheight/2; // Animeeditor button width and height.
 	let animebuttoncolor = 2; // Animeeditor button color.
 
 	//let colorstouchareacolor = 1; // Coloreditor touch area color.
@@ -362,6 +363,26 @@ async function appMain() {
 
 	// Pixel editor mode.
 	if (!animeflag) {
+
+		// Draw background of pixels.
+		if (frametouching >= 0 && picoAction () &&
+			!picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
+			!picoAction(colorsposx, colorsposy, bgcolorwidth/2, bgcolorheight/2)) {
+			frametouching = 0;
+			animeflag = 1;
+			appUpdate(true);
+			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
+		} else if (frametouching >= 0 && picoMotion () &&
+			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
+			!picoMotion(colorsposx, colorsposy, bgcolorwidth/2, bgcolorheight/2)) {
+			animetouching = -1;
+			pixeltouching = -1;
+			colortouching = -1;
+			frametouching = 1; // Touch frame.
+			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
+		} else {
+			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
+		}
 
 		// Release touching background color.
 		if (colortouching >= 0 &&
@@ -435,26 +456,6 @@ async function appMain() {
 		} else {
 			// Draw background of coloreditor.
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
-		}
-
-		// Draw background of pixels.
-		if (frametouching >= 0 && picoAction () &&
-			!picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			!picoAction(colorsposx, colorsposy, bgcolorwidth/2, bgcolorheight/2)) {
-			frametouching = 0;
-			animeflag = 1;
-			appUpdate(true);
-			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
-		} else if (frametouching >= 0 && picoMotion () &&
-			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			!picoMotion(colorsposx, colorsposy, bgcolorwidth/2, bgcolorheight/2)) {
-			animetouching = -1;
-			pixeltouching = -1;
-			colortouching = -1;
-			frametouching = 1; // Touch frame.
-			picoRect(bgframecolor, framesposx, framesposy, bgpixelwidth, bgpixelheight);
-		} else {
-			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
 		}
 
 		// Touching color buttons.
@@ -878,7 +879,6 @@ async function appMain() {
 
 	// Draw colors.
 	if (!animeflag && !colorflag) {
-		const scale = 4;
 
 		for (let i = 1; i <= depth; i++) {
 			let x = colorsposx + (i - (depth+1)/2) * colorsgrid; // Margins for each color.
@@ -889,7 +889,7 @@ async function appMain() {
 				colortouching = 0;
 				//colorselected = colorselecting;
 				picoBeep(0, 0.1);
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.5);
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale*0.5);
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -925,17 +925,17 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.45);
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale*0.45);
 
 			} else {
 
 				// Not touching but selecting color.
 				if (colorselecting == i) {
-					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, scale*0.5);
+					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale*0.5);
 
 				// Other colors.
 				} else {
-					picoChar("-", i, x, colorsposy, 0, scale);
+					picoChar("-", i, x, colorsposy, 0, colorsscale);
 				}
 			}
 		}
