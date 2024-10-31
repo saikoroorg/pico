@@ -73,8 +73,8 @@ async function appAction() {
 
 	// Frame viewer mode.
 	if (animeflag) {
-		let text = await picoReadClipboard();
-		if (text[0] == "0" && text[1] != "0" && text[2] != "0") {
+		let text = await picoClipboard();
+		if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
 			buffers[frame] = picoStringCode6(text);
 			animeselecting = -1;
 			playing = -1; // Reset pixels from buffer.
@@ -836,9 +836,8 @@ async function appMain() {
 						animetouching = -1;
 						animeholding = 0;
 						if (buffers[frame]) {
-							picoSetCode6(buffers[frame]);
-							let text = picoString();
-							await picoWriteClipboard(text);
+							let text = picoCode6String(buffers[frame]);
+							await picoClipboard(text);
 							console.log("Copy to clipboard:" + text);
 							picoBeep(1.2, 0.1);
 							picoBeep(1.2, 0.1, 0.2);

@@ -97,14 +97,9 @@ function picoWideScreen() {
 	return pico.app.wideScreen();
 }
 
-// Read from clipboard.
-async function picoReadClipboard() {
-	return await pico.app.readClipboard();
-}
-
-// Write to clipboard.
-async function picoWriteClipboard(text) {
-	await pico.app.writeClipboard(text);
+// Set clipboard text and return current clipboard text.
+async function picoClipboard(text=null) {
+	return await pico.app.clipboard(text);
 }
 
 // App mode.
@@ -533,19 +528,13 @@ pico.App = class {
 		return window.matchMedia("(min-aspect-ratio: 1.0)").matches;
 	}
 
-	// Read clipboard.
-	async readClipboard() {
+	// Set clipboard text and return current clipboard text.
+	async clipboard(text) {
 		try {
+			if (text != null) {
+				await navigator.clipboard.writeText(text);
+			}
 			return await navigator.clipboard.readText();
-		} catch (error) {
-			console.error(error.name, error.message);
-		}
-	}
-
-	// Write clipboard.
-	async writeClipboard(text) {
-		try {
-			await navigator.clipboard.writeText(text);
 		} catch (error) {
 			console.error(error.name, error.message);
 		}
