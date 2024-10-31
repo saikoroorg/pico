@@ -125,6 +125,18 @@ function picoStringCode8(str) {
 	return pico.param._expandCode(pico.param._stringCode(str));
 }
 
+// Get string by 6bit code.
+function picoCode6String(code6) {
+	return pico.param._code2str(code6);
+}
+
+// Get string by 8bit code.
+function picoCode8String(code8) {
+	const compression = 2;
+	let code6 = this._compressCode(code8, compression)
+	return pico.param._code2str(code6);
+}
+
 // Get 6bit code (1 number) by char.
 function picoCharCode6(char) {
 	let code = picoStringCode6(char);
