@@ -944,18 +944,9 @@ function picoTextFile(text, name=null, type=null) {
 	}
 }
 
-//obsolete: Get all params by one string.
-function picoParams() {
-	return pico.param.params();
-}
-
 // Reset all params.
 function picoReset() {
-	pico.param.resetParams();
-}
-//obsolete: Reset all params.
-function picoResetParams() {
-	pico.param.resetParams();
+	pico.param.reset();
 }
 
 // Get all param keys.
@@ -965,22 +956,12 @@ function picoKeys() {
 
 // Get param as string.
 function picoParam(key=0) {
-	return pico.param.string(key);
+	return pico.param.param(key);
 }
 
 // Set param as string.
 function picoSetParam(str, key=0) {
-	return pico.param.setString(str, key);
-}
-
-//obsolete: Get param as string.
-function picoString(key=0) {
-	return pico.param.string(key);
-}
-
-//obsolete: Set param as string.
-function picoSetString(str, key=0) {
-	return pico.param.setString(str, key);
+	return pico.param.setParam(str, key);
 }
 
 // Get param as numbers.
@@ -997,26 +978,6 @@ function picoNumber(key=0) {
 // Set param as numbers.
 function picoSetNumbers(numbers, key=0, separator=".") {
 	return pico.param.setNumbers(numbers, key, separator);
-}
-
-//obsolete: Get param as 6bit code.
-function picoCode6(key=0) {
-	return pico.param.code6(key);
-}
-
-//obsolete: Set param as 6bit code.
-function picoSetCode6(code6, key=0) {
-	return pico.param.setCode6(code6, key);
-}
-
-//obsolete: Get param as 8bit compatible 6bit code.
-function picoCode8(key=0) {
-	return pico.param.code8(key);
-}
-
-//obsolete: Set param as 8bit compatible 6bit code.
-function picoSetCode8(code8, key=0) {
-	return pico.param.setCode8(code8, key);
 }
 
 // Get code by string.
@@ -1036,32 +997,9 @@ function picoCodeText(code, bitlength=8) {
 	return pico.param._codeString(code);
 }
 
-//obsolete: Get 6bit code by string.
-function picoStringCode6(str) {
-	return pico.param._stringCode(str);
-}
-
-//obsolete: Get 8bit code by string.
-function picoStringCode8(str) {
-	return pico.param._expandCode(pico.param._stringCode(str));
-}
-
-//obsolete: Get string by 6bit code.
-function picoCode6String(code6) {
-	return pico.param._codeString(code6);
-}
-
-//obsolete: Get string by 8bit code.
-function picoCode8String(code8) {
-	const compression = 2;
-	let code6 = this._compressCode(code8, compression)
-	return pico.param._codeString(code6);
-}
-
 // Get X bit code (1 number) by char.
 function picoCharCode(char, bitlength=8) {
-	let code = picoTextCode(char, bitlength);
-	return code[0];
+	return picoTextCode(char, bitlength)[0];
 }
 
 // Get char by 6bit code (1 number).
@@ -1069,28 +1007,70 @@ function picoCodeChar(c, bitlength=8) {
 	return picoCodeText([c], bitlength)[0];
 }
 
+
+//obsolete: Get all params by one string.
+function picoParams() {
+	return pico.param._serialize();
+}
+//obsolete: Reset all params.
+function picoResetParams() {
+	picoReset();
+}
+//obsolete: Get param as string.
+function picoString(key=0) {
+	return picoParam(key);
+}
+//obsolete: Set param as string.
+function picoSetString(str, key=0) {
+	return picoSetParam(str, key);
+}
+//obsolete: Get param as 6bit code.
+function picoCode6(key=0) {
+	return picoTextCode(picoParam(key));
+}
+//obsolete: Set param as 6bit code.
+function picoSetCode6(code6, key=0) {
+	return picoSetParam(picoCodeText(code6), key);
+}
+//obsolete: Get param as 8bit compatible 6bit code.
+function picoCode8(key=0) {
+	return picoTextCode(picoParam(key), 6);
+}
+//obsolete: Set param as 8bit compatible 6bit code.
+function picoSetCode8(code8, key=0) {
+	return picoSetParam(picoCodeText(code6, 6), key);
+}
+//obsolete: Get 6bit code by string.
+function picoStringCode6(str) {
+	return picoTextCode(str);
+}
+//obsolete: Get 8bit compatible 6bit code by string.
+function picoStringCode8(str) {
+	return picoTextCode(str, 6);
+}
+//obsolete: Get string by 6bit code.
+function picoCode6String(code6) {
+	return picoCodeText(code6);
+}
+//obsolete: Get string by 8bit compatible 6bit code.
+function picoCode8String(code8) {
+	return picoCodeText(code6, 6);
+}
 //obsolete: Get 6bit code (1 number) by char.
 function picoCharCode6(char) {
-	let code = picoStringCode6(char);
-	return code[0];
+	return picoCharCode(str);
 }
-
-//obsolete: Get 8bit code (1 number) by char.
+//obsolete: Get 8bit compatible 6bit code (1 number) by char.
 function picoCharCode8(char) {
-	let code = picoStringCode8(char);
-	return code[0];
+	return picoCharCode(str, 6);
 }
-
 //obsolete: Get char by 6bit code (1 number).
 function picoCode6Char(code6) {
-	return pico.param._codeString([code6])[0];
+	return picoCodeChar(code6);
 }
-
-//obsolete: Get char by 8bit code (1 number).
+//obsolete: Get char by 8bit compatible 6bit code (1 number).
 function picoCode8Char(code8) {
-	const compression = 2;
-	let code6 = this._compressCode([code8], compression)
-	return pico.param._codeString(code6)[0];
+	return picoCodeChar(code6, 6);
 }
 
 //************************************************************/
@@ -1142,7 +1122,7 @@ pico.Param = class {
 		try {
 			const blob = new Blob([text], {type: type ? type : "text/plain"});
 			const file = new File([blob], name ? name : "text.txt", {type: type});
-			//console.log("Text file: " + file.size);
+			////console.log("Text file: " + file.size);
 			return file;
 		} catch (error) {
 			console.error(error);
@@ -1150,13 +1130,8 @@ pico.Param = class {
 		}
 	}
 
-	// Get all params by one string.
-	params() {
-		return this._serialize();
-	}
-
 	// Reset all params.
-	resetParams() {
+	reset() {
 		this._reset();
 	}
 
@@ -1166,12 +1141,12 @@ pico.Param = class {
 	}
 
 	// Get param as string.
-	string(key=0) {
+	param(key=0) {
 		return this._string(key);
 	}
 
 	// Set param as string.
-	setString(str, key=0) {
+	setParam(str, key=0) {
 		this._setString(str, key);
 	}
 
@@ -1183,29 +1158,6 @@ pico.Param = class {
 	// Set param as numbers.
 	setNumbers(numbers, key=0) {
 		this._setNumbers(numbers, key);
-	}
-
-	// Get param as 6bit code.
-	code6(key=0) {
-		return this._stringCode(this._string(key));
-	}
-
-	// Set param as 6bit code.
-	setCode6(code6, key=0) {
-		this._setString(this._codeString(code6), key);
-	}
-
-	// Get param as 8bit compatible 6bit code.
-	code8(key=0) {
-		let code6 = this.code6(key)
-		return this._expandCode(code6);
-	}
-
-	// Set param as 8bit compatible 6bit code.
-	setCode8(code8, key=0) {
-		const compression = 2;
-		let code6 = this._compressCode(code8, compression)
-		this.setCode6(code6, key);
 	}
 
 	//*----------------------------------------------------------*/
@@ -1230,7 +1182,7 @@ pico.Param = class {
 		// Load query.
 		let query = window.location.search;
 		if (query != null && query != "") {
-			//console.log("Load query: " + query);
+			////console.log("Load query: " + query);
 			let text = query.slice(1);
 			this._deserialize(text);
 		}
@@ -1249,10 +1201,10 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "&";
 					let query = text ? separator + text : "";
-					//console.log("Jump: " + query);
+					////console.log("Jump: " + query);
 					window.location.href = url + query;
 				} else {
-					//console.log("Reload: " + text);
+					////console.log("Reload: " + text);
 					window.location.search = text;
 				}
 			}
@@ -1269,11 +1221,11 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "";
 					let query = text ? separator + text : "";
-					//console.log("Share query: " + query);
+					////console.log("Share query: " + query);
 					data.url = url + query;
 				} else if (!files) {
 					let query = text ? "?" + text : "";
-					//console.log("Flush query: " + query);
+					////console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					data.url = window.location.href.replace(/[\?\#].*$/, "") + query;
 				}
@@ -1281,18 +1233,18 @@ pico.Param = class {
 					data.files = files;
 				}
 				if (navigator.canShare) {
-					//console.log("Sharing: " + JSON.stringify(data));
+					////console.log("Sharing: " + JSON.stringify(data));
 					if (navigator.canShare(data) && navigator.share) {
 						await navigator.share(data).then(() => {
-							//console.log("Successful share");
+							////console.log("Successful share");
 						}).catch((error) => {
-							//console.log("Error sharing:" + error);
+							////console.log("Error sharing:" + error);
 						});
 					} else {
-						//console.log("Not supported file");
+						////console.log("Not supported file");
 					}
 				} else {
-					//console.log("Not supported share");
+					////console.log("Not supported share");
 				}
 			}
 			return resolve();
@@ -1410,7 +1362,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = r ^ bitmask; // Bit flip.
-			////console.log("Expand: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
+			//////console.log("Expand: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
 			results[i] = r;
 		}
 		return results;
@@ -1432,7 +1384,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = (r + 1) % (1 << (bitlength - compression)); // Plus 1 to reserve 0.
-			////console.log("Compress: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
+			//////console.log("Compress: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
 			results[i] = r;
 		}
 		return results;
