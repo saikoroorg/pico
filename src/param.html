@@ -43,10 +43,10 @@ console.log("Numbers: " + picoNumbers());
 // Test 8bit compatible 6bit code param.
 {
 	const code = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0];
-	picoSetParam(picoCodeText(code, 6));
+	picoSetParam(picoCodeText(code, 8));
 	console.log("Param: " + picoParam());
 	console.log("Code: " + picoTextCode(picoParam()));
-	console.log("Code6/8: " + picoTextCode(picoParam(), 6));
+	console.log("Code8: " + picoTextCode(picoParam(), 8));
 }
 //*/
 
@@ -57,7 +57,7 @@ console.log("Numbers: " + picoNumbers());
 	for (let i = 0; i <= 255; i++) {
 		code1[i] = i;
 	}
-	let text = picoCodeText(code1, 8);
+	let text = picoCodeText(code1);
 	let code2 = picoTextCode(text);
 	for (let i = 0; i < code2.length; i++) {
 		console.log("" +
@@ -89,7 +89,7 @@ console.log("Numbers: " + picoNumbers());
 	 67, 47,  0,   0, 71,  0,   0, 81,  0,   0, 63, 23,
 	 27, 63, 95,   0,  0,  0,   0,  0,  0,   0,  0,  0,
 	];
-	let text = picoCodeText(code1, 6, 8);
+	let text = picoCodeText(code1, 8);
 	let code2 = picoTextCode(text);
 	for (let i = 0; i < code2.length; i++) {
 		console.log("" +
@@ -110,7 +110,7 @@ if (!picoParam()) {
 console.log("Param: " + picoParam());
 console.log("Numbers: " + picoNumbers());
 console.log("6bit code: " + picoTextCode(picoParam()));
-console.log("8bit compatible 6bit code: " + picoTextCode(picoParam(), 6, 8));
+console.log("8bit compatible 6bit code: " + picoTextCode(picoParam(), 8));
 
 // Test share param.
 // color5 = [255,255,255, 159,255,247, 255,223,175, 191,191,191, 0,119,239, 231,0,95, 0,151,63, 143,0,119, 167,0,0, 0,63,23];

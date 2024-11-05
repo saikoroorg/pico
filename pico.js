@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.9.41105a"; // Update by package.json.
+pico.version = "0.9.41106a"; // Update by package.json.
 
 /* PICO Image module */
 
@@ -961,7 +961,7 @@ function picoParam(key=0) {
 
 // Set param as string.
 function picoSetParam(str, key=0) {
-	return pico.param.setParam(str, key);
+	pico.param.setParam(str, key);
 }
 
 // Get param as numbers.
@@ -977,34 +977,27 @@ function picoNumber(key=0) {
 
 // Set param as numbers.
 function picoSetNumbers(numbers, key=0, separator=".") {
-	return pico.param.setNumbers(numbers, key, separator);
+	pico.param.setNumbers(numbers, key, separator);
 }
 
 // Get code by string.
-function picoTextCode(str, bitlength=8) {
-	let code = pico.param._stringCode(str);
-	if (bitlength < 8) {
-		code = pico.param._expandCode(code, bitlength);
-	}
-	return code;
+function picoTextCode(str, bitlength=6) {
+	return pico.param.textCode(str, bitlength);
 }
 
 // Get string by code.
-function picoCodeText(code, bitlength=8) {
-	if (bitlength < 8) {
-		code = pico.param._compressCode(code, 8-bitlength, 8)
-	}
-	return pico.param._codeString(code);
+function picoCodeText(code, bitlength=6) {
+	return pico.param.codeText(code, bitlength);
 }
 
 // Get X bit code (1 number) by char.
-function picoCharCode(char, bitlength=8) {
-	return picoTextCode(char, bitlength)[0];
+function picoCharCode(char, bitlength=6) {
+	return pico.param.textCode(char, bitlength)[0];
 }
 
 // Get char by 6bit code (1 number).
-function picoCodeChar(c, bitlength=8) {
-	return picoCodeText([c], bitlength)[0];
+function picoCodeChar(c, bitlength=6) {
+	return pico.param.codeText([c], bitlength)[0];
 }
 
 
@@ -1022,7 +1015,7 @@ function picoString(key=0) {
 }
 //obsolete: Set param as string.
 function picoSetString(str, key=0) {
-	return picoSetParam(str, key);
+	picoSetParam(str, key);
 }
 //obsolete: Get param as 6bit code.
 function picoCode6(key=0) {
@@ -1030,15 +1023,15 @@ function picoCode6(key=0) {
 }
 //obsolete: Set param as 6bit code.
 function picoSetCode6(code6, key=0) {
-	return picoSetParam(picoCodeText(code6), key);
+	picoSetParam(picoCodeText(code6), key);
 }
 //obsolete: Get param as 8bit compatible 6bit code.
 function picoCode8(key=0) {
-	return picoTextCode(picoParam(key), 6);
+	return picoTextCode(picoParam(key), 8);
 }
 //obsolete: Set param as 8bit compatible 6bit code.
 function picoSetCode8(code8, key=0) {
-	return picoSetParam(picoCodeText(code6, 6), key);
+	picoSetParam(picoCodeText(code6, 8), key);
 }
 //obsolete: Get 6bit code by string.
 function picoStringCode6(str) {
@@ -1046,7 +1039,7 @@ function picoStringCode6(str) {
 }
 //obsolete: Get 8bit compatible 6bit code by string.
 function picoStringCode8(str) {
-	return picoTextCode(str, 6);
+	return picoTextCode(str, 8);
 }
 //obsolete: Get string by 6bit code.
 function picoCode6String(code6) {
@@ -1054,7 +1047,7 @@ function picoCode6String(code6) {
 }
 //obsolete: Get string by 8bit compatible 6bit code.
 function picoCode8String(code8) {
-	return picoCodeText(code6, 6);
+	return picoCodeText(code6, 8);
 }
 //obsolete: Get 6bit code (1 number) by char.
 function picoCharCode6(char) {
@@ -1062,7 +1055,7 @@ function picoCharCode6(char) {
 }
 //obsolete: Get 8bit compatible 6bit code (1 number) by char.
 function picoCharCode8(char) {
-	return picoCharCode(str, 6);
+	return picoCharCode(str, 8);
 }
 //obsolete: Get char by 6bit code (1 number).
 function picoCode6Char(code6) {
@@ -1070,7 +1063,7 @@ function picoCode6Char(code6) {
 }
 //obsolete: Get char by 8bit compatible 6bit code (1 number).
 function picoCode8Char(code8) {
-	return picoCodeChar(code6, 6);
+	return picoCodeChar(code6, 8);
 }
 
 //************************************************************/
@@ -1158,6 +1151,25 @@ pico.Param = class {
 	// Set param as numbers.
 	setNumbers(numbers, key=0) {
 		this._setNumbers(numbers, key);
+	}
+
+	// Get code by string.
+	textCode(str, bitlength=6) {
+		const basebitlength = 6;
+		let code = this._stringCode(str);
+		if (bitlength > basebitlength) {
+			code = this._expandCode(code, bitlength);
+		}
+		return code;
+	}
+
+	// Get string by code.
+	codeText(code, bitlength=6) {
+		const basebitlength = 6;
+		if (bitlength > basebitlength) {
+			code = this._compressCode(code, bitlength-basebitlength, basebitlength)
+		}
+		return this._codeString(code);
 	}
 
 	//*----------------------------------------------------------*/
