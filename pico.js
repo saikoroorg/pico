@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.9.41031a"; // Update by package.json.
+pico.version = "0.9.41105a"; // Update by package.json.
 
 /* PICO Image module */
 
@@ -944,12 +944,16 @@ function picoTextFile(text, name=null, type=null) {
 	}
 }
 
-// Get all params by one string.
+//obsolete: Get all params by one string.
 function picoParams() {
 	return pico.param.params();
 }
 
 // Reset all params.
+function picoReset() {
+	pico.param.resetParams();
+}
+//obsolete: Reset all params.
 function picoResetParams() {
 	pico.param.resetParams();
 }
@@ -960,11 +964,21 @@ function picoKeys() {
 }
 
 // Get param as string.
-function picoString(key=0) {
+function picoParam(key=0) {
 	return pico.param.string(key);
 }
 
 // Set param as string.
+function picoSetParam(str, key=0) {
+	return pico.param.setString(str, key);
+}
+
+//obsolete: Get param as string.
+function picoString(key=0) {
+	return pico.param.string(key);
+}
+
+//obsolete: Set param as string.
 function picoSetString(str, key=0) {
 	return pico.param.setString(str, key);
 }
@@ -985,70 +999,98 @@ function picoSetNumbers(numbers, key=0, separator=".") {
 	return pico.param.setNumbers(numbers, key, separator);
 }
 
-// Get param as 6bit code.
+//obsolete: Get param as 6bit code.
 function picoCode6(key=0) {
 	return pico.param.code6(key);
 }
 
-// Set param as 6bit code.
+//obsolete: Set param as 6bit code.
 function picoSetCode6(code6, key=0) {
 	return pico.param.setCode6(code6, key);
 }
 
-// Get param as 8bit compatible 6bit code.
+//obsolete: Get param as 8bit compatible 6bit code.
 function picoCode8(key=0) {
 	return pico.param.code8(key);
 }
 
-// Set param as 8bit compatible 6bit code.
+//obsolete: Set param as 8bit compatible 6bit code.
 function picoSetCode8(code8, key=0) {
 	return pico.param.setCode8(code8, key);
 }
 
-// Get 6bit code by string.
+// Get code by string.
+function picoTextCode(str, bitlength=8) {
+	let code = pico.param._stringCode(str);
+	if (bitlength < 8) {
+		code = pico.param._expandCode(code, bitlength);
+	}
+	return code;
+}
+
+// Get string by code.
+function picoCodeText(code, bitlength=8) {
+	if (bitlength < 8) {
+		code = pico.param._compressCode(code, 8-bitlength, 8)
+	}
+	return pico.param._codeString(code);
+}
+
+//obsolete: Get 6bit code by string.
 function picoStringCode6(str) {
 	return pico.param._stringCode(str);
 }
 
-// Get 8bit code by string.
+//obsolete: Get 8bit code by string.
 function picoStringCode8(str) {
 	return pico.param._expandCode(pico.param._stringCode(str));
 }
 
-// Get string by 6bit code.
+//obsolete: Get string by 6bit code.
 function picoCode6String(code6) {
-	return pico.param._code2str(code6);
+	return pico.param._codeString(code6);
 }
 
-// Get string by 8bit code.
+//obsolete: Get string by 8bit code.
 function picoCode8String(code8) {
 	const compression = 2;
 	let code6 = this._compressCode(code8, compression)
-	return pico.param._code2str(code6);
+	return pico.param._codeString(code6);
 }
 
-// Get 6bit code (1 number) by char.
+// Get X bit code (1 number) by char.
+function picoCharCode(char, bitlength=8) {
+	let code = picoTextCode(char, bitlength);
+	return code[0];
+}
+
+// Get char by 6bit code (1 number).
+function picoCodeChar(c, bitlength=8) {
+	return picoCodeText([c], bitlength)[0];
+}
+
+//obsolete: Get 6bit code (1 number) by char.
 function picoCharCode6(char) {
 	let code = picoStringCode6(char);
 	return code[0];
 }
 
-// Get 8bit code (1 number) by char.
+//obsolete: Get 8bit code (1 number) by char.
 function picoCharCode8(char) {
 	let code = picoStringCode8(char);
 	return code[0];
 }
 
-// Get char by 6bit code (1 number).
+//obsolete: Get char by 6bit code (1 number).
 function picoCode6Char(code6) {
-	return pico.param._code2str([code6])[0];
+	return pico.param._codeString([code6])[0];
 }
 
-// Get char by 8bit code (1 number).
+//obsolete: Get char by 8bit code (1 number).
 function picoCode8Char(code8) {
 	const compression = 2;
 	let code6 = this._compressCode([code8], compression)
-	return pico.param._code2str(code6)[0];
+	return pico.param._codeString(code6)[0];
 }
 
 //************************************************************/
@@ -1150,7 +1192,7 @@ pico.Param = class {
 
 	// Set param as 6bit code.
 	setCode6(code6, key=0) {
-		this._setString(this._code2str(code6), key);
+		this._setString(this._codeString(code6), key);
 	}
 
 	// Get param as 8bit compatible 6bit code.
@@ -1336,7 +1378,7 @@ pico.Param = class {
 	}
 
 	// Set number 6bit array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
-	_code2str(code6) {
+	_codeString(code6) {
 		let result = "";
 		for (let i = 0; i < code6.length; i++) {
 			if (0 <= code6[i] && code6[i] < 10) {
@@ -1354,43 +1396,43 @@ pico.Param = class {
 		return result;
 	}
 
-	// Expand code to 8bit code.
-	_expandCode(code) {
-		const maxbit = 8, maxmask = (1 << maxbit) - 1;
+	// Expand code to bitlength code.
+	_expandCode(code, bitlength=8) {
+		const bitmask = (1 << bitlength) - 1;
 		let results = [];
 		for (let i = 0; i < code.length; i++) {
 			let r = 0, x = code[i];
-			// Expand 8bit compatible 6bit code to 6bit code.
-			let b = maxbit, a = (x - 1) & maxmask; // Minus 1 to reserve 0.
+			// Expand X(bitlength) bit compatible Y bit code to X bit code.
+			let b = bitlength, a = (x - 1) & bitmask; // Minus 1 to reserve 0.
 			while (b--) { // Bit reverse.
 				r <<= 1;
 				r |= (a & 1);
 				a >>= 1;
 			}
-			r = r ^ maxmask; // Bit flip.
-			//console.log("Expand: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			r = r ^ bitmask; // Bit flip.
+			////console.log("Expand: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
 			results[i] = r;
 		}
 		return results;
 	}
 
-	// Compress code to 8bit compatible X (8 - compression) bit code.
-	// Requires 6 (compression >= 2) bit when encode with ASCII code only.
-	_compressCode(code, compression=2) {
-		const maxbit = 8, maxmask = (1 << maxbit) - 1;
+	// Compress code to X(bitlength) bit compatible Y(bitlength - compression) bit code.
+	// Requires 6(compression >= 2 && bitlength == 8) bit when encode with ASCII code only.
+	_compressCode(code, compression=2, bitlength=8) {
+		const bitmask = (1 << bitlength) - 1;
 		let results = [];
 		for (let i = 0; i < code.length; i++) {
 			let r = 0, x = code[i];
-			// Compress 6bit code to 8bit compatible 6bit code.
-			let b = maxbit - compression, a = x ^ maxmask; // Bit flip.
+			// Compress Y bit code to X(bitlength) bit compatible Y bit code.
+			let b = bitlength - compression, a = x ^ bitmask; // Bit flip.
 			a = a >> compression; // Compress.
 			while (b--) { // Bit reverse.
 				r <<= 1;
 				r |= (a & 1);
 				a >>= 1;
 			}
-			r = (r + 1) % (1 << (maxbit - compression)); // Plus 1 to reserve 0.
-			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-8) + " -> " + ("00000000"+r.toString(2)).slice(-8));
+			r = (r + 1) % (1 << (bitlength - compression)); // Plus 1 to reserve 0.
+			////console.log("Compress: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
 			results[i] = r;
 		}
 		return results;
