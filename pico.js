@@ -1051,11 +1051,11 @@ function picoCode8String(code8) {
 }
 //obsolete: Get 6bit code (1 number) by char.
 function picoCharCode6(char) {
-	return picoCharCode(str);
+	return picoCharCode(char);
 }
 //obsolete: Get 8bit compatible 6bit code (1 number) by char.
 function picoCharCode8(char) {
-	return picoCharCode(str, 8);
+	return picoCharCode(char, 8);
 }
 //obsolete: Get char by 6bit code (1 number).
 function picoCode6Char(code6) {
