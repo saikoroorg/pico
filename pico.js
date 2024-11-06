@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.9.41106a"; // Update by package.json.
+pico.version = "0.9.41106"; // Update by package.json.
 
 /* PICO Image module */
 
