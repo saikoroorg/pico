@@ -1031,7 +1031,7 @@ function picoCode8(key=0) {
 }
 //obsolete: Set param as 8bit compatible 6bit code.
 function picoSetCode8(code8, key=0) {
-	picoSetParam(picoCodeText(code6, 8), key);
+	picoSetParam(picoCodeText(code8, 8), key);
 }
 //obsolete: Get 6bit code by string.
 function picoStringCode6(str) {
@@ -1047,7 +1047,7 @@ function picoCode6String(code6) {
 }
 //obsolete: Get string by 8bit compatible 6bit code.
 function picoCode8String(code8) {
-	return picoCodeText(code6, 8);
+	return picoCodeText(code8, 8);
 }
 //obsolete: Get 6bit code (1 number) by char.
 function picoCharCode6(char) {
@@ -1063,7 +1063,7 @@ function picoCode6Char(code6) {
 }
 //obsolete: Get char by 8bit compatible 6bit code (1 number).
 function picoCode8Char(code8) {
-	return picoCodeChar(code6, 8);
+	return picoCodeChar(code8, 8);
 }
 
 //************************************************************/
@@ -1167,7 +1167,7 @@ pico.Param = class {
 	codeText(code, bitlength=6) {
 		const basebitlength = 6;
 		if (bitlength > basebitlength) {
-			code = this._compressCode(code, bitlength-basebitlength, basebitlength)
+			code = this._compressCode(code, bitlength)
 		}
 		return this._codeString(code);
 	}
@@ -1382,7 +1382,9 @@ pico.Param = class {
 
 	// Compress code to X(bitlength) bit compatible Y(bitlength - compression) bit code.
 	// Requires 6(compression >= 2 && bitlength == 8) bit when encode with ASCII code only.
-	_compressCode(code, compression=2, bitlength=8) {
+	_compressCode(code, bitlength=8) {
+		const basebitlength = 6;
+		const compression = bitlength - basebitlength;
 		const bitmask = (1 << bitlength) - 1;
 		let results = [];
 		for (let i = 0; i < code.length; i++) {
