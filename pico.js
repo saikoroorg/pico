@@ -990,14 +990,14 @@ function picoCodeText(code, bitlength=6) {
 	return pico.param.codeText(code, bitlength);
 }
 
-// Get X bit code (1 number) by char.
+// Get code as one number by char.
 function picoCharCode(char, bitlength=6) {
 	return pico.param.textCode(char, bitlength)[0];
 }
 
-// Get char by 6bit code (1 number).
-function picoCodeChar(c, bitlength=6) {
-	return pico.param.codeText([c], bitlength)[0];
+// Get char by code as one number.
+function picoCodeChar(number, bitlength=6) {
+	return pico.param.codeText([number], bitlength)[0];
 }
 
 
@@ -1360,13 +1360,13 @@ pico.Param = class {
 		return result;
 	}
 
-	// Expand code to bitlength code.
-	_expandCode(code, bitlength=8) {
+	// Expand 6 bit code to X(bitlength) bit code.
+	_expandCode(code6, bitlength=8) {
 		const bitmask = (1 << bitlength) - 1;
 		let results = [];
-		for (let i = 0; i < code.length; i++) {
-			let r = 0, x = code[i];
-			// Expand X(bitlength) bit compatible Y bit code to X bit code.
+		for (let i = 0; i < code6.length; i++) {
+			let r = 0, x = code6[i];
+			// Expand X bit compatible 6 bit code to X bit code.
 			let b = bitlength, a = (x - 1) & bitmask; // Minus 1 to reserve 0.
 			while (b--) { // Bit reverse.
 				r <<= 1;
@@ -1380,8 +1380,7 @@ pico.Param = class {
 		return results;
 	}
 
-	// Compress code to X(bitlength) bit compatible Y(bitlength - compression) bit code.
-	// Requires 6(compression >= 2 && bitlength == 8) bit when encode with ASCII code only.
+	// Compress code to X(bitlength) bit compatible 6 bit code for encode with ASCII code only.
 	_compressCode(code, bitlength=8) {
 		const basebitlength = 6;
 		const compression = bitlength - basebitlength;
@@ -1389,7 +1388,7 @@ pico.Param = class {
 		let results = [];
 		for (let i = 0; i < code.length; i++) {
 			let r = 0, x = code[i];
-			// Compress Y bit code to X(bitlength) bit compatible Y bit code.
+			// Compress X bit code to X bit compatible 6 bit code.
 			let b = bitlength - compression, a = x ^ bitmask; // Bit flip.
 			a = a >> compression; // Compress.
 			while (b--) { // Bit reverse.
