@@ -368,7 +368,7 @@ async function appMain() {
 	//picoRect(4, 0, 0, 200, 200);
 
 	// Pixel editor mode.
-	if (!animeflag) {
+	//if (!animeflag) {
 
 		// Draw background of pixels.
 		if (frametouching >= 0 &&
@@ -379,9 +379,12 @@ async function appMain() {
 			pixeltouching = -1;
 			colortouching = -1;
 			frametouching = 1; // Touch frame.
-			animeflag = 1;
-			appUpdate(true);
-			//picoBeep(1.2, 0.1);	
+			colorselecting = 0;
+			if (!animeflag) {
+				animeflag = 1;
+				appUpdate(true);
+				picoBeep(1.2, 0.1);	
+			}
 			picoRect(bgframecolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
 		/*} else if (frametouching >= 0 &&
 			picoMotion(framesposx, framesposy, bgframewidth/2, bgframeheight/2) &&
@@ -401,6 +404,10 @@ async function appMain() {
 			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
 			console.log("Release touching background.");
 			colortouching = 0;
+			if (animeflag) {
+				animeflag = 0;
+				appUpdate(true);
+			}
 
 			if (!colorflag) {
 				//colorselected = colorselecting;
@@ -479,6 +486,11 @@ async function appMain() {
 					colortouching = 0;
 					depth += 1;
 					colorselecting = depth;
+					if (animeflag) {
+						animeflag = 0;
+						appUpdate(true);
+						picoBeep(1.2, 0.1);
+					}
 					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
 
 				// Touching color plus button.
@@ -502,6 +514,11 @@ async function appMain() {
 					colortouching = 0;
 					depth -= 1;
 					colorselecting = colorselecting<depth ? colorselecting : depth;
+					if (animeflag) {
+						animeflag = 0;
+						appUpdate(true);
+						picoBeep(1.2, 0.1);
+					}
 					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
 
 				// Touching color minus button.
@@ -520,14 +537,14 @@ async function appMain() {
 			}
 		}
 
+	//}
 	// Frame viewer mode.
-	} else {
+	if (animeflag) {
 
 		// Touching frame plus buttons.
 		if (frametouching >= 0 && picoAction(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
 			picoChar("&", framebuttoncolor, framebutton1x, framebutton1y, 90, 2);
 			frametouching = 0;
-			animeflag = 0;
 			if (frame + 1 < anime) {
 				frame = frame + 1;
 			}
@@ -545,9 +562,6 @@ async function appMain() {
 		} else if (frametouching >= 0 && picoAction(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
 			picoChar("&", framebuttoncolor, framebutton2x, framebutton2y, -90, 2);
 			frametouching = 0;
-			animeflag = 0;
-			frametouching = 0;
-			animeflag = 0;
 			if (frame - 1 >= 0) {
 				frame = frame - 1;
 			}
@@ -578,7 +592,7 @@ async function appMain() {
 			frametouching = 0;
 			animeflag = 0;
 			appUpdate(true);
-			picoBeep(1.2, 0.1);	
+			picoBeep(1.2, 0.1);
 			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
 		} else if (frametouching >= 0 &&
 			picoMotion() &&
@@ -594,7 +608,9 @@ async function appMain() {
 		}
 
 		// Draw background of animeeditor.
-		picoRect(bganimecolor, animesposx, animesposy, bganimewidth, bganimeheight);
+		//picoRect(bganimecolor, animesposx, animesposy, bganimewidth, bganimeheight);
+		// Draw background of coloreditor.
+		picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		// Touching anime buttons.
 		{
@@ -812,7 +828,7 @@ async function appMain() {
 	}
 
 	// Draw animes.
-	if (animeflag) {
+	if (0&&animeflag) {
 		let margin = anime <= 9 ? 2 : 1;
 		let w1 = framesgrid - margin; // Width.
 		let w2 = framesgrid; // Width for selecting.
@@ -941,7 +957,7 @@ async function appMain() {
 	}
 
 	// Draw colors.
-	if (!animeflag && !colorflag) {
+	if (!colorflag) {
 
 		for (let i = 1; i <= depth; i++) {
 			let x = colorsposx + (i - (depth+1)/2) * colorsgrid; // Margins for each color.
@@ -951,6 +967,10 @@ async function appMain() {
 				console.log("Release touching color.");
 				colortouching = 0;
 				//colorselected = colorselecting;
+				if (animeflag) {
+					animeflag = 0;
+					appUpdate(true);
+				}
 				picoBeep(0, 0.1);
 				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale*0.5);
 
