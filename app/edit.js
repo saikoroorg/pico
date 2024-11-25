@@ -253,9 +253,9 @@ async function appLoad() {
 				buffers[framecount] = picoCode6(keys[k]);
 				frame = framecount;
 				anime = framecount + 1;
-				/*if (anime >= 2) {
+				if (anime >= 2) {
 					animeflag = 1;
-				}*/
+				}
 				////console.log("Load buffer" + keys[k] + ": " + buffers[framecount]);
 				framecount++;
 			}
