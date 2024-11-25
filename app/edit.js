@@ -394,7 +394,6 @@ async function appMain() {
 			pixeltouching = -1;
 			colortouching = -1;
 			frametouching = 1; // Touch frame.
-			colorselecting = 0;
 			if (!animeflag) {
 				animeflag = 1;
 				appUpdate(true);
@@ -496,7 +495,7 @@ async function appMain() {
 		}
 
 		// Touching color buttons.
-		if (!colorflag && !animeflag) {
+		if (!colorflag) {
 			const char1 = "+", char2 = "-", scale = 2;
 			if (depth + 1 < maxcolor) {
 				// Release touching color plus button.
@@ -1072,7 +1071,7 @@ async function appMain() {
 	}
 
 	// Draw coloreditor.
-	if (!animeflag && colorflag) {
+	if (colorflag) {
 		const compression = 2, maxcompresed = (1 << (8 - compression));
 		const scale = 4;
 
