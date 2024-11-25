@@ -1,5 +1,11 @@
 const title = "Edit"; // Title.
-var colors = [255,255,255, 191,191,191, 127,127,127, 63,63,63, 191,191,127, 231,0,95, 0,119,239, 0,151,63, 167,0,0, 143,0,119, 0,0,0]; // Colors.
+var colors = [ // Colors.
+	// 0:White(111), 1:LightGray(333), 2:Gray(222), 3:DarkGray(444),
+	255,255,255, 191,191,191, 127,127,127, 63,63,63,
+	// 4:Red(p06), 5:Blue(0i9), 6:Green(0n4),
+	231,0,95, 0,119,239,  0,151,63, 
+	// 7:Gold(332), 8:Silver(555), 9:Black(000),
+	191,191,127, 223,223,223, 0,0,0];
 var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
