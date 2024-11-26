@@ -131,6 +131,7 @@ function appSelect(x) {
 			picoBeep(0, 0.1);
 		} else {
 			animeflag = 1;
+			colorselecting = 0;
 			picoBeep(1.2, 0.1);
 		}
 		appUpdate(true);
@@ -359,7 +360,7 @@ async function appMain() {
 	let bganimecolor = 1; // Background of animeeditor color.
 
 	let animebuttonwidth = landscape ? 12 : 6, animebuttonheight = 8; // Anime button width and height.
-	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Anime button color and scales.
+	let animebuttoncolor = bgcolor, animebuttonscale0 = landscape ? 1.5 : 2, animebuttonscale1 = landscape ? 1 : 1.5; // Anime button color and scales.
 	let animebutton1x = bgframewidth/2 - animebuttonwidth, animebutton1y = animesposy; // Anime plus button position.
 	let animebutton2x = -bgframewidth/2 + animebuttonwidth, animebutton2y = animesposy; // Anime minus button position.
 
@@ -394,8 +395,8 @@ async function appMain() {
 			frametouching = 1; // Touch frame.
 			if (!animeflag) {
 				animeflag = 1;
+				colorselecting = 0;
 				appUpdate(true);
-				picoBeep(1.2, 0.1);	
 			}
 			picoRect(bgframecolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
 		/*} else if (frametouching >= 0 &&
@@ -727,7 +728,7 @@ async function appMain() {
 		//picoChar(""+(frame+1)+"/"+anime, numbercolor, numberposx, numberposy, 0, 1);
 	}
 
-	let animegrid = landscape ? (104 / (anime > 13 ? anime : 13)) : (136 / (anime > 17 ? anime : 17)); // Grid length of each colors.
+	let animegrid = landscape ? (104 / (anime > 13 ? anime : 13)) : (132 / (anime > 12 ? anime : 12)); // Grid length of each colors.
 	let frameswidth = anime * animegrid, framesheight = animegrid; // Anime width and height.
 
 	/*//
