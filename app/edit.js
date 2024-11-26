@@ -335,35 +335,33 @@ async function appMain() {
 	let bgpixelcolor = 1; // Background of pixels color.
 
 	let colorsposx = 0, colorsposy = landscape ? 58 : 76; // Offset of coloreditor.
-	let colorsgrid = colorflag ? 14 : landscape ? 14 : 12; // Grid length of each colors.
-	let colorswidth = (colorflag ? 9 : depth) * colorsgrid, colorsheight = colorflag ? 20 : 16; // Coloreditor width and height.
-	let colorsscale = colorflag ? 4 : landscape ? 4 : 3.5; //@todo: 1frame bugs on entering coloreditor mode.
-	let bgcolorwidth = landscape ? 160 : 138, bgcolorheight = landscape ? 24 : 32; // Background of coloreditor width and height.
+	let colorswidth = (colorflag ? 9 : depth) * 14, colorsheight = colorflag ? 20 : 16; // Coloreditor width and height.
+	let bgcolorwidth = landscape ? 160 : animeflag ? 132 : 138, bgcolorheight = landscape ? 24 : 32; // Background of coloreditor width and height.
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background coloreditor width and height for touching.
 
-	let colorbutton1x = bgcolorwidth/2 + 4, colorbutton1y = colorsposy; // Coloreditor plus button position.
-	let colorbutton2x = -bgcolorwidth/2 - 4, colorbutton2y = colorsposy; // Coloreditor minus button position.
-	let colorbuttonwidth = 4, colorbuttonheight = colorsheight/2; // Coloreditor button width and height.
-	let colorbuttoncolor = bgcolor; // Coloreditor button color.
+	let colorbuttonwidth = animeflag ? 6 : 4, colorbuttonheight = colorsheight/2; // Coloreditor button width and height.
+	let colorbuttoncolor = bgcolor, colorbuttonscale0 = 2, colorbuttonscale1 = 1.5; // Coloreditor button color and scales.
+	let colorbutton1x = bgcolorwidth/2 + colorbuttonwidth, colorbutton1y = colorsposy; // Coloreditor plus button position.
+	let colorbutton2x = -bgcolorwidth/2 - colorbuttonwidth, colorbutton2y = colorsposy; // Coloreditor minus button position.
 
-	let framesposx = 0, framesposy = pixelsposy; // Positions of pixelframes.
-	let bgframewidth = landscape ? 180 : 180;
-	let bgframeheight = bgpixelheight; // Background of pixelframes width and height.
+	let framesposx = 0, framesposy = pixelsposy - 8; // Positions of pixelframes.
+	let bgframewidth = landscape ? 140 : 156;
+	let bgframeheight = bgpixelheight + 16; // Background of pixelframes width and height.
 	let bgframecolor = 1; // Background of pixelframes color.
 
-	let framebutton1x = bgpixelwidth/2 + (landscape ? 12 : 4), framebutton1y = pixelsposy; // Frame plus button position.
-	let framebutton2x = -bgpixelwidth/2 - (landscape ? 12 : 4), framebutton2y = pixelsposy; // Frame minus button position.
-	let framebuttonwidth = landscape ? 12 : 4, framebuttonheight = 48; // Frame button width and height.
+	let framebuttonwidth = landscape ? 12 : 6, framebuttonheight = 48; // Frame button width and height.
 	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frame button color and scales.
+	let framebutton1x = bgframewidth/2 - framebuttonwidth, framebutton1y = pixelsposy; // Frame plus button position.
+	let framebutton2x = -bgframewidth/2 + framebuttonwidth, framebutton2y = pixelsposy; // Frame minus button position.
 
 	let animesposx = 0, animesposy = landscape ? -66 : -86; // Offset of animeeditor.
 	let bganimewidth = landscape ? 180 : 138, bganimeheight = landscape ? 24 : 32; // Background of animeeditor width and height.
 	let bganimecolor = 1; // Background of animeeditor color.
 
-	let animebutton1x = bgpixelwidth/2 + (landscape ? 12 : 4), animebutton1y = animesposy; // Anime plus button position.
-	let animebutton2x = -bgpixelwidth/2 - (landscape ? 12 : 4), animebutton2y = animesposy; // Anime minus button position.
-	let animebuttonwidth = landscape ? 12 : 4, animebuttonheight = 8; // Anime button width and height.
+	let animebuttonwidth = landscape ? 12 : 6, animebuttonheight = 8; // Anime button width and height.
 	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Anime button color and scales.
+	let animebutton1x = bgframewidth/2 - animebuttonwidth, animebutton1y = animesposy; // Anime plus button position.
+	let animebutton2x = -bgframewidth/2 + animebuttonwidth, animebutton2y = animesposy; // Anime minus button position.
 
 	//let numberposx = 0, numberposy = landscape ? -68 : -92; // Positions of frame number.
 	//let numbercolor = 2; // Frame number color.
@@ -509,7 +507,7 @@ async function appMain() {
 
 		// Touching color buttons.
 		if (!colorflag) {
-			const char1 = "+", char2 = "-", scale = 2;
+			const char1 = "+", char2 = "-";
 			if (depth + 1 < maxcolor) {
 				// Release touching color plus button.
 				if (colortouching >= 0 && picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight)) {
@@ -522,7 +520,7 @@ async function appMain() {
 						appUpdate(true);
 						picoBeep(1.2, 0.1);
 					}*/
-					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
+					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale1);
 
 				// Touching color plus button.
 				} else if (colortouching >= 0 && picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight)) {
@@ -530,11 +528,11 @@ async function appMain() {
 					animetouching = -1;
 					pixeltouching = -1;
 					colortouching = 1;
-					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
+					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale1);
 
 				// Color plus button. show only animeeditor mode.
 				} else if (animeflag) {
-					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, scale);
+					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale0);
 				}
 			}
 			if (depth - 1 > 0) {
@@ -549,7 +547,7 @@ async function appMain() {
 						appUpdate(true);
 						picoBeep(1.2, 0.1);
 					}*/
-					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
+					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale1);
 
 				// Touching color minus button.
 				} else if (colortouching >= 0 && picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight)) {
@@ -557,11 +555,11 @@ async function appMain() {
 					animetouching = -1;
 					pixeltouching = -1;
 					colortouching = 1;
-					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
+					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale1);
 
 				// Color minus button. show only animeeditor mode.
 				} else if (animeflag) {
-					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, scale);
+					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale0);
 				}
 			}
 		}
@@ -1012,6 +1010,9 @@ async function appMain() {
 			}
 		}
 	}
+
+	let colorsgrid = colorflag ? 14 : landscape ? 14 : 12; // Grid length of each colors.
+	let colorsscale = colorflag ? 4 : landscape ? 4 : 3.5; // Scale of coloreditor.
 
 	// Draw colors.
 	if (!colorflag) {
