@@ -422,12 +422,14 @@ async function appMain() {
 			!picoAction(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
 			console.log("Release touching background.");
 			colortouching = 0;
-			if (animeflag) {
-				animeflag = 0;
-				appUpdate(true);
-			}
 
+			// Cancel animeeditor mode.
 			if (!colorflag) {
+				if (animeflag) {
+					animeflag = 0;
+					appUpdate(true);
+				}
+
 				//colorselected = colorselecting;
 				picoBeep(0, 0.1);
 
@@ -471,11 +473,17 @@ async function appMain() {
 					console.log("Continue touching background.");// + colorholding);
 					colorholding++;
 
-					// Change background color.
+					// Change back/foreground color.
 					if (colorholding >= 60) {
-						console.log("Change background color.");
+						console.log("Change back/foreground color.");
 						let c = colors[0];
-						colors[0] = colors[1] = colors[2] = c > 0 ? 0 : 255;
+						if (c > 0) {
+							colors[0] = colors[1] = colors[2] = 0;
+							colors[colors.length-3] = colors[colors.length-2] = colors[colors.length-1] = 255;
+						} else {
+							colors[0] = colors[1] = colors[2] = 255;
+							colors[colors.length-3] = colors[colors.length-2] = colors[colors.length-1] = 0;
+						}
 						bgindex = colors[0] != 0 ? 0 : -1;
 						bgcolor = colors[0] != 0 ? 0 : -1;
 						appUpdate(); // Update thumbnail.
@@ -490,6 +498,11 @@ async function appMain() {
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		} else {
+			// Cancel holding coloreditor.
+			if (!picoMotion(colorsposx, colorsposy, colorswidth/2, colorsheight/2)) {
+				colorholding = 0;
+			}
+
 			// Draw background of coloreditor.
 			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 		}
@@ -504,11 +517,11 @@ async function appMain() {
 					colortouching = 0;
 					depth += 1;
 					colorselecting = depth;
-					if (animeflag) {
+					/*if (animeflag) {
 						animeflag = 0;
 						appUpdate(true);
 						picoBeep(1.2, 0.1);
-					}
+					}*/
 					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
 
 				// Touching color plus button.
@@ -519,10 +532,9 @@ async function appMain() {
 					colortouching = 1;
 					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, scale*0.9);
 
-				// Color plus button.
-				} else {
-					// Hidden button.
-					//picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, scale);
+				// Color plus button. show only animeeditor mode.
+				} else if (animeflag) {
+					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, scale);
 				}
 			}
 			if (depth - 1 > 0) {
@@ -532,11 +544,11 @@ async function appMain() {
 					colortouching = 0;
 					depth -= 1;
 					colorselecting = colorselecting<depth ? colorselecting : depth;
-					if (animeflag) {
+					/*if (animeflag) {
 						animeflag = 0;
 						appUpdate(true);
 						picoBeep(1.2, 0.1);
-					}
+					}*/
 					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
 
 				// Touching color minus button.
@@ -547,10 +559,9 @@ async function appMain() {
 					colortouching = 1;
 					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, scale*0.9);
 
-				// Color minus button.
-				} else {
-					// Hidden button.
-					//picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, scale);
+				// Color minus button. show only animeeditor mode.
+				} else if (animeflag) {
+					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, scale);
 				}
 			}
 		}
