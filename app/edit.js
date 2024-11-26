@@ -360,7 +360,7 @@ async function appMain() {
 	let bganimecolor = 1; // Background of animeeditor color.
 
 	let animebuttonwidth = landscape ? 12 : 6, animebuttonheight = 8; // Anime button width and height.
-	let animebuttoncolor = bgcolor, animebuttonscale0 = landscape ? 1.5 : 2, animebuttonscale1 = landscape ? 1 : 1.5; // Anime button color and scales.
+	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Anime button color and scales.
 	let animebutton1x = bgframewidth/2 - animebuttonwidth, animebutton1y = animesposy; // Anime plus button position.
 	let animebutton2x = -bgframewidth/2 + animebuttonwidth, animebutton2y = animesposy; // Anime minus button position.
 
@@ -534,7 +534,8 @@ async function appMain() {
 
 				// Color plus button. show only animeeditor mode.
 				} else if (animeflag) {
-					picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale0);
+					//Hidden button.
+					//picoChar(char1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale0);
 				}
 			}
 			if (depth - 1 > 0) {
@@ -562,7 +563,8 @@ async function appMain() {
 
 				// Color minus button. show only animeeditor mode.
 				} else if (animeflag) {
-					picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale0);
+					//Hidden button.
+					//picoChar(char2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale0);
 				}
 			}
 		}
@@ -593,7 +595,8 @@ async function appMain() {
 				//picoRect(bgframecolor, animebutton1x, animebutton1y, animebuttonwidth, animebuttonheight);
 				picoChar("+", animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale1);
 			} else {
-				picoChar("+", animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale0);
+				//Hidden button.
+				//picoChar("+", animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale0);
 			}
 		}
 
@@ -622,7 +625,8 @@ async function appMain() {
 				picoChar("-", animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale1);
 		//*/
 			} else {
-				picoChar("-", animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale0);
+				//Hidden button.
+				//picoChar("-", animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale0);
 			}
 		}
 
