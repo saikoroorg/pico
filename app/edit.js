@@ -50,7 +50,7 @@ async function appUpdate(force = true) {
 	}
 
 	// Frame viewer mode.
-	if (animeflag) {
+	/*if (animeflag) {
 		if (testing) {
 			if (buffers[frame]) {
 				let data = await picoSpriteData(buffers[frame], bgcolor);
@@ -60,10 +60,10 @@ async function appUpdate(force = true) {
 			}
 		} else {
 			picoLabel("action", "%");
-		}
+		}*/
 
 	// Pixel editor mode.
-	} else {
+	//} else {
 
 		// Update icon image.
 		if (buffers[frame]) {
@@ -72,7 +72,7 @@ async function appUpdate(force = true) {
 		} else {
 			picoLabel("action", "*");
 		}
-	}
+	//}
 
 	// Update select button.
 	//if (animeflag) {
@@ -88,7 +88,7 @@ async function appUpdate(force = true) {
 async function appAction() {
 
 	// Frame viewer mode.
-	if (animeflag) {
+	/*if (animeflag) {
 		if (anime >= 2) {
 			if (!testing) {
 				console.log("Start testing:" + anime);
@@ -105,10 +105,10 @@ async function appAction() {
 		} else {
 			picoBeep(-1.2, 0.1);
 			picoBeep(-1.2, 0.1, 0.2);
-		}
+		}*/
 
 	// Pixel editor mode.
-	} else {
+	//} else {
 		picoResetParams();
 
 		// Create num code to share url.
@@ -134,18 +134,20 @@ async function appAction() {
 		if (!await picoReturnApp()) {
 			picoShareApp();
 		}
-	}
+	//}
 }
 
 // Select button.
 function appSelect(x) {
 
+	// Invalid on testing.
+	if (testing) {
+		picoBeep(-1.2, 0.1);
+
 	// Change menu mode.
-	if (x == 0) {
+	} else if (x == 0) {
 	//	colorflag = 0;
-		if (testing) {
-			picoBeep(-1.2, 0.1);
-		} else if (animeflag) {
+		if (animeflag) {
 			console.log("Switch to pixeleditor mode.");
 			animeflag = 0;
 			picoBeep(0, 0.1);
@@ -205,6 +207,7 @@ function appSelect(x) {
 var bgindex = 0; // Background color index.
 var pixeltouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var pixeltouchmoving = 0; // Pixel touching on view mode.
+var pixeltouchmoved = 0; // Pixel touch moved on view mode.
 var colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var colorholding = 0; // 0:untouched, 1+:touching.
 var colorselecting = depth; // Touching color index.
@@ -365,7 +368,7 @@ async function appMain() {
 	let framesposx = 0, framesposy = landscape ? -12 : -18; // Positions of pixelframes.
 	let bgframewidth = landscape ? 200 : 148;
 	let bgframeheight = landscape ? 116 : 152; // Background of pixelframes width and height.
-	let bgframecolor = 3; // Background of pixelframes color.
+	let bgframecolor = 2; // Background of pixelframes color.
 
 	let colorsposx = 0, colorsposy = landscape ? 58 : 76; // Offset of coloreditor.
 	let colorswidth = (colorflag ? 9 : depth) * (landscape ? 14 : 12), colorsheight = colorflag ? 20 : 16; // Coloreditor width and height.
@@ -436,6 +439,7 @@ async function appMain() {
 	}
 
 	/*// Draw background area.
+
 	// Draw background of pixelframes.
 	picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
 
@@ -759,24 +763,42 @@ async function appMain() {
 
 				// Update canvas on viewer mode.
 				if (animeflag) {
-					if (!testing && pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2+1)) {
-						let j0 = j - yoffset, i0 = i - xoffset;
-						//console.log("Touch animes" + 
-						//	pixeltouching + " " + xoffset + "," + yoffset + ":" + 
-						//	pixeltouchposx + "," + pixeltouchposy+"->"+i0+","+j0);
-						if (pixeltouching > 0 && (pixeltouchposx != i0 || pixeltouchposy != j0)) {
-							pixeltouchmovex += pixeltouchposx - i0;
-							pixeltouchmovey += pixeltouchposy - j0;
-							//console.log("Moving:" + pixeltouchmovex + "," + pixeltouchmovey);
+					let j0 = j - yoffset, i0 = i - xoffset;
+					if (pixeltouching >= 0 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
+						if (!testing) {
+							console.log("Start testing:" + anime);
+							testing = 1;
+							appUpdate();
+							picoBeep(1.2, 0.1);
 						}
-						pixeltouchposx = i0;
-						pixeltouchposy = j0;
 
-						console.log("Touch pixels.");
-						pixeltouching = 1; // Touch pixels.
-						frametouching = -1;
-						animetouching = -1;
-						colortouching = -1;
+					} else if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2+1)) {
+						if (testing) {
+							console.log("End testing:" + anime);
+							testing = 0;
+							pixeltouchmoved = 1;
+							appUpdate();
+							picoBeep(1.2, 0.1);
+							picoBeep(1.2, 0.1, 0.2);
+						} else {
+							//console.log("Touch animes" + 
+							//	pixeltouching + " " + xoffset + "," + yoffset + ":" + 
+							//	pixeltouchposx + "," + pixeltouchposy+"->"+i0+","+j0);
+							if (pixeltouching > 0 && !testing && (pixeltouchposx != i0 || pixeltouchposy != j0)) {
+								pixeltouchmoved = 1;
+								pixeltouchmovex += pixeltouchposx - i0;
+								pixeltouchmovey += pixeltouchposy - j0;
+								//console.log("Moving:" + pixeltouchmovex + "," + pixeltouchmovey);
+							}
+							pixeltouchposx = i0;
+							pixeltouchposy = j0;
+
+							console.log("Touch pixels.");
+							pixeltouching = 1; // Touch pixels.
+							frametouching = -1;
+							animetouching = -1;
+							colortouching = -1;
+						}
 					}
 
 					canvas += picoCode6Char(coffset+pixels[j][i]);
@@ -830,21 +852,26 @@ async function appMain() {
 			appUpdate(false);
 		}
 
-		let l = blockwidth;
+		// View mode.
+		let l = blockwidth - 1;
 		if (animeflag) {
-			// Switch view to edit.
-			if (!testing && !pixeltouchmoving && picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
-				console.log("Release touching anime.");
-				//animeflag = 0;
 
 			// Touching on view mode.
-			} else if (!testing && picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
+			if (pixeltouching > 0) {
 				//console.log("Touching anime.");
 
-			// No touching on view mode.
-			} else {
-				l = blockwidth - 1;
+				// Draw background of pixelframes.
+				//picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
+
+				// Touch moving pixels on view mode.
+				//if (pixeltouchmoved) {
+					l = blockwidth;
+				//}
 			}
+
+		// Edit mode.
+		} else {
+			l = blockwidth;
 		}
 
 		// Draw canvas.
@@ -870,7 +897,7 @@ async function appMain() {
 			let w0 = animegrid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
 			// Release touching frame.
-			if (!testing && animetouching >= 0 && picoAction(x, animesposy, w0, w0)) {
+			if (animetouching >= 0 && picoAction(x, animesposy, w0, w0)) {
 				console.log("Release touching frame.");
 				animetouching = 0;
 
@@ -914,13 +941,20 @@ async function appMain() {
 				picoSprite(sprite, 0, x, animesposy, 0, w3 / animewidth); // Selecting frame.
 
 			// Touching frame.
-			} else if (!testing && animetouching >= 0 && picoMotion(x, animesposy, w0, w0)) {
+			} else if (animetouching >= 0 && picoMotion(x, animesposy, w0, w0)) {
 				frametouching = -1;
 				pixeltouching = -1;
 				colortouching = -1;
 
+				if (testing) {
+					console.log("End testing:" + anime);
+					testing = 0;
+					appUpdate();
+					picoBeep(1.2, 0.1);
+					picoBeep(1.2, 0.1, 0.2);
+
 				// Start to touching frame.
-				if (animetouching == 0) {
+				} else if (animetouching == 0) {
 					console.log("Touching frame.");
 					animetouching = 1;
 					animeholding = 0;
@@ -1146,6 +1180,7 @@ async function appMain() {
 		frametouching = 0;
 		pixeltouching = 0;
 		pixeltouchmoving = 0;
+		pixeltouchmoved = 0;
 		colortouching = 0;
 		animetouching = 0;
 		framechanging = 0;
