@@ -205,7 +205,7 @@ function appSelect(x) {
 
 // Touching flags and states.
 var bgindex = 0; // Background color index.
-var pixeltouching = 0; // -1:invalid, 0:untouched, 1:touching.
+var pixeltouching = 0; // -1:invalid, 0:untouched, 1+:touching.
 var pixeltouchmoving = 0; // Pixel touching on view mode.
 var pixeltouchmoved = 0; // Pixel touch moved on view mode.
 var colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
@@ -764,7 +764,8 @@ async function appMain() {
 				// Update canvas on viewer mode.
 				if (animeflag) {
 					let j0 = j - yoffset, i0 = i - xoffset;
-					if (pixeltouching >= 0 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
+					// Start testing on tapping within 15 msec.
+					if (pixeltouching >= 0 && pixeltouching < 15 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
 						if (!testing) {
 							console.log("Start testing:" + anime);
 							testing = 1;
@@ -794,7 +795,7 @@ async function appMain() {
 							pixeltouchposy = j0;
 
 							console.log("Touch pixels.");
-							pixeltouching = 1; // Touch pixels.
+							pixeltouching++; // Touch pixels.
 							frametouching = -1;
 							animetouching = -1;
 							colortouching = -1;
@@ -835,7 +836,8 @@ async function appMain() {
 		}
 
 		// Update offset.
-		if (pixeltouchmovex || pixeltouchmovey) {
+		// Ignore touch-moving within 10 msec.
+		if (pixeltouching >= 10 && (pixeltouchmovex || pixeltouchmovey)) {
 			pixeltouchmoving = 1;
 			xoffset += pixeltouchmovex;
 			if (xoffset < 0) {
@@ -1191,6 +1193,7 @@ async function appMain() {
 	// Increment tapping count.
 	if (animetapping > 0) {
 		//console.log("Increment tapping count:" + animetapping);
+		// Ignore tappng over 30 msec.
 		animetapping = animetapping+1 < 30 ? animetapping+1 : 0;
 		picoFlush();
 	}
