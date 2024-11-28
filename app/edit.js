@@ -189,7 +189,8 @@ var colorselecting = depth; // Touching color index.
 //var colorselected = -1; // Previous touched color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var animetouching = 0; // -1:invalid, 0:untouched, 1:touching.
-var animeholding = 0; // 0:untouched, 1+:touching.
+var animetapping = 0; // 0:untouched, 1+:tapping count.
+var animeholding = 0; // 0:untouched, 1+:holding count.
 var framechanging = 0; // 0:not changed, 1:changing.
 var animeselecting = -1; // Selecting frame index.
 var landscape = false; // landscape mode.
@@ -839,7 +840,26 @@ async function appMain() {
 			if (animetouching >= 0 && picoAction(x, animesposy, w0, w0)) {
 				console.log("Release touching frame.");
 				animetouching = 0;
-				picoBeep(1.2, 0.1);
+
+				if (animetapping > 0) {
+					animetapping = 0;
+
+					// Copy to clipboard.
+					if (buffers[frame]) {
+						let text = picoCode6String(buffers[frame]);
+						await picoClipboard(text);
+						console.log("Copy to clipboard:" + text);
+						picoBeep(1.2, 0.1);
+						picoBeep(1.2, 0.1, 0.2);
+					} else {
+						console.log("No data on buffer.");
+						picoBeep(-1.2, 0.1);
+						picoBeep(-1.2, 0.1, 0.2);
+					}
+				} else {
+					animetapping = 1;
+					picoBeep(1.2, 0.1);
+				}
 
 				// Switch view to edit.
 				//if (!framechanging) {
@@ -894,27 +914,25 @@ async function appMain() {
 					console.log("Continue touching anime.");// + animeholding);
 					animeholding++;
 
-					// Copy to clipboard.
+					// Paste from clipboard.
 					if (animeholding >= 60) {
 						animetouching = -1;
 						animeholding = 0;
-						if (buffers[frame]) {
-							let text = picoCode6String(buffers[frame]);
-							await picoClipboard(text);
-							console.log("Copy to clipboard:" + text);
+
+						// Load from clipboard.
+						let text = await picoClipboard();
+						if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
+							buffers[frame] = picoStringCode6(text);
+							animeselecting = -1;
+							playing = -1; // Reset pixels from buffer.
+							console.log("Load from clipboard:" + text);
 							picoBeep(1.2, 0.1);
 							picoBeep(1.2, 0.1, 0.2);
+							picoBeep(1.2, 0.1, 0.4);
 						} else {
-							let text = await picoClipboard();
-							if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
-								buffers[frame] = picoStringCode6(text);
-								animeselecting = -1;
-								playing = -1; // Reset pixels from buffer.
-								console.log("Load from clipboard:" + text);
-								picoBeep(1.2, 0.1);
-								picoBeep(1.2, 0.1, 0.2);
-								picoBeep(1.2, 0.1, 0.4);
-							}
+							console.log("No data on clipboard.");
+							picoBeep(-1.2, 0.1);
+							picoBeep(-1.2, 0.1, 0.2);
 						}
 					}
 				}
@@ -1100,6 +1118,13 @@ async function appMain() {
 		framechanging = 0;
 		pixeltouchposx = 0;
 		pixeltouchposy = 0;
+	}
+
+	// Increment tapping count.
+	if (animetapping > 0) {
+		//console.log("Increment tapping count:" + animetapping);
+		animetapping = animetapping+1 < 30 ? animetapping+1 : 0;
+		picoFlush();
 	}
 
 	// Increment playing count.
