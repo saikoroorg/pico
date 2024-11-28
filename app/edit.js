@@ -17,6 +17,7 @@ var frame = 0; // Anime frame index.
 var buffers = []; // Pixels buffers.
 var animeflag = 0; // Anime editing flag.
 var playing = 0; // Playing count.
+var testing = 0; // Testing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = 3;//colors.length/3; // Color count.
@@ -29,7 +30,7 @@ async function appUpdate(force = true) {
 
 	// Update buffer.
 	if (force || buffers[frame]) {
-		////console.log("Update" + frame + ": " + buffers[frame]);
+		//console.log("Update" + frame + ": " + buffers[frame]);
 
 		// Store canvas pixels to buffers.
 		buffers[frame] = [0, width, height];
@@ -50,7 +51,16 @@ async function appUpdate(force = true) {
 
 	// Frame viewer mode.
 	if (animeflag) {
-		picoLabel("action", "%");
+		if (testing) {
+			if (buffers[frame]) {
+				let data = await picoSpriteData(buffers[frame], bgcolor);
+				picoLabel("action", null, data);
+			} else {
+				picoLabel("action", "-");
+			}
+		} else {
+			picoLabel("action", "%");
+		}
 
 	// Pixel editor mode.
 	} else {
@@ -79,15 +89,22 @@ async function appAction() {
 
 	// Frame viewer mode.
 	if (animeflag) {
-		let text = await picoClipboard();
-		if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
-			buffers[frame] = picoStringCode6(text);
-			animeselecting = -1;
-			playing = -1; // Reset pixels from buffer.
-			console.log("Load from clipboard:" + text);
-			picoBeep(1.2, 0.1);
-			picoBeep(1.2, 0.1, 0.2);
-			picoBeep(1.2, 0.1, 0.4);
+		if (anime >= 2) {
+			if (!testing) {
+				console.log("Start testing:" + anime);
+				testing = 1;
+				appUpdate();
+				picoBeep(1.2, 0.1);
+			} else {
+				console.log("End testing:" + anime);
+				testing = 0;
+				appUpdate();
+				picoBeep(1.2, 0.1);
+				picoBeep(1.2, 0.1, 0.2);
+			}
+		} else {
+			picoBeep(-1.2, 0.1);
+			picoBeep(-1.2, 0.1, 0.2);
 		}
 
 	// Pixel editor mode.
@@ -126,10 +143,14 @@ function appSelect(x) {
 	// Change menu mode.
 	if (x == 0) {
 	//	colorflag = 0;
-		if (animeflag) {
+		if (testing) {
+			picoBeep(-1.2, 0.1);
+		} else if (animeflag) {
+			console.log("Switch to pixeleditor mode.");
 			animeflag = 0;
 			picoBeep(0, 0.1);
 		} else {
+			console.log("Switch to animeeditor mode.");
 			animeflag = 1;
 			colorselecting = 0;
 			picoBeep(1.2, 0.1);
@@ -154,6 +175,7 @@ function appSelect(x) {
 
 	// Change canvas size.
 	} else {
+	console.log("Change canvas size.");
 		width = width + x < 3 ? 3 : width + x > maxwidth ? maxwidth : width + x;
 		height = height + x < 3 ? 3 : height + x > maxheight ? maxheight : height + x;
 //		xoffset = picoDiv(maxwidth - width, 2);
@@ -392,7 +414,7 @@ async function appMain() {
 	if (!animeflag) {
 
 		// Touch frame of pixels.
-		if (frametouching >= 0 &&
+		if (!testing && frametouching >= 0 &&
 			picoMotion(framesposx, framesposy, bgframewidth/2, bgframeheight/2) &&
 			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
 			console.log("Touch frame of pixels.");
@@ -442,7 +464,7 @@ async function appMain() {
 
 			// Cancel animeeditor mode.
 			if (!colorflag) {
-				if (animeflag) {
+				if (!testing && animeflag) {
 					animeflag = 0;
 					appUpdate(true);
 				}
@@ -528,7 +550,8 @@ async function appMain() {
 		if (!colorflag) {
 			if (depth + 1 < maxcolor) {
 				// Release touching color plus button.
-				if (colortouching >= 0 && picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
+				if (colortouching >= 0 &&
+					picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
 					console.log("Release touching color plus button.");
 					colortouching = 0;
 					depth += 1;
@@ -542,7 +565,8 @@ async function appMain() {
 					picoChar(colorbutton1char, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale1);
 
 				// Touching color plus button.
-				} else if (colortouching >= 0 && picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
+				} else if (colortouching >= 0 &&
+					picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
 					frametouching = -1;
 					animetouching = -1;
 					pixeltouching = -1;
@@ -557,7 +581,8 @@ async function appMain() {
 			}
 			if (depth - 1 > 0) {
 				// Release touching color minus button.
-				if (colortouching >= 0 && picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
+				if (colortouching >= 0 &&
+					picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
 					console.log("Release touching color minus button.");
 					colortouching = 0;
 					depth -= 1;
@@ -571,7 +596,8 @@ async function appMain() {
 					picoChar(colorbutton2char, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale1);
 
 				// Touching color minus button.
-				} else if (colortouching >= 0 && picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
+				} else if (colortouching >= 0 &&
+					picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
 					frametouching = -1;
 					animetouching = -1;
 					pixeltouching = -1;
@@ -592,7 +618,8 @@ async function appMain() {
 	if (animeflag) {
 		if (anime < maxanime) {
 			// Touching anime plus buttons.
-			if (animetouching >= 0 && picoAction(animebutton1x, animebutton1y, animebuttonwidth/2, animebuttonheight/2)) {
+			if (!testing && animetouching >= 0 &&
+				picoAction(animebutton1x, animebutton1y, animebuttonwidth/2, animebuttonheight/2)) {
 				console.log("Release touching anime plus botton.");
 				picoChar(animebutton1char, animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale1);
 				animetouching = 0;
@@ -601,7 +628,8 @@ async function appMain() {
 					picoBeep(1.2, 0.1);
 				}
 				//playing = -1; // Reset pixels from buffer.
-			} else if (animetouching >= 0 && picoMotion(animebutton1x, animebutton1y, animebuttonwidth/2, animebuttonheight/2)) {
+			} else if (!testing && animetouching >= 0 &&
+				picoMotion(animebutton1x, animebutton1y, animebuttonwidth/2, animebuttonheight/2)) {
 				console.log("Touch anime plus botton.");
 				pixeltouching = -1;
 				colortouching = -1;
@@ -617,7 +645,8 @@ async function appMain() {
 
 		if (anime > 1) {
 			// Touching anime minus buttons.
-			if (animetouching >= 0 && picoAction(animebutton2x, animebutton2y, animebuttonwidth/2, animebuttonheight/2)) {
+			if (!testing && animetouching >= 0 &&
+				picoAction(animebutton2x, animebutton2y, animebuttonwidth/2, animebuttonheight/2)) {
 				console.log("Release touching anime minus botton.");
 				picoChar(animebutton2char, animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale1);
 				animetouching = 0;
@@ -630,7 +659,8 @@ async function appMain() {
 					picoBeep(1.2, 0.1);
 				}
 				//playing = -1; // Reset pixels from buffer.
-			} else if (animetouching >= 0 && picoMotion(animebutton2x, animebutton2y, animebuttonwidth/2, animebuttonheight/2)) {
+			} else if (!testing && animetouching >= 0 &&
+				picoMotion(animebutton2x, animebutton2y, animebuttonwidth/2, animebuttonheight/2)) {
 				console.log("Touch anime minus botton.");
 				pixeltouching = -1;
 				colortouching = -1;
@@ -653,7 +683,8 @@ async function appMain() {
 		{
 			if (frame + 1 < anime) {
 				// Release touching frame plus button.
-				if (frametouching >= 0 && picoAction(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
+				if (!testing && frametouching >= 0 &&
+					picoAction(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
 					console.log("Release touching frame plus button.");
 					frametouching = 0;
 					if (frame + 1 < anime) {
@@ -664,7 +695,8 @@ async function appMain() {
 					picoChar(framebuttonchar, framebuttoncolor, framebutton1x, framebutton1y, framebutton1angle, framebuttonscale1);
 
 				// Touching frame plus button.
-				} else if (frametouching >= 0 && picoMotion(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
+				} else if (!testing && frametouching >= 0 &&
+					picoMotion(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
 					frametouching = 1;
 					pixeltouching = -1;
 					colortouching = -1;
@@ -678,7 +710,8 @@ async function appMain() {
 			}
 			if (frame >= 1) {
 				// Release touching frame minus button.
-				if (frametouching >= 0 && picoAction(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
+				if (!testing && frametouching >= 0 &&
+					picoAction(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
 					console.log("Release touching frame minus button.");
 					frametouching = 0;
 					if (frame >= 1) {
@@ -689,7 +722,8 @@ async function appMain() {
 					picoChar(framebuttonchar, framebuttoncolor, framebutton2x, framebutton2y, framebutton2angle, framebuttonscale1);
 
 				// Touching frame minus button.
-				} else if (frametouching >= 0 && picoMotion(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
+				} else if (!testing && frametouching >= 0 &&
+					picoMotion(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
 					frametouching = 1;
 					pixeltouching = -1;
 					colortouching = -1;
@@ -725,7 +759,7 @@ async function appMain() {
 
 				// Update canvas on viewer mode.
 				if (animeflag) {
-					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2+1)) {
+					if (!testing && pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2+1)) {
 						let j0 = j - yoffset, i0 = i - xoffset;
 						//console.log("Touch animes" + 
 						//	pixeltouching + " " + xoffset + "," + yoffset + ":" + 
@@ -749,7 +783,7 @@ async function appMain() {
 
 				// Update canvas on editor mode.
 				} else {
-					if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
+					if (!testing && pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
 						console.log("Touch pixels.");
 						pixeltouching = 1; // Touch pixels.
 						frametouching = -1;
@@ -799,18 +833,17 @@ async function appMain() {
 		let l = blockwidth;
 		if (animeflag) {
 			// Switch view to edit.
-			if (!pixeltouchmoving && picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
+			if (!testing && !pixeltouchmoving && picoAction(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
 				console.log("Release touching anime.");
 				//animeflag = 0;
 
-			} else {
-				// Touching on view mode.
-				if (picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
+			// Touching on view mode.
+			} else if (!testing && picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
+				//console.log("Touching anime.");
 
-				// No touching on view mode.
-				} else {
-					l = blockwidth - 1;
-				}
+			// No touching on view mode.
+			} else {
+				l = blockwidth - 1;
 			}
 		}
 
@@ -837,7 +870,7 @@ async function appMain() {
 			let w0 = animegrid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
 			// Release touching frame.
-			if (animetouching >= 0 && picoAction(x, animesposy, w0, w0)) {
+			if (!testing && animetouching >= 0 && picoAction(x, animesposy, w0, w0)) {
 				console.log("Release touching frame.");
 				animetouching = 0;
 
@@ -881,7 +914,7 @@ async function appMain() {
 				picoSprite(sprite, 0, x, animesposy, 0, w3 / animewidth); // Selecting frame.
 
 			// Touching frame.
-			} else if (animetouching >= 0 && picoMotion(x, animesposy, w0, w0)) {
+			} else if (!testing && animetouching >= 0 && picoMotion(x, animesposy, w0, w0)) {
 				frametouching = -1;
 				pixeltouching = -1;
 				colortouching = -1;
@@ -982,7 +1015,7 @@ async function appMain() {
 				console.log("Release touching color.");
 				colortouching = 0;
 				//colorselected = colorselecting;
-				if (animeflag) {
+				if (!testing && animeflag) {
 					animeflag = 0;
 					appUpdate(true);
 				}
@@ -1124,6 +1157,16 @@ async function appMain() {
 	if (animetapping > 0) {
 		//console.log("Increment tapping count:" + animetapping);
 		animetapping = animetapping+1 < 30 ? animetapping+1 : 0;
+		picoFlush();
+	}
+
+	// Increment testing count.
+	if (testing > 0) {
+		testing++;
+		if (!picoMod(testing,10)) {
+			frame = frame + 1 < anime ? frame + 1 : 0;
+			playing = -1; // Reset pixels from buffer.
+		}
 		picoFlush();
 	}
 
