@@ -379,17 +379,17 @@ async function appMain() {
 	let bgbuttonwidth = landscape ? 156 : 148;
 	let bgbuttoncolor = 2; // Background of buttons color.
 
-	const animebutton1char = "+", animebutton2char = "-"; // Anime button chars.
-	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Anime button color and scales.
-	let animebuttonwidth = landscape ? 24 : 8, animebuttonheight = 8; // Anime button width and height.
-	let animebutton1x = bgbuttonwidth/2 - animebuttonwidth/2, animebutton1y = animesposy; // Anime plus button position.
-	let animebutton2x = -bgbuttonwidth/2 + animebuttonwidth/2, animebutton2y = animesposy; // Anime minus button position.
+	const animebutton1char = "+", animebutton2char = "-"; // Animeeditor button chars.
+	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Animeeditor button color and scales.
+	let animebuttonwidth = landscape ? 24 : 8, animebuttonheight = 8; // Animeeditor button width and height.
+	let animebutton1x = bgbuttonwidth/2 - animebuttonwidth/2, animebutton1y = animesposy; // Animeeditor plus button position.
+	let animebutton2x = -bgbuttonwidth/2 + animebuttonwidth/2, animebutton2y = animesposy; // Animeeditor minus button position.
 
-	const framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frame button char and angles.
-	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frame button color and scales.
-	let framebuttonwidth = landscape ? 24 : 8, framebuttonheight = landscape ? 104 : 132; // Frame button width and height.
-	let framebutton1x = bgbuttonwidth/2 - framebuttonwidth/2, framebutton1y = pixelsposy; // Frame plus button position.
-	let framebutton2x = -bgbuttonwidth/2 + framebuttonwidth/2, framebutton2y = pixelsposy; // Frame minus button position.
+	const framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frameeditor button char and angles.
+	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frameeditor button color and scales.
+	let framebuttonwidth = landscape ? 24 : 8, framebuttonheight = landscape ? 104 : 132; // Frameeditor button width and height.
+	let framebutton1x = bgbuttonwidth/2 - framebuttonwidth/2, framebutton1y = pixelsposy; // Frameeditor plus button position.
+	let framebutton2x = -bgbuttonwidth/2 + framebuttonwidth/2, framebutton2y = pixelsposy; // Frameeditor minus button position.
 
 	const colorbutton1char = "+", colorbutton2char = "-"; // Coloreditor button chars.
 	let colorbuttoncolor = bgcolor, colorbuttonscale0 = 2, colorbuttonscale1 = 1.5; // Coloreditor button color and scales.
@@ -397,10 +397,12 @@ async function appMain() {
 	let colorbutton1x = bgcolorwidth/2 + colorbuttonwidth/2, colorbutton1y = colorsposy; // Coloreditor plus button position.
 	let colorbutton2x = -bgcolorwidth/2 - colorbuttonwidth/2, colorbutton2y = colorsposy; // Coloreditor minus button position.
 
-	const incdecbuttonchar = "&"; // Color increase/decrease button char.
-	const incdecbuttonscale0 = 4, incdecbuttonscale1 = 3; // Color increase/decrease button scales.
-	const incbuttonangle = 0, incbuttony = -4; // Color increase button angle and y offset.
-	const decbuttonangle = 180, decbuttony = 4; // Color decrease button angle and y offset.
+	const incdecbutton1char = "+", incdecbutton2char = "-"; // Color inc/dec button char.
+	const incdecbuttonscale0 = 4, incdecbuttonscale1 = 3; // Color inc/dec button scales.
+	let incdecbuttonlength = landscape ? 10 : 9, incdecbuttongrids = landscape ? 3 : 2.5, incdecbuttonoffset = 2; // Color inc/dec buttons potisions.
+	let incdecbuttonwidth = landscape ? 10 : 8, incdecbuttonheight = 16; // Color inc/dec button width and height.
+	const incdecbutton1angle = 0, incdecbutton1x = incdecbuttonwidth, incdecbutton1y = 0; // Color inc/dec button angle and offset.
+	const incdecbutton2angle = 0, incdecbutton2x = -incdecbuttonwidth, incdecbutton2y = 0; // Color inc/dec button angle and offset.
 
 	// Reset color.
 	picoColor();
@@ -1119,53 +1121,53 @@ async function appMain() {
 
 				// Decrease color number.
 				if (c > 0) {
-					let x = colorsposx + (i*3+1 - 10/2) * colorsgrid; // Margins for each color number.
-					if (colortouching >= 0 && picoAction(x, colorsposy+4, 8, 4)) {
+					let x = colorsposx + (i*incdecbuttongrids+incdecbuttonoffset - incdecbuttonlength/2) * colorsgrid; // Margins for each color number.
+					if (colortouching >= 0 && picoAction(x+incdecbutton2x, colorsposy+incdecbutton2y, 8, 8)) {
 						c = (c + 1) >> compression; // Bit shift for compressed decrease.
 						c = c - 1 > 0 ? c - 1 : 0; // Decrease.
 						c = (c << compression) - 1; // Bit unshift.
 						c = c > 0 ? c : 0;
 
 						// Draw decrease button.
-						picoChar(incdecbuttonchar, colorselecting, x, colorsposy+decbuttony, decbuttonangle, incdecbuttonscale1);
-					} else if (colortouching >= 0 && picoMotion(x, colorsposy+4, 8, 4)) {
+						picoChar(incdecbutton2char, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale1);
+					} else if (colortouching >= 0 && picoMotion(x+incdecbutton2x, colorsposy+incdecbutton2y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
 						// Draw decrease button.
-						picoChar(incdecbuttonchar, colorselecting, x, colorsposy+decbuttony, decbuttonangle, incdecbuttonscale1);
+						picoChar(incdecbutton2char, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale1);
 					} else {
-						// Draw decrease button.
-						picoChar(incdecbuttonchar, colorselecting, x, colorsposy+decbuttony, decbuttonangle, incdecbuttonscale0);
+						// Hidden decrease button.
+						//picoChar(incdecbutton2char, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale0);
 					}
 				}
 
 				// Increase color number.
 				if (c < 255) {
-					let x = colorsposx + (i*3+1 - 10/2) * colorsgrid; // Margins for each color number.
-					if (colortouching >= 0 && picoAction(x, colorsposy-4, 8, 4)) {
+					let x = colorsposx + (i*incdecbuttongrids+incdecbuttonoffset - incdecbuttonlength/2) * colorsgrid; // Margins for each color number.
+					if (colortouching >= 0 && picoAction(x+incdecbutton1x, colorsposy+incdecbutton1y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
 						c = (c + 1) >> compression; // Bit shift for compressed increase.
 						c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
 						c = (c << compression) - 1; // Bit unshift.
 
 						// Draw increase button.
-						picoChar(incdecbuttonchar, colorselecting, x, colorsposy+incbuttony, incbuttonangle, incdecbuttonscale1);
-					} else if (colortouching >= 0 && picoMotion(x, colorsposy-4, 8, 4)) {
+						picoChar(incdecbutton1char, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale1);
+					} else if (colortouching >= 0 && picoMotion(x+incdecbutton1x, colorsposy+incdecbutton1y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
 						// Draw increase button.
-						picoChar(incdecbuttonchar, colorselecting, x, colorsposy+incbuttony, incbuttonangle, incdecbuttonscale1);
+						picoChar(incdecbutton1char, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale1);
 					} else {
-						// Draw increase button.
-						picoChar(incdecbuttonchar, colorselecting, x, colorsposy+incbuttony, incbuttonangle, incdecbuttonscale0);
+						// Hidden increase button.
+						//picoChar(incdecbutton1char, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale0);
 					}
 					colors[colorselecting * 3 + i] = c;
 				}
 
-				// Convert range 0-255 to 0-100.
+				// Convert range 0-255 to 0-99.
 				let c99 = picoDiv(colors[colorselecting * 3 + i] * 99, 255);
-				let c00 = c99 >= 99 ? "100" : c99 >= 9 ? " " + (c99 + 1) : c99 >= 1 ? " 0" + (c99 + 1) : " 00";
+				let s99 = /*c99 >= 99 ? "100" :*/ c99 >= 9 ? "" + (c99 + 1) : c99 >= 1 ? "0" + (c99 + 1) : "00";
 
 				// Draw color numbers.
 				let l = colorsgrid / incdecbuttonscale0; // Char leading for each color number.
-				let x = colorsposx + (i*3+2 - 10/2) * colorsgrid; // Margins for each color number.
+				let x = colorsposx + (i*incdecbuttongrids+incdecbuttonoffset - incdecbuttonlength/2) * colorsgrid; // Margins for each color number.
 				picoCharLeading(l, l);
-				picoChar(c00, colorselecting, x, colorsposy, 0, incdecbuttonscale0);
+				picoChar(s99, colorselecting, x, colorsposy, 0, incdecbuttonscale0);
 			}
 		}
 	}
