@@ -211,13 +211,11 @@ var pixeltouchmoved = 0; // Pixel touch moved on view mode.
 var colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var colorholding = 0; // 0:untouched, 1+:touching.
 var colorselecting = depth; // Touching color index.
-//var colorselected = -1; // Previous touched color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
+var frameselecting = -1; // Selecting frame index.
 var animetouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var animetapping = 0; // 0:untouched, 1+:tapping count.
 var animeholding = 0; // 0:untouched, 1+:holding count.
-var framechanging = 0; // 0:not changed, 1:changing.
-var animeselecting = -1; // Selecting frame index.
 var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
@@ -299,10 +297,10 @@ async function appMain() {
 	if (playing <= 0) {
 
 		// Load pixels to canvas.
-		if (animeselecting != frame) {
+		if (frameselecting != frame) {
 			//console.log("Load pixels to canvas.");
-			animeselecting = frame;
-			if (animeselecting >= 0 && buffers[frame]) {
+			frameselecting = frame;
+			if (frameselecting >= 0 && buffers[frame]) {
 				for (let j = 0; j < maxheight; j++) {
 					pixels[j] = [];
 					for (let i = 0; i < maxwidth; i++) {
@@ -474,15 +472,12 @@ async function appMain() {
 					animeflag = 0;
 					appUpdate(true);
 				}
-
-				//colorselected = colorselecting;
 				picoBeep(0, 0.1);
 
 			// Back to pixel mode.
 			} else {
 				console.log("Back to pixel mode.");
 				colorflag = 0;
-				colorselected = -1;
 				picoFlush(); // Update after action event.
 				picoBeep(1.2, 0.1);
 			}
@@ -511,7 +506,6 @@ async function appMain() {
 					console.log("Touching another background.");
 					colorselecting = 0;
 					colorholding = 0;
-					//colorselected = -2;
 
 				// Continue touching background.
 				} else {
@@ -824,7 +818,6 @@ async function appMain() {
 						if (colorflag) {
 							console.log("Cancel color editing.");
 							colorflag = 0;
-							//colorselected = -1;
 							picoFlush();
 						}
 
@@ -925,22 +918,6 @@ async function appMain() {
 					picoBeep(1.2, 0.1);
 				}
 
-				// Switch view to edit.
-				//if (!framechanging) {
-				//	animeflag = 0;
-				//}
-
-				// Paste and release.
-				/*if (frame != i) {
-					console.log("Paste and release.");
-					if (buffers[frame]) {
-						sprite = buffers[frame];
-					}
-					animeselecting = frame = i;
-					appUpdate(); // Paste pixels to buffers.
-					picoBeep(1.2, 0.1);
-				}*/
-
 				// Release holding frame.
 				picoSprite(sprite, 0, x, animesposy, 0, w3 / animewidth); // Selecting frame.
 
@@ -964,21 +941,16 @@ async function appMain() {
 					animeholding = 0;
 					if (frame != i) {
 						frame = i;
-						framechanging = 1;
 						playing = -1; // Reset pixels from buffer.
 					}
 					
 				// Hovering to another frame.
-				} else if (animeselecting != i) {
+				} else if (frameselecting != i) {
 					console.log("Touching another frame.");
 					if (frame != i) {
 						frame = i;
-						framechanging = 1;
 						playing = -1; // Reset pixels from buffer.
 					}
-//					if (buffers[frame]) {
-//						sprite = buffers[frame];
-//					}
 
 				// Continue touching anime.
 				} else {
@@ -994,7 +966,7 @@ async function appMain() {
 						let text = await picoClipboard();
 						if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
 							buffers[frame] = picoStringCode6(text);
-							animeselecting = -1;
+							frameselecting = -1;
 							playing = -1; // Reset pixels from buffer.
 							console.log("Load from clipboard:" + text);
 							picoBeep(1.2, 0.1);
@@ -1008,18 +980,11 @@ async function appMain() {
 					}
 				}
 
-				// Cancel color editing.
-				/*if (colorflag) {
-					console.log("Cancel color editing.");
-					colorflag = 0;
-					//colorselected = -1;
-				}*/
-
 				// Touch holding frame.
 				picoSprite(sprite, 0, x, animesposy, 0, w3 / animewidth); // Touching frame.
 
 			// Not touching but selecting frame.
-			} else if (animeselecting == i) {
+			} else if (frameselecting == i) {
 				animeholding = 0;
 
 				// Touch holding frame.
@@ -1052,7 +1017,6 @@ async function appMain() {
 			if (colortouching >= 0 && picoAction(x, colorsposy, colorsgrid/2, colorsheight/2)) {
 				console.log("Release touching color.");
 				colortouching = 0;
-				//colorselected = colorselecting;
 				if (!testing && animeflag) {
 					animeflag = 0;
 					appUpdate(true);
@@ -1078,16 +1042,15 @@ async function appMain() {
 					console.log("Touching another color.");
 					colorselecting = i;
 					colorholding = 0;
-					//colorselected = -2;
 
 				// Continue touching color.
 				} else {
-					console.log("Continue touching color.");// + colorholding);
+					console.log("Continue touching color.");
 					colorholding++;
 
 					// Enter color edit mode.
 					if (colorholding >= 60) {
-						console.log("Enter color edit mode.");//:" + colorselected);
+						console.log("Enter color edit mode.");
 						colorflag = 1;
 						picoBeep(1.2, 0.1);
 						colortouching = -1;
@@ -1187,7 +1150,6 @@ async function appMain() {
 		pixeltouchmoved = 0;
 		colortouching = 0;
 		animetouching = 0;
-		framechanging = 0;
 		pixeltouchposx = 0;
 		pixeltouchposy = 0;
 	}
