@@ -15,6 +15,7 @@ const maxanime = 20; // Frame max size.
 var anime = 1; // Frame count.
 var frame = 0; // Anime frame index.
 var buffers = []; // Pixels buffers.
+var clipboard = null; // Clipboard buffers.
 var animeflag = 0; // Anime editing flag.
 var playing = 0; // Playing count.
 var testing = 0; // Testing count.
@@ -297,41 +298,42 @@ async function appMain() {
 	if (playing <= 0) {
 
 		// Load pixels to canvas.
-		if (frameselecting != frame) {
+		if (clipboard || frameselecting != frame) {
 			//console.log("Load pixels to canvas.");
 			frameselecting = frame;
-			if (frameselecting >= 0 && buffers[frame]) {
+			let newpixels = clipboard ? clipboard : buffers[frame];
+			if (frameselecting >= 0 && newpixels) {
 				for (let j = 0; j < maxheight; j++) {
 					pixels[j] = [];
 					for (let i = 0; i < maxwidth; i++) {
 						pixels[j][i] = 0;
 					}
 				}
-				if (buffers[frame][0] == 0) {
-					width = buffers[frame][0 + 1] >= 0 && buffers[frame][0 + 1] <= maxwidth ? buffers[frame][0 + 1] : 7;
-					height = buffers[frame][0 + 2] >= 0 && buffers[frame][0 + 2] <= maxheight ? buffers[frame][0 + 2] : 7;
+				if (newpixels[0] == 0) {
+					width = newpixels[0 + 1] >= 0 && newpixels[0 + 1] <= maxwidth ? newpixels[0 + 1] : 7;
+					height = newpixels[0 + 2] >= 0 && newpixels[0 + 2] <= maxheight ? newpixels[0 + 2] : 7;
 					xoffset = picoDiv(maxwidth - width, 2);
 					yoffset = picoDiv(maxheight - height, 2);
 				}
-				for (let n = 3; n < buffers[frame].length; n += 3) {
-					if (buffers[frame][n + 3] == 0) {
-						let imax = buffers[frame][n + 1] + buffers[frame][n + 4] + xoffset;
-						let jmax = buffers[frame][n + 2] + buffers[frame][n + 5] + yoffset;
+				for (let n = 3; n < newpixels.length; n += 3) {
+					if (newpixels[n + 3] == 0) {
+						let imax = newpixels[n + 1] + newpixels[n + 4] + xoffset;
+						let jmax = newpixels[n + 2] + newpixels[n + 5] + yoffset;
 						//console.log("Put pixel: " + "->" + imax + "," + jmax);
-						for (let i = buffers[frame][n + 1] + xoffset; i <= imax; i++) {
-							for (let j = buffers[frame][n + 2] + yoffset; j <= jmax; j++) {
+						for (let i = newpixels[n + 1] + xoffset; i <= imax; i++) {
+							for (let j = newpixels[n + 2] + yoffset; j <= jmax; j++) {
 								//console.log("Put pixel: " + i + "," + j);
 								if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-									pixels[j][i] = buffers[frame][n];
+									pixels[j][i] = newpixels[n];
 								}
 							}
 						}
 						n += 3;
 					} else {
-						let i = buffers[frame][n + 1] + xoffset;
-						let j = buffers[frame][n + 2] + yoffset;
+						let i = newpixels[n + 1] + xoffset;
+						let j = newpixels[n + 2] + yoffset;
 						if (i >= xoffset && i < xoffset + width && j >= yoffset && j < yoffset + height) {
-							pixels[j][i] = buffers[frame][n];
+							pixels[j][i] = newpixels[n];
 						}
 					}
 				}
@@ -344,8 +346,10 @@ async function appMain() {
 				}
 			}
 			//console.log("Load pixel: " + pixels);
+			if (!clipboard) {
+				appUpdate();
+			}
 		}
-		appUpdate();
 
 		// Reset playing count.
 		playing = 1;
@@ -654,6 +658,7 @@ async function appMain() {
 					anime = anime - 1;
 					if (frame >= anime) {
 						frame = anime - 1;
+						clipboard = null; // Cancel paste from clipboard.
 						playing = -1; // Reset pixels from buffer.
 					}
 					picoBeep(1.2, 0.1);
@@ -689,6 +694,7 @@ async function appMain() {
 					frametouching = 0;
 					if (frame + 1 < anime) {
 						frame = frame + 1;
+						clipboard = null; // Cancel paste from clipboard.
 						playing = -1; // Reset pixels from buffer.
 						picoBeep(1.2, 0.1);
 					}
@@ -716,6 +722,7 @@ async function appMain() {
 					frametouching = 0;
 					if (frame >= 1) {
 						frame = frame - 1;
+						clipboard = null; // Cancel paste from clipboard.
 						playing = -1; // Reset pixels from buffer.
 						picoBeep(1.2, 0.1);
 					}
@@ -762,7 +769,14 @@ async function appMain() {
 					let j0 = j - yoffset, i0 = i - xoffset;
 					// Start testing on tapping within 15 msec.
 					if (pixeltouching >= 0 && pixeltouching < 15 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
-						if (!testing) {
+						if (clipboard) {
+							console.log("End paste from clipboard.");
+							clipboard = null;
+							pixeltouchmoved = 1;
+							appUpdate();
+							picoBeep(1.2, 0.1);
+							picoBeep(1.2, 0.1, 0.2);
+						} else if (!testing) {
 							console.log("Start testing:" + anime);
 							testing = 1;
 							appUpdate();
@@ -941,6 +955,7 @@ async function appMain() {
 					animeholding = 0;
 					if (frame != i) {
 						frame = i;
+						clipboard = null; // Cancel paste from clipboard.
 						playing = -1; // Reset pixels from buffer.
 					}
 					
@@ -965,13 +980,11 @@ async function appMain() {
 						// Load from clipboard.
 						let text = await picoClipboard();
 						if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
-							buffers[frame] = picoStringCode6(text);
-							frameselecting = -1;
-							playing = -1; // Reset pixels from buffer.
 							console.log("Load from clipboard:" + text);
+							clipboard = picoStringCode6(text);
+							frameselecting = -1;
+							playing = -1; // Reset pixels from clipboard.
 							picoBeep(1.2, 0.1);
-							picoBeep(1.2, 0.1, 0.2);
-							picoBeep(1.2, 0.1, 0.4);
 						} else {
 							console.log("No data on clipboard.");
 							picoBeep(-1.2, 0.1);
