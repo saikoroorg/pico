@@ -155,7 +155,6 @@ function appSelect(x) {
 		} else {
 			console.log("Switch to animeeditor mode.");
 			animeflag = 1;
-			colorselecting = 0;
 			picoBeep(1.2, 0.1);
 		}
 		appUpdate(true);
@@ -431,7 +430,6 @@ async function appMain() {
 			frametouching = 1; // Touch frame.
 			if (!animeflag) {
 				animeflag = 1;
-				colorselecting = 0;
 				appUpdate(true);
 				picoBeep(1.2, 0.1);
 			}
