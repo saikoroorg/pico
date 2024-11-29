@@ -381,25 +381,25 @@ async function appMain() {
 	let bgbuttonwidth = landscape ? 156 : 148;
 	let bgbuttoncolor = 2; // Background of buttons color.
 
-	const animebutton1char = "+", animebutton2char = "-"; // Animeeditor button chars.
+	const animebutton0char = "*", animebutton1char = "+", animebutton2char = "-"; // Animeeditor button chars.
 	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Animeeditor button color and scales.
 	let animebuttonwidth = landscape ? 24 : 8, animebuttonheight = 8; // Animeeditor button width and height.
 	let animebutton1x = bgbuttonwidth/2 - animebuttonwidth/2, animebutton1y = animesposy; // Animeeditor plus button position.
 	let animebutton2x = -bgbuttonwidth/2 + animebuttonwidth/2, animebutton2y = animesposy; // Animeeditor minus button position.
 
-	const framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frameeditor button char and angles.
+	const framebutton0char = "*", framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frameeditor button char and angles.
 	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frameeditor button color and scales.
 	let framebuttonwidth = landscape ? 24 : 8, framebuttonheight = landscape ? 104 : 132; // Frameeditor button width and height.
 	let framebutton1x = bgbuttonwidth/2 - framebuttonwidth/2, framebutton1y = pixelsposy; // Frameeditor plus button position.
 	let framebutton2x = -bgbuttonwidth/2 + framebuttonwidth/2, framebutton2y = pixelsposy; // Frameeditor minus button position.
 
-	const colorbutton1char = "+", colorbutton2char = "-"; // Coloreditor button chars.
+	const colorbutton0char = "*", colorbutton1char = "+", colorbutton2char = "-"; // Coloreditor button chars.
 	let colorbuttoncolor = bgcolor, colorbuttonscale0 = 2, colorbuttonscale1 = 1.5; // Coloreditor button color and scales.
 	let colorbuttonwidth = landscape ? 12 : animeflag ? 8 : 6, colorbuttonheight = bgcolorheight; // Coloreditor button width and height.
 	let colorbutton1x = bgcolorwidth/2 + colorbuttonwidth/2, colorbutton1y = colorsposy; // Coloreditor plus button position.
 	let colorbutton2x = -bgcolorwidth/2 - colorbuttonwidth/2, colorbutton2y = colorsposy; // Coloreditor minus button position.
 
-	const incdecbutton1char = "+", incdecbutton2char = "-"; // Color inc/dec button char.
+	const incdecbutton0char = "*", incdecbutton1char = "+", incdecbutton2char = "-"; // Color inc/dec button char.
 	const incdecbuttonscale0 = 4, incdecbuttonscale1 = 3; // Color inc/dec button scales.
 	let incdecbuttonlength = landscape ? 10 : 9, incdecbuttongrids = landscape ? 3 : 2.5, incdecbuttonoffset = 2; // Color inc/dec buttons potisions.
 	let incdecbuttonwidth = landscape ? 10 : 8, incdecbuttonheight = 16; // Color inc/dec button width and height.
@@ -552,84 +552,95 @@ async function appMain() {
 
 		// Touching color buttons.
 		if (!colorflag) {
-			if (depth + 1 < maxcolor) {
-				// Release touching color plus button.
-				if (colortouching >= 0 &&
-					picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
-					console.log("Release touching color plus button.");
-					colortouching = 0;
+			// Release touching color plus button.
+			let c1 = depth + 1 < maxcolor ? colorbutton1char : colorbutton0char;
+			if (colortouching >= 0 &&
+				picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
+				console.log("Release touching color plus button.");
+				colortouching = 0;
+				if (depth + 1 < maxcolor) {
 					depth += 1;
 					colorselecting = depth;
-					/*if (animeflag) {
-						animeflag = 0;
-						appUpdate(true);
-						picoBeep(1.2, 0.1);
-					}*/
+				/*if (animeflag) {
+					animeflag = 0;
+					appUpdate(true);
 					picoBeep(1.2, 0.1);
-					picoChar(colorbutton1char, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale1);
-
-				// Touching color plus button.
-				} else if (colortouching >= 0 &&
-					picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
-					frametouching = -1;
-					animetouching = -1;
-					pixeltouching = -1;
-					colortouching = 1;
-					picoChar(colorbutton1char, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale1);
-
-				// Color plus button. show only animeeditor mode.
-				} else if (animeflag) {
-					//Hidden button.
-					//picoChar(colorbutton1char, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale0);
+				}*/
+					picoBeep(1.2, 0.1);
+				} else {
+					picoBeep(-1.2, 0.1);
 				}
+				picoChar(c1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale1);
+
+			// Touching color plus button.
+			} else if (colortouching >= 0 &&
+				picoMotion(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
+				frametouching = -1;
+				animetouching = -1;
+				pixeltouching = -1;
+				colortouching = 1;
+				picoChar(c1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale1);
+
+			// Color plus button. show only animeeditor mode.
+			} else if (animeflag) {
+				//Hidden button.
+				//picoChar(c1, colorbuttoncolor, colorbutton1x, colorbutton1y, 0, colorbuttonscale0);
 			}
-			if (depth - 1 > 0) {
-				// Release touching color minus button.
-				if (colortouching >= 0 &&
-					picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
-					console.log("Release touching color minus button.");
-					colortouching = 0;
+
+			// Release touching color minus button.
+			let c2 = depth - 1 > 0 ? colorbutton2char : colorbutton0char;
+			if (colortouching >= 0 &&
+				picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
+				console.log("Release touching color minus button.");
+				colortouching = 0;
+				if (depth - 1 > 0) {
 					depth -= 1;
 					colorselecting = colorselecting<depth ? colorselecting : depth;
-					/*if (animeflag) {
-						animeflag = 0;
-						appUpdate(true);
-						picoBeep(1.2, 0.1);
-					}*/
+				/*if (animeflag) {
+					animeflag = 0;
+					appUpdate(true);
 					picoBeep(1.2, 0.1);
-					picoChar(colorbutton2char, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale1);
-
-				// Touching color minus button.
-				} else if (colortouching >= 0 &&
-					picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
-					frametouching = -1;
-					animetouching = -1;
-					pixeltouching = -1;
-					colortouching = 1;
-					picoChar(colorbutton2char, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale1);
-
-				// Color minus button. show only animeeditor mode.
-				} else if (animeflag) {
-					//Hidden button.
-					//picoChar(colorbutton2char, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale0);
+				}*/
+					picoBeep(1.2, 0.1);
+				} else {
+					picoBeep(-1.2, 0.1);
 				}
+				picoChar(c2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale1);
+
+			// Touching color minus button.
+			} else if (colortouching >= 0 &&
+				picoMotion(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
+				frametouching = -1;
+				animetouching = -1;
+				pixeltouching = -1;
+				colortouching = 1;
+				picoChar(c2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale1);
+
+			// Color minus button. show only animeeditor mode.
+			} else if (animeflag) {
+				//Hidden button.
+				//picoChar(c2, colorbuttoncolor, colorbutton2x, colorbutton2y, 0, colorbuttonscale0);
 			}
 		}
-
 	}
 
 	// Frame viewer mode.
 	if (animeflag) {
-		if (anime < maxanime) {
-			// Touching anime plus buttons.
+
+		// Touching anime buttons.
+		{
+			// Touching anime plus button.
+			let c1 = anime + 1 <= maxanime ? animebutton1char : animebutton0char;
 			if (!testing && animetouching >= 0 &&
 				picoAction(animebutton1x, animebutton1y, animebuttonwidth/2, animebuttonheight/2)) {
 				console.log("Release touching anime plus botton.");
-				picoChar(animebutton1char, animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale1);
+				picoChar(c1, animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale1);
 				animetouching = 0;
 				if (anime + 1 <= maxanime) {
 					anime = anime + 1;
 					picoBeep(1.2, 0.1);
+				} else {
+					picoBeep(-1.2, 0.1);
 				}
 				//playing = -1; // Reset pixels from buffer.
 			} else if (!testing && animetouching >= 0 &&
@@ -640,19 +651,18 @@ async function appMain() {
 				frametouching = -1;
 				animetouching = 1; // Touch anime.
 				//picoRect(bgframecolor, animebutton1x, animebutton1y, animebuttonwidth, animebuttonheight);
-				picoChar(animebutton1char, animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale1);
+				picoChar(c1, animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale1);
 			} else {
 				//Hidden button.
 				//picoChar(animebutton1char, animebuttoncolor, animebutton1x, animebutton1y, 0, animebuttonscale0);
 			}
-		}
 
-		if (anime > 1) {
-			// Touching anime minus buttons.
+			// Touching anime minus button.
+			let c2 = anime - 1 > 0 ? animebutton2char : animebutton0char;
 			if (!testing && animetouching >= 0 &&
 				picoAction(animebutton2x, animebutton2y, animebuttonwidth/2, animebuttonheight/2)) {
 				console.log("Release touching anime minus botton.");
-				picoChar(animebutton2char, animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale1);
+				picoChar(c2, animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale1);
 				animetouching = 0;
 				if (anime - 1 > 0) {
 					anime = anime - 1;
@@ -662,6 +672,8 @@ async function appMain() {
 						playing = -1; // Reset pixels from buffer.
 					}
 					picoBeep(1.2, 0.1);
+				} else {
+					picoBeep(-1.2, 0.1);
 				}
 				//playing = -1; // Reset pixels from buffer.
 			} else if (!testing && animetouching >= 0 &&
@@ -672,7 +684,7 @@ async function appMain() {
 				frametouching = -1;
 				animetouching = 1; // Touch anime.
 				//picoRect(bgframecolor, animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight);
-				picoChar(animebutton2char, animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale1);
+				picoChar(c2, animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale1);
 			} else {
 				//Hidden button.
 				//picoChar(animebutton2char, animebuttoncolor, animebutton2x, animebutton2y, 0, animebuttonscale0);
@@ -686,61 +698,64 @@ async function appMain() {
 
 		// Touching frame buttons.
 		{
-			if (frame + 1 < anime) {
-				// Release touching frame plus button.
-				if (!testing && frametouching >= 0 &&
-					picoAction(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
-					console.log("Release touching frame plus button.");
-					frametouching = 0;
-					if (frame + 1 < anime) {
-						frame = frame + 1;
-						clipboard = null; // Cancel paste from clipboard.
-						playing = -1; // Reset pixels from buffer.
-						picoBeep(1.2, 0.1);
-					}
-					picoChar(framebuttonchar, framebuttoncolor, framebutton1x, framebutton1y, framebutton1angle, framebuttonscale1);
-
-				// Touching frame plus button.
-				} else if (!testing && frametouching >= 0 &&
-					picoMotion(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
-					frametouching = 1;
-					pixeltouching = -1;
-					colortouching = -1;
-					animetouching = -1;
-					picoChar(framebuttonchar, framebuttoncolor, framebutton1x, framebutton1y, framebutton1angle, framebuttonscale1);
-
+			// Release touching frame plus button.
+			let c1 = frame + 1 < anime ? framebuttonchar : framebutton0char;
+			if (!testing && frametouching >= 0 &&
+				picoAction(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
+				console.log("Release touching frame plus button.");
+				frametouching = 0;
+				if (frame + 1 < anime) {
+					frame = frame + 1;
+					clipboard = null; // Cancel paste from clipboard.
+					playing = -1; // Reset pixels from buffer.
+					picoBeep(1.2, 0.1);
 				} else {
-				// Frame plus button. show only touching.
-				//	picoChar(framebuttonchar, framebuttoncolor, framebutton1x, framebutton1y, framebutton1angle, framebuttonscale0);
+					picoBeep(-1.2, 0.1);
 				}
+				picoChar(c1, framebuttoncolor, framebutton1x, framebutton1y, framebutton1angle, framebuttonscale1);
+
+			// Touching frame plus button.
+			} else if (!testing && frametouching >= 0 &&
+				picoMotion(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2)) {
+				frametouching = 1;
+				pixeltouching = -1;
+				colortouching = -1;
+				animetouching = -1;
+				picoChar(c1, framebuttoncolor, framebutton1x, framebutton1y, framebutton1angle, framebuttonscale1);
+
+			} else {
+			// Frame plus button. show only touching.
+			//	picoChar(c1, framebuttoncolor, framebutton1x, framebutton1y, framebutton1angle, framebuttonscale0);
 			}
-			if (frame >= 1) {
-				// Release touching frame minus button.
-				if (!testing && frametouching >= 0 &&
-					picoAction(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
-					console.log("Release touching frame minus button.");
-					frametouching = 0;
-					if (frame >= 1) {
-						frame = frame - 1;
-						clipboard = null; // Cancel paste from clipboard.
-						playing = -1; // Reset pixels from buffer.
-						picoBeep(1.2, 0.1);
-					}
-					picoChar(framebuttonchar, framebuttoncolor, framebutton2x, framebutton2y, framebutton2angle, framebuttonscale1);
 
-				// Touching frame minus button.
-				} else if (!testing && frametouching >= 0 &&
-					picoMotion(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
-					frametouching = 1;
-					pixeltouching = -1;
-					colortouching = -1;
-					animetouching = -1;
-					picoChar(framebuttonchar, framebuttoncolor, framebutton2x, framebutton2y, framebutton2angle, framebuttonscale1);
-
+			// Release touching frame minus button.
+			let c2 = frame >= 1 ? framebuttonchar : framebutton0char;
+			if (!testing && frametouching >= 0 &&
+				picoAction(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
+				console.log("Release touching frame minus button.");
+				frametouching = 0;
+				if (frame >= 1) {
+					frame = frame - 1;
+					clipboard = null; // Cancel paste from clipboard.
+					playing = -1; // Reset pixels from buffer.
+					picoBeep(1.2, 0.1);
 				} else {
-				// Frame minus button. show only touching.
-				//	picoChar(framebuttonchar, framebuttoncolor, framebutton2x, framebutton2y, framebutton2angle, framebuttonscale0);
+					picoBeep(-1.2, 0.1);
 				}
+				picoChar(c2, framebuttoncolor, framebutton2x, framebutton2y, framebutton2angle, framebuttonscale1);
+
+			// Touching frame minus button.
+			} else if (!testing && frametouching >= 0 &&
+				picoMotion(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2)) {
+				frametouching = 1;
+				pixeltouching = -1;
+				colortouching = -1;
+				animetouching = -1;
+				picoChar(c2, framebuttoncolor, framebutton2x, framebutton2y, framebutton2angle, framebuttonscale1);
+
+			} else {
+			// Frame minus button. show only touching.
+			//	picoChar(c2, framebuttoncolor, framebutton2x, framebutton2y, framebutton2angle, framebuttonscale0);
 			}
 		}
 	}
@@ -1093,46 +1108,60 @@ async function appMain() {
 		// Draw buttons and color numbers.
 		if (colorselecting) {
 			for (let i = 0; i < 3; i++) {
-				let c = colors[colorselecting * 3 + i];
 
-				// Decrease color number.
-				if (c > 0) {
+				// Increase color number.
+				{
+					let c = colors[colorselecting * 3 + i];
+					let c1 = c < 255 ? incdecbutton1char : incdecbutton0char;
 					let x = colorsposx + (i*incdecbuttongrids+incdecbuttonoffset - incdecbuttonlength/2) * colorsgrid; // Margins for each color number.
-					if (colortouching >= 0 && picoAction(x+incdecbutton2x, colorsposy+incdecbutton2y, 8, 8)) {
-						c = (c + 1) >> compression; // Bit shift for compressed decrease.
-						c = c - 1 > 0 ? c - 1 : 0; // Decrease.
-						c = (c << compression) - 1; // Bit unshift.
-						c = c > 0 ? c : 0;
+					if (colortouching >= 0 && picoAction(x+incdecbutton1x, colorsposy+incdecbutton1y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
+						if (c < 255) {
+							c = (c + 1) >> compression; // Bit shift for compressed increase.
+							c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
+							c = (c << compression) - 1; // Bit unshift.
+							colors[colorselecting * 3 + i] = c;
+							picoBeep(1.2, 0.1);
+						} else {
+							picoBeep(-1.2, 0.1);
+						}
 
-						// Draw decrease button.
-						picoChar(incdecbutton2char, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale1);
-					} else if (colortouching >= 0 && picoMotion(x+incdecbutton2x, colorsposy+incdecbutton2y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
-						// Draw decrease button.
-						picoChar(incdecbutton2char, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale1);
+						// Draw increase button.
+						picoChar(c1, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale1);
+					} else if (colortouching >= 0 && picoMotion(x+incdecbutton1x, colorsposy+incdecbutton1y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
+						// Draw increase button.
+						picoChar(c1, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale1);
 					} else {
-						// Hidden decrease button.
-						//picoChar(incdecbutton2char, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale0);
+						// Hidden increase button.
+						//picoChar(c1, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale0);
 					}
 				}
 
-				// Increase color number.
-				if (c < 255) {
+				// Decrease color number.
+				{
+					let c = colors[colorselecting * 3 + i];
+					let c2 = c > 0 ? incdecbutton2char : incdecbutton0char;
 					let x = colorsposx + (i*incdecbuttongrids+incdecbuttonoffset - incdecbuttonlength/2) * colorsgrid; // Margins for each color number.
-					if (colortouching >= 0 && picoAction(x+incdecbutton1x, colorsposy+incdecbutton1y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
-						c = (c + 1) >> compression; // Bit shift for compressed increase.
-						c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
-						c = (c << compression) - 1; // Bit unshift.
+					if (colortouching >= 0 && picoAction(x+incdecbutton2x, colorsposy+incdecbutton2y, 8, 8)) {
+						if (c > 0) {
+							c = (c + 1) >> compression; // Bit shift for compressed decrease.
+							c = c - 1 > 0 ? c - 1 : 0; // Decrease.
+							c = (c << compression) - 1; // Bit unshift.
+							c = c > 0 ? c : 0;
+							colors[colorselecting * 3 + i] = c;
+							picoBeep(1.2, 0.1);
+						} else {
+							picoBeep(-1.2, 0.1);
+						}
 
-						// Draw increase button.
-						picoChar(incdecbutton1char, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale1);
-					} else if (colortouching >= 0 && picoMotion(x+incdecbutton1x, colorsposy+incdecbutton1y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
-						// Draw increase button.
-						picoChar(incdecbutton1char, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale1);
+						// Draw decrease button.
+						picoChar(c2, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale1);
+					} else if (colortouching >= 0 && picoMotion(x+incdecbutton2x, colorsposy+incdecbutton2y, incdecbuttonwidth/2, incdecbuttonheight/2)) {
+						// Draw decrease button.
+						picoChar(c2, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale1);
 					} else {
-						// Hidden increase button.
-						//picoChar(incdecbutton1char, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale0);
+						// Hidden decrease button.
+						//picoChar(c2, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale0);
 					}
-					colors[colorselecting * 3 + i] = c;
 				}
 
 				// Convert range 0-255 to 0-99.
