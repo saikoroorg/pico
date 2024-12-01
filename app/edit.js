@@ -15,8 +15,7 @@ const maxanime = 20; // Frame max size.
 var anime = 1; // Frame count.
 var frame = 0; // Anime frame index.
 var buffers = []; // Pixels buffers.
-var clipboard = null; // Clipboard buffers.
-var animeflag = 0; // Anime editing flag.
+var clipboard = [0,7,7]; // Clipboard buffers.
 var playing = 0; // Playing count.
 var testing = 0; // Testing count.
 var pixels = []; // Canvas pixels.
@@ -24,7 +23,8 @@ var canvas = ""; // Canvas pixels by text format.
 var depth = 3;//colors.length/3; // Color count.
 const coffset = 36; // Color offset.
 const maxcolor = 10;//26; // Color max count.
-var colorflag = 0; // Color editing flag.
+var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting, 2:framecopying.
+var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
 
 // Update icon image.
 async function appUpdate(force = true) {
@@ -141,22 +141,19 @@ async function appAction() {
 // Select button.
 function appSelect(x) {
 
-	// Invalid on testing.
-	if (testing) {
-		picoBeep(-1.2, 0.1);
+	// Cancel animeeditor mode.
+	if (animeflag) {
+		console.log("Switch to pixeleditor mode.");
+		animeflag = 0;
+		testing = 0; // End testing.
+		picoBeep(0, 0.1);
+		appUpdate(true);
 
-	// Change menu mode.
+	// Start animeeditor mode.
 	} else if (x == 0) {
-	//	colorflag = 0;
-		if (animeflag) {
-			console.log("Switch to pixeleditor mode.");
-			animeflag = 0;
-			picoBeep(0, 0.1);
-		} else {
-			console.log("Switch to animeeditor mode.");
-			animeflag = 1;
-			picoBeep(1.2, 0.1);
-		}
+		console.log("Switch to animeeditor mode.");
+		animeflag = 1;
+		picoBeep(1.2, 0.1);
 		appUpdate(true);
 
 	// Change color depth.
@@ -212,10 +209,10 @@ var colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var colorholding = 0; // 0:untouched, 1+:touching.
 var colorselecting = depth; // Touching color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
+var frameholding = 0; // 0:untouched, 1+:holding count.
 var frameselecting = -1; // Selecting frame index.
 var animetouching = 0; // -1:invalid, 0:untouched, 1:touching.
-var animetapping = 0; // 0:untouched, 1+:tapping count.
-var animeholding = 0; // 0:untouched, 1+:holding count.
+var animetouchmoved = 0; // Anime touch moved on view mode.
 var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
@@ -297,10 +294,10 @@ async function appMain() {
 	if (playing <= 0) {
 
 		// Load pixels to canvas.
-		if (clipboard || frameselecting != frame) {
+		if (frameselecting != frame) {
 			//console.log("Load pixels to canvas.");
 			frameselecting = frame;
-			let newpixels = clipboard ? clipboard : buffers[frame];
+			let newpixels = buffers[frame];
 			if (frameselecting >= 0 && newpixels) {
 				for (let j = 0; j < maxheight; j++) {
 					pixels[j] = [];
@@ -345,9 +342,7 @@ async function appMain() {
 				}
 			}
 			//console.log("Load pixel: " + pixels);
-			if (!clipboard) {
-				appUpdate();
-			}
+			appUpdate();
 		}
 
 		// Reset playing count.
@@ -668,7 +663,6 @@ async function appMain() {
 					anime = anime - 1;
 					if (frame >= anime) {
 						frame = anime - 1;
-						clipboard = null; // Cancel paste from clipboard.
 						playing = -1; // Reset pixels from buffer.
 					}
 					picoBeep(1.2, 0.1);
@@ -706,7 +700,6 @@ async function appMain() {
 				frametouching = 0;
 				if (frame + 1 < anime) {
 					frame = frame + 1;
-					clipboard = null; // Cancel paste from clipboard.
 					playing = -1; // Reset pixels from buffer.
 					picoBeep(1.2, 0.1);
 				} else {
@@ -736,7 +729,6 @@ async function appMain() {
 				frametouching = 0;
 				if (frame >= 1) {
 					frame = frame - 1;
-					clipboard = null; // Cancel paste from clipboard.
 					playing = -1; // Reset pixels from buffer.
 					picoBeep(1.2, 0.1);
 				} else {
@@ -766,6 +758,66 @@ async function appMain() {
 	// Set colors data.
 	picoColor(colors.slice(0,(depth+1)*3));
 
+	// Draw clipboard.
+	if (animeflag == 2) {
+		let margin = 2;
+		let w1 = animegrid - margin; // Width.
+		let w2 = animegrid - margin*2; // Width for deselecting.
+		let w3 = animegrid + margin; // Width for selecting.
+		let clipmarkposy = animesposy + (landscape ? 3 : 4);
+		let clipboardposy = animesposy - (landscape ? 3 : 4);
+		let clipmarkmove = 2;
+
+		let sprite = clipboard;
+		let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
+		let w0 = animegrid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
+
+		// Release touching clipboard.
+		if (animetouching >= 0 && !animetouchmoved && picoAction(0, clipboardposy, w0, w0)) {
+			console.log("Release touching frame.");
+			animetouching = 0;
+			frametouching = -1;
+			pixeltouching = -1;
+			colortouching = -1;
+			animetouchmoved = 0;
+
+			// Update buffer from clipboard.
+			console.log("Paste from clipboard.");
+			buffers[frame] = clipboard;
+			frameselecting = -1;
+			animeflag = 1; // End clipboard mode.
+			playing = -1; // Reset pixels from buffer.
+			picoBeep(0, 0.1);
+
+			picoSprite(sprite, 0, 0, clipboardposy, 0, w3 / animewidth); // Touching frame.
+			picoChar("%", 0, 0, clipmarkposy+clipmarkmove, 0, 1);
+
+		// Touching clipboard.
+		} else if (animetouching >= 0 && !animetouchmoved && picoMotion(0, clipboardposy, w0, w0)) {
+			console.log("Touching frame.");
+			animetouching = 1;
+			frametouching = -1;
+			pixeltouching = -1;
+			colortouching = -1;
+
+			picoSprite(sprite, 0, 0, clipboardposy, 0, w3 / animewidth); // Selecting frames.
+			picoChar("%", 0, 0, clipmarkposy+clipmarkmove, 0, 1);
+
+		// Not touching clipboard.
+		} else {
+			if (animetouching) {
+				animetouchmoved = 1;
+			}
+			if (pixeltouching > 0 && !pixeltouchmoved) {
+				picoSprite(sprite, 0, 0, clipboardposy, 0, w2 / animewidth); // Deselecting frames.
+				picoChar("&", 0, 0, clipmarkposy-clipmarkmove, 0, 1);
+			} else {
+				picoSprite(sprite, 0, 0, clipboardposy, 0, w1 / animewidth); // Unselecting frames.
+				picoChar("%", 0, 0, clipmarkposy, 0, 1);
+			}
+		}
+	}
+
 	// Draw pixels.
 	{
 		let pixeltouchmovex = 0, pixeltouchmovey = 0; // Touch position difference for frame moving.
@@ -784,14 +836,27 @@ async function appMain() {
 					let j0 = j - yoffset, i0 = i - xoffset;
 					// Start testing on tapping within 15 msec.
 					if (pixeltouching >= 0 && pixeltouching < 15 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
-						if (clipboard) {
-							console.log("End paste from clipboard.");
-							clipboard = null;
+						if (animeflag == 2) {
+							// Copy to clipboard.
+							console.log("Copy to clipboard.");
+							clipboard = buffers[frame] ? buffers[frame] : [0,7,7];
+							animeflag = 1; // End clipboard mode.
 							pixeltouchmoved = 1;
-							appUpdate();
+							playing = -1; // Reset pixels from buffer.
+							let text = await picoClipboard(picoCode6String(clipboard));
+							if (text) {
+								console.log("Copy to clipboard:" + text);
+								picoBeep(1.2, 0.1);
+								picoBeep(1.2, 0.1, 0.2);
+							} else {
+								console.log("No data on buffer.");
+								picoBeep(-1.2, 0.1);
+								picoBeep(-1.2, 0.1, 0.2);
+							}
+							animeflag = 1; // End clipboard mode.
 							picoBeep(1.2, 0.1);
-							picoBeep(1.2, 0.1, 0.2);
-						} else if (!testing) {
+
+						} else if (animeflag == 1 && !testing) {
 							console.log("Start testing:" + anime);
 							testing = 1;
 							appUpdate();
@@ -799,28 +864,31 @@ async function appMain() {
 						}
 
 					} else if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2+1)) {
-						if (testing) {
+						if (animeflag == 1 && testing) {
 							console.log("End testing:" + anime);
 							testing = 0;
 							pixeltouchmoved = 1;
 							appUpdate();
 							picoBeep(1.2, 0.1);
 							picoBeep(1.2, 0.1, 0.2);
+
 						} else {
 							//console.log("Touch animes" + 
 							//	pixeltouching + " " + xoffset + "," + yoffset + ":" + 
 							//	pixeltouchposx + "," + pixeltouchposy+"->"+i0+","+j0);
 							if (pixeltouching > 0 && !testing && (pixeltouchposx != i0 || pixeltouchposy != j0)) {
 								pixeltouchmoved = 1;
-								pixeltouchmovex += pixeltouchposx - i0;
-								pixeltouchmovey += pixeltouchposy - j0;
+								if (animeflag == 1) {
+									pixeltouchmovex += pixeltouchposx - i0;
+									pixeltouchmovey += pixeltouchposy - j0;
 								//console.log("Moving:" + pixeltouchmovex + "," + pixeltouchmovey);
+								}
 							}
 							pixeltouchposx = i0;
 							pixeltouchposy = j0;
 
 							console.log("Touch pixels.");
-							pixeltouching++; // Touch pixels.
+							pixeltouching++; // Touching pixels.
 							frametouching = -1;
 							animetouching = -1;
 							colortouching = -1;
@@ -878,25 +946,51 @@ async function appMain() {
 			appUpdate(false);
 		}
 
-		// View mode.
 		let l = blockwidth - 1;
-		if (animeflag) {
 
-			// Touching on view mode.
+		// Clip mode.
+		if (animeflag == 2) {
+			if (pixeltouching > 0 && !pixeltouchmoved) {
+				l = blockwidth;
+			} else if (animetouching > 0 && !animetouchmoved) {
+				l = blockwidth;
+			}
+
+		// View mode.
+		} else if (animeflag == 1) {
+			//console.log("Touching frame.");
+
+			// Continue touching frame.
 			if (pixeltouching > 0) {
-				//console.log("Touching anime.");
+				//console.log("Continue touching frame.");// + frameholding);
+				frameholding++;
 
-				// Draw background of pixelframes.
-				//picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
+				// Start clipboard mode.
+				if (frameholding >= 60 && !pixeltouchmoved) {
+					console.log("Start clipboard mode.");// + frameholding);
+					pixeltouching = -1;
+					frameholding = 0;
+					animeflag = 2; // Start clipboard mode.
+
+					// Load from clipboard.
+					let text = await picoClipboard();
+					if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
+						console.log("Load from clipboard:" + text);
+						clipboard = picoStringCode6(text);
+						frameselecting = -1;
+					}
+					picoBeep(1.2, 0.1);
+				}
 
 				// Touch moving pixels on view mode.
-				//if (pixeltouchmoved) {
-					l = blockwidth;
-				//}
+				l = blockwidth;
+			} else {
+				frameholding = 0;
 			}
 
 		// Edit mode.
 		} else {
+			frameholding = 0;
 			l = blockwidth;
 		}
 
@@ -908,7 +1002,7 @@ async function appMain() {
 	}
 
 	// Draw animes.
-	if (animeflag) {
+	if (animeflag == 1) {
 		let margin = landscape ? (anime <= 13 ? 2 : 1) : (anime <= 17 ? 2 : 1);
 		let w1 = animegrid - margin; // Width.
 		let w2 = animegrid; // Width for selecting.
@@ -926,25 +1020,6 @@ async function appMain() {
 			if (animetouching >= 0 && picoAction(x, animesposy, w0, w0)) {
 				console.log("Release touching frame.");
 				animetouching = 0;
-
-				if (animetapping > 0) {
-					animetapping = 0;
-
-					// Copy to clipboard.
-					let text = await picoClipboard(picoCode6String(buffers[frame]));
-					if (text) {
-						console.log("Copy to clipboard:" + text);
-						picoBeep(1.2, 0.1);
-						picoBeep(1.2, 0.1, 0.2);
-					} else {
-						console.log("No data on buffer.");
-						picoBeep(-1.2, 0.1);
-						picoBeep(-1.2, 0.1, 0.2);
-					}
-				} else {
-					animetapping = 1;
-					picoBeep(1.2, 0.1);
-				}
 
 				// Release holding frame.
 				picoSprite(sprite, 0, x, animesposy, 0, w3 / animewidth); // Selecting frame.
@@ -966,10 +1041,8 @@ async function appMain() {
 				} else if (animetouching == 0) {
 					console.log("Touching frame.");
 					animetouching = 1;
-					animeholding = 0;
 					if (frame != i) {
 						frame = i;
-						clipboard = null; // Cancel paste from clipboard.
 						playing = -1; // Reset pixels from buffer.
 					}
 					
@@ -980,31 +1053,6 @@ async function appMain() {
 						frame = i;
 						playing = -1; // Reset pixels from buffer.
 					}
-
-				// Continue touching anime.
-				} else {
-					console.log("Continue touching anime.");// + animeholding);
-					animeholding++;
-
-					// Paste from clipboard.
-					if (animeholding >= 60) {
-						animetouching = -1;
-						animeholding = 0;
-
-						// Load from clipboard.
-						let text = await picoClipboard();
-						if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
-							console.log("Load from clipboard:" + text);
-							clipboard = picoStringCode6(text);
-							frameselecting = -1;
-							playing = -1; // Reset pixels from clipboard.
-							picoBeep(1.2, 0.1);
-						} else {
-							console.log("No data on clipboard.");
-							picoBeep(-1.2, 0.1);
-							picoBeep(-1.2, 0.1, 0.2);
-						}
-					}
 				}
 
 				// Touch holding frame.
@@ -1012,7 +1060,6 @@ async function appMain() {
 
 			// Not touching but selecting frame.
 			} else if (frameselecting == i) {
-				animeholding = 0;
 
 				// Touch holding frame.
 				//if (animetouching >= 1) {
@@ -1184,21 +1231,15 @@ async function appMain() {
 			appUpdate();
 		}
 		frametouching = 0;
+		frameholding = 0;
 		pixeltouching = 0;
 		pixeltouchmoving = 0;
 		pixeltouchmoved = 0;
 		colortouching = 0;
 		animetouching = 0;
+		animetouchmoved = 0;
 		pixeltouchposx = 0;
 		pixeltouchposy = 0;
-	}
-
-	// Increment tapping count.
-	if (animetapping > 0) {
-		//console.log("Increment tapping count:" + animetapping);
-		// Ignore tappng over 30 msec.
-		animetapping = animetapping+1 < 30 ? animetapping+1 : 0;
-		picoFlush();
 	}
 
 	// Increment testing count.
