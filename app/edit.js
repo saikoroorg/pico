@@ -761,60 +761,90 @@ async function appMain() {
 	// Draw clipboard.
 	if (animeflag == 2) {
 		let margin = 2;
+		let w0 = animegrid/2, h0 = (landscape ? 3 : 4)/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
 		let w1 = animegrid - margin; // Width.
 		let w2 = animegrid - margin*2; // Width for deselecting.
 		let w3 = animegrid + margin; // Width for selecting.
-		let clipmarkposy = animesposy + (landscape ? 3 : 4);
 		let clipboardposy = animesposy - (landscape ? 3 : 4);
-		let clipmarkmove = 2;
+		let cliparrowposy0 = animesposy + (landscape ? 3 : 4);
+		let cliparrowposy1 = cliparrowposy0 + 2;
+		let cliparrowposy2 = cliparrowposy0 - 2;
 
 		let sprite = clipboard;
 		let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
-		let w0 = animegrid/2;// * 7 / picoSpriteSize(sprite); // Width for toucharea.
 
 		// Release touching clipboard.
-		if (animetouching >= 0 && !animetouchmoved && picoAction(0, clipboardposy, w0, w0)) {
-			console.log("Release touching frame.");
+		if (animetouching >= 0 && !animetouchmoved && picoAction(0, clipboardposy, w0, h0)) {
+			console.log("Release touching clipboard.");
 			animetouching = 0;
 			frametouching = -1;
 			pixeltouching = -1;
 			colortouching = -1;
 			animetouchmoved = 0;
 
-			// Update buffer from clipboard.
+			// Paste from clipboard.
 			console.log("Paste from clipboard.");
 			buffers[frame] = clipboard;
 			frameselecting = -1;
-			animeflag = 1; // End clipboard mode.
 			playing = -1; // Reset pixels from buffer.
 			picoBeep(0, 0.1);
 
-			picoSprite(sprite, 0, 0, clipboardposy, 0, w3 / animewidth); // Touching frame.
-			picoChar("%", 0, 0, clipmarkposy+clipmarkmove, 0, 1);
+			picoSprite(sprite, 0, 0, clipboardposy, 0, w3 / animewidth); // Touched clipboard.
+			picoChar("%", 0, 0, cliparrowposy1, 0, 1);
 
 		// Touching clipboard.
-		} else if (animetouching >= 0 && !animetouchmoved && picoMotion(0, clipboardposy, w0, w0)) {
-			console.log("Touching frame.");
+		} else if (animetouching >= 0 && !animetouchmoved && picoMotion(0, clipboardposy, w0, h0)) {
+			console.log("Touching clipboard.");
 			animetouching = 1;
 			frametouching = -1;
 			pixeltouching = -1;
 			colortouching = -1;
 
-			picoSprite(sprite, 0, 0, clipboardposy, 0, w3 / animewidth); // Selecting frames.
-			picoChar("%", 0, 0, clipmarkposy+clipmarkmove, 0, 1);
+			picoSprite(sprite, 0, 0, clipboardposy, 0, w3 / animewidth); // Selecting clipboard.
+			picoChar("%", 0, 0, cliparrowposy1, 0, 1);
+
+		// Release touching cliparrow.
+		} else if (animetouching >= 0 && !animetouchmoved && picoAction(0, cliparrowposy0, w0, h0)) {
+			console.log("Release touching cliparrow.");
+
+			// Copy to clipboard.
+			console.log("Copy to clipboard.");
+			clipboard = buffers[frame] ? buffers[frame] : [0,7,7];
+			pixeltouchmoved = 1;
+			playing = -1; // Reset pixels from buffer.
+			let text = await picoClipboard(picoCode6String(clipboard));
+			if (text) {
+				console.log("Copy to clipboard:" + text);
+				picoBeep(1.2, 0.1);
+				picoBeep(1.2, 0.1, 0.2);
+			} else {
+				console.log("No data on buffer.");
+				picoBeep(-1.2, 0.1);
+				picoBeep(-1.2, 0.1, 0.2);
+			}
+
+			picoSprite(sprite, 0, 0, clipboardposy, 0, w2 / animewidth); // Selecting cliparrow.
+			picoChar("&", 0, 0, cliparrowposy2, 0, 1);
+
+		// Touching cliparrow.
+		} else if (animetouching >= 0 && !animetouchmoved && picoMotion(0, cliparrowposy0, w0, h0)) {
+			console.log("Touching cliparrow.");
+			animetouching = 1;
+			frametouching = -1;
+			pixeltouching = -1;
+			colortouching = -1;
+
+			picoSprite(sprite, 0, 0, clipboardposy, 0, w2 / animewidth); // Selecting cliparrow.
+			picoChar("&", 0, 0, cliparrowposy2, 0, 1);
 
 		// Not touching clipboard.
 		} else {
+
 			if (animetouching) {
 				animetouchmoved = 1;
 			}
-			if (pixeltouching > 0 && !pixeltouchmoved) {
-				picoSprite(sprite, 0, 0, clipboardposy, 0, w2 / animewidth); // Deselecting frames.
-				picoChar("&", 0, 0, clipmarkposy-clipmarkmove, 0, 1);
-			} else {
-				picoSprite(sprite, 0, 0, clipboardposy, 0, w1 / animewidth); // Unselecting frames.
-				picoChar("%", 0, 0, clipmarkposy, 0, 1);
-			}
+			picoSprite(sprite, 0, 0, clipboardposy, 0, w1 / animewidth); // Unselecting clipboard.
+			picoChar("%", 0, 0, cliparrowposy0, 0, 1);
 		}
 	}
 
@@ -837,22 +867,6 @@ async function appMain() {
 					// Start testing on tapping within 15 msec.
 					if (pixeltouching >= 0 && pixeltouching < 15 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
 						if (animeflag == 2) {
-							// Copy to clipboard.
-							console.log("Copy to clipboard.");
-							clipboard = buffers[frame] ? buffers[frame] : [0,7,7];
-							animeflag = 1; // End clipboard mode.
-							pixeltouchmoved = 1;
-							playing = -1; // Reset pixels from buffer.
-							let text = await picoClipboard(picoCode6String(clipboard));
-							if (text) {
-								console.log("Copy to clipboard:" + text);
-								picoBeep(1.2, 0.1);
-								picoBeep(1.2, 0.1, 0.2);
-							} else {
-								console.log("No data on buffer.");
-								picoBeep(-1.2, 0.1);
-								picoBeep(-1.2, 0.1, 0.2);
-							}
 							animeflag = 1; // End clipboard mode.
 							picoBeep(1.2, 0.1);
 
