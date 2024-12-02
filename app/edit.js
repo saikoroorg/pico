@@ -352,7 +352,7 @@ async function appMain() {
 	}
 
 	// Layouts.
-	let animesposx = 0, animesposy = landscape ? -70 : -86; // Offset of animeeditor.
+	let animesposx = 0, animesposy = landscape ? -68 : -86; // Offset of animeeditor.
 	let bganimewidth = landscape ? 180 : 138, bganimeheight = landscape ? 24 : 32; // Background of animeeditor width and height.
 	let bganimecolor = 1; // Background of animeeditor color.
 
@@ -368,7 +368,7 @@ async function appMain() {
 	let bgframeheight = landscape ? 116 : 152; // Background of pixelframes width and height.
 	let bgframecolor = 2; // Background of pixelframes color.
 
-	let colorsposx = 0, colorsposy = landscape ? 62 : 76; // Offset of coloreditor.
+	let colorsposx = 0, colorsposy = landscape ? 60 : 76; // Offset of coloreditor.
 	let colorswidth = (colorflag ? 9 : depth) * (landscape ? 14 : 12), colorsheight = colorflag ? 20 : 16; // Coloreditor width and height.
 	let bgcolorwidth = landscape ? 160 : animeflag ? 132 : 138, bgcolorheight = landscape ? 24 : 32; // Background of coloreditor width and height.
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background coloreditor width and height for touching.
