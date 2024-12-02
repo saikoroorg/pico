@@ -275,8 +275,8 @@ async function appLoad() {
 			// Load pixels.
 			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
 				buffers[framecount] = picoCode6(keys[k]);
-				frame = framecount;
 				anime = framecount + 1;
+				frame = 0;
 				if (anime >= 2) {
 					animeflag = 1;
 				}
@@ -784,11 +784,7 @@ async function appMain() {
 					let j0 = j - yoffset, i0 = i - xoffset;
 					// Start testing on tapping within 15 msec.
 					if (pixeltouching >= 0 && pixeltouching < 15 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
-						if (animeflag == 2) {
-							animeflag = 1; // End clipboard mode.
-							picoBeep(1.2, 0.1);
-
-						} else if (animeflag == 1 && !testing) {
+						if (animeflag && !testing) {
 							console.log("Start testing:" + anime);
 							testing = 1;
 							appUpdate();
@@ -796,7 +792,7 @@ async function appMain() {
 						}
 
 					} else if (pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2+1)) {
-						if (animeflag == 1 && testing) {
+						if (animeflag && testing) {
 							console.log("End testing:" + anime);
 							testing = 0;
 							pixeltouchmoved = 1;
@@ -923,17 +919,6 @@ async function appMain() {
 		let w2 = animegrid; // Width for selecting.
 		let w3 = animegrid - margin*1.5; // Width for holding.
 		let w4 = animegrid + margin; // Width for copyed.
-
-		let wc0 = animegrid/2, hc0 = animegrid/2; // Width for clipboard.
-		let wc1 = animegrid + margin*0.5; // Width for clipboard deselecting.
-		let wc2 = animegrid - margin*2.0; // Width for clipboard selecting.
-
-		let yc0 = (landscape ? -6 : -8); // Y offset of clipboard image.
-		let yc1 = (landscape ? -2 : -4); // Y offset of clipboard image on selecting.
-
-		let ya0 = (landscape ? 0 : 0); // Y offset of clipboard button.
-		let ya1 = (landscape ? 4 : 6), ya2 = (landscape ? -1 : -2); // Y offset of clipboard button on selecting/deselecting.
-		let ca1 = "%", ca2 = "&"; // Clipboard button chars on selecting/deselecting.
 
 		let arrowbuttonwidth = animegrid;
 		for (let i = 0; i < anime; i++) {
@@ -1119,8 +1104,9 @@ async function appMain() {
 			if (colortouching >= 0 && picoAction(x, colorsposy, colorsgrid/2, colorsheight/2)) {
 				console.log("Release touching color.");
 				colortouching = 0;
-				if (!testing && animeflag) {
+				if (animeflag) {
 					animeflag = 0;
+					testing = 0;
 					appUpdate(true);
 				}
 				picoBeep(0, 0.1);
