@@ -916,7 +916,7 @@ async function appMain() {
 	}
 
 	// Draw animes.
-	if (animeflag >= 1) {
+	if (animeflag) {
 		let margin = landscape ? (anime <= 13 ? 2 : 1) : (anime <= 17 ? 2 : 1);
 		let w0 = animegrid/2, h0 = animegrid/2; // Width for toucharea.
 		let w1 = animegrid - margin; // Width.
@@ -943,13 +943,13 @@ async function appMain() {
 			let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
 
 			// Clipboard mode.
-			if (animetouching > 0 && !animetouchmoved && i == frame) {
+			if (frametouching > 0 && !animetouchmoved && i == frame) {
 
 				// Release touching up-arrow.
-				if (animetouching > 0 && !animetouchmoved && picoAction(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				if (frametouching > 0 && !animetouchmoved && picoAction(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					console.log("Release touching up-arrow.");
-					animetouching = 0;
-					frametouching = -1;
+					frametouching = 0;
+					animetouching = -1;
 					pixeltouching = -1;
 					colortouching = -1;
 
@@ -974,17 +974,17 @@ async function appMain() {
 					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y1, 0, arrowbuttonscale1);
 
 				// Touching up-arrow.
-				} else if (animetouching > 0 && !animetouchmoved && picoMotion(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				} else if (frametouching > 0 && !animetouchmoved && picoMotion(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					//console.log("Touching up-arrow.");
 					animetouchmovey = 1;
 					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
 					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y1, 0, arrowbuttonscale0);
 
 				// Release touching down-arrow.
-				} else if (animetouching > 0 && !animetouchmoved && picoAction(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				} else if (frametouching > 0 && !animetouchmoved && picoAction(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					console.log("Release touching down-arrow.");
-					animetouching = 1;
-					frametouching = -1;
+					frametouching = 1;
+					animetouching = -1;
 					pixeltouching = -1;
 					colortouching = -1;
 
@@ -1006,14 +1006,14 @@ async function appMain() {
 					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y1, 0, arrowbuttonscale1);
 
 				// Touching down-arrow.
-				} else if (animetouching > 0 && picoMotion(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				} else if (frametouching > 0 && picoMotion(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					//console.log("Touching down-arrow.");
 					animetouchmovey = -1;
 					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
 					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y1, 0, arrowbuttonscale0);
 
 				// Touching arrows center.
-				} else if (animetouching > 0 && picoMotion(x, y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				} else if (frametouching > 0 && picoMotion(x, y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					console.log("Touching arrows center.");
 					animetouchmovey = 0;
 					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
@@ -1023,7 +1023,7 @@ async function appMain() {
 				// Not touching arrows.
 				} else {
 					//console.log("Not touching arrows.");
-					if (animetouching) {
+					if (frametouching) {
 						animetouchmovey = 0;
 						animetouchmoved = 1;
 					}
@@ -1035,9 +1035,9 @@ async function appMain() {
 			} else {
 
 				// Release touching frame.
-				if (animetouching >= 0 && picoAction(x, y, w0, h0)) {
+				if (frametouching >= 0 && picoAction(x, y, w0, h0)) {
 					console.log("Release touching frame.");
-					animetouching = 0;
+					frametouching = 0;
 					animetouchmovey = 0;
 					animetouchmoved = 0;
 
@@ -1046,8 +1046,8 @@ async function appMain() {
 					picoChar("$", 0, x, y, 0, 1.5);
 
 				// Touching frame.
-				} else if (animetouching >= 0 && picoMotion(x, y, w0, h0)) {
-					//console.log("Touching frame:" + animetouching);
+				} else if (frametouching >= 0 && picoMotion(x, y, w0, h0)) {
+					//console.log("Touching frame:" + frametouching);
 
 					if (testing) {
 						console.log("End testing:" + anime);
@@ -1057,7 +1057,7 @@ async function appMain() {
 						picoBeep(1.2, 0.1, 0.2);
 
 					// Start to touching frame.
-					} else if (animetouching == 0) {
+					} else if (frametouching == 0) {
 						console.log("Start to touching frame: " + frame + " " + i);
 						if (frame != i) {
 							frame = i;
@@ -1077,8 +1077,8 @@ async function appMain() {
 						}
 					}
 
-					animetouching = 1;
-					frametouching = -1;
+					frametouching = 1;
+					animetouching = -1;
 					pixeltouching = -1;
 					colortouching = -1;
 
@@ -1090,9 +1090,6 @@ async function appMain() {
 				} else if (frameselecting == i) {
 
 					// Touch holding frame.
-					//if (animetouching >= 1) {
-					//	picoSprite(sprite, 0, x, y, 0, w4 / animewidth); // Copyed frame.
-					//} else 
 					if (anime >= 2) {
 						//picoSprite(sprite, 0, x, y, 0, w2 / animewidth); // Selecting frame.
 						picoChar(arrowbutton0char, 0, x, y, 0, 1);
