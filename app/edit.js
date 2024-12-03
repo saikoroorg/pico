@@ -352,53 +352,50 @@ async function appMain() {
 	}
 
 	// Layouts.
-	let animesposx = 0, animesposy = landscape ? -68 : -86; // Offset of animeeditor.
-	let bganimewidth = landscape ? 180 : 138, bganimeheight = landscape ? 24 : 32; // Background of animeeditor width and height.
-	let bganimecolor = 1; // Background of animeeditor color.
+	let animesposx = 0, animesposy = landscape ? -66 : -86; // Offset of animeeditor.
+	let bganimewidth = landscape ? 160 : 140, bganimeheight = landscape ? 18 : 20; // Background of animeeditor width and height.
+	let bganimecolor = 4; // Background of animeeditor color.
 
-	let pixelswidth = landscape ? (animeflag ? 104 : 112) : (animeflag ? 132 : 140); // Size of pixels.
-	let pixelsposx = 0, pixelsposy = landscape && animeflag ? -8 : -12; // Positions of pixels.
+	let framesposx = 0, framesposy = landscape ? -4 : -6; // Offset of frameeditor.
+
+	let pixelswidth = landscape ? (animeflag ? 108 : 112) : (animeflag ? 132 : 140); // Size of pixels.
+	let pixelsposx = 0, pixelsposy = landscape ? (animeflag ? -4 : -12) : (animeflag ? -6 : -12); // Positions of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
-	let bgpixelwidth = pixelswidth+4, bgpixelheight = pixelswidth+4; // Background of pixels width and height.
-	let bgpixelcolor = 1; // Background of pixels color.
+	let bgpixelwidth = pixelswidth+2, bgpixelheight = pixelswidth+2; // Background of pixels width and height.
+	let bgpixelcolor = 3; // Background of pixels color.
 
-	let framesposx = 0, framesposy = landscape ? -12 : -18; // Positions of pixelframes.
-	let bgframewidth = landscape ? 200 : 148;
-	let bgframeheight = landscape ? 116 : 152; // Background of pixelframes width and height.
-	let bgframecolor = 2; // Background of pixelframes color.
+	let bgbuttonwidth = landscape ? 108 : 132;
+	let bgbuttoncolor = 3; // Background of buttons color.
 
-	let colorsposx = 0, colorsposy = landscape ? 60 : 76; // Offset of coloreditor.
+	let colorsposx = 0, colorsposy = landscape ? 64 : 80; // Offset of coloreditor.
 	let colorswidth = (colorflag ? 9 : depth) * (landscape ? 14 : 12), colorsheight = colorflag ? 20 : 16; // Coloreditor width and height.
-	let bgcolorwidth = landscape ? 160 : animeflag ? 132 : 138, bgcolorheight = landscape ? 24 : 32; // Background of coloreditor width and height.
+	let bgcolorwidth = landscape ? 160 : 140, bgcolorheight = landscape ? 24 : 32; // Background of coloreditor width and height.
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background coloreditor width and height for touching.
 
 	// Buttons.
-	let bgbuttonwidth = landscape ? 156 : 148;
-	let bgbuttoncolor = 2; // Background of buttons color.
-
 	const animebutton0char = "*", animebutton1char = "+", animebutton2char = "-"; // Animeeditor button chars.
 	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Animeeditor button color and scales.
-	let animebuttonwidth = landscape ? 24 : 8, animebuttonheight = 8; // Animeeditor button width and height.
-	let animebutton1x = bgbuttonwidth/2 - animebuttonwidth/2, animebutton1y = animesposy; // Animeeditor plus button position.
-	let animebutton2x = -bgbuttonwidth/2 + animebuttonwidth/2, animebutton2y = animesposy; // Animeeditor minus button position.
+	let animebuttonwidth = landscape ? 20 : 8, animebuttonheight = bganimeheight; // Animeeditor button width and height.
+	let animebutton1x = bganimewidth/2 + animebuttonwidth/2, animebutton1y = animesposy; // Animeeditor plus button position.
+	let animebutton2x = -bganimewidth/2 - animebuttonwidth/2, animebutton2y = animesposy; // Animeeditor minus button position.
 
 	const arrowbutton0char = "$", arrowbutton1char = "&", arrowbutton2char = "%"; // Anime arrow button chars.
 	const arrowbuttonxchar = "&", arrowbuttonxangle = 90; // Anime testing button char and angle.
-	let arrowbuttoncolor = bgcolor, arrowbuttonscale0 = 1, arrowbuttonscale1 = 1.5; // Anime arrow button color and scales.
+	let arrowbuttoncolor = bgcolor, arrowbuttonscale0 = 1, arrowbuttonscale1 = 0.75; // Anime arrow button color and scales.
 	let /*arrowbuttonwidth = landscape ? 24 : 10,*/ arrowbuttonheight = 10; // Anime arrow button width and height.
-	let arrowbutton1x = 0, arrowbutton1y = -10, arrowbutton1y0 = -2, arrowbutton1y1 = -6; // Anime up-arrow button offset.
-	let arrowbutton2x = 0, arrowbutton2y = +10, arrowbutton2y0 = +2, arrowbutton2y1 = +6; // Anime down-arrow button offset.
+	let arrowbutton1x = 0, arrowbutton1y = -10, arrowbutton1y0 = -3, arrowbutton1y1 = -5; // Anime up-arrow button offset.
+	let arrowbutton2x = 0, arrowbutton2y = +10, arrowbutton2y0 = +3, arrowbutton2y1 = +5; // Anime down-arrow button offset.
 
 	const framebutton0char = "*", framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frameeditor button char and angles.
 	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frameeditor button color and scales.
-	let framebuttonwidth = landscape ? 24 : 8, framebuttonheight = landscape ? 104 : 132; // Frameeditor button width and height.
-	let framebutton1x = bgbuttonwidth/2 - framebuttonwidth/2, framebutton1y = pixelsposy; // Frameeditor plus button position.
-	let framebutton2x = -bgbuttonwidth/2 + framebuttonwidth/2, framebutton2y = pixelsposy; // Frameeditor minus button position.
+	let framebuttonwidth = landscape ? 48 : 12, framebuttonheight = landscape ? 104 : 132; // Frameeditor button width and height.
+	let framebutton1x = bgbuttonwidth/2 + framebuttonwidth/2, framebutton1y = framesposy; // Frameeditor next button position.
+	let framebutton2x = -bgbuttonwidth/2 - framebuttonwidth/2, framebutton2y = framesposy; // Frameeditor prev button position.
 
 	const colorbutton0char = "*", colorbutton1char = "+", colorbutton2char = "-"; // Coloreditor button chars.
 	let colorbuttoncolor = bgcolor, colorbuttonscale0 = 2, colorbuttonscale1 = 1.5; // Coloreditor button color and scales.
-	let colorbuttonwidth = landscape ? 12 : animeflag ? 8 : 6, colorbuttonheight = bgcolorheight; // Coloreditor button width and height.
+	let colorbuttonwidth = landscape ? 20 : 8, colorbuttonheight = bgcolorheight; // Coloreditor button width and height.
 	let colorbutton1x = bgcolorwidth/2 + colorbuttonwidth/2, colorbutton1y = colorsposy; // Coloreditor plus button position.
 	let colorbutton2x = -bgcolorwidth/2 - colorbuttonwidth/2, colorbutton2y = colorsposy; // Coloreditor minus button position.
 
@@ -427,9 +424,11 @@ async function appMain() {
 
 		// Touch frame of pixels.
 		if (!testing && frametouching >= 0 &&
-			picoMotion(framesposx, framesposy, bgframewidth/2, bgframeheight/2) &&
-			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2)) {
-			console.log("Touch frame of pixels.");
+			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
+			(picoMotion(animesposx, animesposy, bganimewidth/2, bganimeheight/2) ||
+			 picoMotion(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2) ||
+			 picoMotion(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2))) {
+			console.log("Touch outside of pixels.");
 			animetouching = -1;
 			pixeltouching = -1;
 			colortouching = -1;
@@ -439,29 +438,31 @@ async function appMain() {
 				appUpdate(true);
 				picoBeep(1.2, 0.1);
 			}
-		// Draw background of pixels.
-		//	picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
-		//} else {
-		//	picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
+		/*// Draw background of pixels.
+			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
+		} else {
+			picoRect(bgpixelcolor, pixelsposx, pixelsposy, bgpixelwidth, bgpixelheight);
+		//*/
 		}
 	}
 
 	/*// Draw background area.
 
-	// Draw background of pixelframes.
-	picoRect(bgframecolor, framesposx, framesposy, bgframewidth, bgframeheight);
+	// Draw background of anime buttons.
+	picoRect(bgbuttoncolor, animebutton1x, animebutton1y, animebuttonwidth, animebuttonheight);
+	picoRect(bgbuttoncolor, animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight);
 
-	// Draw background of color buttons.
-	picoRect(bgbuttoncolor, colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight);
-	picoRect(bgbuttoncolor, colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight);
+	// Draw background of animeeditor.
+	picoRect(bganimecolor, animesposx, animesposy, bganimewidth, bganimeheight);
 
 	// Draw background of frame buttons.
 	picoRect(bgbuttoncolor, framebutton1x, framebutton1y, framebuttonwidth, framebuttonheight);
 	picoRect(bgbuttoncolor, framebutton2x, framebutton2y, framebuttonwidth, framebuttonheight);
+	//*/
 
-	// Draw background of anime buttons.
-	picoRect(bgbuttoncolor, animebutton1x, animebutton1y, animebuttonwidth, animebuttonheight);
-	picoRect(bgbuttoncolor, animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight);
+	//*// Draw background of color buttons.
+	picoRect(bgbuttoncolor, colorbutton1x, colorbutton1y, colorbuttonwidth, colorbuttonheight);
+	picoRect(bgbuttoncolor, colorbutton2x, colorbutton2y, colorbuttonwidth, colorbuttonheight);
 	//*/
 
 	//if (!animeflag) 
@@ -694,8 +695,6 @@ async function appMain() {
 			}
 		}
 
-		// Draw background of animeeditor.
-		//picoRect(bganimecolor, animesposx, animesposy, bganimewidth, bganimeheight);
 		// Draw background of coloreditor.
 		picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 
@@ -761,8 +760,8 @@ async function appMain() {
 		}
 	}
 
-	let animegrid = landscape ? (104 / (anime > 13 ? anime : 13)) : (132 / (anime > 12 ? anime : 12)); // Grid length of each colors.
-	let frameswidth = anime * animegrid, framesheight = animegrid; // Anime width and height.
+	let animemargin = landscape ? (anime <= 7 ? 2 : 1.5) : (anime <= 7 ? 2 : 1.5); // Frame margin.
+	let animegrid = landscape ? (160 / (anime > 10 ? anime : 10)) : (140 / (anime > 7 ? anime : 7)); // Grid length of each frames.
 
 	// Set colors data.
 	picoColor(colors.slice(0,(depth+1)*3));
@@ -914,19 +913,11 @@ async function appMain() {
 
 	// Draw animes.
 	if (animeflag) {
-		let margin = landscape ? (anime <= 13 ? 2 : 1) : (anime <= 17 ? 2 : 1);
-		let w0 = animegrid/2, h0 = animegrid/2; // Width for toucharea.
-		let w1 = animegrid - margin; // Width.
-		let w2 = animegrid; // Width for selecting.
-		let w3 = animegrid - margin*1.5; // Width for holding.
-		let w4 = animegrid + margin; // Width for copyed.
-
-		let arrowbuttonwidth = animegrid;
+		let arrowbuttonwidth = animegrid - animemargin;
 		for (let i = 0; i < anime; i++) {
 			let x = (i - (anime - 1) / 2) * animegrid + animesposx;
 			let y = animesposy;
-			let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
-			let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
+			let arrowscale = (animegrid - animemargin) / 9; // Arrow scale.
 
 			// Clipboard mode.
 			if (frametouching > 0 && !animetouchmoved && i == frame) {
@@ -956,15 +947,13 @@ async function appMain() {
 						picoBeep(-1.2, 0.1, 0.2);
 					}
 
-					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
-					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y1, 0, arrowbuttonscale1);
+					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y1, 0, arrowscale*arrowbuttonscale1);
 
 				// Touching up-arrow.
 				} else if (picoMotion(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					//console.log("Touching up-arrow.");
 					animetouchmovey = 1;
-					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
-					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y1, 0, arrowbuttonscale0);
+					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y1, 0, arrowscale*arrowbuttonscale1);
 
 				// Release touching down-arrow.
 				} else if (picoAction(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
@@ -988,23 +977,20 @@ async function appMain() {
 					playing = -1; // Reset pixels from buffer.
 					picoBeep(0, 0.1);
 
-					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
-					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y1, 0, arrowbuttonscale1);
+					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y1, 0, arrowscale*arrowbuttonscale1);
 
 				// Touching down-arrow.
 				} else if (picoMotion(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					//console.log("Touching down-arrow.");
 					animetouchmovey = -1;
-					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
-					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y1, 0, arrowbuttonscale0);
+					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y1, 0, arrowscale*arrowbuttonscale1);
 
 				// Touching arrows center.
 				} else if (picoMotion(x, y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					console.log("Touching arrows center.");
 					animetouchmovey = 0;
-					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
-					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y0, 0, arrowbuttonscale0);
-					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y0, 0, arrowbuttonscale0);
+					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y0, 0, arrowscale*arrowbuttonscale1);
+					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y0, 0, arrowscale*arrowbuttonscale1);
 
 				// Not touching arrows.
 				} else {
@@ -1013,26 +999,24 @@ async function appMain() {
 						animetouchmovey = 0;
 						animetouchmoved = 1;
 					}
-					//picoSprite(sprite, 0, x, y+yc0, 0, w1 / animewidth); // Unselecting clipboard.
-					picoChar(arrowbutton0char, 0, x, y, 0, 1);
+					picoChar(arrowbutton0char, 0, x, y, 0, arrowscale*arrowbuttonscale0);
 				}
 
 			// View mode.
 			} else {
 
 				// Release touching frame.
-				if (frametouching >= 0 && picoAction(x, y, w0, h0)) {
+				if (frametouching >= 0 && picoAction(x, y, animegrid/2, animegrid/2)) {
 					console.log("Release touching frame.");
 					frametouching = 0;
 					animetouchmovey = 0;
 					animetouchmoved = 0;
 
 					// Release holding frame.
-					//picoSprite(sprite, 0, x, y, 0, w3 / animewidth); // Selecting frame.
-					picoChar("$", 0, x, y, 0, 1.5);
+					picoChar("$", 0, x, y, 0, arrowscale*arrowbuttonscale1);
 
 				// Touching frame.
-				} else if (frametouching >= 0 && picoMotion(x, y, w0, h0)) {
+				} else if (frametouching >= 0 && picoMotion(x, y, animegrid/2, animegrid/2)) {
 					//console.log("Touching frame:" + frametouching);
 
 					if (testing) {
@@ -1069,29 +1053,25 @@ async function appMain() {
 					colortouching = -1;
 
 					// Touch holding frame.
-					//picoSprite(sprite, 0, x, y, 0, w3 / animewidth); // Touching frame.
-					picoChar("$", 0, x, y, 0, 1.5);
+					picoChar("$", 0, x, y, 0, arrowscale*arrowbuttonscale1);
 
 				// Not touching but selecting frame.
 				} else if (frameselecting == i) {
 
 					// Touching pixels to prepare testing.
 					if (testing || (pixeltouching > 0 && pixeltouching < 15 && !pixeltouchmoved)) {
-						picoChar(arrowbuttonxchar, 0, x, y, arrowbuttonxangle, 1);
-
-					// Touch holding frame.
-					} else if (anime >= 2) {
-						//picoSprite(sprite, 0, x, y, 0, w2 / animewidth); // Selecting frame.
-						picoChar(arrowbutton0char, 0, x, y, 0, 1);
+						picoChar(arrowbuttonxchar, 0, x, y, arrowbuttonxangle, arrowscale*arrowbuttonscale0);
 
 					} else {
-						//picoSprite(sprite, 0, x, y, 0, w1 / animewidth); // Only one frame.
-						picoChar(arrowbutton0char, 0, x, y, 0, 1);
+						picoChar(arrowbutton0char, 0, x, y, 0, arrowscale*arrowbuttonscale0);
 					}
 
 				// Other frames.
 				} else {
-					picoSprite(sprite, 0, x, y, 0, w1 / animewidth); // Unselecting frames.
+					let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
+					let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
+					let animescale = (animegrid - animemargin) / animewidth; // Anime scale.
+					picoSprite(sprite, 0, x, y, 0, animescale); // Unselecting frames.
 				}
 			}
 		}
