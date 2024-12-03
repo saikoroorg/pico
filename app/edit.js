@@ -932,7 +932,7 @@ async function appMain() {
 			if (frametouching > 0 && !animetouchmoved && i == frame) {
 
 				// Release touching up-arrow.
-				if (frametouching > 0 && !animetouchmoved && picoAction(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				if (picoAction(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					console.log("Release touching up-arrow.");
 					frametouching = 0;
 					animetouching = -1;
@@ -960,14 +960,14 @@ async function appMain() {
 					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y1, 0, arrowbuttonscale1);
 
 				// Touching up-arrow.
-				} else if (frametouching > 0 && !animetouchmoved && picoMotion(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				} else if (picoMotion(x+arrowbutton1x, y+arrowbutton1y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					//console.log("Touching up-arrow.");
 					animetouchmovey = 1;
 					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
 					picoChar(arrowbutton1char, 0, x+arrowbutton1x, y+arrowbutton1y1, 0, arrowbuttonscale0);
 
 				// Release touching down-arrow.
-				} else if (frametouching > 0 && !animetouchmoved && picoAction(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				} else if (picoAction(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					console.log("Release touching down-arrow.");
 					frametouching = 1;
 					animetouching = -1;
@@ -992,14 +992,14 @@ async function appMain() {
 					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y1, 0, arrowbuttonscale1);
 
 				// Touching down-arrow.
-				} else if (frametouching > 0 && picoMotion(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				} else if (picoMotion(x+arrowbutton2x, y+arrowbutton2y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					//console.log("Touching down-arrow.");
 					animetouchmovey = -1;
 					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
 					picoChar(arrowbutton2char, 0, x+arrowbutton2x, y+arrowbutton2y1, 0, arrowbuttonscale0);
 
 				// Touching arrows center.
-				} else if (frametouching > 0 && picoMotion(x, y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
+				} else if (picoMotion(x, y, arrowbuttonwidth/2, arrowbuttonheight/2)) {
 					console.log("Touching arrows center.");
 					animetouchmovey = 0;
 					//picoSprite(sprite, 0, x, y, 0, w1 / animewidth);
@@ -1049,7 +1049,7 @@ async function appMain() {
 							frame = i;
 							playing = -1; // Reset pixels from buffer.
 							animetouchmovey = 0;
-							animetouchmoved = 0;
+							animetouchmoved = 1;
 						}
 
 					// Hovering to another frame.
