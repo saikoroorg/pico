@@ -141,20 +141,25 @@ async function appAction() {
 // Select button.
 function appSelect(x) {
 
-	// Cancel animeeditor mode.
-	if (animeflag) {
-		console.log("Switch to pixeleditor mode.");
-		animeflag = 0;
-		testing = 0; // End testing.
-		picoBeep(0, 0.1);
-		appUpdate(true);
+	// End testing.
+	if (testing) {
+		console.log("End testing:" + anime);
+		testing = 0;
+		appUpdate();
+		picoBeep(1.2, 0.1);
+		picoBeep(1.2, 0.1, 0.2);
 
 	// Start animeeditor mode.
 	} else if (x == 0) {
-		console.log("Switch to animeeditor mode.");
-		animeflag = 1;
-		picoBeep(1.2, 0.1);
-		appUpdate(true);
+		console.log("Switch animeeditor mode.");
+		if (!animeflag) {
+			animeflag = 1;
+			picoBeep(1.2, 0.1);
+		} else {
+			animeflag = 0;
+			picoBeep(0, 0.1);
+		}
+		appUpdate();
 
 	// Change color depth.
 	//} else if (colorflag) {
