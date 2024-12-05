@@ -70,6 +70,9 @@ async function appUpdate(force = true) {
 		if (buffers[frame]) {
 			let data = await picoSpriteData(buffers[frame], bgcolor);
 			picoLabel("action", null, data);
+		} else if (anime >= 2) {
+			let data = await picoSpriteData([0,7,7], bgcolor);
+			picoLabel("action", null, data);
 		} else {
 			picoLabel("action", "*");
 		}
