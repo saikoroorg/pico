@@ -1089,9 +1089,9 @@ async function appMain() {
 	}
 
 	let colorsgrid = colorflag ? 14 : landscape ? 14 : 12; // Grid length of each colors.
-	let colorsscale = colorflag ? 4 : landscape ? 4 : 3.5; // Scale of colors.
-	let colorsscale0 = colorsscale / blockwidth * 2.5; // Scale of selecting colors.
-	let colorsscale1 = colorsscale / blockwidth * 3; // Scale of selected colors.
+	let colorsscale0 = colorflag ? 4 : landscape ? 4 : 3.5; // Scale of colors.
+	let colorsscale1 = colorsscale0 / blockwidth * 3.5; // Scale of colors touching.
+	let colorsscale2 = colorsscale0 / blockwidth * 3; // Scale of colors selected.
 
 	// Draw colors.
 	if (!colorflag) {
@@ -1109,7 +1109,7 @@ async function appMain() {
 					appUpdate(true);
 				}
 				picoBeep(0, 0.1);
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale1);
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1144,17 +1144,17 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale0);
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale1);
 
 			} else {
 
 				// Not touching but selecting color.
 				if (colorselecting == i) {
-					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale1);
+					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 				// Other colors.
 				} else {
-					picoChar("-", i, x, colorsposy, 0, colorsscale);
+					picoChar("-", i, x, colorsposy, 0, colorsscale0);
 				}
 			}
 		}
