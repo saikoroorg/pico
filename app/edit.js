@@ -226,7 +226,7 @@ var animetouchmovey = 0; // Direction y of touch moving on view mode.
 var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
-const blockwidth = 5; // Width of block sprite.
+const blockwidth = 4; // Width of block sprite.
 
 // Resize.
 async function appResize() {
@@ -361,23 +361,22 @@ async function appMain() {
 	}
 
 	// Layouts.
-	let animesposx = 0, animesposy = landscape ? -66 : -86; // Offset of animeeditor.
+	let animesposx = 0, animesposy = landscape ? -68 : -86; // Offset of animeeditor.
 	let bganimewidth = landscape ? 160 : 140, bganimeheight = landscape ? 18 : 20; // Background of animeeditor width and height.
 	let bganimecolor = 4; // Background of animeeditor color.
 
-	let framesposx = 0, framesposy = landscape ? -4 : -6; // Offset of frameeditor.
-
-	let pixelwidth = animeflag ? 16 : 20; // Width of basepixels, that is proportional to blocksize-1:blocksize.
+	let pixelwidth = (animeflag ? (blockwidth-1) : blockwidth) * 5; // Width of basepixels, that is proportional to blockwidth-1:blockwidth.
 	let pixelcount = landscape ? 6 : 7; // Count of basepixels.
+	let pixelswidth = pixelwidth * pixelcount; // Size of pixels. L:90(15*6),120(20*6) / P:115(15*7),140(20*7)
 
-	let pixelswidth = pixelwidth * pixelcount; // Size of pixels. L:108,120 / P:126,140 <= L:108,112 / P:132,140
 	let pixelsposx = 0, pixelsposy = landscape ? (animeflag ? -4 : -12) : (animeflag ? -6 : -12); // Positions of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
 	let bgpixelwidth = pixelswidth+2, bgpixelheight = pixelswidth+2; // Background of pixels width and height.
 	let bgpixelcolor = 3; // Background of pixels color.
 
-	let bgbuttonwidth = landscape ? 108 : 132;
+	let framesposx = 0, framesposy = landscape ? -4 : -6; // Offset of frameeditor.
+	let bgframewidth = landscape ? 90 : 115; // Background of frameeditor width.
 	let bgbuttoncolor = 3; // Background of buttons color.
 
 	let colorsposx = 0, colorsposy = landscape ? 64 : 80; // Offset of coloreditor.
@@ -401,9 +400,9 @@ async function appMain() {
 
 	const framebutton0char = "*", framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frameeditor button char and angles.
 	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frameeditor button color and scales.
-	let framebuttonwidth = landscape ? 48 : 12, framebuttonheight = landscape ? 104 : 132; // Frameeditor button width and height.
-	let framebutton1x = bgbuttonwidth/2 + framebuttonwidth/2, framebutton1y = framesposy; // Frameeditor next button position.
-	let framebutton2x = -bgbuttonwidth/2 - framebuttonwidth/2, framebutton2y = framesposy; // Frameeditor prev button position.
+	let framebuttonwidth = landscape ? 55 : 20, framebuttonheight = landscape ? 104 : 132; // Frameeditor button width and height.
+	let framebutton1x = bgframewidth/2 + framebuttonwidth/2, framebutton1y = framesposy; // Frameeditor next button position.
+	let framebutton2x = -bgframewidth/2 - framebuttonwidth/2, framebutton2y = framesposy; // Frameeditor prev button position.
 
 	const colorbutton0char = "*", colorbutton1char = "+", colorbutton2char = "-"; // Coloreditor button chars.
 	let colorbuttoncolor = bgcolor, colorbuttonscale0 = 2, colorbuttonscale1 = 1.5; // Coloreditor button color and scales.
