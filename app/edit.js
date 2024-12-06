@@ -488,8 +488,9 @@ async function appMain() {
 
 			// Cancel animeeditor mode.
 			if (!colorflag) {
-				if (!testing && animeflag) {
+				if (animeflag) {
 					animeflag = 0;
+					testing = 0;
 					appUpdate(true);
 				}
 				picoBeep(0, 0.1);
