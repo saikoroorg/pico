@@ -227,6 +227,7 @@ var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
 const blockwidth = 4; // Width of block sprite.
+const charwidth = 4; // Width of char sprite.
 
 // Resize.
 async function appResize() {
@@ -361,8 +362,8 @@ async function appMain() {
 	}
 
 	// Layouts.
-	let animesposx = 0, animesposy = landscape ? -68 : -86; // Offset of animeeditor.
-	let bganimewidth = landscape ? 160 : 140, bganimeheight = landscape ? 18 : 20; // Background of animeeditor width and height.
+	let animesposx = 0, animesposy = landscape ? -66 : -86; // Offset of animeeditor.
+	let bganimewidth = landscape ? 160 : 140, bganimeheight = landscape ? 16 : 20; // Background of animeeditor width and height.
 	let bganimecolor = 4; // Background of animeeditor color.
 
 	let pixelwidth = (animeflag ? (blockwidth-1) : blockwidth) * 5; // Width of basepixels, that is proportional to blockwidth-1:blockwidth.
@@ -379,8 +380,13 @@ async function appMain() {
 	let bgframewidth = landscape ? 90 : 115; // Background of frameeditor width.
 	let bgbuttoncolor = 3; // Background of buttons color.
 
-	let colorsposx = 0, colorsposy = landscape ? 64 : 80; // Offset of coloreditor.
-	let colorswidth = (colorflag ? 9 : depth) * (landscape ? 14 : 12), colorsheight = colorflag ? 20 : 16; // Coloreditor width and height.
+	const colorsgrid = 14; // Grid length of each colors.
+	const colorsscale0 = 4; // Scale of colors.
+	const colorsscale1 = colorsscale0 / blockwidth * 3.5; // Scale of colors touching.
+	const colorsscale2 = colorsscale0 / blockwidth * 3; // Scale of colors selected.
+
+	let colorsposx = 0, colorsposy = landscape ? 62 : 80; // Offset of coloreditor.
+	let colorswidth = (colorflag ? 8 : depth) * colorsgrid, colorsheight = colorflag ? 20 : 16; // Coloreditor width and height.
 	let bgcolorwidth = landscape ? 160 : 140, bgcolorheight = landscape ? 24 : 32; // Background of coloreditor width and height.
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background coloreditor width and height for touching.
 
@@ -410,14 +416,13 @@ async function appMain() {
 	let colorbutton1x = bgcolorwidth/2 + colorbuttonwidth/2, colorbutton1y = colorsposy; // Coloreditor plus button position.
 	let colorbutton2x = -bgcolorwidth/2 - colorbuttonwidth/2, colorbutton2y = colorsposy; // Coloreditor minus button position.
 
-	const numberscale0 = 4, numberscale1 = 3; // Color number scales.
-	let numberlength = 9, numbergrids = 2.5, numberoffset = 2; // Color number potisions.
-	let numberwidth = 8, numberheight = 16; // Color number width and height.
+	const numbersscale0 = 4, numbersscale1 = 3.5; // Scale of color number.
+	const numberwidth = 16, numberheight = 16; // Color number width and height.
 
-	const incdecbutton0char = "*", incdecbutton1char = "+", incdecbutton2char = "-"; // Color inc/dec button char.
-	const incdecbuttonscale0 = 3, incdecbuttonscale1 = 2; // Color inc/dec button scales.
-	const incdecbutton1angle = 0, incdecbutton1x = numberwidth, incdecbutton1y = 0; // Color inc/dec button angle and offset.
-	const incdecbutton2angle = 0, incdecbutton2x = -numberwidth, incdecbutton2y = 0; // Color inc/dec button angle and offset.
+	const numberbutton0char = "*", numberbutton1char = "+", numberbutton2char = "-"; // Color number button char.
+	const /*numberbuttonscale0 = 4,*/ numberbuttonscale1 = 2; // Color number button scales.
+	const numberbutton1angle = 0, numberbutton1x = numberwidth/2, numberbutton1y = 0; // Color number button angle and offset.
+	const numberbutton2angle = 0, numberbutton2x = -numberwidth/2, numberbutton2y = 0; // Color number button angle and offset.
 
 	// Reset color.
 	picoColor();
@@ -863,7 +868,7 @@ async function appMain() {
 							picoFlush();
 						}
 
-						picoRect(pixels[j][i], x+0.5, y+0.5, pixelsgrid, pixelsgrid);
+						picoRect(pixels[j][i] ? pixels[j][i] : coloroffset, x, y, pixelsgrid, pixelsgrid);
 						canvas += " ";
 					} else {
 						canvas += picoCode6Char(coffset+pixels[j][i]);
@@ -919,7 +924,7 @@ async function appMain() {
 		// Draw canvas.
 		let w = l * pixelscount, s = pixelswidth / w;
 		picoCharLeading(l, l);
-		picoText(canvas, -1, pixelsposx+0.5, pixelsposy+0.5, w,w, 0,s);
+		picoText(canvas, -1, pixelsposx, pixelsposy, w,w, 0,s);
 	}
 
 	// Draw animes.
@@ -1088,11 +1093,6 @@ async function appMain() {
 		}
 	}
 
-	let colorsgrid = colorflag ? 14 : landscape ? 14 : 12; // Grid length of each colors.
-	let colorsscale0 = colorflag ? 4 : landscape ? 4 : 3.5; // Scale of colors.
-	let colorsscale1 = colorsscale0 / blockwidth * 3.5; // Scale of colors touching.
-	let colorsscale2 = colorsscale0 / blockwidth * 3; // Scale of colors selected.
-
 	// Draw colors.
 	if (!colorflag) {
 
@@ -1163,17 +1163,21 @@ async function appMain() {
 	// Draw coloreditor.
 	if (colorflag) {
 		const compression = 2, maxcompresed = (1 << (8 - compression));
+		const numberoffset1 = 2.5, numberoffset2 = 2, numberlength = 9; // Color number potisions.
+		picoCharLeading(charwidth, charwidth);
 
 		// Draw buttons and color numbers.
 		if (colorselecting) {
 			for (let i = 0; i < 3; i++) {
-				let x = colorsposx + (i*numbergrids+numberoffset - numberlength/2) * colorsgrid; // Margins for each color number.
+				let x = colorsposx + (i*numberoffset1+numberoffset2 - numberlength/2) * colorsgrid; // Margins for each color number.
+				let s = numbersscale0;
 
 				// Increase color number.
 				{
 					let c = colors[colorselecting * 3 + i];
-					let c1 = c < 255 ? incdecbutton1char : incdecbutton0char;
-					if (colortouching >= 0 && picoAction(x+incdecbutton1x, colorsposy+incdecbutton1y, numberwidth/2, numberheight/2)) {
+					let c1 = c < 255 ? numberbutton1char : numberbutton0char;
+					if (colortouching >= 0 && picoAction(x+numberbutton1x, colorsposy+numberbutton1y, numberwidth/2, numberheight/2)) {
+						s = numbersscale1;
 						if (c < 255) {
 							c = (c + 1) >> compression; // Bit shift for compressed increase.
 							c = c + 1 < maxcompresed ? c + 1 : maxcompresed; // Increase.
@@ -1185,21 +1189,23 @@ async function appMain() {
 						}
 
 						// Draw increase button.
-						picoChar(c1, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale1);
-					} else if (colortouching >= 0 && picoMotion(x+incdecbutton1x, colorsposy+incdecbutton1y, numberwidth/2, numberheight/2)) {
+						picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
+					} else if (colortouching >= 0 && picoMotion(x+numberbutton1x, colorsposy+numberbutton1y, numberwidth/2, numberheight/2)) {
+						s = numbersscale1;
 						// Draw increase button.
-						picoChar(c1, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale1);
+						picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
 					} else {
 						// Hidden increase button.
-						//picoChar(c1, colorselecting, x+incdecbutton1x*2, colorsposy+incdecbutton1y, incdecbutton1angle, incdecbuttonscale0);
+						//picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale0);
 					}
 				}
 
 				// Decrease color number.
 				{
 					let c = colors[colorselecting * 3 + i];
-					let c2 = c > 0 ? incdecbutton2char : incdecbutton0char;
-					if (colortouching >= 0 && picoAction(x+incdecbutton2x, colorsposy+incdecbutton2y, 8, 8)) {
+					let c2 = c > 0 ? numberbutton2char : numberbutton0char;
+					if (colortouching >= 0 && picoAction(x+numberbutton2x, colorsposy+numberbutton2y, numberwidth/2, numberheight/2)) {
+						s = numbersscale1;
 						if (c > 0) {
 							c = (c + 1) >> compression; // Bit shift for compressed decrease.
 							c = c - 1 > 0 ? c - 1 : 0; // Decrease.
@@ -1212,13 +1218,14 @@ async function appMain() {
 						}
 
 						// Draw decrease button.
-						picoChar(c2, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale1);
-					} else if (colortouching >= 0 && picoMotion(x+incdecbutton2x, colorsposy+incdecbutton2y, numberwidth/2, numberheight/2)) {
+						picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
+					} else if (colortouching >= 0 && picoMotion(x+numberbutton2x, colorsposy+numberbutton2y, numberwidth/2, numberheight/2)) {
+						s = numbersscale1;
 						// Draw decrease button.
-						picoChar(c2, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale1);
+						picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
 					} else {
 						// Hidden decrease button.
-						//picoChar(c2, colorselecting, x+incdecbutton2x*2, colorsposy+incdecbutton2y, incdecbutton2angle, incdecbuttonscale0);
+						//picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale0);
 					}
 				}
 
@@ -1227,9 +1234,7 @@ async function appMain() {
 				let s99 = c99 >= 99 ? "99" : c99 >= 9 ? "" + (c99 + 1) : c99 >= 1 ? "0" + (c99 + 1) : "00";
 
 				// Draw color numbers.
-				let l = colorsgrid / numberscale0; // Char leading for each color number.
-				picoCharLeading(l, l);
-				picoChar(s99, colorselecting, x, colorsposy, 0, numberscale0);
+				picoChar(s99, colorselecting, x, colorsposy, 0, s);
 			}
 		}
 	}
