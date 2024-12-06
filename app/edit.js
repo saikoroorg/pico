@@ -377,8 +377,11 @@ async function appMain() {
 	let bgpixelcolor = 3; // Background of pixels color.
 
 	let framesposx = 0, framesposy = landscape ? -4 : -6; // Offset of frameeditor.
-	let bgframewidth = landscape ? 90 : 115; // Background of frameeditor width.
-	let bgbuttoncolor = 3; // Background of buttons color.
+	let framewidth = landscape ? 90 : 116; // Frameeditor width and height.
+
+	let bgframeposx = 0, bgframeposy = landscape ? -13 : -20; // Offset of frameeditor.
+	let bgframewidth = landscape ? 200 : 156, bgframeheight = landscape ? 122 : 160; // Background of frameeditor width and height.
+	let bgframecolor = 5; // Background of frameeditor color.
 
 	const colorsgrid = 14; // Grid length of each colors.
 	const colorsscale0 = 4; // Scale of colors.
@@ -391,6 +394,8 @@ async function appMain() {
 	let bgcolorwidth2 = bgcolorwidth+2, bgcolorheight2 = bgcolorheight+2; // Background coloreditor width and height for touching.
 
 	// Buttons.
+	let bgbuttoncolor = 1; // Background of buttons color.
+
 	const animebutton0char = "*", animebutton1char = "+", animebutton2char = "-"; // Animeeditor button chars.
 	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Animeeditor button color and scales.
 	let animebuttonwidth = landscape ? 20 : 8, animebuttonheight = bganimeheight; // Animeeditor button width and height.
@@ -407,8 +412,8 @@ async function appMain() {
 	const framebutton0char = "*", framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frameeditor button char and angles.
 	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frameeditor button color and scales.
 	let framebuttonwidth = landscape ? 55 : 20, framebuttonheight = landscape ? 104 : 132; // Frameeditor button width and height.
-	let framebutton1x = bgframewidth/2 + framebuttonwidth/2, framebutton1y = framesposy; // Frameeditor next button position.
-	let framebutton2x = -bgframewidth/2 - framebuttonwidth/2, framebutton2y = framesposy; // Frameeditor prev button position.
+	let framebutton1x = framewidth/2 + framebuttonwidth/2, framebutton1y = framesposy; // Frameeditor next button position.
+	let framebutton2x = -framewidth/2 - framebuttonwidth/2, framebutton2y = framesposy; // Frameeditor prev button position.
 
 	const colorbutton0char = "*", colorbutton1char = "+", colorbutton2char = "-"; // Coloreditor button chars.
 	let colorbuttoncolor = bgcolor, colorbuttonscale0 = 2, colorbuttonscale1 = 1.5; // Coloreditor button color and scales.
@@ -441,9 +446,7 @@ async function appMain() {
 		// Touch frame of pixels.
 		if (!testing && frametouching >= 0 &&
 			!picoMotion(pixelsposx, pixelsposy, pixelswidth/2, pixelswidth/2) &&
-			(picoMotion(animesposx, animesposy, bganimewidth/2, bganimeheight/2) ||
-			 picoMotion(framebutton1x, framebutton1y, framebuttonwidth/2, framebuttonheight/2) ||
-			 picoMotion(framebutton2x, framebutton2y, framebuttonwidth/2, framebuttonheight/2))) {
+			picoMotion(bgframeposx, bgframeposy, bgframewidth/2, bgframeheight/2)) {
 			console.log("Touch outside of pixels.");
 			animetouching = -1;
 			pixeltouching = -1;
@@ -462,14 +465,18 @@ async function appMain() {
 		}
 	}
 
-	/*// Draw background area.
+	// Draw background area.
+
+	/*// Draw background of frameeditor.
+	picoRect(bgframecolor, bgframeposx, bgframeposy, bgframewidth, bgframeheight);
+	//*/
+
+	/*// Draw background of animeeditor.
+	picoRect(bganimecolor, animesposx, animesposy, bganimewidth, bganimeheight);
 
 	// Draw background of anime buttons.
 	picoRect(bgbuttoncolor, animebutton1x, animebutton1y, animebuttonwidth, animebuttonheight);
 	picoRect(bgbuttoncolor, animebutton2x, animebutton2y, animebuttonwidth, animebuttonheight);
-
-	// Draw background of animeeditor.
-	picoRect(bganimecolor, animesposx, animesposy, bganimewidth, bganimeheight);
 
 	// Draw background of frame buttons.
 	picoRect(bgbuttoncolor, framebutton1x, framebutton1y, framebuttonwidth, framebuttonheight);
