@@ -226,7 +226,7 @@ var animetouchmovey = 0; // Direction y of touch moving on view mode.
 var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
-const blockwidth = 6; // Width of block sprite.
+const blockwidth = 5; // Width of block sprite.
 
 // Resize.
 async function appResize() {
@@ -367,10 +367,10 @@ async function appMain() {
 
 	let framesposx = 0, framesposy = landscape ? -4 : -6; // Offset of frameeditor.
 
-	let pixelwidth = landscape ? (animeflag ? 18 : 16) : (animeflag ? 22 : 20); // Width of each pixels.
-	let pixelcount = animeflag ? 6 : 7; // Count of each pixels.
+	let pixelwidth = animeflag ? 16 : 20; // Width of basepixels, that is proportional to blocksize-1:blocksize.
+	let pixelcount = landscape ? 6 : 7; // Count of basepixels.
 
-	let pixelswidth = pixelwidth * pixelcount; // Size of pixels.
+	let pixelswidth = pixelwidth * pixelcount; // Size of pixels. L:108,120 / P:126,140 <= L:108,112 / P:132,140
 	let pixelsposx = 0, pixelsposy = landscape ? (animeflag ? -4 : -12) : (animeflag ? -6 : -12); // Positions of pixels.
 	let pixelscount = width < height ? width : height; // Line/Row count of pixels.
 	let pixelsgrid = pixelswidth / pixelscount; // Grid length of each pixels.
