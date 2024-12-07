@@ -406,8 +406,8 @@ async function appMain() {
 	const arrowbuttonxchar = "&", arrowbuttonxangle = 90; // Anime testing button char and angle.
 	let arrowbuttoncolor = bgcolor, arrowbuttonscale0 = 1, arrowbuttonscale1 = 0.75; // Anime arrow button color and scales.
 	let /*arrowbuttonwidth = landscape ? 24 : 10,*/ arrowbuttonheight = 10; // Anime arrow button width and height.
-	let arrowbutton1x = 0, arrowbutton1y = -10, arrowbutton1y0 = -3, arrowbutton1y1 = -5; // Anime up-arrow button offset.
-	let arrowbutton2x = 0, arrowbutton2y = +10, arrowbutton2y0 = +3, arrowbutton2y1 = +5; // Anime down-arrow button offset.
+	let arrowbutton1x = 0, arrowbutton1y = -10, arrowbutton1y0 = -3, arrowbutton1y1 = -8; // Anime up-arrow button offset.
+	let arrowbutton2x = 0, arrowbutton2y = +10, arrowbutton2y0 = +3, arrowbutton2y1 = +8; // Anime down-arrow button offset.
 
 	const framebutton0char = "*", framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frameeditor button char and angles.
 	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frameeditor button color and scales.
