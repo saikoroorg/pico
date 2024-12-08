@@ -117,6 +117,7 @@ async function appMain() {
 			//playing = -1; // Reroll.
 			//picoFlush(); // Update animation without input.
 			state = "menu";
+			playing = -1;
 			appUpdate(); // Show menu.
 			return;
 		} else if (picoMotion()) {
@@ -146,7 +147,7 @@ async function appMain() {
 	// Menu.
 	if (state == "menu") {
 		// Scale animation at start.
-		let s = playing < 5 ? (0.8 + 0.04 * playing) : 1;
+		let s = playing < 5 ? (0.9 + 0.02 * playing) : 1;
 		// 300(Image size) * 0.4(Image scale) / 4(Pixel ratio) = 30(Pixel size)
 		const itemcolor = 2, itemscale = 1.5, imagescale = 0.4;
 		const itemwidth = 30, itemvgrid = 44, itemhgrid = 44;
