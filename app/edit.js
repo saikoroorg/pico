@@ -6,7 +6,6 @@ var colors = [ // Colors.
 	231,0,95, 0,119,239,  0,151,63, 
 	// 7:Gold(332), 8:Silver(555), 9:Black(000),
 	191,191,127, 223,223,223, 0,0,0];
-var bgcolor = 0; // Original design bg color.
 const maxwidth = 60, maxheight = 60; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
@@ -21,9 +20,10 @@ var testing = 0; // Testing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = 3;//colors.length/3; // Color count.
-const coffset = 36; // Color offset.
-const maxcolor = 10;//26; // Color max count.
-var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting, 2:framecopying.
+const coloroffset = 35; // Color min index.
+const maxcolor = 10; // Color max count.
+var bgcolor = coloroffset; // Bg color -1 if transparent.
+var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting.
 var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
 
 // Update icon image.
@@ -131,7 +131,7 @@ async function appAction() {
 		}
 		if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 			(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
-			picoSetCode8(colors.slice(0,(depth+1)*3), k);
+			picoSetCode8(colors.slice(0, depth*3), k);
 		}
 
 		// Back or share.
@@ -209,13 +209,12 @@ function appSelect(x) {
 }
 
 // Touching flags and states.
-var bgindex = 0; // Background color index.
 var pixeltouching = 0; // -1:invalid, 0:untouched, 1+:touching.
 var pixeltouchmoving = 0; // Pixel touching on view mode.
 var pixeltouchmoved = 0; // Pixel touch moved on view mode.
 var colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var colorholding = 0; // 0:untouched, 1+:touching.
-var colorselecting = depth; // Touching color index.
+var colorselecting = 0; // Touching color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var frameholding = 0; // 0:untouched, 1+:holding count.
 var frameselecting = -1; // Selecting frame index.
@@ -243,14 +242,14 @@ async function appLoad() {
 	let char0 = "0" + picoCodeChar(blockwidth) + picoCodeChar(blockwidth);
 	let char1 = "00" + "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	for (let i = 0; i < maxcolor; i++) {
-		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(i) + char1));
+		picoCharSprite(picoCode6Char(coloroffset+i), picoStringCode6(char0 + picoCode6Char(coloroffset+i) + char1));
 	}
 
 	// Initialize pixels on max size.
 	for (let j = 0; j < maxheight; j++) {
 		pixels[j] = [];
 		for (let i = 0; i < maxwidth; i++) {
-			pixels[j][i] = 0;
+			pixels[j][i] = coloroffset;
 		}
 	}
 
@@ -261,29 +260,26 @@ async function appLoad() {
 		if (value) {
 			////console.log("Param" + k + ": " + keys[k] + " -> " + picoString(k));
 
-
 			// Load colors.
-			if ((value[0] == "1" && value[1] == "1" && value[2] == "1")) {
+			let colorvalue = value.slice(0,3) == "111" ? 1 : value.slice(0,3) == "000" ? -1 : 0;
+			if (colorvalue) {
 				let code8 = picoCode8(keys[k]);
-				code8 = code8.slice(0,maxcolor*3);
-				colors = code8.concat(colors.slice(code8.length));
 				depth = picoDiv(code8.length,3)-1;
-				colorselecting = depth;
-				bgcolor = 0;
-				console.log("Load color: " + colors + " " + depth);
-
-			// Load colors with transparent color.
-			} else if ((value[0] == "0" && value[1] == "0" && value[2] == "0") ) {
-				let code8 = picoCode8(keys[k]);
-				code8 = code8.slice(0,maxcolor*3);
-				colors = code8.concat(colors.slice(code8.length));
-				depth = picoDiv(code8.length,3)-1;
-				colorselecting = depth;
-				bgcolor = -1;
+				if (depth >= maxcolor) {
+					depth = maxcolor;
+				}
+				for (let j = 0; j < depth; j++) {
+					let k0 = j*3, k1 = j*3;
+					for (let i = 0; i < 3; i++) {
+						colors[k0+i] = code8[k1+i];
+					}
+				}
+				colorselecting = 0;
+				bgcolor = colorvalue < 0 ? -1 : coloroffset; // -1: Transparent bg color.
 				console.log("Load color: " + colors + " " + depth);
 
 			// Load pixels.
-			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
+			} else if (value[0] == "0") {
 				buffers[framecount] = picoCode6(keys[k]);
 				anime = framecount + 1;
 				frame = 0;
@@ -397,26 +393,26 @@ async function appMain() {
 	let bgbuttoncolor = 1; // Background of buttons color.
 
 	const animebutton0char = "*", animebutton1char = "+", animebutton2char = "-"; // Animeeditor button chars.
-	let animebuttoncolor = bgcolor, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Animeeditor button color and scales.
+	let animebuttoncolor = 0, animebuttonscale0 = 2, animebuttonscale1 = 1.5; // Animeeditor button color and scales.
 	let animebuttonwidth = landscape ? 20 : 8, animebuttonheight = bganimeheight; // Animeeditor button width and height.
 	let animebutton1x = bganimewidth/2 + animebuttonwidth/2, animebutton1y = animesposy; // Animeeditor plus button position.
 	let animebutton2x = -bganimewidth/2 - animebuttonwidth/2, animebutton2y = animesposy; // Animeeditor minus button position.
 
 	const arrowbutton0char = "$", arrowbutton1char = "&", arrowbutton2char = "%"; // Anime arrow button chars.
 	const arrowbuttonxchar = "&", arrowbuttonxangle = 90; // Anime testing button char and angle.
-	let arrowbuttoncolor = bgcolor, arrowbuttonscale0 = 1, arrowbuttonscale1 = 0.75; // Anime arrow button color and scales.
+	let arrowbuttoncolor = 0, arrowbuttonscale0 = 1, arrowbuttonscale1 = 0.75; // Anime arrow button color and scales.
 	let /*arrowbuttonwidth = landscape ? 24 : 10,*/ arrowbuttonheight = 10; // Anime arrow button width and height.
 	let arrowbutton1x = 0, arrowbutton1y = -10, arrowbutton1y0 = -3, arrowbutton1y1 = -8; // Anime up-arrow button offset.
 	let arrowbutton2x = 0, arrowbutton2y = +10, arrowbutton2y0 = +3, arrowbutton2y1 = +8; // Anime down-arrow button offset.
 
 	const framebutton0char = "*", framebuttonchar = "&", framebutton1angle = 90, framebutton2angle = -90; // Frameeditor button char and angles.
-	let framebuttoncolor = bgcolor, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frameeditor button color and scales.
+	let framebuttoncolor = 0, framebuttonscale0 = 2, framebuttonscale1 = 1.5; // Frameeditor button color and scales.
 	let framebuttonwidth = landscape ? 55 : 20, framebuttonheight = landscape ? 104 : 132; // Frameeditor button width and height.
 	let framebutton1x = framewidth/2 + framebuttonwidth/2, framebutton1y = framesposy; // Frameeditor next button position.
 	let framebutton2x = -framewidth/2 - framebuttonwidth/2, framebutton2y = framesposy; // Frameeditor prev button position.
 
 	const colorbutton0char = "*", colorbutton1char = "+", colorbutton2char = "-"; // Coloreditor button chars.
-	let colorbuttoncolor = bgcolor, colorbuttonscale0 = 2, colorbuttonscale1 = 1.5; // Coloreditor button color and scales.
+	let colorbuttoncolor = 0, colorbuttonscale0 = 2, colorbuttonscale1 = 1.5; // Coloreditor button color and scales.
 	let colorbuttonwidth = landscape ? 20 : 8, colorbuttonheight = bgcolorheight; // Coloreditor button width and height.
 	let colorbutton1x = bgcolorwidth/2 + colorbuttonwidth/2, colorbutton1y = colorsposy; // Coloreditor plus button position.
 	let colorbutton2x = -bgcolorwidth/2 - colorbuttonwidth/2, colorbutton2y = colorsposy; // Coloreditor minus button position.
@@ -429,8 +425,8 @@ async function appMain() {
 	const numberbutton1angle = 0, numberbutton1x = numberwidth/2, numberbutton1y = 0; // Color number button angle and offset.
 	const numberbutton2angle = 0, numberbutton2x = -numberwidth/2, numberbutton2y = 0; // Color number button angle and offset.
 
-	// Reset color.
-	picoColor();
+	// Set colors data.
+	picoColor(Array(coloroffset*3).concat(colors.slice(0,depth*3)));
 
 	/*// Draw background.
 	//picoRect(4, 0, 0, 200, 200);
@@ -516,7 +512,7 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
+			picoRect(coloroffset, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		// Touching background color.
 		} else if (colortouching >= 0 &&
@@ -548,16 +544,15 @@ async function appMain() {
 					// Change back/foreground color.
 					if (colorholding >= 60) {
 						console.log("Change back/foreground color.");
-						let c = colors[0];
-						if (c > 0) {
-							colors[0] = colors[1] = colors[2] = 0;
-							colors[colors.length-3] = colors[colors.length-2] = colors[colors.length-1] = 255;
+						let k0 = 0, k1 = colors.length-3;
+						if (colors[k0+0] > 0) {
+							colors[k0+0] = colors[k0+1] = colors[k0+2] = 0;
+							colors[k1+0] = colors[k1+1] = colors[k1+2] = 255;
 						} else {
-							colors[0] = colors[1] = colors[2] = 255;
-							colors[colors.length-3] = colors[colors.length-2] = colors[colors.length-1] = 0;
+							colors[k0+0] = colors[k0+1] = colors[k0+2] = 255;
+							colors[k1+0] = colors[k1+1] = colors[k1+2] = 0;
 						}
-						bgindex = colors[0] != 0 ? 0 : -1;
-						bgcolor = colors[0] != 0 ? 0 : -1;
+						bgcolor = colors[k0+0] == 0 ? -1 : coloroffset;
 						appUpdate(); // Update thumbnail.
 						picoBeep(1.2, 0.1);
 						colortouching = -1;
@@ -567,7 +562,7 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
+			picoRect(coloroffset, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		} else {
 			// Cancel holding coloreditor.
@@ -576,7 +571,7 @@ async function appMain() {
 			}
 
 			// Draw background of coloreditor.
-			picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
+			picoRect(coloroffset, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 		}
 
 		// Touching color buttons.
@@ -589,7 +584,6 @@ async function appMain() {
 				colortouching = 0;
 				if (depth + 1 < maxcolor) {
 					depth += 1;
-					colorselecting = depth;
 				/*if (animeflag) {
 					animeflag = 0;
 					appUpdate(true);
@@ -622,9 +616,9 @@ async function appMain() {
 				picoAction(colorbutton2x, colorbutton2y, colorbuttonwidth/2, colorbuttonheight/2)) {
 				console.log("Release touching color minus button.");
 				colortouching = 0;
-				if (depth - 1 > 0) {
+				if (depth - 1 > 1) {
 					depth -= 1;
-					colorselecting = colorselecting<depth ? colorselecting : depth;
+					colorselecting = colorselecting<depth ? colorselecting : 0;
 				/*if (animeflag) {
 					animeflag = 0;
 					appUpdate(true);
@@ -720,7 +714,7 @@ async function appMain() {
 		}
 
 		// Draw background of coloreditor.
-		picoRect(bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
+		picoRect(coloroffset, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 
 		// Touching frame buttons.
 		{
@@ -787,9 +781,6 @@ async function appMain() {
 	let animemargin = landscape ? (anime <= 7 ? 2 : 1.5) : (anime <= 7 ? 2 : 1.5); // Frame margin.
 	let animegrid = landscape ? (160 / (anime > 10 ? anime : 10)) : (140 / (anime > 7 ? anime : 7)); // Grid length of each frames.
 
-	// Set colors data.
-	picoColor(colors.slice(0,(depth+1)*3));
-
 	// Draw pixels.
 	{
 		let pixeltouchmovex = 0, pixeltouchmovey = 0; // Touch position difference for frame moving.
@@ -849,9 +840,9 @@ async function appMain() {
 
 					// Touching down-arrow on view mode.
 					if (animetouchmovey < 0) {
-						canvas += picoCode6Char(coffset);
+						canvas += picoCode6Char(coloroffset);
 					} else {
-						canvas += picoCode6Char(coffset+pixels[j][i]);
+						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coloroffset);
 					}
 
 				// Update canvas on editor mode.
@@ -864,8 +855,10 @@ async function appMain() {
 						colortouching = -1;
 
 						// Put pixel.
-						if (pixels[j][i] != colorselecting) {
-							pixels[j][i] = colorselecting;
+						if (!colorselecting) {
+							pixels[j][i] = 0;
+						} else if (pixels[j][i] != coloroffset+colorselecting) {
+							pixels[j][i] = coloroffset+colorselecting;
 						}
 
 						// Cancel color editing.
@@ -878,7 +871,7 @@ async function appMain() {
 						picoRect(pixels[j][i] ? pixels[j][i] : coloroffset, x, y, pixelsgrid, pixelsgrid);
 						canvas += " ";
 					} else {
-						canvas += picoCode6Char(coffset+pixels[j][i]);
+						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coloroffset);
 					}
 				}
 			}
@@ -1094,7 +1087,7 @@ async function appMain() {
 					let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
 					let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
 					let animescale = (animegrid - animemargin) / animewidth; // Anime scale.
-					picoSprite(sprite, 0, x, y, 0, animescale); // Unselecting frames.
+					picoSprite(sprite, coloroffset, x, y, 0, animescale); // Unselecting frames.
 				}
 			}
 		}
@@ -1103,8 +1096,8 @@ async function appMain() {
 	// Draw colors.
 	if (!colorflag) {
 
-		for (let i = 1; i <= depth; i++) {
-			let x = colorsposx + (i - (depth+1)/2) * colorsgrid; // Margins for each color.
+		for (let i = 1; i < depth; i++) {
+			let x = colorsposx + (i - depth/2) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
 			if (colortouching >= 0 && picoAction(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1116,7 +1109,7 @@ async function appMain() {
 					appUpdate(true);
 				}
 				picoBeep(0, 0.1);
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
+				picoChar(picoCode6Char(coloroffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1151,17 +1144,17 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale1);
+				picoChar(picoCode6Char(coloroffset+i), -1, x, colorsposy, 0, colorsscale1);
 
 			} else {
 
 				// Not touching but selecting color.
 				if (colorselecting == i) {
-					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
+					picoChar(picoCode6Char(coloroffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 				// Other colors.
 				} else {
-					picoChar("-", i, x, colorsposy, 0, colorsscale0);
+					picoChar("-", coloroffset+i, x, colorsposy, 0, colorsscale0);
 				}
 			}
 		}
@@ -1196,14 +1189,14 @@ async function appMain() {
 						}
 
 						// Draw increase button.
-						picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
+						picoChar(c1, coloroffset+colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
 					} else if (colortouching >= 0 && picoMotion(x+numberbutton1x, colorsposy+numberbutton1y, numberwidth/2, numberheight/2)) {
 						s = numbersscale1;
 						// Draw increase button.
-						picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
+						picoChar(c1, coloroffset+colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
 					} else {
 						// Hidden increase button.
-						//picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale0);
+						//picoChar(c1, coloroffset+colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale0);
 					}
 				}
 
@@ -1225,14 +1218,14 @@ async function appMain() {
 						}
 
 						// Draw decrease button.
-						picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
+						picoChar(c2, coloroffset+colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
 					} else if (colortouching >= 0 && picoMotion(x+numberbutton2x, colorsposy+numberbutton2y, numberwidth/2, numberheight/2)) {
 						s = numbersscale1;
 						// Draw decrease button.
-						picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
+						picoChar(c2, coloroffset+colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
 					} else {
 						// Hidden decrease button.
-						//picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale0);
+						//picoChar(c2, coloroffset+colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale0);
 					}
 				}
 
@@ -1241,7 +1234,7 @@ async function appMain() {
 				let s99 = c99 >= 99 ? "99" : c99 >= 9 ? "" + (c99 + 1) : c99 >= 1 ? "0" + (c99 + 1) : "00";
 
 				// Draw color numbers.
-				picoChar(s99, colorselecting, x, colorsposy, 0, s);
+				picoChar(s99, coloroffset+colorselecting, x, colorsposy, 0, s);
 			}
 		}
 	}
