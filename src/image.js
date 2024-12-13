@@ -218,8 +218,7 @@ pico.Image = class {
 
 	// Image color. (6 gray scale system colors: -6:ffffff -5:dfdfdf -4:bfbfbf -3:7f7f7f -2:3f3f3f -1:000000)
 	static colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0];
-	static csystem = 6; // System color length. (6=colors.length/3)
-	static coffset = 35; // Color index alias. (0=35, 1=36=A, 2=37=B ..)
+	static coffset = 36; // Color index max. (0=35, 1=36=A, 2=37=B ..)
 
 	// Default char leading.
 	static leading = 4; // Default char leading.
@@ -311,7 +310,7 @@ pico.Image = class {
 	color(colors=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (colors && colors.length > 0) {
-				this.colors = pico.Image.colors.concat(colors);
+				this.colors = colors.concat();
 			} else {
 				this.colors = pico.Image.colors.concat();
 			}
@@ -740,9 +739,8 @@ pico.Image = class {
 		//console.log("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
 		////console.log("Center: " + cx + "," + cy + " / " + u);
-		let k = c < 0 && c+pico.Image.csystem >= 0 ? c+pico.Image.csystem : // System color.
-			c >= pico.Image.coffset && c-pico.Image.coffset < this.colors.length/3-pico.Image.csystem ? c-pico.Image.coffset : // Color index alias.
-			c < this.colors.length/3-pico.Image.csystem ? c : pico.Image.csystem-1;
+		let c1 = Math.floor((c+pico.Image.coffset) % (pico.Image.coffset));
+		let k = c1 < this.colors.length/3 ? c1 : this.colors.length/3-1;
 		let r = this.colors[k*3], g = this.colors[k*3+1], b = this.colors[k*3+2];
 		////console.log("Color: " + r + "," + g + "," + b);
 		this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
