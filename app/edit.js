@@ -6,7 +6,7 @@ var colors = [ // Colors.
 	231,0,95, 0,119,239,  0,151,63, 
 	// 7:Gold(332), 8:Silver(555), 9:Black(000),
 	191,191,127, 223,223,223, 0,0,0];
-const maxwidth = 60, maxheight = 60; // Canvas max size.
+const maxwidth = 64, maxheight = 64; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
 var yoffset = picoDiv(maxheight - height, 2); // Pixels y-index offset.
@@ -14,7 +14,7 @@ const maxanime = 20; // Frame max size.
 var anime = 1; // Frame count.
 var frame = 0; // Anime frame index.
 var buffers = []; // Pixels buffers.
-var clipboard = [0,7,7]; // Clipboard buffers.
+var clipboard = [0,6,6]; // Clipboard buffers.
 var playing = 0; // Playing count.
 var testing = 0; // Testing count.
 var pixels = []; // Canvas pixels.
@@ -34,7 +34,7 @@ async function appUpdate(force = true) {
 		//console.log("Update" + frame + ": " + buffers[frame]);
 
 		// Store canvas pixels to buffers.
-		buffers[frame] = [0, width, height];
+		buffers[frame] = [0, width-1, height-1];
 		for (let j = yoffset; j < yoffset + height; j++) {
 			for (let i = xoffset; i < xoffset + width; i++) {
 				if (pixels[j][i]) {
@@ -71,7 +71,7 @@ async function appUpdate(force = true) {
 			let data = await picoSpriteData(buffers[frame], bgcolor);
 			picoLabel("action", null, data);
 		} else if (anime >= 2) {
-			let data = await picoSpriteData([0,7,7], bgcolor);
+			let data = await picoSpriteData([0,6,6], bgcolor);
 			picoLabel("action", null, data);
 		} else {
 			picoLabel("action", "*");
@@ -121,12 +121,12 @@ async function appAction() {
 			if (buffers[p]) {
 				picoSetCode6(buffers[p], k);
 			} else {
-				picoSetCode6([0,7,7], k);
+				picoSetCode6([0,6,6], k);
 			}
 			k++;
 		}
 		if (k == 0) {
-			picoSetCode6([0,7,7], k);
+			picoSetCode6([0,6,6], k);
 			k++
 		}
 		if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
@@ -225,7 +225,7 @@ var animetouchmovey = 0; // Direction y of touch moving on view mode.
 var landscape = false; // landscape mode.
 var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
-const blockwidth = 4; // Width of block sprite.
+const blockwidth = 5; // Width of block sprite.
 const charwidth = 4; // Width of char sprite.
 
 // Resize.
@@ -239,7 +239,7 @@ async function appLoad() {
 	picoTitle(title);
 
 	// Initialize sprites.
-	let char0 = "0" + picoCodeChar(blockwidth) + picoCodeChar(blockwidth);
+	let char0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	let char1 = "00" + "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	for (let i = 0; i < maxcolor; i++) {
 		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1));
@@ -314,8 +314,8 @@ async function appMain() {
 					}
 				}
 				if (newpixels[0] == 0) {
-					width = newpixels[0 + 1] >= 0 && newpixels[0 + 1] <= maxwidth ? newpixels[0 + 1] : 7;
-					height = newpixels[0 + 2] >= 0 && newpixels[0 + 2] <= maxheight ? newpixels[0 + 2] : 7;
+					width = newpixels[1] >= 0 && newpixels[1] < maxwidth ? newpixels[1]+1 : 7;
+					height = newpixels[2] >= 0 && newpixels[2] < maxheight ? newpixels[2]+1 : 7;
 					xoffset = picoDiv(maxwidth - width, 2);
 					yoffset = picoDiv(maxheight - height, 2);
 				}
@@ -362,7 +362,7 @@ async function appMain() {
 	let bganimewidth = landscape ? 160 : 140, bganimeheight = landscape ? 16 : 20; // Background of animeeditor width and height.
 	let bganimecolor = 4; // Background of animeeditor color.
 
-	let pixelwidth = (animeflag ? (blockwidth-1) : blockwidth) * 5; // Width of basepixels, that is proportional to blockwidth-1:blockwidth.
+	let pixelwidth = (animeflag ? blockwidth-2 : blockwidth-1) * 5; // Width of basepixels, that is proportional to blockwidth-1:blockwidth.
 	let pixelcount = landscape ? 6 : 7; // Count of basepixels.
 	let pixelswidth = pixelwidth * pixelcount; // Size of pixels. L:90(15*6),120(20*6) / P:115(15*7),140(20*7)
 
@@ -577,12 +577,12 @@ async function appMain() {
 		// Touching color buttons.
 		if (!colorflag) {
 			// Release touching color plus button.
-			let c1 = depth + 1 < maxcolor ? colorbutton1char : colorbutton0char;
+			let c1 = depth + 1 <= maxcolor ? colorbutton1char : colorbutton0char;
 			if (colortouching >= 0 &&
 				picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
 				console.log("Release touching color plus button.");
 				colortouching = 0;
-				if (depth + 1 < maxcolor) {
+				if (depth + 1 <= maxcolor) {
 					depth += 1;
 				/*if (animeflag) {
 					animeflag = 0;
@@ -948,7 +948,7 @@ async function appMain() {
 
 					// Copy to clipboard.
 					console.log("Copy to clipboard.");
-					clipboard = buffers[frame] ? buffers[frame] : [0,7,7];
+					clipboard = buffers[frame] ? buffers[frame] : [0,6,6];
 					pixeltouchmoved = 1;
 					playing = -1; // Reset pixels from buffer.
 
@@ -1084,7 +1084,7 @@ async function appMain() {
 
 				// Other frames.
 				} else {
-					let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
+					let sprite = buffers[i] ? buffers[i] : [0,6,6];
 					let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
 					let animescale = (animegrid - animemargin) / animewidth; // Anime scale.
 					picoSprite(sprite, coffset, x, y, 0, animescale); // Unselecting frames.
