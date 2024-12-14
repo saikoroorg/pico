@@ -345,10 +345,10 @@ window.addEventListener("load", async (evt) => {
 		picoCharSprite(extraCharAiliases[i]);
 	}
 	picoCharLeading(8,8);
-	picoColor(colors);
+	picoColor(colors5, 6);
 
 	picoClear();
-	picoRect(2, 0,0,150,150, 0,1);
+	picoRect(3, 0,0,150,150, 0,1);
 	picoText(builtinChars + extraChars, -1, 0,0,120,120, 0,1);
 });
 var count = 0;
@@ -370,11 +370,11 @@ if (count <= 0) {
 	} else if (count <= 2) {
 
 		picoCharLeading(6,6);
-		picoColor(colors);
+		picoColor(colors5, 6);
 
 		for (let i = 0; i < builtinChars.length; i++) {
 			picoClear();
-			picoRect(2, 0,0,42,42, 0,4);
+			picoRect(3, 0,0,42,42, 0,4);
 			picoText(builtinChars.substr(0, picoMod(i,builtinChars.length)+1), -1, 0,0,42,42, 0,4);
 			await picoFlip(20);
 		}
@@ -396,7 +396,7 @@ if (count <= 0) {
 //*/
 	} else if (count <= 4) {
 		picoCharLeading(4,6);
-		picoColor(colors);
+		picoColor(colors5, 6);
 
 		for (let i = 0; i <= 180; i++) {
 			picoClear();
@@ -404,17 +404,18 @@ if (count <= 0) {
 
 			picoChar(":7       1:", -1, 0,0, i-60,2);
 			picoChar(":8       2:", -1, 0,0, i-30,2);
-			picoChar(":9       3:",  2, 0,0, i,   2);
+			picoChar(":9         ", 11, 0,0, i,   2);
+			picoChar("         3:", 10, 0,0, i,   2);
 			picoChar("10       4:", -1, 0,0, i+30,2);
 			picoChar("11       5:", -1, 0,0, i+60,2);
 			picoChar("12       6:", -1, 0,0, i+90,2);
-			picoChar("+", 2, 0,0, 0,2);
+			picoChar(     "+",      12, 0,0, 0,2);
 
 			await picoFlip(20);
 		}
 //*/
 	} else if (count <= 5) {
-		picoColor(colors);
+		picoColor(colors5, 6);
 
 		for (let i = 60; i >= 0; i--) {
 			picoClear();
@@ -428,7 +429,7 @@ if (count <= 0) {
 		await picoFlip(100);
 //*/
 	} else {
-		let image1 = await picoSpriteData(dots[8], -1);
+		let image1 = await picoSpriteData(dots[8], -1, 2);
 		let e1 = document.getElementById("image1");
 		if (e1) {
 			e1.src = image1;

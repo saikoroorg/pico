@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.9.41212"; // Update by package.json.
+pico.version = "0.9.41214"; // Update by package.json.
 
 /* PICO Image module */
 
@@ -58,9 +58,9 @@ async function picoResize(width=0, height=0) {
 }
 
 // Set image color pallete.
-async function picoColor(colors=null) {
+async function picoColor(colors=null, offset=0) {
 	try {
-		await pico.image.color(colors);
+		await pico.image.color(colors, offset);
 	} catch (error) {
 		console.error(error);
 	}
@@ -225,7 +225,6 @@ pico.Image = class {
 
 	// Image color. (6 gray scale system colors: -6:ffffff -5:dfdfdf -4:bfbfbf -3:7f7f7f -2:3f3f3f -1:000000)
 	static colors = [255,255,255, 223,223,223, 191,191,191, 127,127,127, 63,63,63, 0,0,0];
-	static coffset = 36; // Color index max. (0=35, 1=36=A, 2=37=B ..)
 
 	// Default char leading.
 	static leading = 4; // Default char leading.
@@ -314,10 +313,12 @@ pico.Image = class {
 	}
 
 	// Set image color pallete.
-	color(colors=null) {
+	color(colors=null, offset=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (colors && colors.length > 0) {
-				this.colors = colors.concat();
+				this.offset = offset;
+				this.colors.length = offset*3;
+				this.colors = this.colors.concat(colors);
 			} else {
 				this.colors = pico.Image.colors.concat();
 			}
@@ -594,7 +595,8 @@ pico.Image = class {
 		this.canvas = []; // Double buffered canvas elements.
 		this.primary = 0; // Primary canvas index.
 		this.context = null; // Canvas 2d context.
-		this.colors = Object.assign([], pico.Image.colors); // Master image color. 
+		this.colors = Object.assign([], pico.Image.colors); // Master image color.
+		this.offset = 0; // Color index offset.
 		this.leading = pico.Image.leading; // Char leading.
 		this.vleading = pico.Image.vleading; // Line leading (vertical).
 		this.sprites = Object.assign([], pico.Image.csprites); // Char sprites.
@@ -687,6 +689,7 @@ pico.Image = class {
 			original.canvas[0].width/pico.Image.ratio,
 			original.canvas[0].height/pico.Image.ratio);
 		this.colors = Object.assign([], original.colors);
+		this.offset = original.offset;
 		this.leading = original.leading;
 		this.vleading = original.vleading;
 		this.sprites = Object.assign({}, original.sprites);
@@ -746,8 +749,7 @@ pico.Image = class {
 		////console.log("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
 		//////console.log("Center: " + cx + "," + cy + " / " + u);
-		let c1 = Math.floor((c+pico.Image.coffset) % (pico.Image.coffset));
-		let k = c1 < this.colors.length/3 ? c1 : this.colors.length/3-1;
+		let k = c >= 0 ? c : Math.floor((c+this.colors.length/3) % (this.colors.length/3));
 		let r = this.colors[k*3], g = this.colors[k*3+1], b = this.colors[k*3+2];
 		//////console.log("Color: " + r + "," + g + "," + b);
 		this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
