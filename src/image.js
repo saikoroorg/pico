@@ -408,9 +408,9 @@ pico.Image = class {
 		}
 		let flipped = [];
 		let i = 0, w = 1, h = 1;
-		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
-			w = cells[1];
-			h = cells[2];
+		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
+			w = cells[1] + 1;
+			h = cells[2] + 1;
 			flipped[0] = cells[0];
 			flipped[1] = cells[1];
 			flipped[2] = cells[2];
@@ -795,9 +795,9 @@ pico.Image = class {
 	_sprite(cells=[-1,0,0], fgcolor=-1, bgcolor=-1) {
 		//console.log("Sprite: " + cells.join(","));
 		let i = 0, x0 = 0, y0 = 0;
-		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
-			x0 = -(cells[1] - 1) / 2;
-			y0 = -(cells[2] - 1) / 2;
+		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
+			x0 = -cells[1] / 2;
+			y0 = -cells[2] / 2;
 			i += 3;
 		}
 		if (bgcolor >= 0 && x0 < 0 && y0 < 0) {
@@ -818,8 +818,8 @@ pico.Image = class {
 
 	// Get sprite size.
 	_spriteSize(cells=[-1,0,0]) {
-		if (cells[0] == 0 && cells[1] > 0 && cells[2] > 0) {
-			return (cells[1] > cells[2] ? cells[1] : cells[2]);
+		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
+			return (cells[1] > cells[2] ? cells[1] + 1 : cells[2] + 1);
 		}
 		return 0;
 	}
