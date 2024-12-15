@@ -931,9 +931,8 @@ async function appMain() {
 					animetapping = 0;
 
 					// Copy to clipboard.
-					if (buffers[frame]) {
-						let text = picoCode6String(buffers[frame]);
-						await picoClipboard(text);
+					let text = await picoClipboard(picoCode6String(buffers[frame]));
+					if (text) {
 						console.log("Copy to clipboard:" + text);
 						picoBeep(1.2, 0.1);
 						picoBeep(1.2, 0.1, 0.2);
