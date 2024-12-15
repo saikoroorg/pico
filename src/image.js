@@ -742,7 +742,8 @@ pico.Image = class {
 		//console.log("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
 		////console.log("Center: " + cx + "," + cy + " / " + u);
-		let k = c >= 0 ? c : Math.floor((c+this.colors.length/3) % (this.colors.length/3));
+		let m = this.colors.length/3;
+		let k = c >= m ? m-1 : c >= 0 ? c : Math.floor((c+m) % (m));
 		let r = this.colors[k*3], g = this.colors[k*3+1], b = this.colors[k*3+2];
 		////console.log("Color: " + r + "," + g + "," + b);
 		this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
@@ -753,11 +754,10 @@ pico.Image = class {
 	_char(char, c=-1) {
 		let sprite = [];
 		let charStr = String.fromCharCode(char);
-		if (this.aliases[charStr]) {
-			charStr = this.aliases[charStr];
-		}
 		if (this.sprites[charStr]) {
 			sprite = this.sprites[charStr];
+		} else if (this.aliases[charStr]) {
+			sprite = this.sprites[this.aliases[charStr]];
 		}
 		return this._sprite(sprite, c, -1);
 	}

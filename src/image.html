@@ -8,6 +8,34 @@
 <script src="param.js"></script>
 <!--Main--><script>
 const builtinChars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ.-/:+=?!*&%$#"; // Built in chars.
+const alphabetCharSprites = { // Alphabet char sprite table.
+	"a": picoStringCode6("066931942933943924944935945"),
+	"b": picoStringCode6("066921922923933943924944935"),
+	"c": picoStringCode6("066932942923924935945"),
+	"d": picoStringCode6("066941942923933943924944935"),
+	"e": picoStringCode6("066932942923943924934935945"),
+	"f": picoStringCode6("066931941932923933943934935"),
+	"g": picoStringCode6("066931941922942933943944925935"),
+	"h": picoStringCode6("066921922923933924944925945"),
+	"i": picoStringCode6("066931933934935"),
+	"j": picoStringCode6("066941943924944935945"),
+	"k": picoStringCode6("066921922942923933924934925945"),
+	"l": picoStringCode6("066931932933934925945"),
+	"m": picoStringCode6("066922932942923933943924944925945"),
+	"n": picoStringCode6("066922932923943924944925945"),
+	"o": picoStringCode6("066932923943924944935"),
+	"p": picoStringCode6("066922932923943924934925"),
+	"q": picoStringCode6("066932942923943934944945"),
+	"r": picoStringCode6("066922942923933924925"),
+	"s": picoStringCode6("066932942923934944925935"),
+	"t": picoStringCode6("066932923933943934935"),
+	"u": picoStringCode6("066922942923943924944935945"),
+	"v": picoStringCode6("066922942923943924944935"),
+	"w": picoStringCode6("066922942923943924934944925935945"),
+	"x": picoStringCode6("066922942933934925945"),
+	"y": picoStringCode6("066922942923943934944925935"),
+	"z": picoStringCode6("066922932942943934925935945"),
+};
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
 	"ァ": picoStringCode6("066912922932942923943924934925"),
 	"ア": picoStringCode6("066911921931941951932952933943934925"),
@@ -328,7 +356,11 @@ const nums = [ // Numbered design pixels.
 ];
 
 window.addEventListener("load", async (evt) => {
-	let extraChars = "";
+	let extraChars = "0123456789.-/:+=?!*&%$#";
+	for (let chars in alphabetCharSprites) {
+		picoCharSprite(chars, alphabetCharSprites[chars]);
+		extraChars += chars[0];
+	}
 	for (let chars in katakana5x5CharSprites) {
 		picoCharSprite(chars, katakana5x5CharSprites[chars]);
 		extraChars += chars[0];
@@ -349,7 +381,7 @@ window.addEventListener("load", async (evt) => {
 
 	picoClear();
 	picoRect(3, 0,0,150,150, 0,1);
-	picoText(builtinChars + extraChars, -1, 0,0,120,120, 0,1);
+	picoText(extraChars, -1, 0,0,120,120, 0,1);
 });
 var count = 0;
 document.addEventListener("click", async (evt) => {
