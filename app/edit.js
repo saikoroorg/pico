@@ -19,10 +19,10 @@ var playing = 0; // Playing count.
 var testing = 0; // Testing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
-var depth = 3;//colors.length/3; // Color count.
-const coloroffset = 35; // Color min index.
+var depth = 4;//colors.length/3; // Color count.
 const maxcolor = 10; // Color max count.
-var bgcolor = coloroffset; // Bg color -1 if transparent.
+const coffset = 35; // Color index offset. (35=BG, 36=A, ...)
+var bgcolor = coffset; // Bg color -1 if transparent.
 var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting.
 var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
 
@@ -242,14 +242,14 @@ async function appLoad() {
 	let char0 = "0" + picoCodeChar(blockwidth) + picoCodeChar(blockwidth);
 	let char1 = "00" + "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	for (let i = 0; i < maxcolor; i++) {
-		picoCharSprite(picoCode6Char(coloroffset+i), picoStringCode6(char0 + picoCode6Char(coloroffset+i) + char1));
+		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1));
 	}
 
 	// Initialize pixels on max size.
 	for (let j = 0; j < maxheight; j++) {
 		pixels[j] = [];
 		for (let i = 0; i < maxwidth; i++) {
-			pixels[j][i] = coloroffset;
+			pixels[j][i] = coffset;
 		}
 	}
 
@@ -264,7 +264,7 @@ async function appLoad() {
 			let colorvalue = value.slice(0,3) == "111" ? 1 : value.slice(0,3) == "000" ? -1 : 0;
 			if (colorvalue) {
 				let code8 = picoCode8(keys[k]);
-				depth = picoDiv(code8.length,3)-1;
+				depth = picoDiv(code8.length,3);
 				if (depth >= maxcolor) {
 					depth = maxcolor;
 				}
@@ -275,7 +275,7 @@ async function appLoad() {
 					}
 				}
 				colorselecting = 0;
-				bgcolor = colorvalue < 0 ? -1 : coloroffset; // -1: Transparent bg color.
+				bgcolor = colorvalue < 0 ? -1 : coffset; // -1: Transparent bg color.
 				console.log("Load color: " + colors + " " + depth);
 
 			// Load pixels.
@@ -426,7 +426,7 @@ async function appMain() {
 	const numberbutton2angle = 0, numberbutton2x = -numberwidth/2, numberbutton2y = 0; // Color number button angle and offset.
 
 	// Set colors data.
-	picoColor(Array(coloroffset*3).concat(colors.slice(0,depth*3)));
+	picoColor(colors.slice(0,depth*3), coffset);
 
 	/*// Draw background.
 	//picoRect(4, 0, 0, 200, 200);
@@ -512,7 +512,7 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(coloroffset, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
+			picoRect(0, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		// Touching background color.
 		} else if (colortouching >= 0 &&
@@ -552,7 +552,7 @@ async function appMain() {
 							colors[k0+0] = colors[k0+1] = colors[k0+2] = 255;
 							colors[k1+0] = colors[k1+1] = colors[k1+2] = 0;
 						}
-						bgcolor = colors[k0+0] == 0 ? -1 : coloroffset;
+						bgcolor = colors[k0+0] == 0 ? -1 : coffset;
 						appUpdate(); // Update thumbnail.
 						picoBeep(1.2, 0.1);
 						colortouching = -1;
@@ -562,7 +562,7 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(coloroffset, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
+			picoRect(0, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		} else {
 			// Cancel holding coloreditor.
@@ -571,7 +571,7 @@ async function appMain() {
 			}
 
 			// Draw background of coloreditor.
-			picoRect(coloroffset, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
+			picoRect(0, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 		}
 
 		// Touching color buttons.
@@ -714,7 +714,7 @@ async function appMain() {
 		}
 
 		// Draw background of coloreditor.
-		picoRect(coloroffset, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
+		picoRect(coffset, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 
 		// Touching frame buttons.
 		{
@@ -840,9 +840,9 @@ async function appMain() {
 
 					// Touching down-arrow on view mode.
 					if (animetouchmovey < 0) {
-						canvas += picoCode6Char(coloroffset);
+						canvas += picoCode6Char(coffset);
 					} else {
-						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coloroffset);
+						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coffset);
 					}
 
 				// Update canvas on editor mode.
@@ -857,8 +857,8 @@ async function appMain() {
 						// Put pixel.
 						if (!colorselecting) {
 							pixels[j][i] = 0;
-						} else if (pixels[j][i] != coloroffset+colorselecting) {
-							pixels[j][i] = coloroffset+colorselecting;
+						} else if (pixels[j][i] != coffset+colorselecting) {
+							pixels[j][i] = coffset+colorselecting;
 						}
 
 						// Cancel color editing.
@@ -868,10 +868,10 @@ async function appMain() {
 							picoFlush();
 						}
 
-						picoRect(pixels[j][i] ? pixels[j][i] : coloroffset, x, y, pixelsgrid, pixelsgrid);
+						picoRect(pixels[j][i] ? pixels[j][i] : coffset, x, y, pixelsgrid, pixelsgrid);
 						canvas += " ";
 					} else {
-						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coloroffset);
+						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coffset);
 					}
 				}
 			}
@@ -1087,7 +1087,7 @@ async function appMain() {
 					let sprite = buffers[i] ? buffers[i] : [0, 7, 7];
 					let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
 					let animescale = (animegrid - animemargin) / animewidth; // Anime scale.
-					picoSprite(sprite, coloroffset, x, y, 0, animescale); // Unselecting frames.
+					picoSprite(sprite, coffset, x, y, 0, animescale); // Unselecting frames.
 				}
 			}
 		}
@@ -1109,7 +1109,7 @@ async function appMain() {
 					appUpdate(true);
 				}
 				picoBeep(0, 0.1);
-				picoChar(picoCode6Char(coloroffset+i), -1, x, colorsposy, 0, colorsscale2);
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1144,17 +1144,17 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				picoChar(picoCode6Char(coloroffset+i), -1, x, colorsposy, 0, colorsscale1);
+				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale1);
 
 			} else {
 
 				// Not touching but selecting color.
 				if (colorselecting == i) {
-					picoChar(picoCode6Char(coloroffset+i), -1, x, colorsposy, 0, colorsscale2);
+					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 				// Other colors.
 				} else {
-					picoChar("-", coloroffset+i, x, colorsposy, 0, colorsscale0);
+					picoChar("-", coffset+i, x, colorsposy, 0, colorsscale0);
 				}
 			}
 		}
@@ -1189,14 +1189,14 @@ async function appMain() {
 						}
 
 						// Draw increase button.
-						picoChar(c1, coloroffset+colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
+						picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
 					} else if (colortouching >= 0 && picoMotion(x+numberbutton1x, colorsposy+numberbutton1y, numberwidth/2, numberheight/2)) {
 						s = numbersscale1;
 						// Draw increase button.
-						picoChar(c1, coloroffset+colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
+						picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale1);
 					} else {
 						// Hidden increase button.
-						//picoChar(c1, coloroffset+colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale0);
+						//picoChar(c1, colorselecting, x+numberbutton1x*2, colorsposy+numberbutton1y, numberbutton1angle, numberbuttonscale0);
 					}
 				}
 
@@ -1218,14 +1218,14 @@ async function appMain() {
 						}
 
 						// Draw decrease button.
-						picoChar(c2, coloroffset+colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
+						picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
 					} else if (colortouching >= 0 && picoMotion(x+numberbutton2x, colorsposy+numberbutton2y, numberwidth/2, numberheight/2)) {
 						s = numbersscale1;
 						// Draw decrease button.
-						picoChar(c2, coloroffset+colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
+						picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale1);
 					} else {
 						// Hidden decrease button.
-						//picoChar(c2, coloroffset+colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale0);
+						//picoChar(c2, colorselecting, x+numberbutton2x*2, colorsposy+numberbutton2y, numberbutton2angle, numberbuttonscale0);
 					}
 				}
 
@@ -1234,7 +1234,7 @@ async function appMain() {
 				let s99 = c99 >= 99 ? "99" : c99 >= 9 ? "" + (c99 + 1) : c99 >= 1 ? "0" + (c99 + 1) : "00";
 
 				// Draw color numbers.
-				picoChar(s99, coloroffset+colorselecting, x, colorsposy, 0, s);
+				picoChar(s99, colorselecting, x, colorsposy, 0, s);
 			}
 		}
 	}
