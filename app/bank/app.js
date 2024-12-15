@@ -15,13 +15,13 @@ var scoreCount = 0; // Initial score.
 // Button.
 const buttonMax = playerMax + 1; // Maximum button count.
 const buttonWidth = 8, buttonHeight = 6; // Button touchable sizes.
-const dealerSprite0 = [0,19,19, 2,3,6,0,12,6, 2,5,4,0,8,10, 1,7,12,0,4,0]; // Dealer sprite.
-const dealerSprite1 = [0,19,19, 0,3,6,0,12,6, 0,5,4,0,8,10, 1,7,12,0,4,0]; // Dealer with cursor sprite.
+const dealerSprite0 = [0,18,18, 2,3,6,0,12,6, 2,5,4,0,8,10, 1,7,12,0,4,0]; // Dealer sprite.
+const dealerSprite1 = [0,18,18, 0,3,6,0,12,6, 0,5,4,0,8,10, 1,7,12,0,4,0]; // Dealer with cursor sprite.
 const dealerColor = 2; // Cneter number color.
 const dealerScale = 4; // Dealer scale.
 const dealerScaleL = 4; // Dealer scale on landscape mode.
-const playerSprite0 = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Player sprite.
-const playerSprite1 = [0,19,19, 4,3,6,0,12,6, 4,5,4,0,8,8, 4,7,1,0,4,0]; // Player with cursor sprite.
+const playerSprite0 = [0,18,18, 4,3,6,0,12,6, 4,5,4,0,8,8]; // Player sprite.
+const playerSprite1 = [0,18,18, 4,3,6,0,12,6, 4,5,4,0,8,8, 4,7,1,0,4,0]; // Player with cursor sprite.
 const playerColor = 0; // Player number color.
 const playerScale = 10; // Player base scale.
 const playerScaleL = 8; // Player base scale on landscape mode.
