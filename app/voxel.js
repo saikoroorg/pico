@@ -8,22 +8,22 @@ var depth = 4; // Depth.
 var motionx = 0, motiony = 0; // Touch motion.
 const motion = 4, defaultx = -4, defaulty = 4; // Default position.
 var playing = 0; // Playing count.
-const colors = picoStringCode8("111333222444000");
+const colors = picoStringCode8("111333222444p060i90n4332555000");
 const pixels = [
-	picoStringCode6("077121131141122132142123133143126136146"),
-	picoStringCode6("077120130140111121131141151112122132142152113123133143153124134144116126136146156"),
-	picoStringCode6("077120130140111121131141151112122132142152113123133143153124134144125135145116126136146156"),
-	picoStringCode6("077120130140111121131141151112122132142152113123133143153124134144115125135145155116126136146156"),
-	picoStringCode6("077120130140111121131141151112122132142152113123133143153124134144125135145116126136146156"),
-	picoStringCode6("077120130140111221131241151112122132142152113223233243153124134144116126136146156"),
-	picoStringCode6("077132126136146"),
+	picoStringCode6("066A21A31A41A22A32A42A23A33A43A26A36A46"),
+	picoStringCode6("066A20A30A40A11A21A31A41A51A12A22A32A42A52A13A23A33A43A53A24A34A44A16A26A36A46A56"),
+	picoStringCode6("066A20A30A40A11A21A31A41A51A12A22A32A42A52A13A23A33A43A53A24A34A44A25A35A45A16A26A36A46A56"),
+	picoStringCode6("066A20A30A40A11A21A31A41A51A12A22A32A42A52A13A23A33A43A53A24A34A44A15A25A35A45A55A16A26A36A46A56"),
+	picoStringCode6("066A20A30A40A11A21A31A41A51A12A22A32A42A52A13A23A33A43A53A24A34A44A25A35A45A16A26A36A46A56"),
+	picoStringCode6("066A20A30A40A11B21A31B41A51A12A22A32A42A52A13B23B33B43A53A24A34A44A16A26A36A46A56"),
+	picoStringCode6("066A32A26A36A46"),
 ];
 const extraCharSprites = { // Extra char sprite table.
-	"↑": picoStringCode6("077931922932942913933953934935"),
-	"↓": picoStringCode6("077931932913933953924934944935"),
-	"→": picoStringCode6("077931942913923933943953944935"),
-	"←": picoStringCode6("077931922913923933943953924935"),
-	"＠": picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"),
+	"↑": picoStringCode6("066931922932942913933953934935"),
+	"↓": picoStringCode6("066931932913933953924934944935"),
+	"→": picoStringCode6("066931942913923933943953944935"),
+	"←": picoStringCode6("066931922913923933943953924935"),
+	"＠": picoStringCode6("088941932942952923943963944915945975916976917927937947957967977"),
 };
 
 // Voxel class.
@@ -63,7 +63,7 @@ Voxel = class {
 		}
 		let newpixels = [];
 		for (let i=0; i<newsize; i++) {
-			newpixels[i] = [0,newsize,newsize];
+			newpixels[i] = [0,newsize-1,newsize-1];
 		}
 
 		// Rotate by axis x.
@@ -131,8 +131,8 @@ Voxel = class {
 			let x0 = -4.5, y0 = -4.5, z0 = -this.pixels.length / 2;
 			for (let j=0; j<this.pixels[i].length; j++) {
 				if (this.pixels[i][j*3+0] == 0) {
-					x0 = -this.pixels[i][j*3+1] / 2;
-					y0 = -this.pixels[i][j*3+2] / 2;
+					x0 = -(this.pixels[i][j*3+1]+1) / 2;
+					y0 = -(this.pixels[i][j*3+2]+1) / 2;
 				} else if (this.pixels[i][j*3+0] == c) {
 					let x = x0 + this.pixels[i][j*3+1];
 					let y = -this.pixels[i][j*3+2];
@@ -207,7 +207,7 @@ async function appLoad() {
 				voxel.colors = picoCode8(keys[k]);
 
 			// Load pixels.
-			} else if (value[0] == "0" && value[1] != "0" && value[2] != "0") {
+			} else if (value[0] == "0") {
 				voxel.pixels[voxel.pixels.length] = picoCode6(keys[k]);
 				custom = true;
 			}
@@ -215,7 +215,7 @@ async function appLoad() {
 	}
 	voxel.colors = voxel.colors.length>0 ? voxel.colors : colors;
 	voxel.pixels = voxel.pixels.length>0 ? voxel.pixels : pixels;
-	picoColor(voxel.colors);
+	picoColor(voxel.colors, 35);
 
 	picoLabel("action", "*");
 	let data = await picoSpriteData(extraCharSprites["＠"], -1);
