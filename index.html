@@ -532,7 +532,14 @@ pico.App = class {
 	async clipboard(text) {
 		try {
 			if (text != null) {
-				await navigator.clipboard.writeText(text);
+				// Not work on safari.
+				const blob = new Blob([text], {type: "text/plain"});
+				const data = new ClipboardItem({[blob.type]: blob});
+				console.log("Clipboard item: " + data.types);
+				await navigator.clipboard.write([data]);
+				// Not work on safari.
+				// https://bugs.webkit.org/show_bug.cgi?id=222262
+				//await navigator.clipboard.writeText(text);
 			}
 			return await navigator.clipboard.readText();
 		} catch (error) {
