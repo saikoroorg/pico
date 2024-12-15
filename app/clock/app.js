@@ -38,9 +38,9 @@ var players = []; // Player.
 // Clock.
 const clockMax = playerMax + 1; // Maximum clock count.
 var clockCount = 2; // Clock count.
-const clockRects0 = [0,17,17, 0,1,4,0,14,8, 0,3,2,0,10,10]; // Clock base sprite.
-const clockRects2 = [0,17,17, 2,1,4,0,14,8, 2,3,2,0,10,10]; // Clock base sprite.
-const clockRects3 = [0,17,17, 3,1,4,0,14,8, 3,3,2,0,10,10]; // Clock base sprite.
+const clockRects0 = [0,16,16, 0,1,4,0,14,8, 0,3,2,0,10,10]; // Clock base sprite.
+const clockRects2 = [0,16,16, 2,1,4,0,14,8, 2,3,2,0,10,10]; // Clock base sprite.
+const clockRects3 = [0,16,16, 3,1,4,0,14,8, 3,3,2,0,10,10]; // Clock base sprite.
 const clockScale = 6; // Clock base scale.
 const numberScale = 0.5; // Clock number scale.
 const bonusScale = 0.25; // Clock adiitional/bonus number scale.
