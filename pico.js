@@ -1506,7 +1506,8 @@ async function picoStop() {
 }
 
 // Play pulse melody.
-// pattern=0.125,0.25,0.5 (8bit original parameter)
+// kcents = -3.6(A1:54.6Hz) .. 7.0(G9:12.4kHz)
+// pattern = 0 or 0.125, 0.25, 0.5 (8bit original parameter)
 async function picoPulse(kcents=[0], length=0.1, pattern=0, repeat=1) {
 	try {
 		await pico.sound.playPulse(kcents, length, pattern, repeat);
@@ -1516,7 +1517,8 @@ async function picoPulse(kcents=[0], length=0.1, pattern=0, repeat=1) {
 }
 
 // Play triangle melody.
-// pattern=16 (8bit original parameter)
+// kcents = -4.8(A0:27.3Hz) .. 8.4(A11:55.9kHz)
+// pattern = 0 or 16 (8bit original parameter)
 async function picoTriangle(kcents=[0], length=0.1, pattern=0, repeat=1) {
 	try {
 		await pico.sound.playTriangle(kcents, length, pattern, repeat);
@@ -1525,11 +1527,13 @@ async function picoTriangle(kcents=[0], length=0.1, pattern=0, repeat=1) {
 	}
 }
 
-// Play noise sound.
-// pattern=1,6 (8bit original parameter)
-async function picoNoise(length=0.1, pattern=0, delay=0) {
+// Play noise melody.
+// kcents = -7.9(D-3), -6.7(D-2), -5.5(D-1), -5.0(G-1), -4.3(D0), -3.8(G0), -3.1(D1),
+//          -1.5(F2#), -2.3(A2#), -0.7(D3), -0.2(G3), 0.5(D4), 1.7(D5), 2.9(D6), 4.1(D7), 5.3(D8)
+// pattern = 0 or 1, 6 (8bit original parameter)
+async function picoNoise(kcents=[0], length=0.1, pattern=0, repeat=1) {
 	try {
-		await pico.sound.playNoise(length, pattern, delay);
+		await pico.sound.playNoise(kcents, length, pattern, repeat);
 	} catch (error) {
 		console.error(error);
 	}
@@ -1566,10 +1570,10 @@ pico.Sound = class {
 		return new Promise(async (resolve) => {
 			for (let i = 0; i < repeat || repeat <= 0; i++) {
 				for (let j = 0; j < kcents.length; j++) {
-					//console.log("Pulse melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
+					////console.log("Pulse melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
 					await this._pulse(kcents[j], length, pattern);
 					if (this.stopped) {
-						//console.log("Pulse melody End.");
+						////console.log("Pulse melody End.");
 						resolve();
 					}
 				}
@@ -1582,10 +1586,10 @@ pico.Sound = class {
 		return new Promise(async (resolve) => {
 			for (let i = 0; i < repeat || repeat <= 0; i++) {
 				for (let j = 0; j < kcents.length; j++) {
-					//console.log("Triangle melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
+					////console.log("Triangle melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
 					await this._triangle(kcents[j], length, pattern);
 					if (this.stopped) {
-						//console.log("Triangle melody End.");
+						////console.log("Triangle melody End.");
 						resolve();
 					}
 				}
@@ -1594,8 +1598,19 @@ pico.Sound = class {
 	}
 
 	// Play noise.
-	playNoise(length=0.1, pattern=0, delay=0) {
-		return this._noise(length, pattern, delay);
+	playNoise(kcents=[0], length=0.1, pattern=0, repeat=1) {
+		return new Promise(async (resolve) => {
+			for (let i = 0; i < repeat || repeat <= 0; i++) {
+				for (let j = 0; j < kcents.length; j++) {
+					////console.log("Noise melody: " + i + "/" + repeat + ":" + j + "/" + kcents.length);
+					await this._noise(kcents[j], length, pattern);
+					if (this.stopped) {
+						////console.log("Noise melody End.");
+						resolve();
+					}
+				}
+			}
+		}); // end of new Promise.
 	}
 
 	//*----------------------------------------------------------*/
@@ -1714,7 +1729,7 @@ pico.Sound = class {
 			return new Promise((resolve) => {
 
 				// Wait to play.
-				//console.log("Wait to play: " + Date.now() + " -> " + this.endTime);
+				////console.log("Wait to play: " + Date.now() + " -> " + this.endTime);
 				//let endTime = Date.now() + length * 1000 + delay * 1000;
 				//this.endTime = endTime > this.endTime ? endTime : this.endTime;
 				this.endTime = Date.now() + length * 1000 + delay * 1000;
@@ -1776,7 +1791,7 @@ pico.Sound = class {
 							//	//console.log("Stopped.");
 							//} else {
 								// End.
-								//console.log("End: " + kcents + " x " + length * kcents.length);
+								////console.log("End: " + kcents + " x " + length * kcents.length);
 								this.master.gain.value = 0;
 							//}
 							resolve();
@@ -1793,7 +1808,6 @@ pico.Sound = class {
 			//console.log("No audio.");
 			return Promise.reject();
 		}
-		//console.log("Pulse" + pattern + ": " + kcent + " x " + length);
 
 		// 8bit original argorithm and parameter: pattern=0.125,0.25,0.5
 		if (pattern > 0) {
@@ -1818,12 +1832,18 @@ pico.Sound = class {
 				pulseFilters[1] = null;
 			}, length * 1000);
 
+			//console.log("Start pulse sound " + pattern + ": " + kcent + "=" + frequency + " x " + length);
+
 			// Start.
 			const type = "sawtooth";
 			return this._play(type, [kcent], length, 0, volume);
 
 		// Simple square sound.
 		} else {
+
+			//console.log("Start pulse sound " + pattern + ": " + kcent + " x " + length);
+
+			// Start.
 			const type = "square";
 			return this._play(type, [kcent], length, 0, volume);
 		}
@@ -1835,7 +1855,6 @@ pico.Sound = class {
 			//console.log("No audio.");
 			return Promise.reject();
 		}
-		//console.log("Triangle" + pattern + ": " + kcent + " x " + length);
 
 		// 8bit original argorithm and parameter: pattern=16
 		if (pattern > 0) {
@@ -1885,28 +1904,31 @@ pico.Sound = class {
 				triangleBuffer = null;
 			}, length * 1000);
 
+			//console.log("Start triangle sound " + pattern + ": " + kcent + "=" + frequency + " x " + length);
+
 			// Start.
 			const type = null;
 			return this._play(type, [0], length, 0, volume);
 
 		// Simple triangle sound.
 		} else {
+
+			//console.log("Start triangle sound " + pattern + ": " + kcent + " x " + length);
+
+			// Start.
 			const type = "triangle";
 			return this._play(type, [kcent], length, 0, volume);
 		}
 	}
 
 	// Start noise sound.
-	_noise(length=0.1, pattern=0, delay=0, volume=1) {
+	_noise(kcent=0, length=0.1, pattern=0, volume=0.5, delay=0) {
 		if (this.context == null) {
 			//console.log("No audio.");
 			return Promise.reject();
-		}/* else if (this.endTime < 0 || this.endTime > Date.now() + delay * 1000) {
-			//console.log("Not end previous sound.");
-			return Promise.resolve();
-		}*/
-		//console.log("Noise" + pattern + ": " + length + " + " + delay);
-		setTimeout(() => {
+		}
+
+		//setTimeout(() => {
 
 			// Create noise buffers.
 			let noiseBuffer = null;
@@ -1934,24 +1956,29 @@ pico.Sound = class {
 				}
 			}
 
-			// Connect noise generator to master volume.
+			// Create noise generator.
 			let noiseGenerator = null;
 			noiseGenerator = this.context.createBufferSource();
 			noiseGenerator.buffer = noiseBuffer;
+			noiseGenerator.detune.setValueAtTime(kcent * 1000, this.context.currentTime);
+
+			// Connect noise generator to master volume.
 			noiseGenerator.connect(this.master);
 			noiseGenerator.start();
 			setTimeout(() => {
-				//console.log("Disconnect noise generator.");
+				////console.log("Disconnect noise generator.");
 				noiseGenerator.disconnect(this.master);
 				noiseGenerator = null;
 				noiseBuffer = null;
 			}, length * 1000);
 
+			//console.log("Start noise sound " + pattern + ": " + kcent + " x " + length);
+
 			// Start.
 			const type = null;
 			return this._play(type, [0], length, 0, volume);
 
-		}, delay * 1000);
+		//}, delay * 1000);
 	}
 };
 

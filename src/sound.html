@@ -5,17 +5,17 @@
 <body>
 <script src="sound.js"></script>
 <!--Main--><script>
-pico.Sound.debug = true;
 //picoBeep();
 
 document.addEventListener("click", async (evt) => { // Need user input event before play sound.
 
-//*/
+/*/
 	picoBeep(-1.2, 0.1);
 	picoBeep(0, 0.1, 0.2);
 	picoBeep(1.2, 1.0, 0.4);
 	await picoWait(500);
 	picoStop();
+	await picoWait(1500);
 //*/
 
 //*/
@@ -26,25 +26,23 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 	picoPulse([-0.9,-0.7,-0.5], 0.2, 0.25);
 	await picoWait(1000);
 	picoPulse([-0.9,-0.7,-0.5], 0.2, 0.125);
-	await picoWait(1000);
+	await picoWait(2000);
 //*/
 
 //*/
 	picoTriangle([-0.9,-0.7,-0.5], 0.2);
 	await picoWait(1000);
 	picoTriangle([-0.9,-0.7,-0.5], 0.2, 16);
-	await picoWait(1000);
+	await picoWait(2000);
 //*/
 
 //*/
-	picoNoise(0.1, 0);
-	picoNoise(0.1, 0, 0.2);
-	picoNoise(0.1, 0, 0.4);
+	picoNoise([-0.9,-0.7,-0.5], 0.2);
 	await picoWait(1000);
-	picoNoise(0.5, 1);
+	picoNoise([-0.9,-0.7,-0.5], 0.2, 1);
 	await picoWait(1000);
-	picoNoise(0.5, 6);
-	await picoWait(1000);
+	picoNoise([-0.9,-0.7,-0.5], 0.2, 6);
+	await picoWait(2000);
 //*/
 
 });</script><!--/Main-->
