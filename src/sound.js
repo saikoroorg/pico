@@ -246,7 +246,6 @@ pico.Sound = class {
 		this.context = null; // Audio context.
 		this.master = null; // Master volume node.
 		this.stopped = false; // Stop flag.
-		//this.endTime = 0; // End time count.
 		this.offset = 0; // Timbres index offset.
 		this.timbres = Object.assign([], pico.Sound.timbres); // Master timbres.
 		this.scales = Object.assign([], pico.Sound.scales); // Master scales.
@@ -288,16 +287,13 @@ pico.Sound = class {
 		}
 
 		// Stop audio.
-		//let restTime = this.endTime - this.context.currentTime;//Date.now();
 		console.log("Stop audio.");
-		//if (restTime >= 0) {
-			this.master.disconnect(this.context.destination);
-			this.master = null;
-			this.master = this.context.createGain(); // Recreate master volume.
-			//this.master.gain.value = pico.Sound.maxvolume;
-			this.master.connect(this.context.destination);
-			this.stopped = true; // Wait for end on each function.
-		//}
+		this.master.disconnect(this.context.destination);
+		this.master = null;
+		this.master = this.context.createGain(); // Recreate master volume.
+		//this.master.gain.value = pico.Sound.maxvolume;
+		this.master.connect(this.context.destination);
+		this.stopped = true; // Wait for end on each function.
 		return Promise.resolve();
 	}
 
@@ -308,19 +304,6 @@ pico.Sound = class {
 			return Promise.reject();
 		}
 		return Promise.resolve();
-/*
-		// Wait for previous end audio.
-		return new Promise((resolve) => {
-			let restTime = this.endTime - Date.now();
-			if (restTime > 0) {
-				console.log("Wait for previous end: " + restTime);
-//				setTimeout(resolve, restTime);
-			} else {
-				console.log("Ready: " + restTime);
-				resolve();
-			}
-		}); // end of new Promise.
-*/
 	}
 
 	// Start sound and control volumes.
@@ -347,23 +330,10 @@ pico.Sound = class {
 				}
 				//this.master.gain.setValueAtTime(0, this.context.currentTime + length);
 
-				// Wait to play end.
-				//let startTime = this.context.currentTime;//Date.now();
-				//let endTime = this.context.currentTime+length;//startTime + length*1000;
-				//this.endTime = endTime > this.endTime ? endTime : this.endTime;
-				//this.endTime = Date.now() + length;
-				//console.log("Wait to play end: " + startTime + " -> " + this.endTime);
-
 				// Wait to end.
+				this.stopped = false;
 				setTimeout(() => {
-					//if (this.stopped) { // Stopped on stop function.
-					//	console.log("Stopped.");
-					//} else {
-						// End.
-						//console.log("End: " + this.endTime);
-						//this.endTime = 0;
-						resolve();
-					//}
+					resolve();
 				}, length*1000);
 			}); // end of new Promise.
 		});
@@ -374,9 +344,6 @@ pico.Sound = class {
 		if (this.context == null) {
 			console.log("No audio.");
 			return Promise.reject();
-	//	} else if (this.endTime < 0 || this.endTime > Date.now()) {
-	//		console.log("Not end previous sound.");
-	//		return Promise.resolve();
 		}
 
 		// Wait for ready to play.
@@ -407,7 +374,6 @@ pico.Sound = class {
 				//console.log("Connect oscillator.");
 				oscillator.connect(this.master);
 				oscillator.start();
-				this.stopped = false;
 
 				// Start sound.
 				await this._start(length, volumes).then(() => {
@@ -447,7 +413,6 @@ pico.Sound = class {
 			//console.log("Connect pulse filters.");
 			oscillator.connect(pulseFilters[0]).connect(pulseFilters[1]).connect(this.master);
 			oscillator.start();
-			this.stopped = false;
 
 			// Start pulse sound.
 			//console.log("Start pulse sound " + pattern + ": " + pitch + "=" + frequency + " x " + length);
@@ -521,7 +486,6 @@ pico.Sound = class {
 			triangleGenerator.buffer = triangleBuffer;
 			triangleGenerator.connect(this.master);
 			triangleGenerator.start();
-			this.stopped = false;
 
 			// Start pseudo triangle sound.
 			//console.log("Start pseudo triangle sound " + pattern + ": " + pitch + "=" + frequency + " x " + length);
@@ -589,7 +553,6 @@ pico.Sound = class {
 		// Connect noise generator to master volume.
 		noiseGenerator.connect(this.master);
 		noiseGenerator.start();
-		this.stopped = false;
 
 		// Start noise sound.
 		//console.log("Start noise sound " + pattern + ": " + pitch + " x " + length);
