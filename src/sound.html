@@ -14,6 +14,14 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 	picoBeep(-1.2, 0.1);
 	picoBeep(0, 0.1, 0.2);
 	picoBeep(1.2, 0.1, 0.4);
+	await picoWait(800);
+
+	picoBeep(0, 1);
+	await picoWait(100);
+	await picoStop();
+	picoBeep(-1.2, 1);
+	await picoWait(100);
+	await picoStop();
 	await picoWait(1000);
 //*/
 
@@ -44,7 +52,7 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 	await picoWait(2000);
 //*/
 
-//*/
+/*/
 	const melody = [
 		0,4,6, 0,4,6, 1,4,6, -1,0,6,        0,4,6, 0,4,6, 1,4,6, -1,0,6,
 		0,4,6, 1,4,6, 2,4,6, 1,4,6,         0,4,6, 1,4,3, 0,4,3, 5,3,6, -1,0,6,
@@ -56,43 +64,41 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 	await picoMelody(melody, 300);
 //*/
 
-//*/
+/*/
 	// Timbre offsets:
 	//  10-21(abcdefg,hijkl) + 22(m)
 	//  23-34(nopqrst,uvwxy) + 35(z)
 	//  36-47(ABCDEFG,HIJKL) + 46(M)
 	//  49-50(NOPQRST,UVWXY) + 51(Z)
 	picoTimbre(
-		picoTextCode("2f0,310"), // Timbre: 2=triangle,f=pattern15, 3=Pulse,1=pattern1
+		picoTextCode("2f0,310,330,110"), // Timbre: 1=triangle15(f), 2/3=pulse1/3, 4=noise1
 		picoTextCode("023578a,1469b"), // Scale: La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+
-		36); // Offset: Timbre1=A..L, Timbre2=N..Y
-	await picoMelody(picoTextCode(
+		10); // Offset: Timbre1=A..L, Timbre2=N..Y
+	picoMelody(picoTextCode(
 		"A46A46B46Z06,A46A46B46Z06"+
 		"A46B46C46B46,A46B43A43F36Z06"+
 		"E36D36E36F36,E36E33C33B36Z06"+
 		"A46A46B46Z06,A46A46B46Z06"+
-		"E36F36B43A43F36,E3bZ0b"), 300);
-//*/
+		"E36F36B43A43F36,E3cZ0c"), 300);
+	picoMelody(picoTextCode(
+		"a1cb1c,a1cb1c"+
+		"a1cc1c,a1cf0c"+
+		"e0ce0c,e0cb0c"+
+		"a1cb1c,a1cb1c"+
+		"e0cb1c,e0cm1c"), 300);
+	picoMelody(picoTextCode(
+		"Z06N23,Z09N23,Z09N23,Z09N23,Z03"+
+		"Z06N23,Z09N23,Z09N23,Z03N23,Z03N23Z03"+
+		"Z06Q13,Z09Q13,Z09Q13,Z03Q13,Z03Q13Z03"+
+		"Z06N23,Z09N23,Z09N23,Z09N23,Z03"+
+		"Z06Q13,Z09Q13,Z09Q13,Z03Q13,Z09"), 300);
+	await picoWait(8000);
 
-//*/
-	await picoMelody(melody);
+	await picoWait(2000);
 //*/
 
 /*/
-	picoTimbre(picoTextCode("230000330"),
-		[0,2, 3,5,7, 8,10, 1, 4,6, 9,11], 10);
-	picoMelody(picoTextCode(
-		"A46A46B46M46,A46A46B46M46"+
-		"A46B46C46B46,A46B43A43F36M46"+
-		"E36D36E36F36,E36E33C33B36M46"+
-		"A46A46B46M46,A46A46B46M46"+
-		"E36F36B43A43F36,E3bM4b"), 150);
-	picoMelody(picoTextCode(
-		"a4bb4b,a4bb4b"+
-		"a4bc4b,a4bf3b"+
-		"e3be3b,e3bb3b"+
-		"a4bb4b,a4bb4b"+
-		"e3bb4b,e3bm4b"), 150);
+	await picoMelody(melody);
 //*/
 
 });</script><!--/Main-->
