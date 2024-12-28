@@ -10,7 +10,7 @@
 
 document.addEventListener("click", async (evt) => { // Need user input event before play sound.
 
-/*/
+//*/
 	picoBeep(-1.2, 0.1);
 	picoBeep(0, 0.1, 0.2);
 	picoBeep(1.2, 0.1, 0.4);
@@ -52,6 +52,7 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 		0,4,6, 0,4,6, 1,4,6, -1,0,6,        0,4,6, 0,4,6, 1,4,6, -1,0,6,
 		4,3,6, 5,3,6, 1,4,3, 0,4,3, 5,3,6,  4,3,12, -1,0,12,
 	];
+	await picoStop();
 	await picoMelody(melody, 300);
 //*/
 
