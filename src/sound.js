@@ -62,8 +62,8 @@ async function picoNoise(pattern=0, length=0.1, pitches=[0], volumes=[1]) {
 }
 
 // Set timbre pallete.
-async function picoTimbre(timbres=null, offset=0) {
-	pico.sound.timbre(timbres, offset);
+async function picoTimbre(timbres=null, scales=null, offset=0) {
+	pico.sound.timbre(timbres, scales, offset);
 }
 
 // Play melody.
@@ -84,7 +84,7 @@ var pico = pico || {};
 pico.Sound = class {
 	static frequency = 440; // Base frequency.
 	static maxvolume = 0.05; // Max volume.
-	static octaves = [0.0,0.2, 0.3,0.5,0.7, 0.8,1.0, 0.1, 0.4,0.6, 0.9,1.1]; // 0:La,1:Ti, 2:Do,3:Re,4:Mi, 5:Fa,6:So, 7:La+, 8:Do+,9:Re+, 10:Fa+,11:So+
+	static scales = [0.0,0.2, 0.3,0.5,0.7, 0.8,1.0, 0.1, 0.4,0.6, 0.9,1.1]; // 0:La,1:Ti, 2:Do,3:Re,4:Mi, 5:Fa,6:So, 7:La+, 8:Do+,9:Re+, 10:Fa+,11:So+
 	static timbres = [0,0,0, 1,1,0, 2,16,0, 3,4,0, 3,8,0]; // Timbre1:1(noise),1,0, Timbre2:2(triangle),16,0, Timbre3:3(pulse),4,0, Timbre4:3(pulse),8,0
 
 	// Wait.
@@ -157,11 +157,15 @@ pico.Sound = class {
 	}
 
 	// Set timbre pallete.
-	timbre(timbres=null, offset=0) {
+	timbre(timbres=null, scales=null, offset=0) {
 		if (timbres && timbres.length > 0) {
-			this.offset = offset;
-			this.timbres.length = offset;
-			this.timbres = this.timbres.concat(timbres);
+			this.timbres = timbres.concat();
+			if (scales && scales.length > 0) {
+				this.scales = scales.concat();
+			}
+			if (offset > 0) {
+				this.offset = offset;
+			}
 		} else {
 			this.timbres = pico.Sound.timbres.concat();
 		}
@@ -175,23 +179,32 @@ pico.Sound = class {
 				// Timbre2 = 23-34 (nopqrst uvwxy) z
 				// Timbre3 = 36-47 (ABCDEFG HIJKL) M
 				// Timbre4 = 49-50 (NOPQRST UVWXY) Z
-				let m0 = melody[i*3], m1 = melody[i*3+1], m2 = melody[i*3+2];
-				let t0 = (m0>=10 && m0<22) ? 1 : (m0>=23 && m0<35) ? 2 : (m0>=36 && m0<48) ? 3 : (m0>=49 && m0<51) ? 4 : 0;
-				let t1 = this.timbres[t0*3];
-				let pitch = t0 ? pico.Sound.octaves[m0 - t0 * 13 + 3] + (m1 - 4) * 1.2 : 0;
-				let length = 60 / speed * m2 / 3;
+				let m0 = melody[i*3], m1 = melody[i*3+1], m2 = melody[i*3+2], t0 = 0, t1 = 0;
+				let pitch = (m1 - 4) * 1.2; // 4=Base pitch index, 1.2=Pitch difference on 1 octave.
+				let length = 60 / speed * m2 / 6; // 60=1 minute, 6=Base note length.
+				for (let j = 0; j < 4; j++) {
+					let k1 = m0 - this.offset - (this.scales.length+1)*j;
+					if (k1 == this.scales.length) { // Rest.
+						break;
+					} else if (k1 >= 0 && k1 < this.scales.length) {
+						t0 = this.timbres[j*3];
+						t1 = this.timbres[j*3+1];
+						pitch = pitch + this.scales[k1];
+						break;
+					}
+				}
 				console.log("Melody " + (i+1) + "/" + (melody.length/3) + ": " +
-					pitch + " x " + length + " " + m0 + "(" + t0+ "->" + t1 + ") " + m1 + " " + m2);
-				if (t1 == 1) {
-					let pattern = m1;
+					pitch + " x " + length + " " + m0 + " " + m1 + " " + m2 + " - " + t0 + " " + t1);
+				if (t0 == 1) {
+					let pattern = t1;
 					console.log("Noise " + pattern + ": " + pitch + " x " + length);
 					await this._noise(pattern, length, pitch);
-				} else if (t1 == 2) {
-					let pattern = m1;
+				} else if (t0 == 2) {
+					let pattern = t1+1;
 					console.log("Triangle " + pattern + ": " + pitch + " x " + length);
 					await this._triangle(pattern, length, pitch);
-				} else if (t1 == 3) {
-					let pattern = m1 ? 1 / m1 : 0;
+				} else if (t0 == 3) {
+					let pattern = t1 ? 1 / (t1+1) : 0;
 					console.log("Pulse " + pattern + ": " + pitch + " x " + length);
 					await this._pulse(pattern, length, pitch);
 				} else {
@@ -218,6 +231,7 @@ pico.Sound = class {
 		this.endTime = 0; // End time count.
 		this.offset = 0; // Timbres index offset.
 		this.timbres = Object.assign([], pico.Sound.timbres); // Master timbres.
+		this.scales = Object.assign([], pico.Sound.scales); // Master scales.
 
 		// Setup after click event for audio permission.
 		document.addEventListener("click", () => {

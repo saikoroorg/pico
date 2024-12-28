@@ -44,13 +44,31 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 	await picoWait(2000);
 //*/
 
-	picoTimbre(picoTextCode("280"), 9);
-	await picoMelody(picoTextCode(
+	picoTimbre(picoTextCode("330"),
+		[0.0,0.2, 0.3,0.5,0.7, 0.8,1.0, 0.1, 0.4,0.6, 0.9,1.1], 36);
+	picoMelody(picoTextCode(
 		"A46A46B46M46,A46A46B46M46"+
 		"A46B46C46B46,A46B43A43F36M46"+
 		"E36D36E36F36,E36E33C33B36M46"+
 		"A46A46B46M46,A46A46B46M46"+
-		"E36F36B43A43F36,E3bM4b"), 300);
+		"E36F36B43A43F36,E3bM4b"), 150);
+
+/*/
+	picoTimbre(picoTextCode("230000330"),
+		[0.0,0.2, 0.3,0.5,0.7, 0.8,1.0, 0.1, 0.4,0.6, 0.9,1.1], 10);
+	picoMelody(picoTextCode(
+		"A46A46B46M46,A46A46B46M46"+
+		"A46B46C46B46,A46B43A43F36M46"+
+		"E36D36E36F36,E36E33C33B36M46"+
+		"A46A46B46M46,A46A46B46M46"+
+		"E36F36B43A43F36,E3bM4b"), 150);
+	picoMelody(picoTextCode(
+		"a4bb4b,a4bb4b"+
+		"a4bc4b,a4bf3b"+
+		"e3be3b,e3bb3b"+
+		"a4bb4b,a4bb4b"+
+		"e3bb4b,e3bm4b"), 150);
+//*/
 
 });</script><!--/Main-->
 </body>
