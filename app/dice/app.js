@@ -1,4 +1,7 @@
 const title = "Dice"; // Title.
+const sprites = { // Sprite table.
+	"&": picoTextCode("088941932942952923943963944915945975916976917927937947957967977"),
+};
 //const editjs = "app/edit.js"; // Editor script.
 const dots = [ // Dotted design pixels.
 	[0,6,6, 5,3,3],
@@ -55,8 +58,7 @@ async function appUpdate() {
 	/*if (custom) {
 		picoLabel("action", "*");
 	} else*/ if (count > 0 && result > 0) {
-		let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
-		picoLabel("action", null, data);
+		picoLabel("action", null, await picoSpriteData(sprites["&"], -1));
 	} else {
 		picoLabel("action");
 	}
@@ -324,8 +326,7 @@ async function appMain() {
 				angle = 0;
 				playing = 1;
 				//appUpdate();
-				let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
-				picoLabel("action", null, data);
+				picoLabel("action", null, await picoSpriteData(sprites["&"], -1));
 
 				// Number matched beeps on show result.
 				let timing = count <= 2 ? 0.2 : 0.5/count;

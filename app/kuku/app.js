@@ -1,4 +1,7 @@
 const title = "Kuku"; // Title.
+const sprites = { // Sprite table.
+	"&": picoTextCode("088941932942952923943963944915945975916976917927937947957967977"),
+};
 const kcents = [
 	     -0.7,-0.5, -0.4,-0.2, 0.0, 0.2, //        0,    1:Mi, 2:Fa, 3:So, 4:La, 5:Ti
 	 0.3, 0.5, 0.7,  0.8, 1.0, 1.2, 1.4, //  6:Do, 7:Re, 8:Mi, 9:Fa,10:So,11:La,12:Ti
@@ -368,8 +371,7 @@ async function appResult() {
 		}
 
 		// Enable share button.
-		let data = await picoSpriteData(picoStringCode6("099941932942952923943963944915945975916976917927937947957967977"), -1);
-		picoLabel("action", null, data);
+		picoLabel("action", null, await picoSpriteData(sprites["&"], -1));
 
 		// Reset playing count.
 		playing = 1;
