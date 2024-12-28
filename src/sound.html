@@ -10,7 +10,7 @@
 
 document.addEventListener("click", async (evt) => { // Need user input event before play sound.
 
-//*/
+/*/
 	picoBeep(-1.2, 0.1);
 	picoBeep(0, 0.1, 0.2);
 	picoBeep(1.2, 0.1, 0.4);
@@ -56,7 +56,7 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 //*/
 
 //*/
-	const melody = [
+	const melody = [0,30,0, // speed(bps=bpm/10)
 		0,4,6, 0,4,6, 1,4,6, -1,0,6,        0,4,6, 0,4,6, 1,4,6, -1,0,6,
 		0,4,6, 1,4,6, 2,4,6, 1,4,6,         0,4,6, 1,4,3, 0,4,3, 5,3,6, -1,0,6,
 		4,3,6, 3,3,6, 4,3,6, 5,3,6,         4,3,6, 4,3,3, 2,3,3, 1,3,6, -1,0,6,
@@ -64,7 +64,7 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 		4,3,6, 5,3,6, 1,4,3, 0,4,3, 5,3,6,  4,3,12, -1,0,12,
 	];
 	await picoStop();
-	await picoMelody(melody, 300, [0.8,0.6]);//[1,0.8,0.6,0.4]);
+	await picoMelody(melody, [0.8,0.6]);//[1,0.8,0.6,0.4]);
 //*/
 
 //*/
@@ -81,24 +81,24 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 		picoTextCode("h04,L00,P00,T00"), // Timbres: pattern,pitch,volume.
 		picoTextCode("023578a,1469b"), // Scales: La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+
 		10); // Offset: Timbre1=A..L, Timbre2=N..Y
-	picoMelody(picoTextCode(
+	picoMelody(picoTextCode("0f0"+ // 150bpm=15bit/sec
 		"A46A46B46Z06,A46A46B46Z06"+
 		"A46B46C46B46,A46B43A43F36Z06"+
 		"E36D36E36F36,E36E33C33B36Z06"+
 		"A46A46B46Z06,A46A46B46Z06"+
-		"E36F36B43A43F36,E3cZ0c"), 150);//, [1,0.8]);
-	picoMelody(picoTextCode(
+		"E36F36B43A43F36,E3cZ0c"));//, [1,0.8]);
+	picoMelody(picoTextCode("0f0"+ // 150bpm=15bit/sec
 		"n4co4c,n4co4c"+
 		"n4cp4c,n4cs3c"+
 		"r3cr3c,r3co3c"+
 		"n4co4c,n4co4c"+
-		"r3co4c,r3cr3c"), 150);//, [1,0.8]);//, [1], [0,1,0,-1,0,1,0,-1]);
-	picoMelody(picoTextCode(
+		"r3co4c,r3cr3c"));//, [1,0.8]);//, [1], [0,1,0,-1,0,1,0,-1]);
+	picoMelody(picoTextCode("0f0"+ // 150bpm=15bit/sec
 		"Z06a23,Z09a23,Z09a23,Z09a23,Z03"+
-		"Z06a23,Z09a23,Z09a23,Z03a23,Z03a23Z03"+
-		"Z06d13,Z09d13,Z09d13,Z03d13,Z03d13Z03"+
+		"Z06a23,Z09a23,Z09a23,Z03a23,Z09"+
+		"Z06d13,Z09d13,Z09d13,Z03d13,Z09"+
 		"Z06a23,Z09a23,Z09a23,Z09a23,Z03"+
-		"Z06d13,Z09d13,Z09d13,Z03d13,Z09"), 150);//, [0.2,0]);
+		"Z06d13,Z09d13,Z09d13,Z03d13,Z09"));//, [0.2,0]);
 	await picoWait(8000);
 
 	await picoWait(2000);

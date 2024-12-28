@@ -67,9 +67,9 @@ async function picoTimbre(timbres=null, scales=null, offset=0) {
 }
 
 // Play melody.
-async function picoMelody(melody=[0], speed=150, volumes=[1], pitches=null) {
+async function picoMelody(melody=[-1,0,0], volumes=[1], pitches=null) {
 	try {
-		await pico.sound.playMelody(melody, speed, volumes, pitches);
+		await pico.sound.playMelody(melody, volumes, pitches);
 	} catch (error) {
 		console.error(error);
 	}
@@ -207,21 +207,26 @@ pico.Sound = class {
 	}
 
 	// Play melody.
-	playMelody(melody=[0], speed=150, volumes=[1], pitches=null) {
+	playMelody(melody=[-1,0,0], volumes=[1], pitches=null) {
 //		return navigator.locks.request(this.lock, async (lock) => {
 		return new Promise(async (resolve) => {
-			for (let j = 0; j < melody.length/3; j++) {
+			let j = 0, speed = 0;
+			if (melody[0] == 0 && melody[1] >= 0 && melody[2] >= 0) {
+				speed = melody[1] * 10;
+				j += 1;
+			}
+			for (; j < melody.length/3; j++) {
 				let m0 = melody[j*3], m1 = melody[j*3+1], m2 = melody[j*3+2];
 				let pattern0 = 0, pattern1 = 0; // Melody pattern;
 				let pitch = (m1 - 4) * 12; // 4=Base pitch index, 12=Pitch difference on 1 octave.
 				let pctrl = 0, vctrl = 0;
 				let length = 60 / speed * m2 / 6; // 60=1 minute, 6=Base note length.
-				for (let j = 0; j < 4; j++) {
-					let k1 = (m0 < this.offset ? m0 : m0 - this.offset) - (this.scales.length+1)*j;
+				for (let i = 0; i < 4; i++) { // Seek matched tone in timbres.
+					let k1 = (m0 < this.offset ? m0 : m0 - this.offset) - (this.scales.length+1)*i;
 					if (k1 == this.scales.length) { // Rest.
 						break;
 					} else if (k1 >= 0 && k1 < this.scales.length) {
-						let j1 = m0 < this.offset ? j : j + this.offset;
+						let j1 = m0 < this.offset ? i : i + this.offset;
 						pattern0 = Math.floor(this.timbres[j1*3] / 16); // Upper bits.
 						pattern1 = Math.floor(this.timbres[j1*3] % 16); // Lower bits.
 						pitch = pitch + this.scales[k1]; // Scale up/down by 1 octave.
@@ -231,7 +236,7 @@ pico.Sound = class {
 					}
 				}
 
-				console.log("Melody " + (j+1) + "/" + (melody.length/3) + ": " +
+				console.log("Melody " + j + "/" + (melody.length/3) + ": " +
 					pitch + " x " + length + " " + m0 + " " + m1 + " " + m2 + " - " + pattern0 + " " + pattern1);
 				if (!pitches) {
 					let p = pitch + pctrl, v = [1];
