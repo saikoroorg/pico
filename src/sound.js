@@ -61,6 +61,20 @@ async function picoNoise(pattern=0, length=0.1, pitches=[0], volumes=[1]) {
 	}
 }
 
+// Set timbre pallete.
+async function picoTimbre(timbres=null, offset=0) {
+	pico.sound.timbre(timbres, offset);
+}
+
+// Play melody.
+async function picoMelody(melody=[0], speed=150) {
+	try {
+		await pico.sound.playMelody(melody, speed);
+	} catch (error) {
+		console.error(error);
+	}
+}
+
 //************************************************************/
 
 // Namespace.
@@ -70,6 +84,8 @@ var pico = pico || {};
 pico.Sound = class {
 	static frequency = 440; // Base frequency.
 	static maxvolume = 0.05; // Max volume.
+	static octaves = [0.0,0.2, 0.3,0.5,0.7, 0.8,1.0, 0.1, 0.4,0.6, 0.9,1.1]; // 0:La,1:Ti, 2:Do,3:Re,4:Mi, 5:Fa,6:So, 7:La+, 8:Do+,9:Re+, 10:Fa+,11:So+
+	static timbres = [0,0,0, 1,1,0, 2,16,0, 3,4,0, 3,8,0]; // Timbre1:1(noise),1,0, Timbre2:2(triangle),16,0, Timbre3:3(pulse),4,0, Timbre4:3(pulse),8,0
 
 	// Wait.
 	wait(t=1000) {
@@ -140,6 +156,55 @@ pico.Sound = class {
 		}); // end of new Promise.
 	}
 
+	// Set timbre pallete.
+	timbre(timbres=null, offset=0) {
+		if (timbres && timbres.length > 0) {
+			this.offset = offset;
+			this.timbres.length = offset;
+			this.timbres = this.timbres.concat(timbres);
+		} else {
+			this.timbres = pico.Sound.timbres.concat();
+		}
+	}
+
+	// Play melody.
+	playMelody(melody=[0], speed=150) {
+		return new Promise(async (resolve) => {
+			for (let i = 0; i < melody.length/3; i++) {
+				// Timbre1 = 10-21 (abcdefg hijkl) m
+				// Timbre2 = 23-34 (nopqrst uvwxy) z
+				// Timbre3 = 36-47 (ABCDEFG HIJKL) M
+				// Timbre4 = 49-50 (NOPQRST UVWXY) Z
+				let m0 = melody[i*3], m1 = melody[i*3+1], m2 = melody[i*3+2];
+				let t0 = (m0>=10 && m0<22) ? 1 : (m0>=23 && m0<35) ? 2 : (m0>=36 && m0<48) ? 3 : (m0>=49 && m0<51) ? 4 : 0;
+				let t1 = this.timbres[t0*3];
+				let pitch = t0 ? pico.Sound.octaves[m0 - t0 * 13 + 3] + (m1 - 4) * 1.2 : 0;
+				let length = 60 / speed * m2 / 3;
+				console.log("Melody " + (i+1) + "/" + (melody.length/3) + ": " +
+					pitch + " x " + length + " " + m0 + "(" + t0+ "->" + t1 + ") " + m1 + " " + m2);
+				if (t1 == 1) {
+					let pattern = m1;
+					console.log("Noise " + pattern + ": " + pitch + " x " + length);
+					await this._noise(pattern, length, pitch);
+				} else if (t1 == 2) {
+					let pattern = m1;
+					console.log("Triangle " + pattern + ": " + pitch + " x " + length);
+					await this._triangle(pattern, length, pitch);
+				} else if (t1 == 3) {
+					let pattern = m1 ? 1 / m1 : 0;
+					console.log("Pulse " + pattern + ": " + pitch + " x " + length);
+					await this._pulse(pattern, length, pitch);
+				} else {
+					await this.wait(length * 1000);
+				}
+				if (this.stopped) {
+					//console.log("Melody End.");
+					//resolve();
+				}
+			}
+		}); // end of new Promise.
+	}
+
 	//*----------------------------------------------------------*/
 
 	// constructor.
@@ -151,6 +216,8 @@ pico.Sound = class {
 		this.started = false; // Oscillator start flag.
 		this.stopped = true; // Oscillator stop flag.
 		this.endTime = 0; // End time count.
+		this.offset = 0; // Timbres index offset.
+		this.timbres = Object.assign([], pico.Sound.timbres); // Master timbres.
 
 		// Setup after click event for audio permission.
 		document.addEventListener("click", () => {
@@ -258,19 +325,19 @@ pico.Sound = class {
 					for (let i = 0; i < volumes.length; i++) {
 						let v = volumes[i] < 1 ? volumes[i] * pico.Sound.maxvolume : pico.Sound.maxvolume;
 						let t = this.context.currentTime + length * i/volumes.length;
-						console.log("Set volume: " + v + " at " + t);
+						//console.log("Set volume: " + v + " at " + t);
 						this.master.gain.setValueAtTime(v, t);
 					}
 				} else {
 					let v = volumes && volumes[0] < 1 ? volumes[0] * pico.Sound.maxvolume : pico.Sound.maxvolume;
-					console.log("Set volume: " + v);
+					//console.log("Set volume: " + v);
 					this.master.gain.value = v;
 				}
 				//this.master.gain.setValueAtTime(0, this.context.currentTime + length);
 
 				// Start audio.
 				if (!this.started) {
-					console.log("Start audio.");
+					//console.log("Start audio.");
 					this.oscillator.start();
 					this.started = true;
 				}
@@ -280,7 +347,7 @@ pico.Sound = class {
 				let endTime = this.context.currentTime+length;//startTime + length*1000;
 				this.endTime = endTime > this.endTime ? endTime : this.endTime;
 				//this.endTime = Date.now() + length;
-				console.log("Wait to play end: " + startTime + " -> " + this.endTime);
+				//console.log("Wait to play end: " + startTime + " -> " + this.endTime);
 				this.stopped = false;
 
 				// Wait to end.
@@ -289,7 +356,7 @@ pico.Sound = class {
 					//	console.log("Stopped.");
 					//} else {
 						// End.
-						console.log("End: " + this.endTime);
+						//console.log("End: " + this.endTime);
 						this.endTime = 0;
 						resolve();
 					//}
@@ -312,7 +379,7 @@ pico.Sound = class {
 		return this._ready().then(async () => {
 
 			// Play sound.
-			console.log("Play " + type + ": " + pitches + " x " + length);
+			//console.log("Play " + type + ": " + pitches + " x " + length);
 			if (type) {
 
 				// Connect.
@@ -321,22 +388,22 @@ pico.Sound = class {
 					for (let i = 0; i < pitches.length; i++) {
 						let p = pitches[i] ? pitches[i] * 1000 : 0;
 						let t = this.context.currentTime + length * i/pitches.length;
-						console.log("Set pitch: " + p + " at " + t);
+						//console.log("Set pitch: " + p + " at " + t);
 						this.oscillator.detune.setValueAtTime(p, t);
 					}
 				} else {
 					let p = pitches && pitches[0] ? pitches[0] * 1000 : 0;
-					console.log("Set pitch: " + p);
+					//console.log("Set pitch: " + p);
 					this.oscillator.detune.value = p;
 				}
-				console.log("Connect oscillator.");
+				//console.log("Connect oscillator.");
 				this.oscillator.connect(this.master);
 
 				// Start sound.
 				await this._start(length, volumes).then(() => {
 
 					if (!this.stopped) {
-						console.log("Disconnect oscillator.")
+						//console.log("Disconnect oscillator.")
 						this.oscillator.disconnect(this.master);
 						this.stopped = true; // Wait for end on start function.
 					}
@@ -362,18 +429,18 @@ pico.Sound = class {
 			pulseFilters[0] = this.context.createGain();
 			pulseFilters[0].gain.value = -1;
 			pulseFilters[1] = this.context.createDelay();
-			console.log("Set pitch: " + pitch + "=" + frequency);
+			//console.log("Set pitch: " + pitch + "=" + frequency);
 			pulseFilters[1].delayTime.value = (1.0 - pattern) / frequency;
 
 			// Connect pulse filters to master volume.
-			console.log("Connect pulse filters.");
+			//console.log("Connect pulse filters.");
 			this.oscillator.connect(pulseFilters[0]).connect(pulseFilters[1]).connect(this.master);
 
 			// Start pulse sound.
-			console.log("Start pulse sound " + pattern + ": " + pitch + "=" + frequency + " x " + length);
+			//console.log("Start pulse sound " + pattern + ": " + pitch + "=" + frequency + " x " + length);
 			return this._play("sawtooth", length, [pitch], [volume]).then(() => {
 
-				console.log("Disconnect pulse filters.");
+				//console.log("Disconnect pulse filters.");
 				this.oscillator.disconnect(pulseFilters[0]);
 				pulseFilters[0].disconnect(pulseFilters[1]);
 				pulseFilters[0] = null;
@@ -385,7 +452,7 @@ pico.Sound = class {
 		} else {
 
 			// Start square sound.
-			console.log("Start square sound " + pattern + ": " + pitch + " x " + length);
+			//console.log("Start square sound " + pattern + ": " + pitch + " x " + length);
 			return this._play("square", length, [pitch], [volume]);
 		}
 	}
@@ -433,7 +500,7 @@ pico.Sound = class {
 			}
 
 			// Connect triangle generator to master volume.
-			console.log("Connect triangle generator.");
+			//console.log("Connect triangle generator.");
 			let triangleGenerator = null;
 			triangleGenerator = this.context.createBufferSource();
 			triangleGenerator.buffer = triangleBuffer;
@@ -441,11 +508,11 @@ pico.Sound = class {
 			triangleGenerator.start();
 
 			// Start pseudo triangle sound.
-			console.log("Start pseudo triangle sound " + pattern + ": " + pitch + "=" + frequency + " x " + length);
+			//console.log("Start pseudo triangle sound " + pattern + ": " + pitch + "=" + frequency + " x " + length);
 			return this._start(length, [volume]).then(() => {
 
 				// Disconnect triangle generator.
-				console.log("Disconnect triangle generator.");
+				//console.log("Disconnect triangle generator.");
 				triangleGenerator.disconnect(this.master);
 				triangleGenerator = null;
 				triangleBuffer = null;
@@ -455,7 +522,7 @@ pico.Sound = class {
 		} else {
 
 			// Start triangle sound.
-			console.log("Start triangle sound " + pattern + ": " + pitch + " x " + length);
+			//console.log("Start triangle sound " + pattern + ": " + pitch + " x " + length);
 			return this._play("triangle", length, [pitch], [volume]);
 		}
 	}
@@ -468,7 +535,7 @@ pico.Sound = class {
 		}
 
 		// Create noise buffers.
-		console.log("Create noise buffers.");
+		//console.log("Create noise buffers.");
 		let noiseBuffer = null;
 		noiseBuffer = this.context.createBuffer(2, this.context.sampleRate * length, this.context.sampleRate);
 
@@ -495,7 +562,7 @@ pico.Sound = class {
 		}
 
 		// Create noise generator.
-		console.log("Connect noise generator.");
+		//console.log("Connect noise generator.");
 		let noiseGenerator = null;
 		noiseGenerator = this.context.createBufferSource();
 		noiseGenerator.buffer = noiseBuffer;
@@ -506,11 +573,11 @@ pico.Sound = class {
 		noiseGenerator.start();
 
 		// Start noise sound.
-		console.log("Start noise sound " + pattern + ": " + pitch + " x " + length);
+		//console.log("Start noise sound " + pattern + ": " + pitch + " x " + length);
 		return this._start(length, [volume]).then(() => {
 
 			// Disconnect noise generator.
-			console.log("Disconnect noise generator.");
+			//console.log("Disconnect noise generator.");
 			noiseGenerator.disconnect(this.master);
 			noiseGenerator = null;
 			noiseBuffer = null;
