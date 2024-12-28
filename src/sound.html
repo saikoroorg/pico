@@ -12,10 +12,16 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 /*/
 	picoBeep(-1.2, 0.1);
 	picoBeep(0, 0.1, 0.2);
-	picoBeep(1.2, 1.0, 0.4);
-	await picoWait(500);
-	picoStop();
-	await picoWait(1500);
+	picoBeep(1.2, 0.1, 0.4);
+	await picoWait(1000);
+//*/
+
+//*/
+	picoBeep(1.2, 2, 0, [-1.5, -2.3, -0.7, -0.2, 0.5, 1.7, 2.9, 4.1, 5.3]);//[-7.9, -6.7, -5.5, -5.0, -4.3, -3.8, -3.1]);
+	await picoWait(4000);
+
+	picoBeep(0, 0.5, 0, [-1.2,0,0,0,1.2], [1,0,1,0,1]);
+	await picoWait(2000);
 //*/
 
 //*/
