@@ -28,7 +28,7 @@ async function picoStop() {
 }
 
 // Play pulse melody.
-// pattern = 0 or 0.125, 0.25, 0.5 (8bit original parameter)
+// pattern = 0 or 1(0.125), 3(0.25), 7(0.5) (8bit original parameter)
 // pitches = -3.6(A1:54.6Hz) .. 7.0(G9:12.4kHz)
 async function picoPulse(pattern=0, length=0.1, pitches=[0], volumes=[1]) {
 	try {
@@ -39,7 +39,7 @@ async function picoPulse(pattern=0, length=0.1, pitches=[0], volumes=[1]) {
 }
 
 // Play triangle melody.
-// pattern = 0 or 16 (8bit original parameter)
+// pattern = 0 or 15 (8bit original parameter)
 // pitches = -4.8(A0:27.3Hz) .. 8.4(A11:55.9kHz)
 async function picoTriangle(pattern=0, length=0.1, pitches=[0], volumes=[1]) {
 	try {
@@ -84,8 +84,8 @@ var pico = pico || {};
 pico.Sound = class {
 	static frequency = 440; // Base frequency.
 	static maxvolume = 0.05; // Max volume.
-	static scales = [0.0,0.2, 0.3,0.5,0.7, 0.8,1.0, 0.1, 0.4,0.6, 0.9,1.1]; // 0:La,1:Ti, 2:Do,3:Re,4:Mi, 5:Fa,6:So, 7:La+, 8:Do+,9:Re+, 10:Fa+,11:So+
-	static timbres = [0,0,0, 1,1,0, 2,16,0, 3,4,0, 3,8,0]; // Timbre1:1(noise),1,0, Timbre2:2(triangle),16,0, Timbre3:3(pulse),4,0, Timbre4:3(pulse),8,0
+	static scales = [0,2,3,5,7,8,10];//, 1,4,6,9,11]; // 0:La,1:Ti,2:Do,3:Re,4:Mi,5:Fa,6:So, // 7:La+,8:Do+,9:Re+,10:Fa+,11:So+
+	static timbres = [3,0,0]; // 3(pulse),0,0, // 1(noise),1,0, 2(triangle),15,0, 3(pulse),1,0, 3(pulse),7,0
 
 	// Wait.
 	wait(t=1000) {
@@ -99,7 +99,7 @@ pico.Sound = class {
 			console.log("Delay: " + delay);
 			setTimeout(() => {
 				console.log("Beep: " + kcent + " x " + length);
-				this._play("square", length, [kcent]).then(() => {
+				this._play("square", length, [kcent*10]).then(() => {
 					resolve();
 				});
 			}, delay * 1000);
@@ -175,38 +175,32 @@ pico.Sound = class {
 	playMelody(melody=[0], speed=150) {
 		return new Promise(async (resolve) => {
 			for (let i = 0; i < melody.length/3; i++) {
-				// Timbre1 = 10-21 (abcdefg hijkl) m
-				// Timbre2 = 23-34 (nopqrst uvwxy) z
-				// Timbre3 = 36-47 (ABCDEFG HIJKL) M
-				// Timbre4 = 49-50 (NOPQRST UVWXY) Z
-				let m0 = melody[i*3], m1 = melody[i*3+1], m2 = melody[i*3+2], t0 = 0, t1 = 0;
-				let pitch = (m1 - 4) * 1.2; // 4=Base pitch index, 1.2=Pitch difference on 1 octave.
+				let m0 = melody[i*3], m1 = melody[i*3+1], m2 = melody[i*3+2];
+				let pattern0 = 0, pattern1 = 0; // Melody pattern;
+				let pitch = (m1 - 4) * 12; // 4=Base pitch index, 12=Pitch difference on 1 octave.
 				let length = 60 / speed * m2 / 6; // 60=1 minute, 6=Base note length.
 				for (let j = 0; j < 4; j++) {
 					let k1 = m0 - this.offset - (this.scales.length+1)*j;
 					if (k1 == this.scales.length) { // Rest.
 						break;
 					} else if (k1 >= 0 && k1 < this.scales.length) {
-						t0 = this.timbres[j*3];
-						t1 = this.timbres[j*3+1];
-						pitch = pitch + this.scales[k1];
+						pattern0 = this.timbres[j*3];
+						pattern1 = this.timbres[j*3+1];
+						pitch = pitch + this.scales[k1]; // Scale up/down by 1 octave.
 						break;
 					}
 				}
 				console.log("Melody " + (i+1) + "/" + (melody.length/3) + ": " +
-					pitch + " x " + length + " " + m0 + " " + m1 + " " + m2 + " - " + t0 + " " + t1);
-				if (t0 == 1) {
-					let pattern = t1;
-					console.log("Noise " + pattern + ": " + pitch + " x " + length);
-					await this._noise(pattern, length, pitch);
-				} else if (t0 == 2) {
-					let pattern = t1+1;
-					console.log("Triangle " + pattern + ": " + pitch + " x " + length);
-					await this._triangle(pattern, length, pitch);
-				} else if (t0 == 3) {
-					let pattern = t1 ? 1 / (t1+1) : 0;
-					console.log("Pulse " + pattern + ": " + pitch + " x " + length);
-					await this._pulse(pattern, length, pitch);
+					pitch + " x " + length + " " + m0 + " " + m1 + " " + m2 + " - " + pattern0 + " " + pattern1);
+				if (pattern0 == 1) {
+					console.log("Noise " + pattern1 + ": " + pitch + " x " + length);
+					await this._noise(pattern1, length, pitch);
+				} else if (pattern0 == 2) {
+					console.log("Triangle " + pattern1 + ": " + pitch + " x " + length);
+					await this._triangle(pattern1, length, pitch);
+				} else if (pattern0 == 3) {
+					console.log("Pulse " + pattern1 + ": " + pitch + " x " + length);
+					await this._pulse(pattern1, length, pitch);
 				} else {
 					await this.wait(length * 1000);
 				}
@@ -215,6 +209,8 @@ pico.Sound = class {
 					//resolve();
 				}
 			}
+			console.log("Melody End.");
+			resolve();
 		}); // end of new Promise.
 	}
 
@@ -400,13 +396,13 @@ pico.Sound = class {
 				this.oscillator.type = type;
 				if (pitches && pitches.length >= 2) {
 					for (let i = 0; i < pitches.length; i++) {
-						let p = pitches[i] ? pitches[i] * 1000 : 0;
+						let p = pitches[i] ? pitches[i] * 100 : 0;
 						let t = this.context.currentTime + length * i/pitches.length;
 						//console.log("Set pitch: " + p + " at " + t);
 						this.oscillator.detune.setValueAtTime(p, t);
 					}
 				} else {
-					let p = pitches && pitches[0] ? pitches[0] * 1000 : 0;
+					let p = pitches && pitches[0] ? pitches[0] * 100 : 0;
 					//console.log("Set pitch: " + p);
 					this.oscillator.detune.value = p;
 				}
@@ -433,18 +429,18 @@ pico.Sound = class {
 			return Promise.reject();
 		}
 
-		// 8bit original argorithm and parameter: pattern=0.125,0.25,0.5
+		// 8bit original argorithm and parameter: pattern=1(0.5),3(0.25),7(0.125)
 		if (pattern > 0) {
 
 			// Create pulse filters.
 			let frequency = !pitch ? this.oscillator.frequency.value :
-				this.oscillator.frequency.value * (2 ** (pitch * 1000 / 1200));
+				this.oscillator.frequency.value * (2 ** (pitch * 100 / 1200));
 			let pulseFilters = [];
 			pulseFilters[0] = this.context.createGain();
 			pulseFilters[0].gain.value = -1;
 			pulseFilters[1] = this.context.createDelay();
 			//console.log("Set pitch: " + pitch + "=" + frequency);
-			pulseFilters[1].delayTime.value = (1.0 - pattern) / frequency;
+			pulseFilters[1].delayTime.value = (1.0 - 1/(pattern+1)) / frequency;
 
 			// Connect pulse filters to master volume.
 			//console.log("Connect pulse filters.");
@@ -478,7 +474,7 @@ pico.Sound = class {
 			return Promise.reject();
 		}
 
-		// 8bit original argorithm and parameter: pattern=16
+		// 8bit original argorithm and parameter: pattern=15
 		if (pattern > 0) {
 
 			// Create triangle buffers.
@@ -487,7 +483,7 @@ pico.Sound = class {
 
 			// 8bit original pseudo triangle argorithm.
 			let frequency = !pitch ? this.oscillator.frequency.value :
-				this.oscillator.frequency.value * (2 ** (pitch * 1000 / 1200));
+				this.oscillator.frequency.value * (2 ** (pitch * 100 / 1200));
 			let triangleCycle = 2 * Math.PI, value = 0;
 			let buffering = triangleBuffer.getChannelData(0);
 			for (let i = 0; i < triangleBuffer.length; i++) {
@@ -499,14 +495,14 @@ pico.Sound = class {
 					} else { // 1 -> 0.
 						value = -k / (triangleCycle / 4) + 2;
 					}
-					buffering[i] = Math.floor(value * pattern) / pattern;
+					buffering[i] = Math.floor(value * (pattern+1)) / (pattern+1);
 				} else {
 					if (k < triangleCycle * 3 / 4) { // 0 -> -1.
 						value = -k / (triangleCycle / 4) + 2;
 					} else { // -1 -> 0.
 						value = k / (triangleCycle / 4) - 4;
 					}
-					buffering[i] = Math.ceil(value * pattern) / pattern;
+					buffering[i] = Math.ceil(value * (pattern+1)) / (pattern+1);
 				}
 				//if (!Math.floor(i % 100)) {
 				//	console.log("buffering" + i + ": " + value + " -> " + buffering[i]);
@@ -580,7 +576,7 @@ pico.Sound = class {
 		let noiseGenerator = null;
 		noiseGenerator = this.context.createBufferSource();
 		noiseGenerator.buffer = noiseBuffer;
-		noiseGenerator.detune.setValueAtTime(pitch * 1000, this.context.currentTime);
+		noiseGenerator.detune.setValueAtTime(pitch * 100, this.context.currentTime);
 
 		// Connect noise generator to master volume.
 		noiseGenerator.connect(this.master);
