@@ -9,7 +9,7 @@
 
 document.addEventListener("click", async (evt) => { // Need user input event before play sound.
 
-/*/
+//*/
 	picoBeep(-1.2, 0.1);
 	picoBeep(0, 0.1, 0.2);
 	picoBeep(1.2, 0.1, 0.4);
@@ -17,37 +17,29 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 //*/
 
 //*/
-	picoBeep(1.2, 2, 0, [-1.5, -2.3, -0.7, -0.2, 0.5, 1.7, 2.9, 4.1, 5.3]);//[-7.9, -6.7, -5.5, -5.0, -4.3, -3.8, -3.1]);
-	await picoWait(4000);
-
-	picoBeep(0, 0.5, 0, [-1.2,0,0,0,1.2], [1,0,1,0,1]);
+	picoPulse(0, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
+	await picoWait(1000);
+	picoPulse(0.5, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
+	await picoWait(1000);
+	picoPulse(0.25, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
+	await picoWait(1000);
+	picoPulse(0.125, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
 	await picoWait(2000);
 //*/
 
 //*/
-	picoPulse([-0.9,-0.7,-0.5], 0.2);
+	picoTriangle(0, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
 	await picoWait(1000);
-	picoPulse([-0.9,-0.7,-0.5], 0.2, 0.5);
-	await picoWait(1000);
-	picoPulse([-0.9,-0.7,-0.5], 0.2, 0.25);
-	await picoWait(1000);
-	picoPulse([-0.9,-0.7,-0.5], 0.2, 0.125);
+	picoTriangle(16, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
 	await picoWait(2000);
 //*/
 
 //*/
-	picoTriangle([-0.9,-0.7,-0.5], 0.2);
+	picoNoise(0, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
 	await picoWait(1000);
-	picoTriangle([-0.9,-0.7,-0.5], 0.2, 16);
-	await picoWait(2000);
-//*/
-
-//*/
-	picoNoise([-0.9,-0.7,-0.5], 0.2);
+	picoNoise(1, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
 	await picoWait(1000);
-	picoNoise([-0.9,-0.7,-0.5], 0.2, 1);
-	await picoWait(1000);
-	picoNoise([-0.9,-0.7,-0.5], 0.2, 6);
+	picoNoise(6, 0.2, [-0.9,-0.7,-0.5], [0.9,0.6,0.3]);
 	await picoWait(2000);
 //*/
 
