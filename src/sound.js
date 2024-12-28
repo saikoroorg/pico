@@ -159,15 +159,16 @@ pico.Sound = class {
 	// Set timbre pallete.
 	timbre(timbres=null, scales=null, offset=0) {
 		if (timbres && timbres.length > 0) {
-			this.timbres = timbres.concat();
+			this.offset = offset;
+			this.timbres.length = offset*3;
+			this.timbres = this.timbres.concat(timbres);
 			if (scales && scales.length > 0) {
 				this.scales = scales.concat();
 			}
-			if (offset > 0) {
-				this.offset = offset;
-			}
-		} else {
+		} else { // Reset timbres.
+			this.offset = offset;
 			this.timbres = pico.Sound.timbres.concat();
+			this.scales = pico.Sound.scales.concat();
 		}
 	}
 
@@ -180,12 +181,13 @@ pico.Sound = class {
 				let pitch = (m1 - 4) * 12; // 4=Base pitch index, 12=Pitch difference on 1 octave.
 				let length = 60 / speed * m2 / 6; // 60=1 minute, 6=Base note length.
 				for (let j = 0; j < 4; j++) {
-					let k1 = m0 - this.offset - (this.scales.length+1)*j;
+					let k1 = (m0 < this.offset ? m0 : m0 - this.offset) - (this.scales.length+1)*j;
 					if (k1 == this.scales.length) { // Rest.
 						break;
 					} else if (k1 >= 0 && k1 < this.scales.length) {
-						pattern0 = this.timbres[j*3];
-						pattern1 = this.timbres[j*3+1];
+						let j1 = m0 < this.offset ? j : j + this.offset;
+						pattern0 = this.timbres[j1*3];
+						pattern1 = this.timbres[j1*3+1];
 						pitch = pitch + this.scales[k1]; // Scale up/down by 1 octave.
 						break;
 					}
