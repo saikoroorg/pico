@@ -87,7 +87,6 @@ pico.Sound = class {
 	static maxvolume = 0.1; // Max volume.
 	static timbres = [48,0,0]; // Default timbres [Noise(16,17,22)/Triangle(32,47)/Pulse(48,49,51,55), Pitch(0,1..), Volume(0,1..)/Fadeout(16,17..)]
 	static scales = [0,2,3,5,7,8,10];//, 1,4,6,9,11]; // Default scales [0:La,1:Ti,2:Do,3:Re,4:Mi,5:Fa,6:So, 7:La+,8:Do+,9:Re+,10:Fa+,11:So+]
-	static volumes = [1,0.6]; // Default volumes.
 
 	// Wait.
 	wait(t=1000) {
@@ -221,7 +220,7 @@ pico.Sound = class {
 				let pattern0 = 0, pattern1 = 0; // Melody pattern;
 				let pitch = (m1 - 4) * 12; // 4=Base pitch index, 12=Pitch difference on 1 octave.
 				let pctrl = 0, fctrl = 0, vctrl = 1; // Pitch, Fade, Volume control.
-				let length = 60 / speed * m2 / 6; // 60=1 minute, 6=Base note length.
+				let length = 60 / speed * m2 / 6; // 60=1 minute, 6=Beat base length.
 				for (let i = 0; i < 4; i++) { // Seek matched tone in timbres.
 					let k1 = (m0 < this.offset ? m0 : m0 - this.offset) - (this.scales.length+1)*i;
 					if (k1 == this.scales.length) { // Rest.
@@ -232,19 +231,24 @@ pico.Sound = class {
 						pattern1 = Math.floor(this.timbres[j1*3] % 16); // Lower bits.
 						pitch = pitch + this.scales[k1]; // Scale up/down by 1 octave.
 						pctrl = -this.timbres[j1*3+1];
-						fctrl = Math.floor(this.timbres[j1*3+2] / 16); // Upper bits.
+						fctrl = Math.floor(this.timbres[j1*3+2] / 16)/16; // Upper bits.
 						vctrl = 1 - Math.floor(this.timbres[j1*3+2] % 16)/16; // Lower bits.
 						break;
 					}
 				}
 
-				// Volume pattern.
+				// Volume pattern (Volume control base length=0.5).
 				let p = pitch + pctrl, v = [vctrl];
 				if (fctrl > 0) {
-					let imax = m2 * 2;
-					for (let i = 0; i < imax; i++) {
-						let u = vctrl - fctrl*i/16;
+					let imax = m2 * 2; // Volume length
+					let rmin = imax - Math.floor(vctrl / fctrl); // Volume reduce length.
+					for (let i = 0; i < rmin; i++) {
+						v[i] = vctrl;
+					}
+					for (let i = rmin; i < imax; i++) {
+						let u = vctrl - fctrl*(i-rmin);
 						v[i] = u > 0 ? u : 0;
+						//console.log("Reduce " + i + "/" + imax + ": " +v[i]);
 					}
 				}
 
