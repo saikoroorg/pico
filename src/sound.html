@@ -83,32 +83,33 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 	//  23-34(nopqrst,uvwxy) + 35(z)
 	//  36-47(ABCDEFG,HIJKL) + 46(M)
 	//  49-50(NOPQRST,UVWXY) + 51(Z)
+	// Melody header:
+	//  0f0: 150bpm=15bit/sec.
+	//  0u0: 300bpm=30bit/sec.
 	picoTimbre(
 		picoTextCode("h0E,L00,P0k,T0k"), // Timbres: pattern,pitch,volume.
 		picoTextCode("023578a,1469b"), // Scales: La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+
 		10); // Offset: Timbre1=A..L, Timbre2=N..Y
-	// Melody header:
-	//  0f0: 150bpm=15bit/sec.
-	//  0u0: 300bpm=30bit/sec.
-	picoMelody(picoTextCode("0f0"+
-		"A46A46B46Z06,A46A46B46Z06"+
-		"A46B46C46B46,A46B43A43F36Z06"+
-		"E36D36E36F36,E36E33C33B36Z06"+
-		"A46A46B46Z06,A46A46B46Z06"+
-		"E36F36B43A43F36,E3cZ0c"));
-	picoMelody(picoTextCode("0f0"+
-		"n4co4c,n4co4c"+
-		"n4cp4c,n4cs3c"+
-		"r3cr3c,r3co3c"+
-		"n4co4c,n4co4c"+
-		"r3co4c,r3cr3c"));
-	picoMelody(picoTextCode("0f0"+
-		"Z06a23,Z09a23,Z09a23,Z09a23,Z03"+
-		"Z06a23,Z09a23,Z09a23,Z03a23,Z09"+
-		"Z06e13,Z09e13,Z09e13,Z03e13,Z09"+
-		"Z06a23,Z09a23,Z09a23,Z09a23,Z03"+
-		"Z06e13,Z09e13,Z09e13,Z03e13,Z09"));
-	await picoWait(8000);
+	for (let i = 0; i < 10; i++) {
+		picoMelody(picoTextCode("0f0"+
+			"Z06a23,Z09a23,Z09a23,Z09a23,Z03"+
+			"Z06a23,Z09a23,Z09a23,Z03a23,Z09"+
+			"Z06e13,Z09e13,Z09e13,Z03e13,Z09"+
+			"Z06a23,Z09a23,Z09a23,Z09a23,Z03"+
+			"Z06e13,Z09e13,Z09e13,Z03e13,Z09"));
+		picoMelody(picoTextCode("0f0"+
+			"n4co4c,n4co4c"+
+			"n4cp4c,n4cs3c"+
+			"r3cr3c,r3co3c"+
+			"n4co4c,n4co4c"+
+			"r3co4c,r3cr3c"));
+		await picoMelody(picoTextCode("0f0"+
+			"A46A46B46Z06,A46A46B46Z06"+
+			"A46B46C46B46,A46B43A43F36Z06"+
+			"E36D36E36F36,E36E33C33B36Z06"+
+			"A46A46B46Z06,A46A46B46Z06"+
+			"E36F36B43A43F36,E3cZ0c"));
+	}
 
 	await picoWait(2000);
 //*/
