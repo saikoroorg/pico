@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.10.41228"; // Update by package.json.
+pico.version = "0.10.41229"; // Update by package.json.
 
 /* PICO Image module */
 
@@ -1565,7 +1565,6 @@ pico.Sound = class {
 	static maxvolume = 0.1; // Max volume.
 	static timbres = [48,0,0]; // Default timbres [Noise(16,17,22)/Triangle(32,47)/Pulse(48,49,51,55), Pitch(0,1..), Volume(0,1..)/Fadeout(16,17..)]
 	static scales = [0,2,3,5,7,8,10];//, 1,4,6,9,11]; // Default scales [0:La,1:Ti,2:Do,3:Re,4:Mi,5:Fa,6:So, 7:La+,8:Do+,9:Re+,10:Fa+,11:So+]
-	static volumes = [1,0.6]; // Default volumes.
 
 	// Wait.
 	wait(t=1000) {
@@ -1579,7 +1578,7 @@ pico.Sound = class {
 		return new Promise(async (resolve) => {
 			////console.log("Delay: " + delay);
 			await setTimeout(async () => {
-				//console.log("Beep: " + kcent + " x " + length);
+				////console.log("Beep: " + kcent + " x " + length);
 				await this._play("square", length, [kcent*10]);
 			}, delay * 1000);
 			resolve();
@@ -1597,20 +1596,20 @@ pico.Sound = class {
 //		return navigator.locks.request(this.lock, async (lock) => {
 		return new Promise(async (resolve) => {
 			if (!pitches) {
-				//console.log("Pulse: " + pattern + ", " + pitch + ", " + volumes);
+				////console.log("Pulse: " + pattern + ", " + pitch + ", " + volumes);
 				await this._pulse(pattern, length, pitch, volumes);
 			} else {
 				let imax = pitches.length > volumes.length ? pitches.length : volumes.length;
 				for (let i = 0; i < imax; i++) {
-					//console.log("Pulse " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
+					////console.log("Pulse " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
 					await this._pulse(pattern, length/imax, pitch+pitches[i], [volumes[i]]);
 					if (this.stopped) {
-						//console.log("Pulse stopped.");
+						////console.log("Pulse stopped.");
 						break;
 					}
 				}
 			}
-			//console.log("Pulse end.");
+			////console.log("Pulse end.");
 			resolve();
 		}); // end of new Promise.
 //		}); // end of lock.
@@ -1621,20 +1620,20 @@ pico.Sound = class {
 //		return navigator.locks.request(this.lock, async (lock) => {
 		return new Promise(async (resolve) => {
 			if (!pitches) {
-				//console.log("Triangle: " + pattern + ", " + pitch + ", " + volumes);
+				////console.log("Triangle: " + pattern + ", " + pitch + ", " + volumes);
 				await this._triangle(pattern, length, pitch, volumes);
 			} else {
 				let imax = pitches.length > volumes.length ? pitches.length : volumes.length;
 				for (let i = 0; i < imax; i++) {
-					//console.log("Triangle " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
+					////console.log("Triangle " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
 					await this._triangle(pattern, length/imax, pitch+pitches[i], [volumes[i]]);
 					if (this.stopped) {
-						//console.log("Triangle stopped.");
+						////console.log("Triangle stopped.");
 						break;
 					}
 				}
 			}
-			//console.log("Triangle end.");
+			////console.log("Triangle end.");
 			resolve();
 		}); // end of new Promise.
 //		}); // end of lock.
@@ -1645,20 +1644,20 @@ pico.Sound = class {
 //		return navigator.locks.request(this.lock, async (lock) => {
 		return new Promise(async (resolve) => {
 			if (!pitches) {
-				//console.log("Noise: " + pattern + ", " + pitch + ", " + volumes);
+				////console.log("Noise: " + pattern + ", " + pitch + ", " + volumes);
 				await this._noise(pattern, length, pitch, volumes);
 			} else {
 				let imax = pitches.length > volumes.length ? pitches.length : volumes.length;
 				for (let i = 0; i < imax; i++) {
-					//console.log("Noise " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
+					////console.log("Noise " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
 					await this._noise(pattern, length/imax, pitch+pitches[i], [volumes[i]]);
 					if (this.stopped) {
-						//console.log("Noise stopped.");
+						////console.log("Noise stopped.");
 						break;
 					}
 				}
 			}
-			//console.log("Noise end.");
+			////console.log("Noise end.");
 			resolve();
 		}); // end of new Promise.
 //		}); // end of lock.
@@ -1699,7 +1698,7 @@ pico.Sound = class {
 				let pattern0 = 0, pattern1 = 0; // Melody pattern;
 				let pitch = (m1 - 4) * 12; // 4=Base pitch index, 12=Pitch difference on 1 octave.
 				let pctrl = 0, fctrl = 0, vctrl = 1; // Pitch, Fade, Volume control.
-				let length = 60 / speed * m2 / 6; // 60=1 minute, 6=Base note length.
+				let length = 60 / speed * m2 / 6; // 60=1 minute, 6=Beat base length.
 				for (let i = 0; i < 4; i++) { // Seek matched tone in timbres.
 					let k1 = (m0 < this.offset ? m0 : m0 - this.offset) - (this.scales.length+1)*i;
 					if (k1 == this.scales.length) { // Rest.
@@ -1710,24 +1709,31 @@ pico.Sound = class {
 						pattern1 = Math.floor(this.timbres[j1*3] % 16); // Lower bits.
 						pitch = pitch + this.scales[k1]; // Scale up/down by 1 octave.
 						pctrl = -this.timbres[j1*3+1];
-						fctrl = Math.floor(this.timbres[j1*3+2] / 16); // Upper bits.
+						fctrl = Math.floor(this.timbres[j1*3+2] / 16)/16; // Upper bits.
 						vctrl = 1 - Math.floor(this.timbres[j1*3+2] % 16)/16; // Lower bits.
 						break;
 					}
 				}
 
-				// Volume pattern.
+				// Volume pattern (Volume control base length=0.5).
 				let p = pitch + pctrl, v = [vctrl];
 				if (fctrl > 0) {
-					let imax = m2 * 2;
-					for (let i = 0; i < imax; i++) {
-						let u = vctrl - fctrl*i/16;
+					let imax = m2 * 2; // Volume length
+					let r = imax - Math.floor(vctrl / fctrl); // Volume reduce length.
+					let rmin = r > 0 ? r : 0;
+					for (let i = 0; i < rmin; i++) {
+						v[i] = vctrl;
+					}
+					for (let i = rmin; i < imax; i++) {
+						let u = vctrl - fctrl*(i-rmin);
 						v[i] = u > 0 ? u : 0;
+						////console.log("Volume " + rmin + "->" + i + "/" + imax + ": " +v[i]);
 					}
 				}
 
-				console.log("Melody " + j + "/" + (melody.length/3) + ": " +
-					pitch + " x " + length + " " + m0 + " " + m1 + " " + m2 + " - " + pattern0 + " " + pattern1 + " - " + p + " " + v);
+				//console.log("Melody " + j + "/" + (melody.length/3) + ": " +
+				//	pitch + " x " + length + " " + m0 + " " + m1 + " " + m2 + " / " +
+				//	pattern0 + " " + pattern1 + " - " + pctrl + " " + vctrl + " - " + p + " " + v);
 				if (pattern0 == 1) {
 					////console.log("Noise " + pattern1 + ": " + p + "," + v);
 					await this._noise(pattern1, length, p, v);
@@ -1779,7 +1785,7 @@ pico.Sound = class {
 
 			// Create audio.
 			if (this.context == null) {
-				//console.log("Create audio.");
+				////console.log("Create audio.");
 				this.context = new window.AudioContext();
 				this.master = this.context.createGain();
 				//this.master.gain.value = pico.Sound.maxvolume;
@@ -1797,7 +1803,7 @@ pico.Sound = class {
 		}
 
 		// Stop audio.
-		//console.log("Stop audio.");
+		////console.log("Stop audio.");
 		this.master.disconnect(this.context.destination);
 		this.master = null;
 		this.master = this.context.createGain(); // Recreate master volume.
@@ -1949,7 +1955,7 @@ pico.Sound = class {
 		} else {
 
 			// Start square sound.
-			//console.log("Start square sound " + pattern + ": " + pitch + " x " + length);
+			////console.log("Start square sound " + pattern + ": " + pitch + " x " + length);
 			return this._play("square", length, [pitch], volumes);
 		}
 	}
