@@ -7,7 +7,7 @@ var colors = [ // Colors.
 	// 7:Gold(332), 8:Silver(555), 9:Black(000),
 	191,191,127, 223,223,223, 0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
-var width = 8, height = 8; // Canvas size.
+var width = 16, height = 16; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
 var yoffset = picoDiv(maxheight - height, 2); // Pixels y-index offset.
 const maxanime = 20; // Frame max size.
@@ -25,6 +25,8 @@ const coffset = 35; // Color index offset. (35=BG, 36=A, ...)
 var bgcolor = coffset; // Bg color -1 if transparent.
 var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting.
 var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
+const maxspeed = 30; // Beat max speed.
+var speed = 15; // Beat speed(bps=bpm/10).
 
 // Update icon image.
 async function appUpdate(force = true) {
@@ -82,7 +84,7 @@ async function appUpdate(force = true) {
 	//if (animeflag) {
 	//	picoLabel("select", "" + anime);
 	//} else {
-		picoLabel("select", "*" + width);
+		picoLabel("select", "*" + speed);
 	//}
 	picoLabel("minus", "-");
 	picoLabel("plus", "+");
@@ -145,7 +147,7 @@ async function appAction() {
 function appSelect(x) {
 
 	// End testing.
-	if (testing) {
+	/*if (testing) {
 		console.log("End testing:" + anime);
 		testing = 0;
 		appUpdate();
@@ -162,7 +164,7 @@ function appSelect(x) {
 			animeflag = 0;
 			picoBeep(0, 0.1);
 		}
-		appUpdate();
+		appUpdate();*/
 
 	// Change color depth.
 	//} else if (colorflag) {
@@ -180,13 +182,19 @@ function appSelect(x) {
 		}
 	//*/
 
-	// Change canvas size.
+	// Start testing.
+	if (x == 0) {
+		testing = testing ? 0 : 1;
+
+	// Change testing speed.
 	} else {
-	console.log("Change canvas size.");
-		width = width + x < 3 ? 3 : width + x > maxwidth ? maxwidth : width + x;
-		height = height + x < 3 ? 3 : height + x > maxheight ? maxheight : height + x;
+	console.log("Change speed.");
+		speed = speed + x < 1 ? 1 : speed + x > maxspeed ? maxspeed : speed + x;
+//		width = width + x < 3 ? 3 : width + x > maxwidth ? maxwidth : width + x;
+//		height = height + x < 3 ? 3 : height + x > maxheight ? maxheight : height + x;
 //		xoffset = picoDiv(maxwidth - width, 2);
 //		yoffset = picoDiv(maxheight - height, 2);
+/*
 		xoffset += x>0 ? (picoMod(width,2)?-1:0) : x<0 ? (!picoMod(width,2)?1:0) : 0;
 		if (xoffset < 0) {
 			xoffset = 0;
@@ -199,13 +207,14 @@ function appSelect(x) {
 		} else if (yoffset > maxheight-height) {
 			yoffset = maxheight-height;
 		}
+*/
 			//console.log("Size: " + width + "x" + height + " + " + xoffset + "," + yoffset);
 		//playing = -1; // Restart.
 		appUpdate(false);
 		picoBeep(1.2, 0.1);	
 	}
 
-	picoFlush();
+	//picoFlush();
 }
 
 // Touching flags and states.
@@ -1264,25 +1273,25 @@ async function appMain() {
 
 	// Increment testing count.
 	if (testing > 0) {
+		let length = 3; // base length.
+		let pitch = 3; // base pitch.
+		let count = 60/speed * length;
 		// Play sound.
-		if (!picoMod(testing-1,30)) {
+		if (!picoMod(testing-1,count)) {
 			console.log("Play sound: " + testing);
 			picoTimbre(
 				picoTextCode("h0E,L0k,P0k,T0k"), // Timbres: pattern,pitch,volume.
 				picoTextCode("023578a,1469b"), // Scales: La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+
 				10); // Offset: Timbre1=A..L, Timbre2=N..Y
 
-			let i = xoffset+picoDiv(testing-1,30) - 1;
+			let i = xoffset+picoDiv(testing-1,count) - 1;
 			for (let j = yoffset; j < yoffset+height; j++) {
 				if (pixels[j][i]) {
 					let k = pixels[j][i] - coffset;
 					let l = yoffset+height - j - 1 +2;//+2=Do-Origin
 					let timbre = 10+(k-1)*13+picoMod(l, 7);
-					let pitch = 4+picoDiv(l, 7);
-					let length = 6;
-					let melody = [0,30,0, // speed(bps=bpm/10)
-						timbre,pitch,length,
-					];
+					let pitch1 = pitch+picoDiv(l, 7);
+					let melody = [0,speed,0, timbre,pitch1,length];
 					console.log("Play sound: " + i + "," + j + "," + k + "," + l +
 						" -> " + timbre + " " + pitch + " " + length);
 					picoMelody(melody);
@@ -1290,7 +1299,7 @@ async function appMain() {
 			}
 		}
 		testing++;
-		if (testing-1 > 30*width) {
+		if (testing-1 > count*width) {
 			console.log("Next sound: " + testing);
 			frame = frame + 1 < anime ? frame + 1 : 0;
 			testing = 1;
