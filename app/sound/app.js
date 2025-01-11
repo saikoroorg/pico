@@ -1,7 +1,11 @@
 const title = "Sound"; // Title.
 var colors = [ // Colors.
-	// 0:White(111), 1:LightGray(333), 2:Gray(222), 3:DarkGray(444), 4:Black(000),
-	255,255,255, 191,191,191, 127,127,127, 63,63,63, 0,0,0];
+	// 0:White(111), 1:Gray(222),
+	255,255,255, 127,127,127,
+	// 2:Gold(332), 3:Red(p06), 4:Blue(0i9), 5:Green(0n4),
+	191,191,127, 231,0,95, 0,119,239,  0,151,63, 
+	// 9:Black(000),
+	0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
 var width = 8, height = 8; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
@@ -15,9 +19,10 @@ var playing = 0; // Playing count.
 var testing = 0; // Testing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
-var depth = 4;//colors.length/3; // Color count.
+var depth = 5;//colors.length/3; // Color count.
 const maxcolor = 10; // Color max count.
 const coffset = 35; // Color index offset. (35=BG, 36=A, ...)
+const maxsystem = 2; // System color count.
 const maxtimbre = 4; // Timbres max count.
 var timbres = [ // Timbres.
 		16+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
@@ -280,8 +285,8 @@ async function appLoad() {
 			if (colorvalue) {
 				let code8 = picoCode8(keys[k]);
 				depth = picoDiv(code8.length,3);
-				if (depth >= maxtimbre) {
-					depth = maxtimbre;
+				if (depth > maxsystem+maxtimbre) {
+					depth = maxsystem+maxtimbre-1;
 				}
 				for (let j = 0; j < depth; j++) {
 					let k0 = j*3, k1 = j*3;
@@ -592,12 +597,12 @@ async function appMain() {
 		// Touching color buttons.
 		if (!colorflag) {
 			// Release touching color plus button.
-			let c1 = depth + 1 <= maxtimbre ? colorbutton1char : colorbutton0char;
+			let c1 = depth + 1 < maxsystem+maxtimbre ? colorbutton1char : colorbutton0char;
 			if (colortouching >= 0 &&
 				picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
 				console.log("Release touching color plus button.");
 				colortouching = 0;
-				if (depth + 1 <= maxtimbre) {
+				if (depth + 1 < maxsystem+maxtimbre) {
 					depth += 1;
 				/*if (animeflag) {
 					animeflag = 0;
@@ -1189,12 +1194,12 @@ async function appMain() {
 
 				// Increase color number.
 				{
-					let c = timbres[(colorselecting-1) * 3 + i];
+					let c = timbres[(colorselecting-maxsystem) * 3 + i];
 					let c1 = c < 63 ? numberbutton1char : numberbutton0char;
 					if (colortouching >= 0 && picoAction(x+numberbutton1x, colorsposy+numberbutton1y, numberwidth/2, numberheight/2)) {
 						s = numbersscale1;
 						if (c < 63) {
-							timbres[(colorselecting-1) * 3 + i] = c + 1; // Increase.
+							timbres[(colorselecting-maxsystem) * 3 + i] = c + 1; // Increase.
 							picoBeep(1.2, 0.1);
 						} else {
 							picoBeep(-1.2, 0.1);
@@ -1214,12 +1219,12 @@ async function appMain() {
 
 				// Decrease color number.
 				{
-					let c = timbres[(colorselecting-1) * 3 + i];
+					let c = timbres[(colorselecting-maxsystem) * 3 + i];
 					let c2 = c > 0 ? numberbutton2char : numberbutton0char;
 					if (colortouching >= 0 && picoAction(x+numberbutton2x, colorsposy+numberbutton2y, numberwidth/2, numberheight/2)) {
 						s = numbersscale1;
 						if (c > 0) {
-							timbres[(colorselecting-1) * 3 + i] = c - 1; // Decrease.
+							timbres[(colorselecting-maxsystem) * 3 + i] = c - 1; // Decrease.
 							picoBeep(1.2, 0.1);
 						} else {
 							picoBeep(-1.2, 0.1);
@@ -1237,7 +1242,7 @@ async function appMain() {
 					}
 				}
 
-				let c99 = timbres[(colorselecting-1) * 3 + i];
+				let c99 = timbres[(colorselecting-maxsystem) * 3 + i];
 				let s99 = c99 >= 99 ? "99" : c99 >= 10 ? "" + c99 : c99 >= 1 ? "0" + c99 : "00";
 
 				// Draw color numbers.
@@ -1272,7 +1277,7 @@ async function appMain() {
 	// Increment testing count.
 	if (testing > 0) {
 		let length = 3; // base length.
-		let pitch = 3; // base pitch.
+		let basepitch = 3; // base pitch.
 		let count = 60/speed * length;
 		// Play sound.
 		if (!picoMod(testing-1,count)) {
@@ -1282,14 +1287,16 @@ async function appMain() {
 			let i = xoffset+picoDiv(testing-1,count) - 1;
 			for (let j = yoffset; j < yoffset+height; j++) {
 				if (pixels[j][i]) {
-					let k = pixels[j][i] - coffset;
-					let l = yoffset+height - j - 1 +2;//+2=Do-Origin
-					let timbre = 10+(k-1)*13+picoMod(l, 7);
-					let pitch1 = pitch+picoDiv(l, 7);
-					let melody = [0,speed,0, timbre,pitch1,length];
-					console.log("Play sound: " + i + "," + j + "," + k + "," + l +
-						" -> " + timbre + " " + pitch + " " + length);
-					picoMelody(melody);
+					let tindex = pixels[j][i] - coffset - maxsystem;
+					if (tindex >= 0) {
+						let pctrl = yoffset+height - j - 1 +2;//+2=Do-Origin
+						let timbre = 10+tindex*13+picoMod(pctrl, 7);
+						let pitch = basepitch+picoDiv(pctrl, 7);
+						let melody = [0,speed,0, timbre,pitch,length];
+						console.log("Play sound: " + i + "," + j + "," + tindex + "," + pctrl +
+							" -> " + timbre + " " + pitch + " " + length);
+						picoMelody(melody);
+					}
 				}
 			}
 		}
