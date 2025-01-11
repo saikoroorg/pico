@@ -1276,27 +1276,37 @@ async function appMain() {
 
 	// Increment testing count.
 	if (testing > 0) {
-		let length = 3; // base length.
+		let baselength = 3; // base length.
 		let basepitch = 3; // base pitch.
-		let count = 60/speed * length;
+		let count = 60/speed * baselength;
+
 		// Play sound.
 		if (!picoMod(testing-1,count)) {
-			console.log("Play sound: " + testing);
-			picoTimbre(timbres, tscale, toffset);
+			picoTimbre(timbres, tscale, toffset)
 
 			let i = xoffset+picoDiv(testing-1,count) - 1;
 			for (let j = yoffset; j < yoffset+height; j++) {
-				if (pixels[j][i]) {
-					let tindex = pixels[j][i] - coffset - maxsystem;
-					if (tindex >= 0) {
-						let pctrl = yoffset+height - j - 1 +2;//+2=Do-Origin
-						let timbre = 10+tindex*13+picoMod(pctrl, 7);
-						let pitch = basepitch+picoDiv(pctrl, 7);
-						let melody = [0,speed,0, timbre,pitch,length];
-						console.log("Play sound: " + i + "," + j + "," + tindex + "," + pctrl +
-							" -> " + timbre + " " + pitch + " " + length);
-						picoMelody(melody);
+				let index = pixels[j][i] - coffset - maxsystem;
+				if (index >= 0) {
+
+					// Calclate sound length.
+					let length = baselength;
+					for (let k = i+1; k < xoffset+width; k++) {
+						let index2 = pixels[j][k] - coffset - maxsystem;
+						//console.log("Sound length: " + i + "->" + k + "," + index + "->" + index2);
+						if (index2 == -1) {
+							length += baselength;
+						}
 					}
+
+					// Play sound.
+					let pctrl = yoffset+height - j - 1 +2;//+2=Do-Origin
+					let timbre = 10+index*13+picoMod(pctrl, 7);
+					let pitch = basepitch+picoDiv(pctrl, 7);
+					let melody = [0,speed,0, timbre,pitch,length];
+					console.log("Play sound: " + i + "," + j + "," + index + "," + pctrl +
+						" -> " + timbre + " " + pitch + " " + length);
+					picoMelody(melody);
 				}
 			}
 		}
