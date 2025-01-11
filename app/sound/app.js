@@ -4,10 +4,11 @@ var colors = [ // Colors.
 	255,255,255, 127,127,127,
 	// 2:Gold(332), 3:Red(p06), 4:Blue(0i9), 5:Green(0n4),
 	191,191,127, 231,0,95, 0,119,239,  0,151,63, 
-	// 9:Black(000),
+	191*0.8,191*0.8,127*0.8, 231*0.8,0*0.8,95*0.8, 0*0.8,119*0.8,239*0.8,  0*0.8,151*0.8,63*0.8, 
+	// 10:Black(000),
 	0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
-var width = 8, height = 8; // Canvas size.
+var width = 16, height = 16; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
 var yoffset = picoDiv(maxheight - height, 2); // Pixels y-index offset.
 const maxanime = 20; // Frame max size.
@@ -867,9 +868,33 @@ async function appMain() {
 
 				// Update canvas on editor mode.
 				} else {
-					if (!testing && pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
+					let j0 = j - yoffset, i0 = i - xoffset;
+					if (pixeltouching >= 0 && pixeltouching < 15 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
+						console.log("Tap pixels.");
+
+						// Shift pixel.
+						if (pixels[j][i] == coffset+colorselecting) {
+							pixels[j][i] = coffset+colorselecting + maxtimbre;
+						}
+
+						picoRect(pixels[j][i] ? pixels[j][i] : coffset, x, y, pixelsgrid, pixelsgrid);
+						canvas += " ";
+
+					} else if (!testing && pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
+
+						if (pixeltouching > 0 && (pixeltouchposx != i0 || pixeltouchposy != j0)) {
+							pixeltouchmoved = 1;
+							if (animeflag == 1) {
+								pixeltouchmovex += pixeltouchposx - i0;
+								pixeltouchmovey += pixeltouchposy - j0;
+							//console.log("Moving:" + pixeltouchmovex + "," + pixeltouchmovey);
+							}
+						}
+						pixeltouchposx = i0;
+						pixeltouchposy = j0;
+
 						console.log("Touch pixels.");
-						pixeltouching = 1; // Touch pixels.
+						pixeltouching++; // Touching pixels.
 						frametouching = -1;
 						animetouching = -1;
 						colortouching = -1;
@@ -879,6 +904,7 @@ async function appMain() {
 							pixels[j][i] = 0;
 						} else if (pixels[j][i] != coffset+colorselecting) {
 							pixels[j][i] = coffset+colorselecting;
+							pixeltouching = 15; // For first touch.
 						}
 
 						// Cancel color editing.
@@ -1299,9 +1325,24 @@ async function appMain() {
 						}
 					}
 
-					// Play sound.
+					// Calclate pitch.
 					let pctrl = yoffset+height - j - 1 +2;//+2=Do-Origin
-					let timbre = 10+index*13+picoMod(pctrl, 7);
+					let pshift = 0;
+					// (La, Ti, Do, Re, Mi, Fa, So, La+,Do+,Re+,Fa+,So+)
+					//   0,  1,  2,  3,  4,  5,  6,   7,  8,  9, 10, 11
+					//   v   v   v   v   v   v   v 
+					//  +7, +1, +6, +6, +1, +5, +5,
+					//   v   v   v   v   v   v   v 
+					//   7,  2,  8,  9,  5, 10, 11,
+					const shifttable = [+7,+1,+6,+6,+1,+5,+5];
+					if (index >= maxtimbre) {
+						index = index - maxtimbre;
+						pshift = shifttable[picoMod(pctrl, 7)];
+						console.log("Shift sound: " + pctrl + " + " + pshift);
+					}
+
+					// Play sound.
+					let timbre = 10+index*13+picoMod(pctrl, 7)+pshift;
 					let pitch = basepitch+picoDiv(pctrl, 7);
 					let melody = [0,speed,0, timbre,pitch,length];
 					console.log("Play sound: " + i + "," + j + "," + index + "," + pctrl +
