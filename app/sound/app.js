@@ -142,10 +142,11 @@ async function appAction() {
 			picoSetCode6([0,6,6], k);
 			k++
 		}
-		if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
+		//@todo: export timbres.
+		/*if (((colors[0] == 255 && colors[1] == 255 && colors[2] == 255) ||
 			(colors[0] == 0 && colors[1] == 0 && colors[2] == 0))) {
 			picoSetCode8(colors.slice(0, depth*3), k);
-		}
+		}*/
 
 		// Back or share.
 		if (!await picoReturnApp()) {
@@ -285,7 +286,9 @@ async function appLoad() {
 			let colorvalue = value.slice(0,3) == "111" ? 1 : value.slice(0,3) == "000" ? -1 : 0;
 			if (colorvalue) {
 				let code8 = picoCode8(keys[k]);
-				depth = picoDiv(code8.length,3);
+
+				//@todo: import timbres.
+				/*depth = picoDiv(code8.length,3);
 				if (depth > maxsystem+maxtimbre) {
 					depth = maxsystem+maxtimbre-1;
 				}
@@ -294,7 +297,8 @@ async function appLoad() {
 					for (let i = 0; i < 3; i++) {
 						timbres[k0+i] = code8[k1+i];
 					}
-				}
+				}*/
+
 				colorselecting = 0;
 				bgcolor = colorvalue < 0 ? -1 : coffset; // -1: Transparent bg color.
 				console.log("Load timbres: " + timbres + " " + depth);
