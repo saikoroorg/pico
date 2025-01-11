@@ -2,8 +2,8 @@ const title = "Image"; // Title.
 var colors = [ // Colors.
 	// 0:White(111), 1:LightGray(333), 2:Gray(222), 3:DarkGray(444),
 	255,255,255, 191,191,191, 127,127,127, 63,63,63,
-	// 4:Red(302), 5:Blue(023), 6:Green(032),
-	191,0,127, 0,127,191,  0,191,127, 
+	// 4:Red(p06), 5:Blue(0i9), 6:Green(0n4),
+	231,0,95, 0,119,239,  0,151,63,
 	// 7:Gold(332), 8:Silver(555), 9:Black(000),
 	191,191,127, 223,223,223, 0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
@@ -19,7 +19,7 @@ var playing = 0; // Playing count.
 var testing = 0; // Testing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
-var depth = 4;//colors.length/3; // Color count.
+var depth = 7;//colors.length/3; // Color count.
 const maxcolor = 10; // Color max count.
 const coffset = 35; // Color index offset. (35=BG, 36=A, ...)
 var bgcolor = coffset; // Bg color -1 if transparent.
