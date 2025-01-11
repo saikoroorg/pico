@@ -35,17 +35,13 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 	await picoWait(1000);
 	picoPulse(7, 0.5, 0, [1,0.8,0.6,0.4], [-10,-9,-8,-7]);
 	await picoWait(1000);
-//*/
 
-//*/
 	picoTriangle(0, 0.5, 0, [1,0.8,0.6,0.4]);
 	await picoWait(1000);
 
 	picoTriangle(15, 0.5, 0, [1,0.8,0.6,0.4], [-10,-9,-8,-7]);
 	await picoWait(1000);
-//*/
 
-//*/
 	picoNoise(0, 0.5, 0, [1,0.8,0.6,0.4]);
 	await picoWait(1000);
 
@@ -56,66 +52,132 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 //*/
 
 //*/
-	const melody = [0,30,0, // speed(bps=bpm/10)
-		0,4,6, 0,4,6, 1,4,6, -1,0,6,        0,4,6, 0,4,6, 1,4,6, -1,0,6,
-		0,4,6, 1,4,6, 2,4,6, 1,4,6,         0,4,6, 1,4,3, 0,4,3, 5,3,6, -1,0,6,
-		4,3,6, 3,3,6, 4,3,6, 5,3,6,         4,3,6, 4,3,3, 2,3,3, 1,3,6, -1,0,6,
-		0,4,6, 0,4,6, 1,4,6, -1,0,6,        0,4,6, 0,4,6, 1,4,6, -1,0,6,
-		4,3,6, 5,3,6, 1,4,3, 0,4,3, 5,3,6,  4,3,12, -1,0,12,
-	];
 	await picoStop();
-	await picoMelody(melody);
+	picoTimbre([16+1,0,8+32]); // Noise1, Volume:8/16-2
+	picoMelody([0,30,0, // 0(reserved), 300bpm, 0(reserved)
+		-1,0,6, 0,2,3, -1,0,9, 0,2,3, -1,0,9, 0,2,3, -1,0,9, 0,2,3, -1,0,3,
+		-1,0,6, 0,2,3, -1,0,9, 0,2,3, -1,0,9, 0,2,3, -1,0,3, 0,2,3, -1,0,9,
+		-1,0,6, 4,1,3, -1,0,9, 4,1,3, -1,0,9, 4,1,3, -1,0,3, 4,1,3, -1,0,9,
+		-1,0,6, 0,2,3, -1,0,9, 0,2,3, -1,0,9, 0,2,3, -1,0,9, 0,2,3, -1,0,3,
+		-1,0,6, 4,1,3, -1,0,9, 4,1,3, -1,0,9, 4,1,3, -1,0,3, 4,1,3, -1,0,9,
+	]);
+	picoTimbre([32+15,0,0+16]); // Triangle15, Volume:16/16-1
+	picoMelody([0,30,0, // 0(reserved), 300bpm, 0(reserved)
+		0,3,12, 1,3,12, 0,3,12, 1,3,12,
+		0,3,12, 2,3,12, 0,3,12, 5,2,12,
+		4,2,12, 4,2,12, 4,2,12, 1,2,12,
+		0,3,12, 1,3,12, 0,3,12, 1,3,12,
+		4,2,12, 1,3,12, 4,2,12, 4,2,12,
+	]);
+	picoTimbre([48+1,0,4+16]); // Pulse1, Volume:12/16-1
+	await picoMelody([0,30,0, // 0(reserved), 300bpm, 0(reserved)
+		0,4,6, 0,4,6, 1,4,6, -1,0,6, 0,4,6, 0,4,6, 1,4,6, -1,0,6,
+		0,4,6, 1,4,6, 2,4,6, 1,4,6, 0,4,6, 1,4,3, 0,4,3, 5,3,6, -1,0,6,
+		4,3,6, 3,3,6, 4,3,6, 5,3,6, 4,3,6, 4,3,3, 2,3,3, 1,3,6, -1,0,6,
+		0,4,6, 0,4,6, 1,4,6, -1,0,6, 0,4,6, 0,4,6, 1,4,6, -1,0,6,
+		4,3,6, 5,3,6, 1,4,3, 0,4,3, 5,3,6, 4,3,12, -1,0,12, 
+	]);
 //*/
 
 //*/
-	// Timbre pattern:
-	//  g(16+0),h(16+1),m(16+6) = 1:Noise 0,1,6
-	//  w(32+0),L(32+15) = 2:Triangle 0,15
-	//  M(48+0),N(48+1),P(48+3),T(48+7) = 3:Pulse 0=1,3,7
-	// Timbre pitches:
-	//  0(+-0), 1(-100), 2(-200), ..
-	// Timbre volumes:
-	//  0(8/8),         2(7/8),         4(6/8),         6(5/8),         8(4/8), ..
-	//  g=16+0(8/8->0), i=16+2(7/8->0), k=16+4(6/8->0), m=16+6(5/8->0), o=16+8(4/8->0), ..
-	//  w=32+0(8/8->>0),y=32+2(7/8->>0),A=32+4(6/8->>0),C=32+6(5/8->>0),E=32+8(4/8->>0), ..
-	// Offsets:
-	//  10-21(abcdefg,hijkl) + 22(m)
-	//  23-34(nopqrst,uvwxy) + 35(z)
-	//  36-47(ABCDEFG,HIJKL) + 46(M)
-	//  49-50(NOPQRST,UVWXY) + 51(Z)
-	// Melody header:
-	//  0f0: 150bpm=15bit/sec.
-	//  0u0: 300bpm=30bit/sec.
-	picoTimbre(
-		picoTextCode("h0E,L00,P0k,T0k"), // Timbres: pattern,pitch,volume.
-		picoTextCode("023578a,1469b"), // Scales: La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+
-		10); // Offset: Timbre1=A..L, Timbre2=N..Y
-	for (let i = 0; i < 10; i++) {
-		picoMelody(picoTextCode("0f0"+
-			"Z06a23,Z09a23,Z09a23,Z09a23,Z03"+
-			"Z06a23,Z09a23,Z09a23,Z03a23,Z09"+
-			"Z06e13,Z09e13,Z09e13,Z03e13,Z09"+
-			"Z06a23,Z09a23,Z09a23,Z09a23,Z03"+
-			"Z06e13,Z09e13,Z09e13,Z03e13,Z09"));
-		picoMelody(picoTextCode("0f0"+
-			"n4co4c,n4co4c"+
-			"n4cp4c,n4cs3c"+
-			"r3cr3c,r3co3c"+
-			"n4co4c,n4co4c"+
-			"r3co4c,r3cr3c"));
-		await picoMelody(picoTextCode("0f0"+
-			"A46A46B46Z06,A46A46B46Z06"+
-			"A46B46C46B46,A46B43A43F36Z06"+
-			"E36D36E36F36,E36E33C33B36Z06"+
-			"A46A46B46Z06,A46A46B46Z06"+
-			"E36F36B43A43F36,E3cZ0c"));
+
+	// Timbres = [pattern0, pitch0, volume0, pattern1, pitch1, volume1, ..]
+	//  patterns: 16~31=Noise, 32~47=Triangle, 48~63=Pulse
+	//   16+0(g)=Noise0,    16+1(h)=Noise1,     16+6(m)=Noise6
+	//   32+0(w)=Triangle0, 32+15(L)=Triangle15
+	//   48+0(M)=Pulse0,    48+1(N)=Pulse1,     48+3(P)=Pulse3, 48+7(T)=Pulse7
+	//  pitches: PitchModulation(0~48)
+	//   0=Pitch+0, 1=Pitch-1, 2=Pitch-2, .. 12=Pitch-12(1 octave), ..
+	//  volumes: Volume(0~15) + VolumeAttenuation(0,16,32,48)
+	//   0=16/16, 2=14/16, 4=12/16, 6=10/16, 8=8/16, ..
+	//   16+0(g)=16/16-1, 16+2(i)=14/16-1, 16+4(k)=12/16-1, 16+6(m)=10/16-1, 16+8(o)=8/16-1, ..
+	//   32+0(w)=16/16-2, 32+2(y)=14/16-2, 32+4(A)=12/16-2, 32+6(C)=10/16-2, 32+8(E)=8/16-2, ..
+	//   48+0(M)=16/16-3, 48+2(O)=14/16-3, 48+4(Q)=12/16-3, 48+6(S)=10/16-3, 48+8(U)=8/16-3, ..
+	const timbres24 = [
+		// TimbreGroup0 = Noise6 "m08,mc8,m0o,mco"
+		16+6,   0, 8,    // Noise6, Pitch+0, Volume:8/16
+		16+6,  12, 8,    // Noise6, Pitch-12, Volume:8/16
+		16+6,   0, 8+32, // Noise6, Pitch+0, Volume:8/16-2
+		16+6,  12, 8+32, // Noise6, Pitch-12, Volume:8/16-2
+		// TimbreGroup1 = Noise1 "h08,hc8,h0E,hcE"
+		16+1,   0, 8,    // Noise1, Pitch+0, Volume:8/16
+		16+1,  12, 8,    // Noise1, Pitch-12, Volume:8/16
+		16+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
+		16+1,  12, 8+32, // Noise1, Pitch-12, Volume:8/16-2
+		// TimbreGroup2 = Triangle15 "L00,Lc0,L0g,Lcg"
+		32+15,  0, 0,    // Triangle15, Pitch+0, Volume:16/16
+		32+15, 12, 0,    // Triangle15, Pitch-12, Volume:16/16
+		32+15,  0, 0+16, // Triangle15, Pitch+0, Volume:16/16-1
+		32+15, 12, 0+16, // Triangle15, Pitch-12, Volume:16/16-1
+		// TimbreGroup3 = Pulse1 "N04,Nc4,N0k,Nck"
+		48+1,   0, 4,    // Pulse1, Pitch+0, Volume:12/16
+		48+1,  12, 4,    // Pulse1, Pitch-12, Volume:12/16
+		48+1,   0, 4+16, // Pulse1, Pitch+0, Volume:12/16-1
+		48+1,  12, 4+16, // Pulse1, Pitch-12, Volume:12/16-1
+		// TimbreGroup4 = Pulse3 "P04,Pc4,P0k,Pck"
+		48+3,   0, 4,    // Pulse3, Pitch+0, Volume:12/16
+		48+3,  12, 4,    // Pulse3, Pitch-12, Volume:12/16
+		48+3,   0, 4+16, // Pulse3, Pitch+0, Volume:12/16-1
+		48+3,  12, 4+16, // Pulse3, Pitch-12, Volume:12/16-1
+		// TimbreGroup5 = Pulse7 "T04,Tc4,T0k,Tck"
+		48+7,   0, 4,    // Pulse7, Pitch+0, Volume:12/16
+		48+7,  12, 4,    // Pulse7, Pitch-12, Volume:12/16
+		48+7,   0, 4+16, // Pulse7, Pitch+0, Volume:12/16-1
+		48+7,  12, 4+16, // Pulse7, Pitch-12, Volume:12/16-1
+	]; // 4 timbres x 6 groups (8bit original parameter)
+
+	// Timbre groups.
+	const timbres = [
+		picoTextCode("h08,hc8,h0E,hcE"), // Noise1
+		picoTextCode("L00,Lc0,L0g,Lcg"), // Triangle15
+		picoTextCode("N04,Nc4,N0k,Nck"), // Pulse1
+		picoTextCode("P04,Pc4,P0k,Pck"), // Pulse3
+	];
+	// Scales = [pitch0, ..., pitchN-1]
+	const scales = [
+		// A natural minor scale "023578a,1469b"
+		// (La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+)
+		0,2,3,5,7,8,10, 1,4,6,9,11,
+	];
+	// Data offset=10 -> timbres 0-3 = 10(a)-61(Z)
+	//  Timbre0: 10-21(abcdefg,hijkl) + Rest=22(m)
+	//  Timbre1: 23-34(nopqrst,uvwxy) + Rest=35(z)
+	//  Timbre2: 36-47(ABCDEFG,HIJKL) + Rest=48(M)
+	//  Timbre3: 49-60(NOPQRST,UVWXY) + Rest=61(Z)
+	const offset = 10;
+
+	// Melodies = [0(reserved), speed, 0(reserved), molodies .. ]
+	const melodies = [
+		picoTextCode("0f0"+
+			"M06A23,M09A23,M09A23,M09A23,M03"+
+			"M06A23,M09A23,M09A23,M03A23,M09"+
+			"M06E13,M09E13,M09E13,M03E13,M09"+
+			"M06A23,M09A23,M09A23,M09A23,M03"+
+			"M06E13,M09E13,M09E13,M03E13,M09"),
+		picoTextCode("0f0"+
+			"A3cB3c,A3cB3c"+
+			"A3cC3c,A3cF2c"+
+			"E2cE2c,E2cB2c"+
+			"A3cB3c,A3cB3c"+
+			"E2cB3c,E2cE2c"),
+		picoTextCode("0f0"+
+			"A46A46B46M06,A46A46B46M06"+
+			"A46B46C46B46,A46B43A43F36M06"+
+			"E36D36E36F36,E36E33C33B36M06"+
+			"A46A46B46M06,A46A46B46M06"+
+			"E36F36B43A43F36,E3cM0c"),
+	];
+
+	for (let i = 0; i < 1; i++) {
+		picoTimbre(timbres[0], scales, offset);
+		picoMelody(melodies[0]);
+		picoTimbre(timbres[1], scales, offset);
+		picoMelody(melodies[1]);
+		picoTimbre(timbres[2], scales, offset);
+		await picoMelody(melodies[2]);
 	}
 
 	await picoWait(2000);
-//*/
-
-/*/
-	await picoMelody(melody);
 //*/
 
 });</script><!--/Main-->
