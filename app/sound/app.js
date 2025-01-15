@@ -197,6 +197,7 @@ function appSelect(x) {
 	if (x == 0) {
 		testing = testing ? 0 : 1;
 		animeflag = 1;
+		colorselecting = 0;
 
 	// Change testing speed.
 	} else {
@@ -493,6 +494,7 @@ async function appMain() {
 			frametouching = 1; // Touch frame.
 			if (!animeflag) {
 				animeflag = 1;
+				colorselecting = 0;
 				appUpdate(true);
 				picoBeep(1.2, 0.1);
 			}
