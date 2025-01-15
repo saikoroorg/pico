@@ -55,19 +55,21 @@ pico.Touch = class {
 						if (this.flushing) {
 							clearInterval(timer);
 							this.flushing = false;
+							pico.touch.allscreen._read();
 							return navigator.locks.request(this.lock, async (lock) => {
 								this._read();
 								resolve();
 							}); // end of lock.
 						} else {
-								if (pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
-									clearInterval(timer);
-									this.flushing = false;
-									return navigator.locks.request(this.lock, async (lock) => {
-										this._read();
-										resolve();
-									}); // end of lock.
-								}
+							if (pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
+								clearInterval(timer);
+								this.flushing = false;
+								pico.touch.allscreen._read();
+								return navigator.locks.request(this.lock, async (lock) => {
+									this._read();
+									resolve();
+								}); // end of lock.
+							}
 						}
 						pico.touch.allscreen._read();
 					}, 10); // end of setInterval.
@@ -217,7 +219,7 @@ pico.Touch = class {
 				this.touching[0][i].motion = 1;
 				this.touching[0][i].x = x;
 				this.touching[0][i].y = y;
-				//console.log("Touch move: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				console.log("Touch move: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
 		}
@@ -302,7 +304,7 @@ pico.Touch = class {
 				} else if (h <= 0) {
 					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
 					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-					//console.log("Motion: " + x2 + "," + y2 + "<=" + (r*r));
+					console.log("Motion: " + x2 + "," + y2 + "<=" + (r*r));
 					if (x2 + y2 <= r * r) {
 						return i + 1;
 					}
@@ -328,7 +330,7 @@ pico.Touch = class {
 				} else if (h <= 0) {
 					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
 					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-					//console.log("Action: " + x2 + "," + y2 + "<=" + (r*r));
+					console.log("Action: " + x2 + "," + y2 + "<=" + (r*r));
 					if (x2 + y2 <= r * r) {
 						return i + 1;
 					}
