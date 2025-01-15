@@ -1,11 +1,11 @@
 const title = "Sound"; // Title.
 var colors = [ // Colors.
-	// 0:White(111), 1:Gray(222),
-	255,255,255, 127,127,127,
+	// 0:White(111), 1:LightGray(333), 2:Gray(222),
+	255,255,255, 191,191,191, 127,127,127,
 	// 2:Gold(332), 3:Red(p06), 4:Blue(0i9), 5:Green(0n4),
 	191,191,127, 231,0,95, 0,119,239,  0,151,63, 
-	// 6:LightGray(333), 7:Black(000),
-	191,191,191, 0,0,0];
+	// 7:Black(000),
+	0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
 var width = 16, height = 16; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
@@ -21,9 +21,9 @@ var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = 5;//colors.length/3; // Color count.
 //const maxcolor = 10; // Color max count.
-const coffset = 35; // Color index offset. (35=BG, 36=A, ...)
-const maxextra = 2; // Extra mark count. (+0=None, +1=Dash)
-const maxtimbre = 4; // Timbres max count. (+2,+3,+4,+5)
+const coffset = 34; // Color index offset. (34=BG1, 35=BG2, 36=A, ...)
+const maxextra = 3; // Extra mark count. (+0=BG1, +1=BG2, +2=Dash)
+const maxtimbre = 4; // Timbres max count. (+3,+4,+5,+6)
 var timbres = [ // Timbres.
 		16+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
 		32+15,  0, 0+16, // Triangle15, Pitch+0, Volume:16/16-1
@@ -248,6 +248,7 @@ var pixeltouchposx = -1; // Position x of touch starting for frame moving.
 var pixeltouchposy = -1; // Position y of touch starting for frame moving.
 const blockwidth = 5; // Width of block sprite.
 const charwidth = 4; // Width of char sprite.
+var sprites = []; // Char sprite data.
 
 // Resize.
 async function appResize() {
@@ -259,7 +260,7 @@ async function appResize() {
 async function appLoad() {
 	picoTitle(title);
 
-	// Initialize sprites.
+	// Initialize char sprites.
 	//  Block: "044" + x "00,044"
 	//  Staff: "066,011,044" + x + "13,060"
 	//  Dash:  "044,000,044" + x + "12,020"
@@ -273,12 +274,15 @@ async function appLoad() {
 	let dash1 = "1" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) + "0";
 	let sharp2 = "01" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) +
 	             "00" + picoCodeChar((blockwidth-1)/2) + "100" + picoCodeChar(blockwidth-3);
-	picoCharSprite(picoCode6Char(coffset+0), picoStringCode6(block0 + picoCode6Char(coffset+0) + block1));
-	picoCharSprite(picoCode6Char(coffset-1), picoStringCode6(staff0 + picoCode6Char(coffset+maxextra+maxtimbre) + staff1));
-	picoCharSprite(picoCode6Char(coffset+1), picoStringCode6(block0 + picoCode6Char(coffset+1) + block1));
-	for (let i = maxextra; i < maxextra+maxtimbre; i++) {
-		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(block0 + picoCode6Char(coffset+i) + block1));
-		picoCharSprite(picoCode6Char(coffset+i+maxtimbre), picoStringCode6(block0 + picoCode6Char(coffset+i) + block1 + sharp2));
+	sprites[coffset+0] = picoStringCode6(staff0 + picoCode6Char(coffset+0) + staff1);
+	sprites[coffset+1] = picoStringCode6(block0 + picoCode6Char(coffset+1) + block1);
+	sprites[coffset+2] = picoStringCode6(block0 + picoCode6Char(coffset+2) + block1);
+	for (let i = coffset+maxextra; i < coffset+maxextra+maxtimbre; i++) {
+		sprites[i] = picoStringCode6(block0 + picoCode6Char(i) + block1);
+		sprites[i+maxtimbre] = picoStringCode6(block0 + picoCode6Char(i) + block1 + sharp2);
+	}
+	for (let i = coffset; i < coffset+maxextra+maxtimbre*2; i++) {
+		picoCharSprite(picoCode6Char(i), sprites[i]);
 	}
 
 	// Initialize pixels on max size.
@@ -885,19 +889,7 @@ async function appMain() {
 				// Update canvas on editor mode.
 				} else {
 					let j0 = j - yoffset, i0 = i - xoffset;
-					if (pixeltouching >= 0 && pixeltouching < 15 && !pixeltouchmoved && picoAction(x, y, pixelsgrid/2+1)) {
-						console.log("Tap pixels.");
-
-						// Shift pixel.
-						if (pixels[j][i] == coffset+colorselecting) {
-							console.log("Shift pixel: " + pixeltouching + " " + pixels[j][i]);
-							pixels[j][i] = coffset+colorselecting + maxtimbre;
-						}
-
-						picoRect(pixels[j][i] ? pixels[j][i] : coffset, x, y, pixelsgrid, pixelsgrid);
-						canvas += " ";
-
-					} else if (!testing && pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
+					if (!testing && pixeltouching >= 0 && picoMotion(x, y, pixelsgrid/2)) {
 
 						if (pixeltouching > 0 && (pixeltouchposx != i0 || pixeltouchposy != j0)) {
 							pixeltouchmoved = 1;
@@ -919,20 +911,27 @@ async function appMain() {
 							pixels[j][i] = 0;
 							// Remove all continuous dash mark.
 							for (let i1 = i+1; i1 < xoffset + width; i1++) {
-								if (pixels[j][i1] == coffset+1) {
+								if (pixels[j][i1] == coffset+2) {
 									pixels[j][i1] = 0;
 								} else {
 									break;
 								}
 							}
-						} else if (pixels[j][i] != coffset+colorselecting && pixeltouching < 15) {
+						} else if (pixeltouching < 15) {
 							//console.log("Touch pixels: " + pixeltouching + " " + pixels[j][i]);
-							pixels[j][i] = coffset+colorselecting;
+							// Shift pixel.
+							if (pixels[j][i] == coffset+colorselecting) {
+								console.log("Shift pixel: " + pixeltouching + " " + pixels[j][i]);
+								pixels[j][i] = coffset+colorselecting + maxtimbre;
+							} else {
+								console.log("Put pixel: " + pixeltouching + " " + pixels[j][i]);
+								pixels[j][i] = coffset+colorselecting;
+							}
 							pixeltouching = 15; // For first touch.
 						} else if (pixeltouchmoved) {
 							if (pixeltouchmovey == 0 && (pixeltouchmovex == 0 || pixeltouchmovex == -1)) {
 								//console.log("Put extra pixels: " + pixeltouching + " " + pixels[j][i]);
-								pixels[j][i] = coffset+1; // Dash mark.
+								pixels[j][i] = coffset+2; // Dash mark.
 							} else {
 								pixeltouching = -1; // Touch end.
 							}
@@ -945,7 +944,10 @@ async function appMain() {
 							picoFlush();
 						}
 
-						picoRect(pixels[j][i] ? pixels[j][i] : coffset, x, y, pixelsgrid, pixelsgrid);
+						if (sprites[pixels[j][i]]) {
+							let spritesize = picoSpriteSize(sprites[pixels[j][i]]);
+							picoSprite(sprites[pixels[j][i]], -1, x, y, 0, pixelsgrid/spritesize);
+						}
 						canvas += " ";
 
 					// Draw note.
@@ -954,11 +956,11 @@ async function appMain() {
 
 					// Draw staff line.
 					} else if (j == yoffset+3 || j == yoffset+5 || j == yoffset+7 || j == yoffset+9 || j == yoffset+11) {
-						canvas += picoCode6Char(coffset-1);
+						canvas += picoCode6Char(coffset+1);
 
 					// Draw background.
 					} else {
-						canvas += picoCode6Char(coffset);
+						canvas += picoCode6Char(coffset+0);
 					}
 				}
 			}
