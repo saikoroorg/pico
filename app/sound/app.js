@@ -4,8 +4,7 @@ var colors = [ // Colors.
 	255,255,255, 127,127,127,
 	// 2:Gold(332), 3:Red(p06), 4:Blue(0i9), 5:Green(0n4),
 	191,191,127, 231,0,95, 0,119,239,  0,151,63, 
-	191*0.8,191*0.8,127*0.8, 231*0.8,0*0.8,95*0.8, 0*0.8,119*0.8,239*0.8,  0*0.8,151*0.8,63*0.8, 
-	// 10:Black(000),
+	// 6:Black(000),
 	0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
 var width = 16, height = 16; // Canvas size.
@@ -261,10 +260,18 @@ async function appLoad() {
 	picoTitle(title);
 
 	// Initialize sprites.
+	// char0+x+1: "044,x00044"
+	// char0+x+1+2: "044,x00044,012020,021002"
 	let char0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	let char1 = "00" + "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
-	for (let i = 0; i < maxcolor; i++) {
+	let char2 = "01" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) +
+	            "00" + picoCodeChar((blockwidth-1)/2) + "100" + picoCodeChar(blockwidth-3);
+	for (let i = 0; i < maxsystem; i++) {
 		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1));
+	}
+	for (let i = maxsystem; i < maxsystem+maxtimbre; i++) {
+		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1));
+		picoCharSprite(picoCode6Char(coffset+i+maxtimbre), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1 + char2));
 	}
 
 	// Initialize pixels on max size.
@@ -877,7 +884,7 @@ async function appMain() {
 						console.log("Tap pixels.");
 
 						// Shift pixel.
-						if (pixels[j][i] == coffset+colorselecting) {
+						if (pixels[j][i] >= maxsystem && pixels[j][i] == coffset+colorselecting) {
 							pixels[j][i] = coffset+colorselecting + maxtimbre;
 						}
 
