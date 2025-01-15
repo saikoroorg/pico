@@ -225,7 +225,7 @@ pico.Param = class {
 		try {
 			const blob = new Blob([text], {type: type ? type : "text/plain"});
 			const file = new File([blob], name ? name : "text.txt", {type: type});
-			//console.log("Text file: " + file.size);
+			console.log("Text file: " + file.size);
 			return file;
 		} catch (error) {
 			console.error(error);
@@ -304,7 +304,7 @@ pico.Param = class {
 		// Load query.
 		let query = window.location.search;
 		if (query != null && query != "") {
-			//console.log("Load query: " + query);
+			console.log("Load query: " + query);
 			let text = query.slice(1);
 			this._deserialize(text);
 		}
@@ -323,10 +323,10 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "&";
 					let query = text ? separator + text : "";
-					//console.log("Jump: " + query);
+					console.log("Jump: " + query);
 					window.location.href = url + query;
 				} else {
-					//console.log("Reload: " + text);
+					console.log("Reload: " + text);
 					window.location.search = text;
 				}
 			}
@@ -343,11 +343,11 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "";
 					let query = text ? separator + text : "";
-					//console.log("Share query: " + query);
+					console.log("Share query: " + query);
 					data.url = url + query;
 				} else if (!files) {
 					let query = text ? "?" + text : "";
-					//console.log("Flush query: " + query);
+					console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					data.url = window.location.href.replace(/[\?\#].*$/, "") + query;
 				}
@@ -355,18 +355,18 @@ pico.Param = class {
 					data.files = files;
 				}
 				if (navigator.canShare) {
-					//console.log("Sharing: " + JSON.stringify(data));
+					console.log("Sharing: " + JSON.stringify(data));
 					if (navigator.canShare(data) && navigator.share) {
 						await navigator.share(data).then(() => {
-							//console.log("Successful share");
+							console.log("Successful share");
 						}).catch((error) => {
-							//console.log("Error sharing:" + error);
+							console.log("Error sharing:" + error);
 						});
 					} else {
-						//console.log("Not supported file");
+						console.log("Not supported file");
 					}
 				} else {
-					//console.log("Not supported share");
+					console.log("Not supported share");
 				}
 			}
 			return resolve();
@@ -484,7 +484,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = r ^ bitmask; // Bit flip.
-			////console.log("Expand: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
+			console.log("Expand: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
 			results[i] = r;
 		}
 		return results;
@@ -507,7 +507,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = (r + 1) % (1 << (bitlength - compression)); // Plus 1 to reserve 0.
-			////console.log("Compress: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
+			console.log("Compress: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
 			results[i] = r;
 		}
 		return results;
