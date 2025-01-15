@@ -20,10 +20,10 @@ var testing = 0; // Testing count.
 var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = 5;//colors.length/3; // Color count.
-const maxcolor = 10; // Color max count.
+//const maxcolor = 10; // Color max count.
 const coffset = 35; // Color index offset. (35=BG, 36=A, ...)
-const maxsystem = 2; // System color count.
-const maxtimbre = 4; // Timbres max count.
+const maxextra = 2; // Extra mark count. (+0=None, +1=Dash)
+const maxtimbre = 4; // Timbres max count. (+2,+3,+4,+5)
 var timbres = [ // Timbres.
 		16+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
 		32+15,  0, 0+16, // Triangle15, Pitch+0, Volume:16/16-1
@@ -260,18 +260,20 @@ async function appLoad() {
 	picoTitle(title);
 
 	// Initialize sprites.
-	// char0+x+1: "044,x00044"
-	// char0+x+1+2: "044,x00044,012020,021002"
-	let char0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
-	let char1 = "00" + "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
-	let char2 = "01" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) +
-	            "00" + picoCodeChar((blockwidth-1)/2) + "100" + picoCodeChar(blockwidth-3);
-	for (let i = 0; i < maxsystem; i++) {
-		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1));
-	}
-	for (let i = maxsystem; i < maxsystem+maxtimbre; i++) {
-		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1));
-		picoCharSprite(picoCode6Char(coffset+i+maxtimbre), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1 + char2));
+	//  Block: "044" + x "00,044"
+	//  Dash:  "044,000,044" + x + "12,020"
+	//  Sharp: "044" + x + "00,044,012,020,021,002"
+	let block0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
+	let block1 = "000" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
+	let dash0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1) + "000044";
+	let dash1 = "1" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) + "0";
+	let sharp2 = "01" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) +
+	             "00" + picoCodeChar((blockwidth-1)/2) + "100" + picoCodeChar(blockwidth-3);
+	picoCharSprite(picoCode6Char(coffset+0), picoStringCode6(block0 + picoCode6Char(coffset+0) + block1));
+	picoCharSprite(picoCode6Char(coffset+1), picoStringCode6(dash0 + picoCode6Char(coffset+1) + dash1));
+	for (let i = maxextra; i < maxextra+maxtimbre; i++) {
+		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(block0 + picoCode6Char(coffset+i) + block1));
+		picoCharSprite(picoCode6Char(coffset+i+maxtimbre), picoStringCode6(block0 + picoCode6Char(coffset+i) + block1 + sharp2));
 	}
 
 	// Initialize pixels on max size.
@@ -296,8 +298,8 @@ async function appLoad() {
 
 				//@todo: import timbres.
 				/*depth = picoDiv(code8.length,3);
-				if (depth > maxsystem+maxtimbre) {
-					depth = maxsystem+maxtimbre-1;
+				if (depth > maxextra+maxtimbre) {
+					depth = maxextra+maxtimbre-1;
 				}
 				for (let j = 0; j < depth; j++) {
 					let k0 = j*3, k1 = j*3;
@@ -609,12 +611,12 @@ async function appMain() {
 		// Touching color buttons.
 		if (!colorflag) {
 			// Release touching color plus button.
-			let c1 = depth + 1 < maxsystem+maxtimbre ? colorbutton1char : colorbutton0char;
+			let c1 = depth + 1 < maxextra+maxtimbre ? colorbutton1char : colorbutton0char;
 			if (colortouching >= 0 &&
 				picoAction(colorbutton1x, colorbutton1y, colorbuttonwidth/2, colorbuttonheight/2)) {
 				console.log("Release touching color plus button.");
 				colortouching = 0;
-				if (depth + 1 < maxsystem+maxtimbre) {
+				if (depth + 1 < maxextra+maxtimbre) {
 					depth += 1;
 				/*if (animeflag) {
 					animeflag = 0;
@@ -884,7 +886,8 @@ async function appMain() {
 						console.log("Tap pixels.");
 
 						// Shift pixel.
-						if (pixels[j][i] >= maxsystem && pixels[j][i] == coffset+colorselecting) {
+						if (pixels[j][i] == coffset+colorselecting) {
+							console.log("Shift pixel: " + pixeltouching + " " + pixels[j][i]);
 							pixels[j][i] = coffset+colorselecting + maxtimbre;
 						}
 
@@ -904,7 +907,7 @@ async function appMain() {
 						pixeltouchposx = i0;
 						pixeltouchposy = j0;
 
-						console.log("Touch pixels.");
+						//console.log("Touch pixels.");
 						pixeltouching++; // Touching pixels.
 						frametouching = -1;
 						animetouching = -1;
@@ -913,9 +916,13 @@ async function appMain() {
 						// Put pixel.
 						if (!colorselecting) {
 							pixels[j][i] = 0;
-						} else if (pixels[j][i] != coffset+colorselecting) {
+						} else if (pixels[j][i] != coffset+colorselecting && pixeltouching < 15) {
+							//console.log("Touch pixels: " + pixeltouching + " " + pixels[j][i]);
 							pixels[j][i] = coffset+colorselecting;
 							pixeltouching = 15; // For first touch.
+						} else if (pixeltouchmoved) {
+							//console.log("Put extra pixels: " + pixeltouching + " " + pixels[j][i]);
+							pixels[j][i] = coffset+1; // Dash mark.
 						}
 
 						// Cancel color editing.
@@ -1153,8 +1160,8 @@ async function appMain() {
 	// Draw colors.
 	if (!colorflag) {
 
-		for (let i = 1; i < depth+1; i++) {
-			let x = colorsposx + (i - (depth+1)/2) * colorsgrid; // Margins for each color.
+		for (let i = 0; i < depth-1; i++) {
+			let x = colorsposx + (i - (depth-2)/2) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
 			if (colortouching >= 0 && picoAction(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1166,7 +1173,7 @@ async function appMain() {
 					appUpdate(true);
 				}
 				picoBeep(0, 0.1);
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
+				picoChar(picoCode6Char(coffset+maxextra+i), -1, x, colorsposy, 0, colorsscale2);
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1179,12 +1186,12 @@ async function appMain() {
 					console.log("Touching color.");
 					colortouching = 1;
 					colorholding = 0;
-					colorselecting = i;
+					colorselecting = maxextra+i;
 
 				// Hovering to another color.
-				} else if (colorselecting != i) {
+				} else if (colorselecting != maxextra+i) {
 					console.log("Touching another color.");
-					colorselecting = i;
+					colorselecting = maxextra+i;
 					colorholding = 0;
 
 				// Continue touching color.
@@ -1201,17 +1208,17 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale1);
+				picoChar(picoCode6Char(coffset+maxextra+i), -1, x, colorsposy, 0, colorsscale1);
 
 			} else {
 
 				// Not touching but selecting color.
-				if (colorselecting == i) {
-					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
+				if (colorselecting == maxextra+i) {
+					picoChar(picoCode6Char(coffset+maxextra+i), -1, x, colorsposy, 0, colorsscale2);
 
 				// Other colors.
 				} else {
-					picoChar("-", coffset+i, x, colorsposy, 0, colorsscale0);
+					picoChar("-", coffset+maxextra+i, x, colorsposy, 0, colorsscale0);
 				}
 			}
 		}
@@ -1231,12 +1238,12 @@ async function appMain() {
 
 				// Increase color number.
 				{
-					let c = timbres[(colorselecting-maxsystem) * 3 + i];
+					let c = timbres[(colorselecting-maxextra) * 3 + i];
 					let c1 = c < 63 ? numberbutton1char : numberbutton0char;
 					if (colortouching >= 0 && picoAction(x+numberbutton1x, colorsposy+numberbutton1y, numberwidth/2, numberheight/2)) {
 						s = numbersscale1;
 						if (c < 63) {
-							timbres[(colorselecting-maxsystem) * 3 + i] = c + 1; // Increase.
+							timbres[(colorselecting-maxextra) * 3 + i] = c + 1; // Increase.
 							picoBeep(1.2, 0.1);
 						} else {
 							picoBeep(-1.2, 0.1);
@@ -1256,12 +1263,12 @@ async function appMain() {
 
 				// Decrease color number.
 				{
-					let c = timbres[(colorselecting-maxsystem) * 3 + i];
+					let c = timbres[(colorselecting-maxextra) * 3 + i];
 					let c2 = c > 0 ? numberbutton2char : numberbutton0char;
 					if (colortouching >= 0 && picoAction(x+numberbutton2x, colorsposy+numberbutton2y, numberwidth/2, numberheight/2)) {
 						s = numbersscale1;
 						if (c > 0) {
-							timbres[(colorselecting-maxsystem) * 3 + i] = c - 1; // Decrease.
+							timbres[(colorselecting-maxextra) * 3 + i] = c - 1; // Decrease.
 							picoBeep(1.2, 0.1);
 						} else {
 							picoBeep(-1.2, 0.1);
@@ -1279,7 +1286,7 @@ async function appMain() {
 					}
 				}
 
-				let c99 = timbres[(colorselecting-maxsystem) * 3 + i];
+				let c99 = timbres[(colorselecting-maxextra) * 3 + i];
 				let s99 = c99 >= 99 ? "99" : c99 >= 10 ? "" + c99 : c99 >= 1 ? "0" + c99 : "00";
 
 				// Draw color numbers.
@@ -1323,13 +1330,13 @@ async function appMain() {
 
 			let i = xoffset+picoDiv(testing-1,count) - 1;
 			for (let j = yoffset; j < yoffset+height; j++) {
-				let index = pixels[j][i] - coffset - maxsystem;
+				let index = pixels[j][i] - coffset - maxextra;
 				if (index >= 0) {
 
 					// Calclate sound length.
 					let length = baselength;
 					for (let k = i+1; k < xoffset+width; k++) {
-						let index2 = pixels[j][k] - coffset - maxsystem;
+						let index2 = pixels[j][k] - coffset - maxextra;
 						//console.log("Sound length: " + i + "->" + k + "," + index + "->" + index2);
 						if (index2 == -1) {
 							length += baselength;
