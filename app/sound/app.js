@@ -4,8 +4,8 @@ var colors = [ // Colors.
 	255,255,255, 127,127,127,
 	// 2:Gold(332), 3:Red(p06), 4:Blue(0i9), 5:Green(0n4),
 	191,191,127, 231,0,95, 0,119,239,  0,151,63, 
-	// 6:Black(000),
-	0,0,0];
+	// 6:LightGray(333), 7:Black(000),
+	191,191,191, 0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
 var width = 16, height = 16; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
@@ -261,16 +261,21 @@ async function appLoad() {
 
 	// Initialize sprites.
 	//  Block: "044" + x "00,044"
+	//  Staff: "066,011,044" + x + "13,060"
 	//  Dash:  "044,000,044" + x + "12,020"
-	//  Sharp: "044" + x + "00,044,012,020,021,002"
+	//  Sharp: "044" + x + "00,044" + "012,020,021,002"
 	let block0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	let block1 = "000" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
-	let dash0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1) + "000044";
+	let staff0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
+	let staff1 = "000" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
+	let dash0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1) +
+	            "000044" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	let dash1 = "1" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) + "0";
 	let sharp2 = "01" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) +
 	             "00" + picoCodeChar((blockwidth-1)/2) + "100" + picoCodeChar(blockwidth-3);
 	picoCharSprite(picoCode6Char(coffset+0), picoStringCode6(block0 + picoCode6Char(coffset+0) + block1));
-	picoCharSprite(picoCode6Char(coffset+1), picoStringCode6(dash0 + picoCode6Char(coffset+1) + dash1));
+	picoCharSprite(picoCode6Char(coffset-1), picoStringCode6(staff0 + picoCode6Char(coffset+maxextra+maxtimbre) + staff1));
+	picoCharSprite(picoCode6Char(coffset+1), picoStringCode6(block0 + picoCode6Char(coffset+1) + block1));
 	for (let i = maxextra; i < maxextra+maxtimbre; i++) {
 		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(block0 + picoCode6Char(coffset+i) + block1));
 		picoCharSprite(picoCode6Char(coffset+i+maxtimbre), picoStringCode6(block0 + picoCode6Char(coffset+i) + block1 + sharp2));
@@ -942,8 +947,18 @@ async function appMain() {
 
 						picoRect(pixels[j][i] ? pixels[j][i] : coffset, x, y, pixelsgrid, pixelsgrid);
 						canvas += " ";
-					} else {
+
+					// Draw note.
+					} else if (pixels[j][i]) {
 						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coffset);
+
+					// Draw staff line.
+					} else if (j == yoffset+3 || j == yoffset+5 || j == yoffset+7 || j == yoffset+9 || j == yoffset+11) {
+						canvas += picoCode6Char(coffset-1);
+
+					// Draw background.
+					} else {
+						canvas += picoCode6Char(coffset);
 					}
 				}
 			}
@@ -1352,7 +1367,7 @@ async function appMain() {
 					}
 
 					// Calclate pitch.
-					let pctrl = yoffset+height - j - 1 +2;//+2=Do-Origin
+					let pctrl = yoffset+height - j - 1;
 					let pshift = 0;
 					// (La, Ti, Do, Re, Mi, Fa, So, La+,Do+,Re+,Fa+,So+)
 					//   0,  1,  2,  3,  4,  5,  6,   7,  8,  9, 10, 11
