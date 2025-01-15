@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.10.50110"; // Update by package.json.
+pico.version = "0.10.50115"; // Update by package.json.
 
 /* PICO Image module */
 
@@ -85,45 +85,45 @@ async function picoCharSprite(chars, sprite) {
 }
 
 // Draw rect.
-async function picoRect(c=-1, x=0, y=0, width=1, height=1, angle=0, scale=1) {
+async function picoRect(c=-1, x=0, y=0, width=1, height=1, angle=0, scale=1, vscale=0) {
 	try {
-		await pico.image.drawRect(c, x, y, width, height, angle, scale);
+		await pico.image.drawRect(c, x, y, width, height, angle, scale, vscale);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Draw char as string or number.
-async function picoChar(char, c=-1, x=0, y=0, angle=0, scale=1) {
+async function picoChar(char, c=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
 	try {
-		await pico.image.drawChar("" + char, c, x, y, angle, scale);
+		await pico.image.drawChar("" + char, c, x, y, angle, scale, vscale);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Draw multiple lines of text.
-async function picoText(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+async function picoText(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1, vscale=0) {
 	try {
-		await pico.image.drawText("" + text, c, x, y, width, height, angle, scale);
+		await pico.image.drawText("" + text, c, x, y, width, height, angle, scale, vscale);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Get multiple lines of text image data.
-async function picoTextData(text, c=-1, width=0, height=0, scale=1) {
+async function picoTextData(text, c=-1, width=0, height=0, scale=1, vscale=0) {
 	try {
-		return await pico.image.offscreen.textData("" + text, c, width, height, scale, pico.image);
+		return await pico.image.offscreen.textData("" + text, c, width, height, scale, vscale, pico.image);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Draw sprite.
-async function picoSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1) {
+async function picoSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
 	try {
-		await pico.image.drawSprite(cells, bgcolor, x, y, angle, scale);
+		await pico.image.drawSprite(cells, bgcolor, x, y, angle, scale, vscale);
 	} catch (error) {
 		console.error(error);
 	}
@@ -352,19 +352,19 @@ pico.Image = class {
 	}
 
 	// Draw rect to image.
-	drawRect(c=-1, x=0, y=0, width=1, height=1, angle=0, scale=1) {
+	drawRect(c=-1, x=0, y=0, width=1, height=1, angle=0, scale=1, vscale=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
-			this._reset(x, y, angle, scale);
+			this._reset(x, y, angle, scale, vscale);
 			this._draw(c, -(width-1)/2, -(height-1)/2, width-1, height-1);
 		}); // end of lock.
 	}
 
 	// Draw char as string or number to image.
-	drawChar(char, c=-1, x=0, y=0, angle=0, scale=1) {
+	drawChar(char, c=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
-			this._reset(x, y, angle, scale);
+			this._reset(x, y, angle, scale, vscale);
 			let length = char.length;
 			if (length >= 2) {
 				this._move(-(length-1)/2 * this.leading, 0);
@@ -377,15 +377,15 @@ pico.Image = class {
 	}
 
 	// Draw multiple lines of text to image.
-	drawText(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+	drawText(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1, vscale=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
-			this._text(text, c, x, y, width, height, angle, scale);
+			this._text(text, c, x, y, width, height, angle, scale, vscale);
 		}); // end of lock.
 	}
 
 	// Draw offscreen and get multiple lines of text image data.
-	textData(text, c=-1, width=0, height=0, scale=1, parent=null) {
+	textData(text, c=-1, width=0, height=0, scale=1, vscale=0, parent=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (parent) {
 				await navigator.locks.request(parent.lock, async (parentlock) => {
@@ -401,9 +401,9 @@ pico.Image = class {
 				width = this.leading*text.length;
 				height = this.vleading;
 			}
-			this._resize(width * scale, height * scale);
+			this._resize(width * scale, height * (vscale ? vscale : scale));
 			await this._ready();
-			this._text(text, c, 0, 0, width, height, 0, scale);
+			this._text(text, c, 0, 0, width, height, 0, scale, vscale);
 			return this._data();
 		}); // end of offscreenlock.
 	}
@@ -454,10 +454,10 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	drawSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1) {
+	drawSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
-			this._reset(x, y, angle, scale);
+			this._reset(x, y, angle, scale, vscale);
 			this._sprite(cells, -1, bgcolor);
 		}); // end of lock.
 	}
@@ -540,7 +540,7 @@ pico.Image = class {
 					  	0, 0, image.canvas[0].width, image.canvas[0].height);*/
 					  //loader.style.display = "none";
 					  //document.body.appendChild(loader);
-						////console.log("Loaded: " + url);
+						//console.log("Loaded: " + url);
 						timeout = 0;
 						resolve(image);
 					}
@@ -549,7 +549,7 @@ pico.Image = class {
 			setTimeout(() => {
 				navigator.locks.request(image.lock, async (imagelock) => {
 					if (timeout > 0) {
-						////console.log("Load timed out: " + url);
+						//console.log("Load timed out: " + url);
 						loader.src = null; // Load cancel.
 						timeout = 0;
 						resolve();
@@ -613,7 +613,7 @@ pico.Image = class {
 
 	// Resize canvas.
 	_resize(width=0, height=0) {
-		////console.log("Resize.");
+		//console.log("Resize.");
 		for (let i = 0; i < 2; i++) {
 			this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
 			this.canvas[i].height = (width ? height : pico.Image.height) * pico.Image.ratio;
@@ -626,7 +626,7 @@ pico.Image = class {
 
 			// Create canvas.
 			if (this.context == null) {
-				////console.log("Create canvas.");
+				//console.log("Create canvas.");
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i] = document.createElement("canvas");
 					this.canvas[i].width = (width ? width : pico.Image.width) * pico.Image.ratio;
@@ -652,7 +652,7 @@ pico.Image = class {
 	// Flip image.
 	_flip() {
 		return this._ready().then(() => {
-			////console.log("Flip.");
+			//console.log("Flip.");
 			return new Promise((resolve) => {
 				for (let i = 0; i < 2; i++) {
 					this.canvas[i].style.display = i == this.primary ? "flex" : "none";
@@ -667,7 +667,7 @@ pico.Image = class {
 	// Clear image.
 	_clear() {
 		return this._ready().then(() => {
-			////console.log("Clear.");
+			//console.log("Clear.");
 			return new Promise((resolve) => {
 
 				// Clear image.
@@ -701,7 +701,7 @@ pico.Image = class {
 	// Ready to draw.
 	_ready() {
 		if (this.context == null) {
-			////console.log("No context.");
+			//console.log("No context.");
 			return Promise.reject();
 		}
 		return Promise.resolve();
@@ -709,7 +709,7 @@ pico.Image = class {
 
 	// Reset image transform (scale, rotate, move).
 	_reset(x=0, y=0, angle=0, scale=1, vscale=0) {
-		//////console.log("Reset transform matrix.");
+		////console.log("Reset transform matrix.");
 		this.context.setTransform(1, 0, 0, 1, 0, 0);
 		this._move(x, y);
 		this._rotate(angle);
@@ -718,7 +718,7 @@ pico.Image = class {
 
 	// Scale image.
 	_scale(scale=1, vscale=0) {
-		//////console.log("Scale: " + scale + "," + vscale);
+		////console.log("Scale: " + scale + "," + vscale);
 		if (scale != 1) {
 			this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
 			this.context.scale(scale, vscale > 0 ? vscale : scale);
@@ -728,7 +728,7 @@ pico.Image = class {
 
 	// Rotate image.
 	_rotate(angle=0) {
-		//////console.log("Rotate: " + angle);
+		////console.log("Rotate: " + angle);
 		if (angle) {
 			this.context.translate(this.canvas[0].width / 2, this.canvas[0].height / 2);
 			this.context.rotate(angle * Math.PI / 180);
@@ -738,7 +738,7 @@ pico.Image = class {
 
 	// Move image.
 	_move(x, y) {
-		//////console.log("Move: " + x + "," + y);
+		////console.log("Move: " + x + "," + y);
 		if (x || y) {
 			this.context.translate(pico.Image.ratio * x, pico.Image.ratio * y);
 		}
@@ -746,13 +746,13 @@ pico.Image = class {
 
 	// Draw pixel to image.
 	_draw(c=-1, x=0, y=0, dx=0, dy=0) {
-		////console.log("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
+		//console.log("Draw: " + c + "," + x + "+" + dx + "," + y + "+" + dy);
 		const u = pico.Image.ratio, cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
-		//////console.log("Center: " + cx + "," + cy + " / " + u);
+		////console.log("Center: " + cx + "," + cy + " / " + u);
 		let m = this.colors.length/3;
 		let k = c >= m ? m-1 : c >= 0 ? c : Math.floor((c+m) % (m));
 		let r = this.colors[k*3], g = this.colors[k*3+1], b = this.colors[k*3+2];
-		//////console.log("Color: " + r + "," + g + "," + b);
+		////console.log("Color: " + r + "," + g + "," + b);
 		this.context.fillStyle = "rgb(" + r + "," + g + "," + b + ")";
 		this.context.fillRect(cx + u * x, cy + u * y, u * (dx + 1), u * (dy + 1));
 	}
@@ -770,17 +770,17 @@ pico.Image = class {
 	}
 
 	// Draw multiple lines of text.
-	_text(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1) {
+	_text(text, c=-1, x=0, y=0, width=0, height=0, angle=0, scale=1, vscale=0) {
 		const u = pico.Image.ratio;
 		const ux = this.leading, uy = this.vleading;
 		let mx = width > 0 ? width / ux - 1 : this.canvas[0].width / (ux * u * scale) - 1;
-		let my = height > 0 ? height / uy - 1 : this.canvas[0].height / (uy * u * scale) - 1;
-		//////console.log("Textarea: " + mx + "," + my + " / " + ux + "," + uy);
-		this._reset(x, y, angle, scale);
+		let my = height > 0 ? height / uy - 1 : this.canvas[0].height / (uy * u * (vscale ? vscale : scale)) - 1;
+		////console.log("Textarea: " + mx + "," + my + " / " + ux + "," + uy);
+		this._reset(x, y, angle, scale, vscale);
 		this._move((-ux * mx) / 2 , (-uy * my) / 2);
 		for (let i = 0, ix = 0, iy = 0; i < text.length && iy <= my; i++) {
 			let char = text.charCodeAt(i);
-			//////console.log("Char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
+			////console.log("Char="+char + " ix="+ix + "/"+mx + " iy="+iy + "/"+my);
 			if (char == "\r".charCodeAt(0) || char == "\n".charCodeAt(0)) {
 				this._move(-ux * ix, uy);
 				ix = 0;
@@ -800,7 +800,7 @@ pico.Image = class {
 
 	// Draw sprite to image.
 	_sprite(cells=[-1,0,0], fgcolor=-1, bgcolor=-1) {
-		////console.log("Sprite: " + cells.join(","));
+		//console.log("Sprite: " + cells.join(","));
 		let i = 0, x0 = 0, y0 = 0;
 		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
 			x0 = -cells[1] / 2;
@@ -813,11 +813,11 @@ pico.Image = class {
 		for (; i < cells.length; i += 3) {
 			let c = fgcolor >= 0 ? fgcolor : cells[i];
 			if (cells[i+3] == 0) {
-				////console.log("SpriteDraw: " + c + "," + cells[i+1]+ "+" + cells[i+4] + "," + cells[i+2] + "+" + cells[i+5]);
+				//console.log("SpriteDraw: " + c + "," + cells[i+1]+ "+" + cells[i+4] + "," + cells[i+2] + "+" + cells[i+5]);
 				this._draw(c, cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
 				i += 3;
 			} else {
-				////console.log("SpriteDraw: " + c + "," + cells[i+1] + "," + cells[i+2]);
+				//console.log("SpriteDraw: " + c + "," + cells[i+1] + "," + cells[i+2]);
 				this._draw(c, cells[i+1] + x0, cells[i+2] + y0);
 			}
 		}
@@ -835,18 +835,18 @@ pico.Image = class {
 	_image(image, sx=0, sy=0, width=0, height=0) {
 		const u = 0;//pico.Image.ratio * 4;
 		const cx = (this.canvas[0].width - u) / 2, cy = (this.canvas[0].height - u) / 2;
-		//////console.log("Center: " + cx + "," + cy);
+		////console.log("Center: " + cx + "," + cy);
 		return new Promise((resolve) => {
 			if (width > 0) {
 				height = (height > 0 ? height : width);
 				let cx = (this.canvas[0].width - width) / 2;
 				let cy = (this.canvas[0].height - height) / 2;
-				////console.log("DrawImage: " + cx + "," + cy + " " + sx + "," + sy + " " + width + "," + height);
+				//console.log("DrawImage: " + cx + "," + cy + " " + sx + "," + sy + " " + width + "," + height);
 				this.context.drawImage(image.canvas[image.primary], sx, sy, width, height, cx, cy, width, height);
 			} else {
 				let cx = (this.canvas[0].width - image.canvas[0].width) / 2;
 				let cy = (this.canvas[0].height - image.canvas[0].height) / 2;
-				////console.log("DrawImage: " + cx + "," + cy + " " + image.canvas[0].width + "," + image.canvas[0].height);
+				//console.log("DrawImage: " + cx + "," + cy + " " + image.canvas[0].width + "," + image.canvas[0].height);
 				this.context.drawImage(image.canvas[image.primary], cx, cy);
 			}
 			resolve();
@@ -880,7 +880,7 @@ pico.Image = class {
 		try {
 			const blob = new Blob([buffers.buffer], {type: "image/png"});
 			const file = new File([blob], name ? name : "image.png", {type: blob.type});
-			////console.log("Image data file: " + file.size);
+			//console.log("Image data file: " + file.size);
 			return file;
 		} catch (error) {
 			console.error(error);
@@ -1119,7 +1119,7 @@ pico.Param = class {
 		try {
 			const blob = new Blob([text], {type: type ? type : "text/plain"});
 			const file = new File([blob], name ? name : "text.txt", {type: type});
-			////console.log("Text file: " + file.size);
+			//console.log("Text file: " + file.size);
 			return file;
 		} catch (error) {
 			console.error(error);
@@ -1198,7 +1198,7 @@ pico.Param = class {
 		// Load query.
 		let query = window.location.search;
 		if (query != null && query != "") {
-			////console.log("Load query: " + query);
+			//console.log("Load query: " + query);
 			let text = query.slice(1);
 			this._deserialize(text);
 		}
@@ -1217,10 +1217,10 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "&";
 					let query = text ? separator + text : "";
-					////console.log("Jump: " + query);
+					//console.log("Jump: " + query);
 					window.location.href = url + query;
 				} else {
-					////console.log("Reload: " + text);
+					//console.log("Reload: " + text);
 					window.location.search = text;
 				}
 			}
@@ -1237,11 +1237,11 @@ pico.Param = class {
 				if (url) {
 					let separator = url && url.indexOf("?") < 0 ? "?" : "";
 					let query = text ? separator + text : "";
-					////console.log("Share query: " + query);
+					//console.log("Share query: " + query);
 					data.url = url + query;
 				} else if (!files) {
 					let query = text ? "?" + text : "";
-					////console.log("Flush query: " + query);
+					//console.log("Flush query: " + query);
 					window.history.replaceState(null, "", query);
 					data.url = window.location.href.replace(/[\?\#].*$/, "") + query;
 				}
@@ -1249,18 +1249,18 @@ pico.Param = class {
 					data.files = files;
 				}
 				if (navigator.canShare) {
-					////console.log("Sharing: " + JSON.stringify(data));
+					//console.log("Sharing: " + JSON.stringify(data));
 					if (navigator.canShare(data) && navigator.share) {
 						await navigator.share(data).then(() => {
-							////console.log("Successful share");
+							//console.log("Successful share");
 						}).catch((error) => {
-							////console.log("Error sharing:" + error);
+							//console.log("Error sharing:" + error);
 						});
 					} else {
-						////console.log("Not supported file");
+						//console.log("Not supported file");
 					}
 				} else {
-					////console.log("Not supported share");
+					//console.log("Not supported share");
 				}
 			}
 			return resolve();
@@ -1378,7 +1378,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = r ^ bitmask; // Bit flip.
-			//////console.log("Expand: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
+			//console.log("Expand: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
 			results[i] = r;
 		}
 		return results;
@@ -1401,7 +1401,7 @@ pico.Param = class {
 				a >>= 1;
 			}
 			r = (r + 1) % (1 << (bitlength - compression)); // Plus 1 to reserve 0.
-			//////console.log("Compress: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
+			//console.log("Compress: " + ("00000000"+x.toString(2)).slice(-bitlength) + " -> " + ("00000000"+r.toString(2)).slice(-bitlength));
 			results[i] = r;
 		}
 		return results;
@@ -1586,7 +1586,7 @@ pico.Sound = class {
 		return new Promise(async (resolve) => {
 			////console.log("Delay: " + delay);
 			await setTimeout(async () => {
-				////console.log("Beep: " + kcent + " x " + length);
+				//console.log("Beep: " + kcent + " x " + length);
 				await this._play("square", length, [kcent*10]);
 			}, delay * 1000);
 			resolve();
@@ -1604,20 +1604,20 @@ pico.Sound = class {
 //		return navigator.locks.request(this.lock, async (lock) => {
 		return new Promise(async (resolve) => {
 			if (!pitches) {
-				////console.log("Pulse: " + pattern + ", " + pitch + ", " + volumes);
+				//console.log("Pulse" + pattern + ": length=" + length + " pitch=" + pitch + " volumes=" + volumes);
 				await this._pulse(pattern, length, pitch, volumes);
 			} else {
 				let imax = pitches.length > volumes.length ? pitches.length : volumes.length;
 				for (let i = 0; i < imax; i++) {
-					////console.log("Pulse " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
+					//console.log("Pulse" + pattern + " " + (i+1) + "/" + imax + ": length=" + length + " pitches=" + pitches[i] + " volumes=" + volumes[i]);
 					await this._pulse(pattern, length/imax, pitch+pitches[i], [volumes[i]]);
 					if (this.stopped) {
-						////console.log("Pulse stopped.");
+						//console.log("Pulse stopped.");
 						break;
 					}
 				}
 			}
-			////console.log("Pulse end.");
+			//console.log("Pulse end.");
 			resolve();
 		}); // end of new Promise.
 //		}); // end of lock.
@@ -1628,20 +1628,20 @@ pico.Sound = class {
 //		return navigator.locks.request(this.lock, async (lock) => {
 		return new Promise(async (resolve) => {
 			if (!pitches) {
-				////console.log("Triangle: " + pattern + ", " + pitch + ", " + volumes);
+				//console.log("Triangle" + pattern + ": length=" + length + " pitch=" + pitch + " volumes=" + volumes);
 				await this._triangle(pattern, length, pitch, volumes);
 			} else {
 				let imax = pitches.length > volumes.length ? pitches.length : volumes.length;
 				for (let i = 0; i < imax; i++) {
-					////console.log("Triangle " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
+					//console.log("Triangle" + pattern + " " + (i+1) + "/" + imax + ": length=" + length + " pitches=" + pitches[i] + " volumes=" + volumes[i]);
 					await this._triangle(pattern, length/imax, pitch+pitches[i], [volumes[i]]);
 					if (this.stopped) {
-						////console.log("Triangle stopped.");
+						//console.log("Triangle stopped.");
 						break;
 					}
 				}
 			}
-			////console.log("Triangle end.");
+			//console.log("Triangle end.");
 			resolve();
 		}); // end of new Promise.
 //		}); // end of lock.
@@ -1652,20 +1652,20 @@ pico.Sound = class {
 //		return navigator.locks.request(this.lock, async (lock) => {
 		return new Promise(async (resolve) => {
 			if (!pitches) {
-				////console.log("Noise: " + pattern + ", " + pitch + ", " + volumes);
+				//console.log("Noise" + pattern + ": length=" + length + " pitch=" + pitch + " volumes=" + volumes);
 				await this._noise(pattern, length, pitch, volumes);
 			} else {
 				let imax = pitches.length > volumes.length ? pitches.length : volumes.length;
 				for (let i = 0; i < imax; i++) {
-					////console.log("Noise " + (i+1) + "/" + imax + ": " + pattern + ", " + pitches[i] + ", " + volumes[i]);
+					//console.log("Noise" + pattern + " " + (i+1) + "/" + imax + ": length=" + length + " pitches=" + pitches[i] + " volumes=" + volumes[i]);
 					await this._noise(pattern, length/imax, pitch+pitches[i], [volumes[i]]);
 					if (this.stopped) {
-						////console.log("Noise stopped.");
+						//console.log("Noise stopped.");
 						break;
 					}
 				}
 			}
-			////console.log("Noise end.");
+			//console.log("Noise end.");
 			resolve();
 		}); // end of new Promise.
 //		}); // end of lock.
@@ -1721,7 +1721,7 @@ pico.Sound = class {
 				let type = 0, pattern = 0; // Timbre type and pattern.
 				let pitch = (m1 - minpitch) * pitchlength, pctrl = 0; // Base pitch and pitch control.
 				let volume = 1, vctrl = 0; // Volume and volume control for attenuation.
-				let duration = baselength / speed * m2; // Beat duration.
+				let length = baselength / speed * m2; // Beat length.
 
 				// Seek matched sound in timbres.
 				let m00 = m0<offset ? m0 : m0-offset;
@@ -1735,7 +1735,6 @@ pico.Sound = class {
 					pctrl = scales[k1] - t1; // Scale up/down by 1 octave.
 					vctrl = Math.floor(t2 / 16)/16; // Upper bits for volume attenuation.
 					volume = 1 - Math.floor(t2 % 16)/16; // Lower bits for volume.
-
 					////console.log("Timbre" + k0 + "=" + k00 + "," + k1 + "->" + t0 + "," + t1 + "," + t2 + ": " + timbres[k00*3] + " " + timbres[k00*3+1] + " " + timbres[k00*3+2]);
 				}
 
@@ -1756,23 +1755,22 @@ pico.Sound = class {
 				}
 
 				// Play sound.
-				//console.log("Melody " + j + "/" + (melody.length/3) + ": " +
-				//	pitch + " x " + duration + " " + m00 + "=" + m0 + " " + m1 + " " + m2 + " / " +
-				//	type + " " + pattern + " - " + pctrl + " " + vctrl + " - " + p + " " + v);
+				////console.log("Melody " + j + "/" + (melody.length/3) + ": " + pitch + " x " + length + " " + m00 + "=" + m0 + " " + m1 + " " + m2 + " / " + type + " " + pattern + " - " + pctrl + " " + vctrl + " - " + p + " " + v);
 				if (type == 1) {
-					////console.log("Noise " + pattern + ": " + p + "," + v);
-					await this._noise(pattern, duration, p, v);
+					//console.log("Noise" + pattern + ": length=" + length + " pitch=" + p + " volumes=" + v);
+					await this._noise(pattern, length, p, v);
 				} else if (type == 2) {
-					////console.log("Triangle " + pattern + ": " + p + "," + v);
-					await this._triangle(pattern, duration, p, v);
+					//console.log("Triangle" + pattern + ": length=" + length + " pitch=" + p + " volumes=" + v);
+					await this._triangle(pattern, length, p, v);
 				} else if (type == 3) {
-					////console.log("Pulse " + pattern + ": " + p + "," + v);
-					await this._pulse(pattern, duration, p, v);
+					//console.log("Pulse" + pattern + ": length=" + length + " pitch=" + p + " volumes=" + v);
+					await this._pulse(pattern, length, p, v);
 				} else {
-					await this.wait(duration * 1000);
+					//console.log("Rest: length=" + length);
+					await this.wait(length * 1000);
 				}
 			}
-			////console.log("Melody end.");
+			//console.log("Melody end.");
 			resolve();
 		}); // end of new Promise.
 		//}); // end of lock.
@@ -1810,7 +1808,7 @@ pico.Sound = class {
 
 			// Create audio.
 			if (this.context == null) {
-				////console.log("Create audio.");
+				//console.log("Create audio.");
 				this.context = new window.AudioContext();
 				this.master = this.context.createGain();
 				//this.master.gain.value = pico.Sound.maxvolume;
@@ -1828,7 +1826,7 @@ pico.Sound = class {
 		}
 
 		// Stop audio.
-		////console.log("Stop audio.");
+		//console.log("Stop audio.");
 		this.master.disconnect(this.context.destination);
 		this.master = null;
 		this.master = this.context.createGain(); // Recreate master volume.
@@ -2259,19 +2257,21 @@ pico.Touch = class {
 						if (this.flushing) {
 							clearInterval(timer);
 							this.flushing = false;
+							pico.touch.allscreen._read();
 							return navigator.locks.request(this.lock, async (lock) => {
 								this._read();
 								resolve();
 							}); // end of lock.
 						} else {
-								if (pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
-									clearInterval(timer);
-									this.flushing = false;
-									return navigator.locks.request(this.lock, async (lock) => {
-										this._read();
-										resolve();
-									}); // end of lock.
-								}
+							if (pico.touch.allscreen._motion() || pico.touch.allscreen._action()) {
+								clearInterval(timer);
+								this.flushing = false;
+								pico.touch.allscreen._read();
+								return navigator.locks.request(this.lock, async (lock) => {
+									this._read();
+									resolve();
+								}); // end of lock.
+							}
 						}
 						pico.touch.allscreen._read();
 					}, 10); // end of setInterval.
@@ -2421,7 +2421,7 @@ pico.Touch = class {
 				this.touching[0][i].motion = 1;
 				this.touching[0][i].x = x;
 				this.touching[0][i].y = y;
-				////console.log("Touch move: " + i + ":" + JSON.stringify(this.touching[0][i]));
+				//console.log("Touch move: " + i + ":" + JSON.stringify(this.touching[0][i]));
 				break;
 			}
 		}
@@ -2506,7 +2506,7 @@ pico.Touch = class {
 				} else if (h <= 0) {
 					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
 					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-					////console.log("Motion: " + x2 + "," + y2 + "<=" + (r*r));
+					//console.log("Motion: " + x2 + "," + y2 + "<=" + (r*r));
 					if (x2 + y2 <= r * r) {
 						return i + 1;
 					}
@@ -2532,7 +2532,7 @@ pico.Touch = class {
 				} else if (h <= 0) {
 					let x2 = Math.pow(cx + x - this.touching[this.primary][i].x, 2);
 					let y2 = Math.pow(cy + y - this.touching[this.primary][i].y, 2);
-					////console.log("Action: " + x2 + "," + y2 + "<=" + (r*r));
+					//console.log("Action: " + x2 + "," + y2 + "<=" + (r*r));
 					if (x2 + y2 <= r * r) {
 						return i + 1;
 					}
