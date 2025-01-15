@@ -855,11 +855,9 @@ async function appMain() {
 							//	pixeltouchposx + "," + pixeltouchposy+"->"+i0+","+j0);
 							if (pixeltouching > 0 && !testing && (pixeltouchposx != i0 || pixeltouchposy != j0)) {
 								pixeltouchmoved = 1;
-								if (animeflag == 1) {
-									pixeltouchmovex += pixeltouchposx - i0;
-									pixeltouchmovey += pixeltouchposy - j0;
+								pixeltouchmovex += pixeltouchposx - i0;
+								pixeltouchmovey += pixeltouchposy - j0;
 								//console.log("Moving:" + pixeltouchmovex + "," + pixeltouchmovey);
-								}
 							}
 							pixeltouchposx = i0;
 							pixeltouchposy = j0;
@@ -898,11 +896,9 @@ async function appMain() {
 
 						if (pixeltouching > 0 && (pixeltouchposx != i0 || pixeltouchposy != j0)) {
 							pixeltouchmoved = 1;
-							if (animeflag == 1) {
-								pixeltouchmovex += pixeltouchposx - i0;
-								pixeltouchmovey += pixeltouchposy - j0;
-							//console.log("Moving:" + pixeltouchmovex + "," + pixeltouchmovey);
-							}
+							pixeltouchmovex += pixeltouchposx - i0;
+							pixeltouchmovey += pixeltouchposy - j0;
+							console.log("Moving:" + pixeltouchmovex + "," + pixeltouchmovey);
 						}
 						pixeltouchposx = i0;
 						pixeltouchposy = j0;
@@ -916,13 +912,25 @@ async function appMain() {
 						// Put pixel.
 						if (!colorselecting) {
 							pixels[j][i] = 0;
+							// Remove all continuous dash mark.
+							for (let i1 = i+1; i1 < xoffset + width; i1++) {
+								if (pixels[j][i1] == coffset+1) {
+									pixels[j][i1] = 0;
+								} else {
+									break;
+								}
+							}
 						} else if (pixels[j][i] != coffset+colorselecting && pixeltouching < 15) {
 							//console.log("Touch pixels: " + pixeltouching + " " + pixels[j][i]);
 							pixels[j][i] = coffset+colorselecting;
 							pixeltouching = 15; // For first touch.
 						} else if (pixeltouchmoved) {
-							//console.log("Put extra pixels: " + pixeltouching + " " + pixels[j][i]);
-							pixels[j][i] = coffset+1; // Dash mark.
+							if (pixeltouchmovey == 0 && (pixeltouchmovex == 0 || pixeltouchmovex == -1)) {
+								//console.log("Put extra pixels: " + pixeltouching + " " + pixels[j][i]);
+								pixels[j][i] = coffset+1; // Dash mark.
+							} else {
+								pixeltouching = -1; // Touch end.
+							}
 						}
 
 						// Cancel color editing.
@@ -943,7 +951,7 @@ async function appMain() {
 
 		// Update offset.
 		// Ignore touch-moving within 10 msec.
-		if (pixeltouching >= 10 && (pixeltouchmovex || pixeltouchmovey)) {
+		if (pixeltouching >= 10 && animeflag && (pixeltouchmovex || pixeltouchmovey)) {
 			pixeltouchmoving = 1;
 			xoffset += pixeltouchmovex;
 			if (xoffset < 0) {
