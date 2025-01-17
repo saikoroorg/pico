@@ -3,7 +3,7 @@
 // Namespace.
 var pico = pico || {};
 pico.name = "pico"; // Update by package.json.
-pico.version = "0.10.50115"; // Update by package.json.
+pico.version = "0.10.50117"; // Update by package.json.
 
 /* PICO Image module */
 
@@ -58,6 +58,12 @@ async function picoResize(width=0, height=0) {
 }
 
 // Set image color pallete.
+//  colors: [r0,g0,b0, r1,g1,b1, ~]
+//   r,g,b: 8bit value(0~255) of red,green,blue color.
+//  offset: Offset of colors for sprite data.
+//   0 = N colors for sprite data 0~N-1
+//   10 = N(~52) colors for sprite data 10(a)~61(Z)
+//   36 = N(~26) colors for sprite data 36(A)~61(Z)
 async function picoColor(colors=null, offset=0) {
 	try {
 		await pico.image.color(colors, offset);
@@ -121,36 +127,45 @@ async function picoTextData(text, c=-1, width=0, height=0, scale=1, vscale=0) {
 }
 
 // Draw sprite.
-async function picoSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
+//  sprite: [data0, data1, ~] or
+//          [0(reserved), width-1, height-1, data0, data1, ~]
+//   width-1,height-1: Size(width-1,height-1) of sprite.
+//   data: [color0,x0,y0, color1,x1,y1, ~]
+//    color: Pixel color index of color pallete.
+//    x,y: Pixel position.
+//  bgcolor: Background color index. -1=Transparent
+//  x,y: Sprite position. angle: Sprite angle by degree.
+//  scale: Sprite scale. vscale: Sprite vertical scale. 0=Invalid
+async function picoSprite(sprite=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
 	try {
-		await pico.image.drawSprite(cells, bgcolor, x, y, angle, scale, vscale);
+		await pico.image.drawSprite(sprite, bgcolor, x, y, angle, scale, vscale);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Flip sprite.
-function picoSpriteFlip(cells=[-1,0,0], x=0, y=0, a=0) {
+function picoSpriteFlip(sprite=[-1,0,0], x=0, y=0, a=0) {
 	try {
-		return pico.image.spriteFlip(cells, x, y, a);
+		return pico.image.spriteFlip(sprite, x, y, a);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Get sprite size.
-function picoSpriteSize(cells=[-1,0,0]) {
+function picoSpriteSize(sprite=[-1,0,0]) {
 	try {
-		return pico.image._spriteSize(cells);
+		return pico.image._spriteSize(sprite);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Get sprite image data.
-async function picoSpriteData(cells=[-1,0,0], bgcolor=-1, scale=10) {
+async function picoSpriteData(sprite=[-1,0,0], bgcolor=-1, scale=10) {
 	try {
-		return await pico.image.offscreen.spriteData(cells, bgcolor, scale, pico.image);
+		return await pico.image.offscreen.spriteData(sprite, bgcolor, scale, pico.image);
 	} catch (error) {
 		console.error(error);
 	}
@@ -268,19 +283,21 @@ pico.Image = class {
 		"X": [-1,-1,-2,0,0,1,-1,-1,1,0,0,1,-1,0,0,-1,1,-2,0,0,1,-1,1,1,0,0,1],
 		"Y": [-1,-1,-2,0,0,1,-1,0,0,0,0,2,-1,1,-2,0,0,1],
 		"Z": [-1,-1,-2,0,2,0,-1,1,-2,0,0,1,-1,0,0,-1,-1,1,0,0,1,-1,-1,2,0,2,0],
-		".": [-1,0,2],
-		"-": [-1,-1,0,0,2,0],
+		"?": [-1,-1,-2,0,2,0,-1,1,-2,0,0,1,-1,0,0,-1,0,2],
+		"!": [-1,0,-2,0,0,2,-1,0,2],
 		"/": [-1,-1,2,-1,0,-1,0,0,2,-1,1,-2],
 		":": [-1,0,-1,-1,0,1],
 		"+": [-1,-1,0,0,2,0,-1,0,-1,0,0,2],
-		"=": [-1,-1,-1,0,2,0,-1,-1,1,0,2,0],
-		"?": [-1,-1,-2,0,2,0,-1,1,-2,0,0,1,-1,0,0,-1,0,2],
-		"!": [-1,0,-2,0,0,2,-1,0,2],
-		"*": [-1,-1,-1,-1,-1,1,-1,0,0,-1,1,-1,-1,1,1],
+		"-": [-1,-1,0,0,2,0],
+		",": [-1,0,1,0,0,1],//"=": [-1,-1,-1,0,2,0,-1,-1,1,0,2,0],
+		".": [-1,0,2],
+		"(": [-1,1,-2,-1,0,-1,0,0,2,-1,1,2],
+		")": [-1,-1,-2,-1,0,-1,0,0,2,-1,-1,2],
 		"&": [-1,-1,0,0,0,1,-1,0,-1,-1,1,0,0,0,1,-1,-1,1,0,2,0],
 		"%": [-1,-1,-1,0,2,0,-1,-1,-1,0,0,1,-1,0,1,-1,1,-1,0,0,1],
 		"$": [-1,-1,0,-1,0,-1,-1,0,1,-1,1,0],
 		"#": [-1,-1,-1,0,2,0,-1,-1,-1,0,0,2,-1,-1,1,0,2,0,-1,1,-1,0,0,2],
+		"*": [-1,-1,-1,-1,-1,1,-1,0,0,-1,1,-1,-1,1,1],
 		"_": [],
 	};
 	static caliases = { // Char sprite alias table.
@@ -409,43 +426,43 @@ pico.Image = class {
 	}
 
 	// Flip splite.
-	spriteFlip(cells=[-1,0,0], x=0, y=0, a=0) {
+	spriteFlip(sprite=[-1,0,0], x=0, y=0, a=0) {
 		if (!x && !y && !a) {
-			return cells;
+			return sprite;
 		}
 		let flipped = [];
 		let i = 0, w = 1, h = 1;
-		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
-			w = cells[1] + 1;
-			h = cells[2] + 1;
-			flipped[0] = cells[0];
-			flipped[1] = cells[1];
-			flipped[2] = cells[2];
+		if (sprite[0] == 0 && sprite[1] >= 0 && sprite[2] >= 0) {
+			w = sprite[1] + 1;
+			h = sprite[2] + 1;
+			flipped[0] = sprite[0];
+			flipped[1] = sprite[1];
+			flipped[2] = sprite[2];
 			i += 3;
 		}
-		for (; i < cells.length; i += 3) {
-			flipped[i+0] = cells[i];
-			if (cells[i+3] != 0) {
+		for (; i < sprite.length; i += 3) {
+			flipped[i+0] = sprite[i];
+			if (sprite[i+3] != 0) {
 				if (a) {
-					flipped[i+1] = y ? cells[i+2] : h-1-cells[i+2];
-					flipped[i+2] = x ? w-1-cells[i+1] : cells[i+1];
+					flipped[i+1] = y ? sprite[i+2] : h-1-sprite[i+2];
+					flipped[i+2] = x ? w-1-sprite[i+1] : sprite[i+1];
 				} else {
-					flipped[i+1] = x ? w-1-cells[i+1] : cells[i+1];
-					flipped[i+2] = y ? h-1-cells[i+2] : cells[i+2];
+					flipped[i+1] = x ? w-1-sprite[i+1] : sprite[i+1];
+					flipped[i+2] = y ? h-1-sprite[i+2] : sprite[i+2];
 				}
 			} else {
 				if (a) {
-					flipped[i+1] = y ? cells[i+2] : h-cells[i+2];
-					flipped[i+2] = x ? w-cells[i+1] : cells[i+1];
-					flipped[i+3] = cells[i+3];
-					flipped[i+4] = y ? cells[i+5] : -cells[i+5]-2;
-					flipped[i+5] = x ? -cells[i+4]-2 : cells[i+4];
+					flipped[i+1] = y ? sprite[i+2] : h-sprite[i+2];
+					flipped[i+2] = x ? w-sprite[i+1] : sprite[i+1];
+					flipped[i+3] = sprite[i+3];
+					flipped[i+4] = y ? sprite[i+5] : -sprite[i+5]-2;
+					flipped[i+5] = x ? -sprite[i+4]-2 : sprite[i+4];
 				} else {
-					flipped[i+1] = x ? w-cells[i+1] : cells[i+1];
-					flipped[i+2] = y ? h-cells[i+2] : cells[i+2];
-					flipped[i+3] = cells[i+3];
-					flipped[i+4] = x ? -cells[i+4]-2 : cells[i+4];
-					flipped[i+5] = y ? -cells[i+5]-2 : cells[i+5];
+					flipped[i+1] = x ? w-sprite[i+1] : sprite[i+1];
+					flipped[i+2] = y ? h-sprite[i+2] : sprite[i+2];
+					flipped[i+3] = sprite[i+3];
+					flipped[i+4] = x ? -sprite[i+4]-2 : sprite[i+4];
+					flipped[i+5] = y ? -sprite[i+5]-2 : sprite[i+5];
 				}
 				i += 3;
 			}
@@ -454,27 +471,27 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	drawSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
+	drawSprite(sprite=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
 			this._reset(x, y, angle, scale, vscale);
-			this._sprite(cells, -1, bgcolor);
+			this._sprite(sprite, -1, bgcolor);
 		}); // end of lock.
 	}
 
 	// Draw offscreen and get sprite image data.
-	spriteData(cells=[-1,0,0], bgcolor=-1, scale=10, parent=null) {
+	spriteData(sprite=[-1,0,0], bgcolor=-1, scale=10, parent=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (parent) {
 				await navigator.locks.request(parent.lock, async (parentlock) => {
 					this.colors = parent.colors.concat();
 				}); // end of lock.
 			}
-			let size = this._spriteSize(cells);
+			let size = this._spriteSize(sprite);
 			this._resize(size * scale, size * scale);
 			await this._ready();
 			this._reset(0, 0, 0, scale);
-			this._sprite(cells, -1, bgcolor);
+			this._sprite(sprite, -1, bgcolor);
 			return this._data();
 		}); // end of lock.
 	}
@@ -799,34 +816,34 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	_sprite(cells=[-1,0,0], fgcolor=-1, bgcolor=-1) {
-		//console.log("Sprite: " + cells.join(","));
+	_sprite(sprite=[-1,0,0], fgcolor=-1, bgcolor=-1) {
+		//console.log("Sprite: " + sprite.join(","));
 		let i = 0, x0 = 0, y0 = 0;
-		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
-			x0 = -cells[1] / 2;
-			y0 = -cells[2] / 2;
+		if (sprite[0] == 0 && sprite[1] >= 0 && sprite[2] >= 0) {
+			x0 = -sprite[1] / 2;
+			y0 = -sprite[2] / 2;
 			i += 3;
 		}
 		if (bgcolor >= 0 && x0 < 0 && y0 < 0) {
 			this._draw(bgcolor, x0, y0, x0*-2, y0*-2);
 		}
-		for (; i < cells.length; i += 3) {
-			let c = fgcolor >= 0 ? fgcolor : cells[i];
-			if (cells[i+3] == 0) {
-				//console.log("SpriteDraw: " + c + "," + cells[i+1]+ "+" + cells[i+4] + "," + cells[i+2] + "+" + cells[i+5]);
-				this._draw(c, cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
+		for (; i < sprite.length; i += 3) {
+			let c = fgcolor >= 0 ? fgcolor : sprite[i];
+			if (sprite[i+3] == 0) {
+				//console.log("SpriteDraw: " + c + "," + sprite[i+1]+ "+" + sprite[i+4] + "," + sprite[i+2] + "+" + sprite[i+5]);
+				this._draw(c, sprite[i+1] + x0, sprite[i+2] + y0, sprite[i+4], sprite[i+5]);
 				i += 3;
 			} else {
-				//console.log("SpriteDraw: " + c + "," + cells[i+1] + "," + cells[i+2]);
-				this._draw(c, cells[i+1] + x0, cells[i+2] + y0);
+				//console.log("SpriteDraw: " + c + "," + sprite[i+1] + "," + sprite[i+2]);
+				this._draw(c, sprite[i+1] + x0, sprite[i+2] + y0);
 			}
 		}
 	}
 
 	// Get sprite size.
-	_spriteSize(cells=[-1,0,0]) {
-		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
-			return (cells[1] > cells[2] ? cells[1] + 1 : cells[2] + 1);
+	_spriteSize(sprite=[-1,0,0]) {
+		if (sprite[0] == 0 && sprite[1] >= 0 && sprite[2] >= 0) {
+			return (sprite[1] > sprite[2] ? sprite[1] + 1 : sprite[2] + 1);
 		}
 		return 0;
 	}
@@ -1323,7 +1340,7 @@ pico.Param = class {
 		this.context[key] = numbers.join(separator);
 	}
 
-	// Get number 6bit array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	// Get number 6bit array: 0-9 A-Z(10-35) a-z(36-61) .(62) -(63)
 	_stringCode(str) {
 		let results = [];
 		if (str) {
@@ -1331,10 +1348,10 @@ pico.Param = class {
 				let c = str.charCodeAt(i);
 				if ("0".charCodeAt(0) <= c && c <= "9".charCodeAt(0)) {
 					results.push(c - "0".charCodeAt(0));
-				} else if ("a".charCodeAt(0) <= c && c <= "z".charCodeAt(0)) {
-					results.push(c - "a".charCodeAt(0) + 10);
 				} else if ("A".charCodeAt(0) <= c && c <= "Z".charCodeAt(0)) {
-					results.push(c - "A".charCodeAt(0) + 36);
+					results.push(c - "A".charCodeAt(0) + 10);
+				} else if ("a".charCodeAt(0) <= c && c <= "z".charCodeAt(0)) {
+					results.push(c - "a".charCodeAt(0) + 36);
 				} else if (c == ".".charCodeAt(0)) {
 					results.push(62);
 				} else if (c == "-".charCodeAt(0)) {
@@ -1345,16 +1362,16 @@ pico.Param = class {
 		return results;
 	}
 
-	// Set number 6bit array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	// Set number 6bit array: 0-9 A-Z(10-35) a-z(36-61) .(62) -(63)
 	_codeString(code6) {
 		let result = "";
 		for (let i = 0; i < code6.length; i++) {
 			if (0 <= code6[i] && code6[i] < 10) {
 				result += code6[i];
 			} else if (10 <= code6[i] && code6[i] < 36) {
-				result += String.fromCharCode("a".charCodeAt(0) + code6[i] - 10);
+				result += String.fromCharCode("A".charCodeAt(0) + code6[i] - 10);
 			} else if (36 <= code6[i] && code6[i] < 62) {
-				result += String.fromCharCode("A".charCodeAt(0) + code6[i] - 36);
+				result += String.fromCharCode("a".charCodeAt(0) + code6[i] - 36);
 			} else if (code6[i] == 62) {
 				result += ".";
 			} else if (code6[i] == 63) {
@@ -1506,8 +1523,9 @@ async function picoStop() {
 }
 
 // Play pulse melody.
-// pattern = 0 or 1(0.125), 3(0.25), 7(0.5) (8bit original parameter)
-// pitches = -3.6(A1:54.6Hz) .. 7.0(G9:12.4kHz)
+//  pattern: 0=1(Square), 3(Pulse with duty ratio 1:3), 7(Pulse with duty ratio 1:7)
+//  length: msecs, volumes: 0(Max), 1(15/16), ~ 15(1/16)
+//  pitch/pitches: -36(A1:54.6Hz), ~ 0(A4:440Hz), ~ 70(G9:12.4kHz)
 async function picoPulse(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=null) {
 	try {
 		await pico.sound.playPulse(pattern, length, pitch, volumes, pitches);
@@ -1517,8 +1535,9 @@ async function picoPulse(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=nu
 }
 
 // Play triangle melody.
-// pattern = 0 or 15 (8bit original parameter)
-// pitches = -4.8(A0:27.3Hz) .. 8.4(A11:55.9kHz)
+//  pattern: 0, 15(Pseudo triangle by 1/16 cycle)
+//  length: msecs, volumes: 0(Max), 1(15/16), ~ 15(1/16)
+//  pitch/pitches: -48(A0:27.3Hz), ~ 0(A4:440Hz), ~ 84(A11:55.9kHz)
 async function picoTriangle(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=null) {
 	try {
 		await pico.sound.playTriangle(pattern, length, pitch, volumes, pitches);
@@ -1528,9 +1547,10 @@ async function picoTriangle(pattern=0, length=0.1, pitch=0, volumes=[1], pitches
 }
 
 // Play noise melody.
-// pattern = 0 or 1, 6 (8bit original parameter)
-// pitches = -7.9(D-3), -6.7(D-2), -5.5(D-1), -5.0(G-1), -4.3(D0), -3.8(G0), -3.1(D1),
-//           -2.5?(F1#?), -2.3(A2#), -0.7(D3), -0.2(G3), 0.5(D4), 1.7(D5), 2.9(D6), 4.1(D7), 5.3(D8)
+//  pattern: 0, 1(Pseudo random noize), 6(High frequency pseudo random noize)
+//  length: msecs, volumes: 0(Max), 1(15/16), ~ 15(1/16)
+//  pitch/pitches: -79(D-3), -67(D-2), -55(D-1), -50(G-1), -43(D0), -38(G0), -31(D1),
+//           -25(F1#), -23(A2#), -07(D3), -02(G3), 05(D4), 17(D5), 29(D6), 41(D7), 53(D8)
 async function picoNoise(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=null) {
 	try {
 		await pico.sound.playNoise(pattern, length, pitch, volumes, pitches);
@@ -1540,12 +1560,45 @@ async function picoNoise(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=nu
 }
 
 // Set timbre pallete.
+//  timbres: [pattern0,pitch0,volume0, pattern1,pitch1,volume1, ~]
+//   patterns: 0~15=Reserved, 16~31=Noise, 32~47=Triangle, 48~63=Pulse
+//    16+0(g)=Noise0,    16+1(h)=Noise1,     16+6(m)=Noise6
+//    32+0(w)=Triangle0, 32+15(L)=Triangle15
+//    48+0(M)=Pulse0,    48+1(N)=Pulse1,     48+3(P)=Pulse3, 48+7(T)=Pulse7
+//   pitches: Pitch modulation(0~48)
+//    0=Pitch+0, 1=Pitch-1, 2=Pitch-2, ~ 12=Pitch-12(-1 octave), ~
+//   volumes: Volume(0=Max~15=Min) + Volume attenuation(0,16,32,48)
+//    0=16/16, 2=14/16, 4=12/16, 6=10/16, 8=8/16, ~
+//    16+0(g)=16/16-1, 16+2(i)=14/16-1, 16+4(k)=12/16-1, 16+6(m)=10/16-1, 16+8(o)=8/16-1, ~
+//    32+0(w)=16/16-2, 32+2(y)=14/16-2, 32+4(A)=12/16-2, 32+6(C)=10/16-2, 32+8(E)=8/16-2, ~
+//    48+0(M)=16/16-3, 48+2(O)=14/16-3, 48+4(Q)=12/16-3, 48+6(S)=10/16-3, 48+8(U)=8/16-3, ~
+//  scales: Sound scales [pitch0, ~ pitchN-1]
+//   [0,2,3,5,7,8,10, 1,4,6,9,11] = A natural minor scale
+//   (La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+)
+//  offset: Offset of timbres for melody data.
+//   0 = 11 notes and 1 rest for melody data 0~12
+//   10 = (11 notes and 1 rest)x4 for melody data 10(a)~61(Z)
+//    Timbre0 -> 10-21(abcdefg,hijkl) + Rest=22(m)
+//    Timbre1 -> 23-34(nopqrst,uvwxy) + Rest=35(z)
+//    Timbre2 -> 36-47(ABCDEFG,HIJKL) + Rest=48(M)
+//    Timbre3 -> 49-60(NOPQRST,UVWXY) + Rest=61(Z)
 async function picoTimbre(timbres=null, scales=null, offset=0) {
 	pico.sound.timbre(timbres, scales, offset);
 }
 
 // Play melody.
-async function picoMelody(melody=[-1,0,0]) {
+//  melody: [data0, data1, ~] or
+//          [0(reserved), speed, 0(reserved), data0, data1, ~]
+//   speed: bit/sec (6bit=1beat(quarter note))
+//    15 bit/sec = 15/6 beat/sec = 150 bpm
+//   data: [tone0,modulation0,length0, tone1,modulation1,length1, ~]
+//    tone: Timbres with pitch.
+//     0(a) = Timbre0 of pitch0, 38(C) = Timbre2 of pitch2
+//    modulation: Scale down modulation.
+//     0 = Default scale, 12 = 1 octave down scale, 24 = 2 octave down scale
+//    length: Beat length by 1/6 beat.
+//     6 = quarter note, 12 = half note, 3 = eighth note
+async function picoMelody(melody=[]) {
 	try {
 		await pico.sound.playMelody(melody);
 	} catch (error) {
@@ -1565,7 +1618,7 @@ pico.Sound = class {
 	static maxvolume = 0.1; // Max volume.
 
 	// Default timbres. (48=Pulse0, 0=No modulation, 0=Max volume without attenuation)
-	// [pattern0, pitch0, volume0,  pattern1, pitch1, volume1,  ..]
+	// [pattern0, pitch0, volume0,  pattern1, pitch1, volume1, ~]
 	//  patterns: 16~31=Noise, 32~47=Triangle, 48~63=Pulse
 	//  pitches: Pitch modulation(0~48)
 	//  volumes: Volume(0~15) + Volume attenuation(0,16,32,48)
@@ -1693,7 +1746,7 @@ pico.Sound = class {
 	}
 
 	// Play melody.
-	playMelody(melody=[-1,0,0]) {
+	playMelody(melody=[]) {
 		const minpitch = 4; // Base pitch index.
 		const baselength = 60 / 6; // Base length = 60 seconds (= 1 minute) / 6 (= 1 note length).
 		const pitchlength = 12; // Pitch difference on 1 octave.
@@ -1957,7 +2010,7 @@ pico.Sound = class {
 			return Promise.reject();
 		}
 
-		// 8bit original argorithm and parameter: pattern=1(0.5),3(0.25),7(0.125)
+		// Pulse sound.
 		if (pattern > 0) {
 
 			// Create oscillator.
@@ -2034,14 +2087,14 @@ pico.Sound = class {
 			return Promise.reject();
 		}
 
-		// 8bit original argorithm and parameter: pattern=15
+		// Pseudo triangle sound.
 		if (pattern > 0) {
 
 			// Create triangle buffers.
 			let triangleBuffer = null;
 			triangleBuffer = this.context.createBuffer(1, this.context.sampleRate * length, this.context.sampleRate);
 
-			// 8bit original pseudo triangle argorithm.
+			// Pseudo triangle argorithm.
 			let frequency = pico.Sound.frequency * (pitch ? 2 ** (pitch * 100 / 1200) : 1);
 			let triangleCycle = 2 * Math.PI, value = 0;
 			////console.log("Create triangle buffers " + pattern + ": " + pitch + "=" + frequency);
@@ -2130,7 +2183,7 @@ pico.Sound = class {
 		let noiseBuffer = null;
 		noiseBuffer = this.context.createBuffer(2, this.context.sampleRate * length, this.context.sampleRate);
 
-		// 8bit original argorithm and parameter: pattern=1,6
+		// Pseudo random noise argorithm.
 		if (pattern > 0) {
 			let reg = 0x8000;
 			for (let j = 0; j < noiseBuffer.numberOfChannels; j++) {
