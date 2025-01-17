@@ -2,7 +2,7 @@ const title = "Image"; // Title.
 var colors = [ // Colors.
 	// 0:White(111), 1:LightGray(333), 2:Gray(222), 3:DarkGray(444),
 	255,255,255, 191,191,191, 127,127,127, 63,63,63,
-	// 4:Red(p06), 5:Blue(0i9), 6:Green(0n4),
+	// 4:Red(P06), 5:Blue(0I9), 6:Green(0N4),
 	231,0,95, 0,119,239,  0,151,63,
 	// 7:Gold(332), 8:Silver(555), 9:Black(000),
 	191,191,127, 223,223,223, 0,0,0];
