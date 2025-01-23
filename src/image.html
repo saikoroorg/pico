@@ -36,12 +36,12 @@ const alphabetCharSprites = { // Alphabet char sprite table.
 	"z": picoTextCode("066922932942943934925935945"),
 };
 const symbol3x5CharSprites1 = { // Symbol3x5 char sprite table.
-	".": picoTextCode("066935"),
-	"-": picoTextCode("066923933943"),
 	"+": picoTextCode("066932923933943934"),
 	"=": picoTextCode("066922932942924934944"),
 	":": picoTextCode("066932934"),
 	"/": picoTextCode("066941932933934925"),
+	".": picoTextCode("066935"),
+	"-": picoTextCode("066923933943"),
 };
 const symbol3x5CharSprites2 = { // Symbol3x5 char sprite table.
 	"'": picoTextCode("066931932"),
@@ -98,17 +98,16 @@ const symbol5x5CharSprites2 = { // Symbol5x5 char sprite table.
 	"△": picoTextCode("066931922942923943914954915925935945955"),//"▽": picoTextCode("066911921931941951912952923943924944935"),
 	"□": picoTextCode("066911921931941951912952913953914954915925935945955"),
 	"×": picoTextCode("066911951922942933924944915955"),
-
 	"〜": picoTextCode("066922913933953944"),
-	"…": picoTextCode("066913933953"),
-	"︙": picoTextCode("066931933935"),
 
+	"（": picoTextCode("066941932933934945"),
+	"）": picoTextCode("066921932933934925"),
 	"・": picoTextCode("066933"),
 	"＿": picoTextCode("066"),
 };
 const bracketCharSprites = { // Bracket char sprite table.
-	"（": picoTextCode("066941932933934945"),
-	"）": picoTextCode("066921932933934925"),
+	"︙": picoTextCode("066931933935"),
+	"…": picoTextCode("066913933953"),
 	"「": picoTextCode("066931941951932933"),
 	"」": picoTextCode("066933934915925935"),
 	//"＜": picoTextCode("066941932923934945"),
@@ -449,6 +448,7 @@ window.addEventListener("load", async (evt) => {
 	// Numbers and alphabets.
 	chars[0] = numberChars;
 	chars[0] += alphabetChars;
+	chars[0] += "    ";
 	for (let c in alphabetCharSprites) {
 		picoCharSprite(c, alphabetCharSprites[c]);
 		chars[0] += c[0];
@@ -457,6 +457,7 @@ window.addEventListener("load", async (evt) => {
 	// Numbers and alphabets.
 	chars[1] = numberChars;
 	chars[1] += alphabetChars;
+	chars[1] += "    ";
 	//chars[1] += morsecodeChars;
 	for (let c in playingCardSprites) {
 		picoCharSprite(c, playingCardSprites[c]);
@@ -466,20 +467,20 @@ window.addEventListener("load", async (evt) => {
 		picoCharSprite(c, playingDiceSprites[c]);
 		chars[1] += c[0];
 	}
-	for (let c in symbol3x5CharSprites1) {
-		picoCharSprite(c, symbol3x5CharSprites1[c]);
-		chars[1] += c[0];
-	}
-	for (let c in symbol3x5CharSprites2) {
-		picoCharSprite(c, symbol3x5CharSprites2[c]);
-		chars[1] += c[0];
-	}
 	for (let c in symbol3x5CharSprites3) {
 		picoCharSprite(c, symbol3x5CharSprites3[c]);
 		chars[1] += c[0];
 	}
 	for (let c in symbol3x5CharSprites4) {
 		picoCharSprite(c, symbol3x5CharSprites4[c]);
+		chars[1] += c[0];
+	}
+	for (let c in symbol3x5CharSprites1) {
+		picoCharSprite(c, symbol3x5CharSprites1[c]);
+		chars[1] += c[0];
+	}
+	for (let c in symbol3x5CharSprites2) {
+		picoCharSprite(c, symbol3x5CharSprites2[c]);
 		chars[1] += c[0];
 	}
 
@@ -493,6 +494,7 @@ window.addEventListener("load", async (evt) => {
 		picoCharSprite(c, katakanaExtraCharSprites[c]);
 		chars[2] += c[0];
 	}
+	chars[2] += "    ";
 	// Katagana chars.
 	for (let c in katagana5x5CharSprites) {
 		picoCharSprite(c, katagana5x5CharSprites[c]);
@@ -506,6 +508,7 @@ window.addEventListener("load", async (evt) => {
 		picoCharSprite(c, symbol3x5CharSprites2[c]);
 		chars[3] += c[0];
 	}
+	chars[3] += "    ";
 	chars[3] += alphabetChars;
 
 	// Hirakana chars.
@@ -526,6 +529,7 @@ window.addEventListener("load", async (evt) => {
 		picoCharSprite(c, symbol3x5CharSprites4[c]);
 		chars[4] += c[0];
 	}
+	chars[4] += "    ";
 	// Hiragana chars.
 	for (let c in hiragana5x6CharSprites) {//hiragana5x5CharSprites) {
 		picoCharSprite(c, hiragana5x6CharSprites[c]);//hiragana5x5CharSprites[c]);
@@ -539,6 +543,7 @@ window.addEventListener("load", async (evt) => {
 		picoCharSprite(c, dotmarkCharSprites[c]);
 		chars[5] += c[0];
 	}
+	chars[5] += "    ";
 	for (let c in playingCardSprites) {
 		picoCharSprite(c, playingCardSprites[c]);
 		chars[5] += c[0];
