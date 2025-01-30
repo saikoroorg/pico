@@ -55,8 +55,7 @@ async function picoResize(width=0, height=0) {
 //   r,g,b: 8bit value(0~255) of red,green,blue color.
 //  offset: Offset of colors for sprite data.
 //   0 = N colors for sprite data 0~N-1
-//   10 = N(~52) colors for sprite data 10(a)~61(Z)
-//   36 = N(~26) colors for sprite data 36(A)~61(Z)
+//   10 = N(~52) colors for sprite data 10(A)~35(Z),36(a)~61(z)
 async function picoColor(colors=null, offset=0) {
 	try {
 		await pico.image.color(colors, offset);
