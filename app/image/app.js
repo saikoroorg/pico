@@ -1,10 +1,10 @@
 const title = "Image"; // Title.
 var colors = [ // Colors.
 	// 0:White(111), 1:LightGray(333), 2:Gray(222), 3:DarkGray(444),
-	255,255,255, 191,191,191, 127,127,127, 63,63,63,
 	// 4:Red(P06), 5:Blue(0I9), 6:Green(0N4),
-	231,0,95, 0,119,239,  0,151,63,
 	// 7:Gold(332), 8:Silver(555), 9:Black(000),
+	255,255,255, 191,191,191, 127,127,127, 63,63,63,
+	231,0,95, 0,119,239,  0,151,63,
 	191,191,127, 223,223,223, 0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
 var width = 7, height = 7; // Canvas size.
@@ -21,8 +21,8 @@ var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = 7;//colors.length/3; // Color count.
 const maxcolor = 10; // Color max count.
-const coffset = 35; // Color index offset. (35=BG, 36=A, ...)
-var bgcolor = coffset; // Bg color -1 if transparent.
+const coffset = 10; // Color index offset. (10=A, ...)
+var bgcolor = 0; // Bg color -1 if transparent.
 var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting.
 var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
 
@@ -214,7 +214,7 @@ var pixeltouchmoving = 0; // Pixel touching on view mode.
 var pixeltouchmoved = 0; // Pixel touch moved on view mode.
 var colortouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var colorholding = 0; // 0:untouched, 1+:touching.
-var colorselecting = 0; // Touching color index.
+var colorselecting = -1; // Touching color index.
 var frametouching = 0; // -1:invalid, 0:untouched, 1:touching.
 var frameholding = 0; // 0:untouched, 1+:holding count.
 var frameselecting = -1; // Selecting frame index.
@@ -241,6 +241,7 @@ async function appLoad() {
 	// Initialize sprites.
 	let char0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	let char1 = "00" + "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
+	picoCharSprite("@", picoStringCode6(char0 + picoCode6Char(0) + char1));
 	for (let i = 0; i < maxcolor; i++) {
 		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1));
 	}
@@ -249,7 +250,7 @@ async function appLoad() {
 	for (let j = 0; j < maxheight; j++) {
 		pixels[j] = [];
 		for (let i = 0; i < maxwidth; i++) {
-			pixels[j][i] = coffset;
+			pixels[j][i] = 0;
 		}
 	}
 
@@ -274,8 +275,8 @@ async function appLoad() {
 						colors[k0+i] = code8[k1+i];
 					}
 				}
-				colorselecting = 0;
-				bgcolor = colorvalue < 0 ? -1 : coffset; // -1: Transparent bg color.
+				colorselecting = -1;
+				bgcolor = colorvalue < 0 ? -1 : 0; // -1: Transparent bg color.
 				console.log("Load color: " + colors + " " + depth);
 
 			// Load pixels.
@@ -426,7 +427,8 @@ async function appMain() {
 	const numberbutton2angle = 0, numberbutton2x = -numberwidth/2, numberbutton2y = 0; // Color number button angle and offset.
 
 	// Set colors data.
-	picoColor(colors.slice(0,depth*3), coffset);
+	picoColor(colors.slice(0,3), 0); // Bg color.
+	picoColor(colors.slice(3,depth*3), coffset);
 
 	/*// Draw background.
 	//picoRect(4, 0, 0, 200, 200);
@@ -527,13 +529,13 @@ async function appMain() {
 				// Start to touching background.
 				if (colortouching == 0) {
 					console.log("Touching background.");
-					colorselecting = 0;
+					colorselecting = -1;
 					colorholding = 0;
 
 				// Hovering from another color.
 				} else if (colorselecting != 0) {
 					console.log("Touching another background.");
-					colorselecting = 0;
+					colorselecting = -1;
 					colorholding = 0;
 
 				// Continue touching background.
@@ -552,7 +554,7 @@ async function appMain() {
 							colors[k0+0] = colors[k0+1] = colors[k0+2] = 255;
 							colors[k1+0] = colors[k1+1] = colors[k1+2] = 0;
 						}
-						bgcolor = colors[k0+0] == 0 ? -1 : coffset;
+						bgcolor = colors[k0+0] == 0 ? -1 : 0;
 						appUpdate(); // Update thumbnail.
 						picoBeep(1.2, 0.1);
 						colortouching = -1;
@@ -714,7 +716,7 @@ async function appMain() {
 		}
 
 		// Draw background of coloreditor.
-		picoRect(coffset, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
+		picoRect(0, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 
 		// Touching frame buttons.
 		{
@@ -840,9 +842,9 @@ async function appMain() {
 
 					// Touching down-arrow on view mode.
 					if (animetouchmovey < 0) {
-						canvas += picoCode6Char(coffset);
+						canvas += "@";
 					} else {
-						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coffset);
+						canvas += pixels[j][i] ? picoCode6Char(pixels[j][i]) : "@";
 					}
 
 				// Update canvas on editor mode.
@@ -855,7 +857,7 @@ async function appMain() {
 						colortouching = -1;
 
 						// Put pixel.
-						if (!colorselecting) {
+						if (colorselecting < 0) {
 							pixels[j][i] = 0;
 						} else if (pixels[j][i] != coffset+colorselecting) {
 							pixels[j][i] = coffset+colorselecting;
@@ -868,10 +870,10 @@ async function appMain() {
 							picoFlush();
 						}
 
-						picoRect(pixels[j][i] ? pixels[j][i] : coffset, x, y, pixelsgrid, pixelsgrid);
+						picoRect(pixels[j][i] ? pixels[j][i] : 0, x, y, pixelsgrid, pixelsgrid);
 						canvas += " ";
 					} else {
-						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coffset);
+						canvas += pixels[j][i] ? picoCode6Char(pixels[j][i]) : "@";
 					}
 				}
 			}
@@ -1087,7 +1089,7 @@ async function appMain() {
 					let sprite = buffers[i] ? buffers[i] : [0,6,6];
 					let animewidth = picoSpriteSize(sprite); // Width of 1 frame block.
 					let animescale = (animegrid - animemargin) / animewidth; // Anime scale.
-					picoSprite(sprite, coffset, x, y, 0, animescale); // Unselecting frames.
+					picoSprite(sprite, 0, x, y, 0, animescale); // Unselecting frames.
 				}
 			}
 		}
@@ -1096,8 +1098,8 @@ async function appMain() {
 	// Draw colors.
 	if (!colorflag) {
 
-		for (let i = 1; i < depth; i++) {
-			let x = colorsposx + (i - depth/2) * colorsgrid; // Margins for each color.
+		for (let i = 0; i < depth-1; i++) {
+			let x = colorsposx + (i - depth/2 + 1) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
 			if (colortouching >= 0 && picoAction(x, colorsposy, colorsgrid/2, colorsheight/2)) {
