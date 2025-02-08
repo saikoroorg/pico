@@ -1,11 +1,11 @@
 const title = "Sound"; // Title.
 var colors = [ // Colors.
-	// 0:White(111), 1:LightGray(333), 2:Gray(222),
-	255,255,255, 191,191,191, 127,127,127,
-	// 2:Gold(332), 3:Red(p06), 4:Blue(0i9), 5:Green(0n4),
-	191,191,127, 231,0,95, 0,119,239,  0,151,63, 
-	// 7:Black(000),
-	0,0,0];
+	// 0:White(111), 
+	255,255,255, 
+	// 1:Red(P06), 2:Blue(0I9), 3:Green(0N4), 4:Gold(332),
+	231,0,95, 0,119,239,  0,151,63, 191,191,127,
+	// 5:LightGray(333), 6:Gray(222),	7:Black(000),
+	191,191,191, 127,127,127, 0,0,0];
 const maxwidth = 64, maxheight = 64; // Canvas max size.
 var width = 16, height = 16; // Canvas size.
 var xoffset = picoDiv(maxwidth - width, 2); // Pixels x-index offset.
@@ -21,18 +21,20 @@ var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = 5;//colors.length/3; // Color count.
 //const maxcolor = 10; // Color max count.
-const coffset = 34; // Color index offset. (34=BG1, 35=BG2, 36=A, ...)
-const maxextra = 3; // Extra mark count. (+0=BG1, +1=BG2, +2=Dash)
-const maxtimbre = 4; // Timbres max count. (+3,+4,+5,+6)
+const coffset = 9; // Color index offset. (9=BG,10=A, ...)
+const bgchar = "#"; // Bg char.
+const linechar = "="; // Line char.
+const maxtimbre = 4; // Timbres max count.
+const maxextra = 1; // Extra mark count.
 var timbres = [ // Timbres.
 		16+1,   0, 4+16, // Pulse1, Pitch+0, Volume:12/16-1
 		16+3,   0, 4+16, // Pulse3, Pitch+0, Volume:12/16-1
 		32+15,  0, 0+16, // Triangle15, Pitch+0, Volume:16/16-1
 		48+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
 ];
-const toffset = 10; // Timbre index offset. (10=a, .. 36=A, ...)
+const toffset = 10; // Timbre index offset. (10=A, ...)
 const tscale = [0,2,3,5,7,8,10, 1,4,6,9,11,]; // Sound scale.
-var bgcolor = coffset; // Bg color -1 if transparent.
+var bgcolor = 0; // Bg color -1 if transparent.
 var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting.
 var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
 const maxspeed = 30; // Beat max speed.
@@ -262,10 +264,10 @@ async function appLoad() {
 	picoTitle(title);
 
 	// Initialize char sprites.
-	//  Block: "044" + x "00,044"
-	//  Staff: "066,011,044" + x + "13,060"
-	//  Dash:  "044,000,044" + x + "12,020"
-	//  Sharp: "044" + x + "00,044" + "012,020,021,002"
+	//  Block: block0("044") + x + block1("00,044")
+	//  Staff: staff0("066,011,044") + x + staff1("13,060")
+	//  Dash:  dash0("044,000,044") + x + dash1("12,020")
+	//  Sharp: block0("044") + x + block1("00,044") + sharp2("012,020,021,002")
 	let block0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	let block1 = "000" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	let staff0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
@@ -275,22 +277,24 @@ async function appLoad() {
 	let dash1 = "1" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) + "0";
 	let sharp2 = "01" + picoCodeChar((blockwidth-1)/2) + "0" + picoCodeChar(blockwidth-3) +
 	             "00" + picoCodeChar((blockwidth-1)/2) + "100" + picoCodeChar(blockwidth-3);
-	sprites[coffset+0] = picoStringCode6(staff0 + picoCode6Char(coffset+0) + staff1);
-	sprites[coffset+1] = picoStringCode6(block0 + picoCode6Char(coffset+1) + block1);
-	sprites[coffset+2] = picoStringCode6(block0 + picoCode6Char(coffset+2) + block1);
-	for (let i = coffset+maxextra; i < coffset+maxextra+maxtimbre; i++) {
-		sprites[i] = picoStringCode6(block0 + picoCode6Char(i) + block1);
-		sprites[i+maxtimbre] = picoStringCode6(block0 + picoCode6Char(i) + block1 + sharp2);
+	picoCharSprite(bgchar, picoTextCode(block0 + picoCodeChar(coffset+0) + block1)); // White.
+	picoCharSprite(linechar, picoTextCode(block0 + picoCodeChar(coffset+5) + block1)); // LightGray.
+	for (let i = 1; i <= maxtimbre; i++) {
+		sprites[i] = picoTextCode(block0 + picoCodeChar(coffset+i) + block1);
+		sprites[i+maxtimbre] = picoTextCode(block0 + picoCodeChar(coffset+i) + block1 + sharp2);
 	}
-	for (let i = coffset; i < coffset+maxextra+maxtimbre*2; i++) {
-		picoCharSprite(picoCode6Char(i), sprites[i]);
+	for (let i = 1; i <= maxtimbre; i++) {
+		picoCharSprite(picoCodeChar(coffset+i), sprites[i]);
+		picoCharSprite(picoCodeChar(coffset+i+maxtimbre), sprites[i+maxtimbre]);
 	}
+	sprites[maxtimbre*2+1] = picoTextCode(block0 + picoCodeChar(coffset+6) + block1); // Gray.
+	picoCharSprite(picoCodeChar(coffset+maxtimbre*2+1), sprites[maxtimbre*2+1]);
 
 	// Initialize pixels on max size.
 	for (let j = 0; j < maxheight; j++) {
 		pixels[j] = [];
 		for (let i = 0; i < maxwidth; i++) {
-			pixels[j][i] = coffset;
+			pixels[j][i] = 0;
 		}
 	}
 
@@ -319,7 +323,7 @@ async function appLoad() {
 				}*/
 
 				colorselecting = 0;
-				bgcolor = colorvalue < 0 ? -1 : coffset; // -1: Transparent bg color.
+				bgcolor = colorvalue < 0 ? -1 : 0; // -1: Transparent bg color.
 				console.log("Load timbres: " + timbres + " " + depth);
 
 			// Load pixels.
@@ -597,7 +601,7 @@ async function appMain() {
 							colors[k0+0] = colors[k0+1] = colors[k0+2] = 255;
 							colors[k1+0] = colors[k1+1] = colors[k1+2] = 0;
 						}
-						bgcolor = colors[k0+0] == 0 ? -1 : coffset;
+						bgcolor = colors[k0+0] == 0 ? -1 : 0;
 						appUpdate(); // Update thumbnail.
 						picoBeep(1.2, 0.1);
 						colortouching = -1;
@@ -883,9 +887,9 @@ async function appMain() {
 
 					// Touching down-arrow on view mode.
 					if (animetouchmovey < 0) {
-						canvas += picoCode6Char(coffset);
+						canvas += bgcolor0;
 					} else {
-						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coffset);
+						canvas += pixels[j][i] ? picoCodeChar(pixels[j][i]) : bgchar;
 					}
 
 				// Update canvas on editor mode.
@@ -913,7 +917,7 @@ async function appMain() {
 							pixels[j][i] = 0;
 							// Remove all continuous dash mark.
 							for (let i1 = i+1; i1 < xoffset + width; i1++) {
-								if (pixels[j][i1] == coffset+2) {
+								if (pixels[j][i1] == coffset+maxtimbre*2+1) {
 									pixels[j][i1] = 0;
 								} else {
 									break;
@@ -933,7 +937,7 @@ async function appMain() {
 						} else if (pixeltouchmoved) {
 							if (pixeltouchmovey == 0 && (pixeltouchmovex == 0 || pixeltouchmovex == -1)) {
 								//console.log("Put extra pixels: " + pixeltouching + " " + pixels[j][i]);
-								pixels[j][i] = coffset+2; // Dash mark.
+								pixels[j][i] = coffset+maxtimbre*2+1; // Dash mark.
 							} else {
 								pixeltouching = -1; // Touch end.
 							}
@@ -954,15 +958,15 @@ async function appMain() {
 
 					// Draw note.
 					} else if (pixels[j][i]) {
-						canvas += picoCode6Char(pixels[j][i] ? pixels[j][i] : coffset);
+						canvas += pixels[j][i] ? picoCodeChar(pixels[j][i]) : bgchar;
 
-					// Draw staff line.
+					// Draw line.
 					} else if (j == yoffset+3 || j == yoffset+5 || j == yoffset+7 || j == yoffset+9 || j == yoffset+11) {
-						canvas += picoCode6Char(coffset+1);
+						canvas += linechar;
 
 					// Draw background.
 					} else {
-						canvas += picoCode6Char(coffset+0);
+						canvas += bgchar;
 					}
 				}
 			}
@@ -1074,7 +1078,7 @@ async function appMain() {
 					let text = await picoClipboard();
 					if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
 						console.log("Load from clipboard:" + text);
-						clipboard = picoStringCode6(text);
+						clipboard = picoTextCode(text);
 					}
 
 					// Paste from clipboard.
@@ -1187,8 +1191,8 @@ async function appMain() {
 	// Draw colors.
 	if (!colorflag) {
 
-		for (let i = 0; i < depth-1; i++) {
-			let x = colorsposx + (i - (depth-2)/2) * colorsgrid; // Margins for each color.
+		for (let i = 1; i < depth; i++) {
+			let x = colorsposx + (i - depth/2) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
 			if (colortouching >= 0 && picoAction(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1200,7 +1204,7 @@ async function appMain() {
 					appUpdate(true);
 				}
 				picoBeep(0, 0.1);
-				picoChar(picoCode6Char(coffset+maxextra+i), -1, x, colorsposy, 0, colorsscale2);
+				picoChar(picoCodeChar(coffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1213,12 +1217,12 @@ async function appMain() {
 					console.log("Touching color.");
 					colortouching = 1;
 					colorholding = 0;
-					colorselecting = maxextra+i;
+					colorselecting = i;
 
 				// Hovering to another color.
-				} else if (colorselecting != maxextra+i) {
+				} else if (colorselecting != i) {
 					console.log("Touching another color.");
-					colorselecting = maxextra+i;
+					colorselecting = i;
 					colorholding = 0;
 
 				// Continue touching color.
@@ -1235,17 +1239,17 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				picoChar(picoCode6Char(coffset+maxextra+i), -1, x, colorsposy, 0, colorsscale1);
+				picoChar(picoCodeChar(coffset+i), -1, x, colorsposy, 0, colorsscale1);
 
 			} else {
 
 				// Not touching but selecting color.
-				if (colorselecting == maxextra+i) {
-					picoChar(picoCode6Char(coffset+maxextra+i), -1, x, colorsposy, 0, colorsscale2);
+				if (colorselecting == i) {
+					picoChar(picoCodeChar(coffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 				// Other colors.
 				} else {
-					picoChar("-", coffset+maxextra+i, x, colorsposy, 0, colorsscale0);
+					picoChar("-", coffset+i, x, colorsposy, 0, colorsscale0);
 				}
 			}
 		}
@@ -1357,13 +1361,13 @@ async function appMain() {
 
 			let i = xoffset+picoDiv(testing-1,count) - 1;
 			for (let j = yoffset; j < yoffset+height; j++) {
-				let index = pixels[j][i] - coffset - maxextra;
+				let index = pixels[j][i] - coffset;
 				if (index >= 0) {
 
 					// Calclate sound length.
 					let length = baselength;
 					for (let k = i+1; k < xoffset+width; k++) {
-						let index2 = pixels[j][k] - coffset - maxextra;
+						let index2 = pixels[j][k] - coffset;
 						//console.log("Sound length: " + i + "->" + k + "," + index + "->" + index2);
 						if (index2 == -1) {
 							length += baselength;
