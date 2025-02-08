@@ -28,8 +28,9 @@ async function picoStop() {
 }
 
 // Play pulse melody.
-// pattern = 0 or 1(0.125), 3(0.25), 7(0.5) (8bit original parameter)
-// pitches = -3.6(A1:54.6Hz) .. 7.0(G9:12.4kHz)
+//  pattern: 0=1(Square), 3(Pulse with duty ratio 1:3), 7(Pulse with duty ratio 1:7)
+//  length: msecs, volumes: 0(Max), 1(15/16), ~ 15(1/16)
+//  pitch/pitches: -36(A1:54.6Hz), ~ 0(A4:440Hz), ~ 70(G9:12.4kHz)
 async function picoPulse(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=null) {
 	try {
 		await pico.sound.playPulse(pattern, length, pitch, volumes, pitches);
@@ -39,8 +40,9 @@ async function picoPulse(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=nu
 }
 
 // Play triangle melody.
-// pattern = 0 or 15 (8bit original parameter)
-// pitches = -4.8(A0:27.3Hz) .. 8.4(A11:55.9kHz)
+//  pattern: 0, 15(Pseudo triangle by 1/16 cycle)
+//  length: msecs, volumes: 0(Max), 1(15/16), ~ 15(1/16)
+//  pitch/pitches: -48(A0:27.3Hz), ~ 0(A4:440Hz), ~ 84(A11:55.9kHz)
 async function picoTriangle(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=null) {
 	try {
 		await pico.sound.playTriangle(pattern, length, pitch, volumes, pitches);
@@ -50,9 +52,10 @@ async function picoTriangle(pattern=0, length=0.1, pitch=0, volumes=[1], pitches
 }
 
 // Play noise melody.
-// pattern = 0 or 1, 6 (8bit original parameter)
-// pitches = -7.9(D-3), -6.7(D-2), -5.5(D-1), -5.0(G-1), -4.3(D0), -3.8(G0), -3.1(D1),
-//           -2.5?(F1#?), -2.3(A2#), -0.7(D3), -0.2(G3), 0.5(D4), 1.7(D5), 2.9(D6), 4.1(D7), 5.3(D8)
+//  pattern: 0, 1(Pseudo random noize), 6(High frequency pseudo random noize)
+//  length: msecs, volumes: 0(Max), 1(15/16), ~ 15(1/16)
+//  pitch/pitches: -79(D-3), -67(D-2), -55(D-1), -50(G-1), -43(D0), -38(G0), -31(D1),
+//           -25(F1#), -23(A2#), -07(D3), -02(G3), 05(D4), 17(D5), 29(D6), 41(D7), 53(D8)
 async function picoNoise(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=null) {
 	try {
 		await pico.sound.playNoise(pattern, length, pitch, volumes, pitches);
@@ -62,12 +65,45 @@ async function picoNoise(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=nu
 }
 
 // Set timbre pallete.
+//  timbres: [pattern0,pitch0,volume0, pattern1,pitch1,volume1, ~]
+//   patterns: 0~15=Reserved, 16~31=Noise, 32~47=Triangle, 48~63=Pulse
+//    16+0(g)=Noise0,    16+1(h)=Noise1,     16+6(m)=Noise6
+//    32+0(w)=Triangle0, 32+15(L)=Triangle15
+//    48+0(M)=Pulse0,    48+1(N)=Pulse1,     48+3(P)=Pulse3, 48+7(T)=Pulse7
+//   pitches: Pitch modulation(0~48)
+//    0=Pitch+0, 1=Pitch-1, 2=Pitch-2, ~ 12=Pitch-12(-1 octave), ~
+//   volumes: Volume(0=Max~15=Min) + Volume attenuation(0,16,32,48)
+//    0=16/16, 2=14/16, 4=12/16, 6=10/16, 8=8/16, ~
+//    16+0(g)=16/16-1, 16+2(i)=14/16-1, 16+4(k)=12/16-1, 16+6(m)=10/16-1, 16+8(o)=8/16-1, ~
+//    32+0(w)=16/16-2, 32+2(y)=14/16-2, 32+4(A)=12/16-2, 32+6(C)=10/16-2, 32+8(E)=8/16-2, ~
+//    48+0(M)=16/16-3, 48+2(O)=14/16-3, 48+4(Q)=12/16-3, 48+6(S)=10/16-3, 48+8(U)=8/16-3, ~
+//  scales: Sound scales [pitch0, ~ pitchN-1]
+//   [0,2,3,5,7,8,10, 1,4,6,9,11] = A natural minor scale
+//   (La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+)
+//  offset: Offset of timbres for melody data.
+//   0 = 11 notes and 1 rest for melody data 0~12
+//   10 = (11 notes and 1 rest)x4 for melody data 10(a)~61(Z)
+//    Timbre0 -> 10-21(abcdefg,hijkl) + Rest=22(m)
+//    Timbre1 -> 23-34(nopqrst,uvwxy) + Rest=35(z)
+//    Timbre2 -> 36-47(ABCDEFG,HIJKL) + Rest=48(M)
+//    Timbre3 -> 49-60(NOPQRST,UVWXY) + Rest=61(Z)
 async function picoTimbre(timbres=null, scales=null, offset=0) {
 	pico.sound.timbre(timbres, scales, offset);
 }
 
 // Play melody.
-async function picoMelody(melody=[-1,0,0]) {
+//  melody: [data0, data1, ~] or
+//          [0(reserved), speed, 0(reserved), data0, data1, ~]
+//   speed: bit/sec (6bit=1beat(quarter note))
+//    15 bit/sec = 15/6 beat/sec = 150 bpm
+//   data: [tone0,modulation0,length0, tone1,modulation1,length1, ~]
+//    tone: Timbres with pitch.
+//     0(a) = Timbre0 of pitch0, 38(C) = Timbre2 of pitch2
+//    modulation: Scale down modulation.
+//     0 = Default scale, 12 = 1 octave down scale, 24 = 2 octave down scale
+//    length: Beat length by 1/6 beat.
+//     6 = quarter note, 12 = half note, 3 = eighth note
+async function picoMelody(melody=[]) {
 	try {
 		await pico.sound.playMelody(melody);
 	} catch (error) {
@@ -87,7 +123,7 @@ pico.Sound = class {
 	static maxvolume = 0.1; // Max volume.
 
 	// Default timbres. (48=Pulse0, 0=No modulation, 0=Max volume without attenuation)
-	// [pattern0, pitch0, volume0,  pattern1, pitch1, volume1,  ..]
+	// [pattern0, pitch0, volume0,  pattern1, pitch1, volume1, ~]
 	//  patterns: 16~31=Noise, 32~47=Triangle, 48~63=Pulse
 	//  pitches: Pitch modulation(0~48)
 	//  volumes: Volume(0~15) + Volume attenuation(0,16,32,48)
@@ -215,7 +251,7 @@ pico.Sound = class {
 	}
 
 	// Play melody.
-	playMelody(melody=[-1,0,0]) {
+	playMelody(melody=[]) {
 		const minpitch = 4; // Base pitch index.
 		const baselength = 60 / 6; // Base length = 60 seconds (= 1 minute) / 6 (= 1 note length).
 		const pitchlength = 12; // Pitch difference on 1 octave.
@@ -479,7 +515,7 @@ pico.Sound = class {
 			return Promise.reject();
 		}
 
-		// 8bit original argorithm and parameter: pattern=1(0.5),3(0.25),7(0.125)
+		// Pulse sound.
 		if (pattern > 0) {
 
 			// Create oscillator.
@@ -556,14 +592,14 @@ pico.Sound = class {
 			return Promise.reject();
 		}
 
-		// 8bit original argorithm and parameter: pattern=15
+		// Pseudo triangle sound.
 		if (pattern > 0) {
 
 			// Create triangle buffers.
 			let triangleBuffer = null;
 			triangleBuffer = this.context.createBuffer(1, this.context.sampleRate * length, this.context.sampleRate);
 
-			// 8bit original pseudo triangle argorithm.
+			// Pseudo triangle argorithm.
 			let frequency = pico.Sound.frequency * (pitch ? 2 ** (pitch * 100 / 1200) : 1);
 			let triangleCycle = 2 * Math.PI, value = 0;
 			//console.log("Create triangle buffers " + pattern + ": " + pitch + "=" + frequency);
@@ -652,7 +688,7 @@ pico.Sound = class {
 		let noiseBuffer = null;
 		noiseBuffer = this.context.createBuffer(2, this.context.sampleRate * length, this.context.sampleRate);
 
-		// 8bit original argorithm and parameter: pattern=1,6
+		// Pseudo random noise argorithm.
 		if (pattern > 0) {
 			let reg = 0x8000;
 			for (let j = 0; j < noiseBuffer.numberOfChannels; j++) {

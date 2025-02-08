@@ -80,19 +80,7 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 //*/
 
 //*/
-
-	// Timbres = [pattern0, pitch0, volume0, pattern1, pitch1, volume1, ..]
-	//  patterns: 16~31=Noise, 32~47=Triangle, 48~63=Pulse
-	//   16+0(g)=Noise0,    16+1(h)=Noise1,     16+6(m)=Noise6
-	//   32+0(w)=Triangle0, 32+15(L)=Triangle15
-	//   48+0(M)=Pulse0,    48+1(N)=Pulse1,     48+3(P)=Pulse3, 48+7(T)=Pulse7
-	//  pitches: PitchModulation(0~48)
-	//   0=Pitch+0, 1=Pitch-1, 2=Pitch-2, .. 12=Pitch-12(1 octave), ..
-	//  volumes: Volume(0~15) + VolumeAttenuation(0,16,32,48)
-	//   0=16/16, 2=14/16, 4=12/16, 6=10/16, 8=8/16, ..
-	//   16+0(g)=16/16-1, 16+2(i)=14/16-1, 16+4(k)=12/16-1, 16+6(m)=10/16-1, 16+8(o)=8/16-1, ..
-	//   32+0(w)=16/16-2, 32+2(y)=14/16-2, 32+4(A)=12/16-2, 32+6(C)=10/16-2, 32+8(E)=8/16-2, ..
-	//   48+0(M)=16/16-3, 48+2(O)=14/16-3, 48+4(Q)=12/16-3, 48+6(S)=10/16-3, 48+8(U)=8/16-3, ..
+	// Timbres.
 	const timbres24 = [
 		// TimbreGroup0 = Noise6 "m08,mc8,m0o,mco"
 		16+6,   0, 8,    // Noise6, Pitch+0, Volume:8/16
@@ -133,20 +121,16 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 		picoTextCode("N04,Nc4,N0k,Nck"), // Pulse1
 		picoTextCode("P04,Pc4,P0k,Pck"), // Pulse3
 	];
-	// Scales = [pitch0, ..., pitchN-1]
+	// Scales.
 	const scales = [
 		// A natural minor scale "023578a,1469b"
 		// (La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+)
 		0,2,3,5,7,8,10, 1,4,6,9,11,
 	];
-	// Data offset=10 -> timbres 0-3 = 10(a)-61(Z)
-	//  Timbre0: 10-21(abcdefg,hijkl) + Rest=22(m)
-	//  Timbre1: 23-34(nopqrst,uvwxy) + Rest=35(z)
-	//  Timbre2: 36-47(ABCDEFG,HIJKL) + Rest=48(M)
-	//  Timbre3: 49-60(NOPQRST,UVWXY) + Rest=61(Z)
+	// Data offset.
 	const offset = 10;
 
-	// Melodies = [0(reserved), speed, 0(reserved), molodies .. ]
+	// Melodies.
 	const melodies = [
 		picoTextCode("0f0"+
 			"M06A23,M09A23,M09A23,M09A23,M03"+
