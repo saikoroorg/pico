@@ -182,7 +182,7 @@ async function appMain() {
 					}
 					blocking = width * height;
 				} else if (x >= 0 && x < width && y >= 0 && y < height) {
-					if (w == 1 || w == 35 + 1) {
+					if (w == 1 || w == 9 + 1) {
 						if (pixels[players[0][1]][players[0][0]] >= 3) {
 							pixels[players[0][1]][players[0][0]] -= 1;
 						} else {
@@ -190,7 +190,7 @@ async function appMain() {
 						}
 						players[0] = [x, y];
 						pixels[y][x] = 1;
-					} else if (w == 2 || w == 35 + 2) {
+					} else if (w == 2 || w == 9 + 2) {
 						if (pixels[players[1][1]][players[1][0]] >= 3) {
 							pixels[players[1][1]][players[1][0]] -= 2;
 						} else {
@@ -198,7 +198,7 @@ async function appMain() {
 						}
 						players[1] = [x, y];
 						pixels[y][x] = 2;
-					} else if (w == 3 || w == 35 + 3) {
+					} else if (w == 3 || w == 9 + 3) {
 						pixels[players[0][1]][players[0][0]] = 0;
 						pixels[players[1][1]][players[1][0]] = 0;
 						players[0] = [x, y];
