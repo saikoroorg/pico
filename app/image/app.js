@@ -428,8 +428,7 @@ async function appMain() {
 	const numberbutton2angle = 0, numberbutton2x = -numberwidth/2, numberbutton2y = 0; // Color number button angle and offset.
 
 	// Set colors data.
-	picoColor(colors.slice(0,3), 0); // Bg color.
-	picoColor(colors.slice(3,depth*3), coffset);
+	picoColor(colors.slice(0,depth*3), coffset);
 
 	/*// Draw background.
 	//picoRect(4, 0, 0, 200, 200);
