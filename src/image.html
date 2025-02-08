@@ -41,16 +41,16 @@ const alphabetExtraCharSprites = { // Alphabet extra char sprite table.
 	":": picoTextCode("066932934"),
 	"/": picoTextCode("066941932933934925"),
 
-	"*": picoTextCode("066922942933924944"),
-	'@': picoTextCode("066922932942923943924934944"),
-	"+": picoTextCode("066932923933943934"),
-	"=": picoTextCode("066922932942924934944"),
-};
-const symbol3x5CharSprites = { // Symbol3x5 char sprite table.
 	"'": picoTextCode("066931932"),
 	",": picoTextCode("066934935"),
 	"!": picoTextCode("066931932933935"),
 	"?": picoTextCode("066921931941942933935"),
+};
+const symbol3x5CharSprites = { // Symbol3x5 char sprite table.
+	"+": picoTextCode("066932923933943934"),
+	"=": picoTextCode("066922932942924934944"),
+	"*": picoTextCode("066922942933924944"),
+	'@': picoTextCode("066922932942923943924934944"),
 
 	"&": picoTextCode("066932923933943924934944"),
 	"%": picoTextCode("066922932942923933943934"),
@@ -79,15 +79,13 @@ const katakanaExtraCharSprites = { // Katakana extra char sprite table.
 	"ー": picoTextCode("066913923933943953"),
 };
 const kataganaExtraCharSprites = { // Katagana extra char sprite table.
-	"ヴ": picoTextCode("066940960931941961912922932942952913953944925935"),
-	"○": picoTextCode("066921931941912952913953914954925935945"),
-	"△": picoTextCode("066931922942923943914954915925935945955"),//"▽": picoTextCode("066911921931941951912952923943924944935"),
-	"×": picoTextCode("066911951922942933924944915955"),
+	"「": picoTextCode("066931941951932933"),
+	"」": picoTextCode("066933934915925935"),
+	"…": picoTextCode("066913933953"),//"︙": picoTextCode("066931933935"),
+	"〜": picoTextCode("066922913933953944"),
 
-	"（": picoTextCode("066941932933934945"),
-	"）": picoTextCode("066921932933934925"),
-	"『": picoTextCode("066911921931941951912952913933943953914934915925935"),
-	"』": picoTextCode("066931941951932952913923933953914954915925935945955"),
+	//"『": picoTextCode("066911921931941951912952913933943953914934915925935"),
+	//"』": picoTextCode("066931941951932952913923933953914954915925935945955"),
 
 	"↑": picoTextCode("066931922932942913933953934935"),
 	"↓": picoTextCode("066931932913933953924934944935"),
@@ -99,15 +97,10 @@ const hirakanaExtraCharSprites = { // Hirakana extra char sprite table.
 	"゜": picoTextCode("066911921931912932913923933"),
 };
 const hiraganaExtraCharSprites = { // Hirakana extra char sprite table.
-	"、": picoTextCode("066914925"),
-	"。": picoTextCode("066913923933914934915925935"),
-	"…": picoTextCode("066913933953"),//"︙": picoTextCode("066931933935"),
-	"〜": picoTextCode("066922913933953944"),
-
-	"「": picoTextCode("066931941951932933"),
-	"」": picoTextCode("066933934915925935"),
-	"！": picoTextCode("066930931932933935"),
-	"？": picoTextCode("066920930940911951942933935"),
+	"×": picoTextCode("066911951922942933924944915955"),
+	"○": picoTextCode("066921931941912952913953914954925935945"),
+	"△": picoTextCode("066931922942923943914954915925935945955"),//"▽": picoTextCode("066911921931941951912952923943924944935"),
+	"□": picoTextCode("066911921931941951912952913953914954915925935945955"),
 
 	"＆♠︎": picoTextCode("066931922932942913923933943953914924934944954925935945"),
 	"％♥︎": picoTextCode("066921941912922932942952913923933943953924934944935"),
@@ -124,8 +117,9 @@ const hiraganaExtraCharSprites = { // Hirakana extra char sprite table.
 	"◀︎": picoTextCode("066941951922932942952913923933943953924934944954945955"),
 	"▶︎": picoTextCode("066911921912922932942913923933943953914924934944915925"),
 
+	"■": picoTextCode("066911921931941951912922932942952913923933943953914924934944954915925935945955"),
 	"●": picoTextCode("066921931941912922932942952913923933943953914924934944954925935945"),
-	"　": picoTextCode("066"),
+//	"　": picoTextCode("066"),
 };
 
 const katakana5x5CharSprites = { // Katakana5x5 char sprite table.
@@ -211,6 +205,11 @@ const katagana5x5CharSprites = { // Katagana5x5 char sprite table.
 	"プ": picoTextCode("066940950960911921931941961942952962953944925935"),
 	"ペ": picoTextCode("066940950960941961922942952962913933944955"),
 	"ポ": picoTextCode("066940950960931941961912922932942952962933914934954915935955"),
+
+	"ヴ": picoTextCode("066940960931941961912922932942952913953944925935"),
+	"　": picoTextCode("066"),
+	"（": picoTextCode("066941932933934945"),
+	"）": picoTextCode("066921932933934925"),
 };
 const hirakana5x5CharSprites = { // Hirakana5x5 char sprite table.
 	"あ": picoTextCode("066911921931941922913923933943914924944954915925935955"),
@@ -296,6 +295,11 @@ const hiragana5x5CharSprites = { // Hiragana5x5 char sprite table.
 	"ぺ": picoTextCode("066940950960941961922932942952962913943954"),
 	"ぽ": picoTextCode("066930940950960911941961912932942952962913943914934944954915935945"),
 //	"ゔ": picoTextCode("066940960921931941961922932942913953954935945"),
+
+	"、": picoTextCode("066914925"),
+	"。": picoTextCode("066913923933914934915925935"),
+	"！": picoTextCode("066931932933935"),
+	"？": picoTextCode("066921931941942933935"),
 };
 const hirakana5x6CharSprites = { // Hirakana5x6 char sprite table.
 	"あ": picoTextCode("066920911921931941951922932913923943914934954915925955"),
@@ -381,6 +385,11 @@ const hiragana5x6CharSprites = { // Hiragana5x6 char sprite table.
 	"ぺ": picoTextCode("066940950960941961922932942952962913943954"),
 	"ぽ": picoTextCode("066910930940950960911941961912932942952962913943914934944954915935945"),
 //	"ゔ": picoTextCode("066920930940960941961922932942913953954935945"),
+
+	"、": picoTextCode("066914925"),
+	"。": picoTextCode("066913923933914934915925935"),
+	"！": picoTextCode("066930931932933935"),
+	"？": picoTextCode("066920930940911951942933935"),
 };
 
 const extraCharAiliases = [ // Extra char ailiases.
