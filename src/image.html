@@ -36,11 +36,6 @@ const alphabetCharSprites = { // Alphabet char sprite table.
 	"z": picoTextCode("066922932942943934925935945"),
 };
 const symbol3x5CharSprites = { // Symbol3x5 char sprite table.
-	"'": picoTextCode("066931932"),
-	",": picoTextCode("066934935"),
-	'"': picoTextCode("066921941"),
-	"_": picoTextCode("066925945"),
-
 	"&": picoTextCode("066932923933943924934944"),
 	"%": picoTextCode("066922932942923933943934"),
 	"$": picoTextCode("066932942923933943934944"),
@@ -48,16 +43,14 @@ const symbol3x5CharSprites = { // Symbol3x5 char sprite table.
 	"*": picoTextCode("066922942933924944"),
 	'@': picoTextCode("066922932942923943924934944"),
 
-	":": picoTextCode("066932934"),
-	"/": picoTextCode("066941932933934925"),
+	"'": picoTextCode("066931932"),
+	",": picoTextCode("066934935"),
 	".": picoTextCode("066935"),
 	"-": picoTextCode("066923933943"),
-
 	"+": picoTextCode("066932923933943934"),
 	"=": picoTextCode("066922932942924934944"),
-	"<": picoTextCode("066941932923934945"),
-	">": picoTextCode("066921932943934925"),
-
+	":": picoTextCode("066932934"),
+	"/": picoTextCode("066941932933934925"),
 	"!": picoTextCode("066931932933935"),
 	"?": picoTextCode("066921931941942933935"),
 };
@@ -70,6 +63,12 @@ const reservedCharSprites= { // Reserved char sprite table.
 	"❻": picoTextCode("066911921931941951912932952913933953914934954915925935945955"),
 	//"❼": picoTextCode("066911921931941951912942952913953914944954915925935945955"),
 	//"❽": picoTextCode("066911921931941951912952913933953914954915925935945955"),
+	//"❾": picoTextCode("066911921931941951912922932942952913953914924934944954915925935945955"),
+	//"⓿": picoTextCode("066911921931941951912922942952913953914924944954915925935945955"),
+	"^": picoTextCode("066932923943"),
+	"~": picoTextCode("066923943934"),
+	"<": picoTextCode("066941932923934945"),
+	">": picoTextCode("066921932943934925"),
 };
 
 const katakanaExtraCharSprites = { // Katakana extra char sprite table.
@@ -123,15 +122,14 @@ const hiraganaExtraCharSprites = { // Hirakana extra char sprite table.
 	"*": picoTextCode("066922942933924944"),
 	'@': picoTextCode("066922932942923943924934944"),
 
-	":": picoTextCode("066932934"),
-	"/": picoTextCode("066941932933934925"),
+	"'": picoTextCode("066931932"),
+	",": picoTextCode("066934935"),
 	".": picoTextCode("066935"),
 	"-": picoTextCode("066923933943"),
 	"+": picoTextCode("066932923933943934"),
 	"=": picoTextCode("066922932942924934944"),
-	"<": picoTextCode("066941932923934945"),
-	">": picoTextCode("066921932943934925"),
-
+	":": picoTextCode("066932934"),
+	"/": picoTextCode("066941932933934925"),
 	"!": picoTextCode("066931932933935"),
 	"?": picoTextCode("066921931941942933935"),
 };
@@ -468,11 +466,11 @@ window.addEventListener("load", async (evt) => {
 	// Numbers and alphabets.
 	chars[1] += alphabetChars;
 	//chars[1] += "    ";
-	//chars[1] += numberChars;
-	for (let c in reservedCharSprites) {
-		picoCharSprite(c, reservedCharSprites[c]);
-		chars[1] += c[0];
-	}
+	chars[1] += numberChars;
+	//for (let c in reservedCharSprites) {
+	//	picoCharSprite(c, reservedCharSprites[c]);
+	//	chars[1] += c[0];
+	//}
 	for (let c in symbol3x5CharSprites) {
 		picoCharSprite(c, symbol3x5CharSprites[c]);
 		chars[1] += c[0];
