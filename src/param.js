@@ -429,7 +429,7 @@ pico.Param = class {
 		this.context[key] = numbers.join(separator);
 	}
 
-	// Get number 6bit array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	// Get number 6bit array: 0-9 A-Z(10-35) a-z(36-61) .(62) -(63)
 	_stringCode(str) {
 		let results = [];
 		if (str) {
@@ -437,10 +437,10 @@ pico.Param = class {
 				let c = str.charCodeAt(i);
 				if ("0".charCodeAt(0) <= c && c <= "9".charCodeAt(0)) {
 					results.push(c - "0".charCodeAt(0));
-				} else if ("a".charCodeAt(0) <= c && c <= "z".charCodeAt(0)) {
-					results.push(c - "a".charCodeAt(0) + 10);
 				} else if ("A".charCodeAt(0) <= c && c <= "Z".charCodeAt(0)) {
-					results.push(c - "A".charCodeAt(0) + 36);
+					results.push(c - "A".charCodeAt(0) + 10);
+				} else if ("a".charCodeAt(0) <= c && c <= "z".charCodeAt(0)) {
+					results.push(c - "a".charCodeAt(0) + 36);
 				} else if (c == ".".charCodeAt(0)) {
 					results.push(62);
 				} else if (c == "-".charCodeAt(0)) {
@@ -451,16 +451,16 @@ pico.Param = class {
 		return results;
 	}
 
-	// Set number 6bit array: 0-9 a-z(10-35) A-Z(36-61) .(62) -(63)
+	// Set number 6bit array: 0-9 A-Z(10-35) a-z(36-61) .(62) -(63)
 	_codeString(code6) {
 		let result = "";
 		for (let i = 0; i < code6.length; i++) {
 			if (0 <= code6[i] && code6[i] < 10) {
 				result += code6[i];
 			} else if (10 <= code6[i] && code6[i] < 36) {
-				result += String.fromCharCode("a".charCodeAt(0) + code6[i] - 10);
+				result += String.fromCharCode("A".charCodeAt(0) + code6[i] - 10);
 			} else if (36 <= code6[i] && code6[i] < 62) {
-				result += String.fromCharCode("A".charCodeAt(0) + code6[i] - 36);
+				result += String.fromCharCode("a".charCodeAt(0) + code6[i] - 36);
 			} else if (code6[i] == 62) {
 				result += ".";
 			} else if (code6[i] == 63) {
