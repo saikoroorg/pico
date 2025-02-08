@@ -9,8 +9,8 @@ items = [
 	["shogi", "app/shogi/icon.svg", "app/shogi/app.js"],
 	["image", "app/image/icon.svg", "app/image/app.js"],
 	["sound", "app/sound/icon.svg", "app/sound/app.js"],
-	["text", "app/text/icon.svg", "app/text/app.js"],
-	["voxel", "app/voxel.svg", "app/voxel.js"],
-	["bros", "app/bros.svg", "app/bros.js"],
+	["voxel", "app/voxel/icon.svg", "app/voxel/app.js"],
+	["bros", "app/bros/icon.svg", "app/bros/app.js"],
+	["text", "app/text.svg", "app/text.js"],
 	["demo", "app/demo.svg", "app/demo.js"],
 ];
