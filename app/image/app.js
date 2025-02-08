@@ -428,8 +428,7 @@ async function appMain() {
 	const numberbutton2angle = 0, numberbutton2x = -numberwidth/2, numberbutton2y = 0; // Color number button angle and offset.
 
 	// Set colors data.
-	picoColor(colors.slice(0,3), 0); // Bg color.
-	picoColor(colors.slice(3,depth*3), coffset);
+	picoColor(colors.slice(0,depth*3), coffset);
 
 	/*// Draw background.
 	//picoRect(4, 0, 0, 200, 200);
@@ -530,13 +529,13 @@ async function appMain() {
 				// Start to touching background.
 				if (colortouching == 0) {
 					console.log("Touching background.");
-					colorselecting = -1;
+					colorselecting = 0;
 					colorholding = 0;
 
 				// Hovering from another color.
 				} else if (colorselecting != 0) {
 					console.log("Touching another background.");
-					colorselecting = -1;
+					colorselecting = 0;
 					colorholding = 0;
 
 				// Continue touching background.
