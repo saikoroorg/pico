@@ -51,6 +51,12 @@ async function picoResize(width=0, height=0) {
 }
 
 // Set image color pallete.
+//  colors: [r0,g0,b0, r1,g1,b1, ~]
+//   r,g,b: 8bit value(0~255) of red,green,blue color.
+//  offset: Offset of colors for sprite data.
+//   0 = N colors for sprite data 0~N-1
+//   10 = N(~52) colors for sprite data 10(a)~61(Z)
+//   36 = N(~26) colors for sprite data 36(A)~61(Z)
 async function picoColor(colors=null, offset=0) {
 	try {
 		await pico.image.color(colors, offset);
@@ -114,36 +120,45 @@ async function picoTextData(text, c=-1, width=0, height=0, scale=1, vscale=0) {
 }
 
 // Draw sprite.
-async function picoSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
+//  sprite: [data0, data1, ~] or
+//          [0(reserved), width-1, height-1, data0, data1, ~]
+//   width-1,height-1: Size(width-1,height-1) of sprite.
+//   data: [color0,x0,y0, color1,x1,y1, ~]
+//    color: Pixel color index of color pallete.
+//    x,y: Pixel position.
+//  bgcolor: Background color index. -1=Transparent
+//  x,y: Sprite position. angle: Sprite angle by degree.
+//  scale: Sprite scale. vscale: Sprite vertical scale. 0=Invalid
+async function picoSprite(sprite=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
 	try {
-		await pico.image.drawSprite(cells, bgcolor, x, y, angle, scale, vscale);
+		await pico.image.drawSprite(sprite, bgcolor, x, y, angle, scale, vscale);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Flip sprite.
-function picoSpriteFlip(cells=[-1,0,0], x=0, y=0, a=0) {
+function picoSpriteFlip(sprite=[-1,0,0], x=0, y=0, a=0) {
 	try {
-		return pico.image.spriteFlip(cells, x, y, a);
+		return pico.image.spriteFlip(sprite, x, y, a);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Get sprite size.
-function picoSpriteSize(cells=[-1,0,0]) {
+function picoSpriteSize(sprite=[-1,0,0]) {
 	try {
-		return pico.image._spriteSize(cells);
+		return pico.image._spriteSize(sprite);
 	} catch (error) {
 		console.error(error);
 	}
 }
 
 // Get sprite image data.
-async function picoSpriteData(cells=[-1,0,0], bgcolor=-1, scale=10) {
+async function picoSpriteData(sprite=[-1,0,0], bgcolor=-1, scale=10) {
 	try {
-		return await pico.image.offscreen.spriteData(cells, bgcolor, scale, pico.image);
+		return await pico.image.offscreen.spriteData(sprite, bgcolor, scale, pico.image);
 	} catch (error) {
 		console.error(error);
 	}
@@ -402,43 +417,43 @@ pico.Image = class {
 	}
 
 	// Flip splite.
-	spriteFlip(cells=[-1,0,0], x=0, y=0, a=0) {
+	spriteFlip(sprite=[-1,0,0], x=0, y=0, a=0) {
 		if (!x && !y && !a) {
-			return cells;
+			return sprite;
 		}
 		let flipped = [];
 		let i = 0, w = 1, h = 1;
-		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
-			w = cells[1] + 1;
-			h = cells[2] + 1;
-			flipped[0] = cells[0];
-			flipped[1] = cells[1];
-			flipped[2] = cells[2];
+		if (sprite[0] == 0 && sprite[1] >= 0 && sprite[2] >= 0) {
+			w = sprite[1] + 1;
+			h = sprite[2] + 1;
+			flipped[0] = sprite[0];
+			flipped[1] = sprite[1];
+			flipped[2] = sprite[2];
 			i += 3;
 		}
-		for (; i < cells.length; i += 3) {
-			flipped[i+0] = cells[i];
-			if (cells[i+3] != 0) {
+		for (; i < sprite.length; i += 3) {
+			flipped[i+0] = sprite[i];
+			if (sprite[i+3] != 0) {
 				if (a) {
-					flipped[i+1] = y ? cells[i+2] : h-1-cells[i+2];
-					flipped[i+2] = x ? w-1-cells[i+1] : cells[i+1];
+					flipped[i+1] = y ? sprite[i+2] : h-1-sprite[i+2];
+					flipped[i+2] = x ? w-1-sprite[i+1] : sprite[i+1];
 				} else {
-					flipped[i+1] = x ? w-1-cells[i+1] : cells[i+1];
-					flipped[i+2] = y ? h-1-cells[i+2] : cells[i+2];
+					flipped[i+1] = x ? w-1-sprite[i+1] : sprite[i+1];
+					flipped[i+2] = y ? h-1-sprite[i+2] : sprite[i+2];
 				}
 			} else {
 				if (a) {
-					flipped[i+1] = y ? cells[i+2] : h-cells[i+2];
-					flipped[i+2] = x ? w-cells[i+1] : cells[i+1];
-					flipped[i+3] = cells[i+3];
-					flipped[i+4] = y ? cells[i+5] : -cells[i+5]-2;
-					flipped[i+5] = x ? -cells[i+4]-2 : cells[i+4];
+					flipped[i+1] = y ? sprite[i+2] : h-sprite[i+2];
+					flipped[i+2] = x ? w-sprite[i+1] : sprite[i+1];
+					flipped[i+3] = sprite[i+3];
+					flipped[i+4] = y ? sprite[i+5] : -sprite[i+5]-2;
+					flipped[i+5] = x ? -sprite[i+4]-2 : sprite[i+4];
 				} else {
-					flipped[i+1] = x ? w-cells[i+1] : cells[i+1];
-					flipped[i+2] = y ? h-cells[i+2] : cells[i+2];
-					flipped[i+3] = cells[i+3];
-					flipped[i+4] = x ? -cells[i+4]-2 : cells[i+4];
-					flipped[i+5] = y ? -cells[i+5]-2 : cells[i+5];
+					flipped[i+1] = x ? w-sprite[i+1] : sprite[i+1];
+					flipped[i+2] = y ? h-sprite[i+2] : sprite[i+2];
+					flipped[i+3] = sprite[i+3];
+					flipped[i+4] = x ? -sprite[i+4]-2 : sprite[i+4];
+					flipped[i+5] = y ? -sprite[i+5]-2 : sprite[i+5];
 				}
 				i += 3;
 			}
@@ -447,27 +462,27 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	drawSprite(cells=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
+	drawSprite(sprite=[-1,0,0], bgcolor=-1, x=0, y=0, angle=0, scale=1, vscale=0) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			await this._ready();
 			this._reset(x, y, angle, scale, vscale);
-			this._sprite(cells, -1, bgcolor);
+			this._sprite(sprite, -1, bgcolor);
 		}); // end of lock.
 	}
 
 	// Draw offscreen and get sprite image data.
-	spriteData(cells=[-1,0,0], bgcolor=-1, scale=10, parent=null) {
+	spriteData(sprite=[-1,0,0], bgcolor=-1, scale=10, parent=null) {
 		return navigator.locks.request(this.lock, async (lock) => {
 			if (parent) {
 				await navigator.locks.request(parent.lock, async (parentlock) => {
 					this.colors = parent.colors.concat();
 				}); // end of lock.
 			}
-			let size = this._spriteSize(cells);
+			let size = this._spriteSize(sprite);
 			this._resize(size * scale, size * scale);
 			await this._ready();
 			this._reset(0, 0, 0, scale);
-			this._sprite(cells, -1, bgcolor);
+			this._sprite(sprite, -1, bgcolor);
 			return this._data();
 		}); // end of lock.
 	}
@@ -792,34 +807,34 @@ pico.Image = class {
 	}
 
 	// Draw sprite to image.
-	_sprite(cells=[-1,0,0], fgcolor=-1, bgcolor=-1) {
-		console.log("Sprite: " + cells.join(","));
+	_sprite(sprite=[-1,0,0], fgcolor=-1, bgcolor=-1) {
+		console.log("Sprite: " + sprite.join(","));
 		let i = 0, x0 = 0, y0 = 0;
-		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
-			x0 = -cells[1] / 2;
-			y0 = -cells[2] / 2;
+		if (sprite[0] == 0 && sprite[1] >= 0 && sprite[2] >= 0) {
+			x0 = -sprite[1] / 2;
+			y0 = -sprite[2] / 2;
 			i += 3;
 		}
 		if (bgcolor >= 0 && x0 < 0 && y0 < 0) {
 			this._draw(bgcolor, x0, y0, x0*-2, y0*-2);
 		}
-		for (; i < cells.length; i += 3) {
-			let c = fgcolor >= 0 ? fgcolor : cells[i];
-			if (cells[i+3] == 0) {
-				console.log("SpriteDraw: " + c + "," + cells[i+1]+ "+" + cells[i+4] + "," + cells[i+2] + "+" + cells[i+5]);
-				this._draw(c, cells[i+1] + x0, cells[i+2] + y0, cells[i+4], cells[i+5]);
+		for (; i < sprite.length; i += 3) {
+			let c = fgcolor >= 0 ? fgcolor : sprite[i];
+			if (sprite[i+3] == 0) {
+				console.log("SpriteDraw: " + c + "," + sprite[i+1]+ "+" + sprite[i+4] + "," + sprite[i+2] + "+" + sprite[i+5]);
+				this._draw(c, sprite[i+1] + x0, sprite[i+2] + y0, sprite[i+4], sprite[i+5]);
 				i += 3;
 			} else {
-				console.log("SpriteDraw: " + c + "," + cells[i+1] + "," + cells[i+2]);
-				this._draw(c, cells[i+1] + x0, cells[i+2] + y0);
+				console.log("SpriteDraw: " + c + "," + sprite[i+1] + "," + sprite[i+2]);
+				this._draw(c, sprite[i+1] + x0, sprite[i+2] + y0);
 			}
 		}
 	}
 
 	// Get sprite size.
-	_spriteSize(cells=[-1,0,0]) {
-		if (cells[0] == 0 && cells[1] >= 0 && cells[2] >= 0) {
-			return (cells[1] > cells[2] ? cells[1] + 1 : cells[2] + 1);
+	_spriteSize(sprite=[-1,0,0]) {
+		if (sprite[0] == 0 && sprite[1] >= 0 && sprite[2] >= 0) {
+			return (sprite[1] > sprite[2] ? sprite[1] + 1 : sprite[2] + 1);
 		}
 		return 0;
 	}
