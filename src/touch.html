@@ -8,7 +8,8 @@
 <script src="image.js"></script>
 <!--Main--><script>
 (async () => {
-	let keyboard = ["1234567890", "QWERTYUIOP", "ASDFGHJKL*", "ZXCVBNM./%"];
+	// 8bit compatible 6bit chars. (numbers:"0-9", alphabets:"A-Z", morsecodes:".-")
+	let keyboard = ["1234567890", "QWERTYUIOP", "ASDFGHJKL*", "ZXCVBNM.-%"];
 	let textarea = "";
 
 	for (;;) {
