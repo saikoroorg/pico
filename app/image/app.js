@@ -21,7 +21,8 @@ var pixels = []; // Canvas pixels.
 var canvas = ""; // Canvas pixels by text format.
 var depth = 7;//colors.length/3; // Color count.
 const maxcolor = 10; // Color max count.
-const coffset = 10; // Color index offset. (10=A, ...)
+const coffset = 9; // Color index offset. (9=BG,10=A, ...)
+const bgchar = "#"; // Bg char.
 var bgcolor = 0; // Bg color -1 if transparent.
 var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting.
 var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
@@ -241,9 +242,9 @@ async function appLoad() {
 	// Initialize sprites.
 	let char0 = "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
 	let char1 = "00" + "0" + picoCodeChar(blockwidth-1) + picoCodeChar(blockwidth-1);
-	picoCharSprite("@", picoStringCode6(char0 + picoCode6Char(0) + char1));
-	for (let i = 0; i < maxcolor; i++) {
-		picoCharSprite(picoCode6Char(coffset+i), picoStringCode6(char0 + picoCode6Char(coffset+i) + char1));
+	picoCharSprite(bgchar, picoTextCode(char0 + picoCodeChar(coffset+0) + char1));
+	for (let i = 1; i < maxcolor; i++) {
+		picoCharSprite(picoCodeChar(coffset+i), picoTextCode(char0 + picoCodeChar(coffset+i) + char1));
 	}
 
 	// Initialize pixels on max size.
@@ -842,9 +843,9 @@ async function appMain() {
 
 					// Touching down-arrow on view mode.
 					if (animetouchmovey < 0) {
-						canvas += "@";
+						canvas += bgchar;
 					} else {
-						canvas += pixels[j][i] ? picoCode6Char(pixels[j][i]) : "@";
+						canvas += pixels[j][i] ? picoCodeChar(pixels[j][i]) : bgchar;
 					}
 
 				// Update canvas on editor mode.
@@ -873,7 +874,7 @@ async function appMain() {
 						picoRect(pixels[j][i] ? pixels[j][i] : 0, x, y, pixelsgrid, pixelsgrid);
 						canvas += " ";
 					} else {
-						canvas += pixels[j][i] ? picoCode6Char(pixels[j][i]) : "@";
+						canvas += pixels[j][i] ? picoCodeChar(pixels[j][i]) : bgchar;
 					}
 				}
 			}
@@ -985,7 +986,7 @@ async function appMain() {
 					let text = await picoClipboard();
 					if (text && text[0] == "0" && text[1] != "0" && text[2] != "0") {
 						console.log("Load from clipboard:" + text);
-						clipboard = picoStringCode6(text);
+						clipboard = picoTextCode(text);
 					}
 
 					// Paste from clipboard.
@@ -1098,8 +1099,8 @@ async function appMain() {
 	// Draw colors.
 	if (!colorflag) {
 
-		for (let i = 0; i < depth-1; i++) {
-			let x = colorsposx + (i - depth/2 + 1) * colorsgrid; // Margins for each color.
+		for (let i = 1; i < depth; i++) {
+			let x = colorsposx + (i - depth/2) * colorsgrid; // Margins for each color.
 
 			// Release touching color.
 			if (colortouching >= 0 && picoAction(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1111,7 +1112,7 @@ async function appMain() {
 					appUpdate(true);
 				}
 				picoBeep(0, 0.1);
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
+				picoChar(picoCodeChar(coffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 			// Touching color.
 			} else if (colortouching >= 0 && picoMotion(x, colorsposy, colorsgrid/2, colorsheight/2)) {
@@ -1146,13 +1147,13 @@ async function appMain() {
 						colorholding = 0;
 					}
 				}
-				picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale1);
+				picoChar(picoCodeChar(coffset+i), -1, x, colorsposy, 0, colorsscale1);
 
 			} else {
 
 				// Not touching but selecting color.
 				if (colorselecting == i) {
-					picoChar(picoCode6Char(coffset+i), -1, x, colorsposy, 0, colorsscale2);
+					picoChar(picoCodeChar(coffset+i), -1, x, colorsposy, 0, colorsscale2);
 
 				// Other colors.
 				} else {
