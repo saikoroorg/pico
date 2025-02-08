@@ -25,10 +25,10 @@ const coffset = 34; // Color index offset. (34=BG1, 35=BG2, 36=A, ...)
 const maxextra = 3; // Extra mark count. (+0=BG1, +1=BG2, +2=Dash)
 const maxtimbre = 4; // Timbres max count. (+3,+4,+5,+6)
 var timbres = [ // Timbres.
-		16+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
+		16+1,   0, 4+16, // Pulse1, Pitch+0, Volume:12/16-1
+		16+3,   0, 4+16, // Pulse3, Pitch+0, Volume:12/16-1
 		32+15,  0, 0+16, // Triangle15, Pitch+0, Volume:16/16-1
-		48+1,   0, 4+16, // Pulse1, Pitch+0, Volume:12/16-1
-		48+3,   0, 4+16, // Pulse3, Pitch+0, Volume:12/16-1
+		48+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
 ];
 const toffset = 10; // Timbre index offset. (10=a, .. 36=A, ...)
 const tscale = [0,2,3,5,7,8,10, 1,4,6,9,11,]; // Sound scale.

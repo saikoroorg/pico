@@ -67,9 +67,9 @@ async function picoNoise(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=nu
 // Set timbre pallete.
 //  timbres: [pattern0,pitch0,volume0, pattern1,pitch1,volume1, ~]
 //   patterns: 0~15=Reserved, 16~31=Noise, 32~47=Triangle, 48~63=Pulse
-//    16+0(G)=Noise0,    16+1(H)=Noise1,     16+6(M)=Noise6
+//    16+0(G)=Pulse0,    16+1(H)=Pulse1,     16+3(J)=Pulse3, 16+7(N)=Pulse7
 //    32+0(W)=Triangle0, 32+15(l)=Triangle15
-//    48+0(m)=Pulse0,    48+1(n)=Pulse1,     48+3(p)=Pulse3, 48+7(t)=Pulse7
+//    48+0(m)=Noise0,    48+1(n)=Noise1,     48+6(s)=Noise6
 //   pitches: Pitch modulation(0~48)
 //    0=Pitch+0, 1=Pitch-1, 2=Pitch-2, ~ 12=Pitch-12(-1 octave), ~
 //   volumes: Volume(0=Max~15=Min) + Volume attenuation(0,16,32,48)
@@ -315,14 +315,14 @@ pico.Sound = class {
 				// Play sound.
 				//console.log("Melody " + j + "/" + (melody.length/3) + ": " + pitch + " x " + length + " " + m00 + "=" + m0 + " " + m1 + " " + m2 + " / " + type + " " + pattern + " - " + pctrl + " " + vctrl + " - " + p + " " + v);
 				if (type == 1) {
-					console.log("Noise" + pattern + ": length=" + length + " pitch=" + p + " volumes=" + v);
-					await this._noise(pattern, length, p, v);
+					console.log("Pulse" + pattern + ": length=" + length + " pitch=" + p + " volumes=" + v);
+					await this._pulse(pattern, length, p, v);
 				} else if (type == 2) {
 					console.log("Triangle" + pattern + ": length=" + length + " pitch=" + p + " volumes=" + v);
 					await this._triangle(pattern, length, p, v);
 				} else if (type == 3) {
-					console.log("Pulse" + pattern + ": length=" + length + " pitch=" + p + " volumes=" + v);
-					await this._pulse(pattern, length, p, v);
+					console.log("Noise" + pattern + ": length=" + length + " pitch=" + p + " volumes=" + v);
+					await this._noise(pattern, length, p, v);
 				} else {
 					console.log("Rest: length=" + length);
 					await this.wait(length * 1000);

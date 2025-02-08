@@ -53,7 +53,7 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 
 //*/
 	await picoStop();
-	picoTimbre([16+1,0,8+32]); // Noise1, Volume:8/16-2
+	picoTimbre([48+1,0,8+32]); // Noise1, Volume:8/16-2
 	picoMelody([0,30,0, // 0(reserved), 300bpm, 0(reserved)
 		-1,0,6, 0,2,3, -1,0,9, 0,2,3, -1,0,9, 0,2,3, -1,0,9, 0,2,3, -1,0,3,
 		-1,0,6, 0,2,3, -1,0,9, 0,2,3, -1,0,9, 0,2,3, -1,0,3, 0,2,3, -1,0,9,
@@ -69,7 +69,7 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 		0,3,12, 1,3,12, 0,3,12, 1,3,12,
 		4,2,12, 1,3,12, 4,2,12, 4,2,12,
 	]);
-	picoTimbre([48+1,0,4+16]); // Pulse1, Volume:12/16-1
+	picoTimbre([16+1,0,4+16]); // Pulse1, Volume:12/16-1
 	await picoMelody([0,30,0, // 0(reserved), 300bpm, 0(reserved)
 		0,4,6, 0,4,6, 1,4,6, -1,0,6, 0,4,6, 0,4,6, 1,4,6, -1,0,6,
 		0,4,6, 1,4,6, 2,4,6, 1,4,6, 0,4,6, 1,4,3, 0,4,3, 5,3,6, -1,0,6,
@@ -82,43 +82,43 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 //*/
 	// Timbres.
 	const timbres24 = [
-		// TimbreGroup1 = Pulse1 "n0K,nCK,n04,nC4"
-		48+1,   0, 4+16, // Pulse1, Pitch+0, Volume:12/16-1
-		48+1,  12, 4+16, // Pulse1, Pitch-12, Volume:12/16-1
-		48+1,   0, 4,    // Pulse1, Pitch+0, Volume:12/16
-		48+1,  12, 4,    // Pulse1, Pitch-12, Volume:12/16
-		// TimbreGroup2 = Pulse3 "p0K,pCK,p04,pC4"
-		48+3,   0, 4+16, // Pulse3, Pitch+0, Volume:12/16-1
-		48+3,  12, 4+16, // Pulse3, Pitch-12, Volume:12/16-1
-		48+3,   0, 4,    // Pulse3, Pitch+0, Volume:12/16
-		48+3,  12, 4,    // Pulse3, Pitch-12, Volume:12/16
-		// TimbreGroup3 = Pulse7 "t0K,tCK,t04,tC4"
-		48+7,   0, 4+16, // Pulse7, Pitch+0, Volume:12/16-1
-		48+7,  12, 4+16, // Pulse7, Pitch-12, Volume:12/16-1
-		48+7,   0, 4,    // Pulse7, Pitch+0, Volume:12/16
-		48+7,  12, 4,    // Pulse7, Pitch-12, Volume:12/16
+		// TimbreGroup1 = Pulse1 "H0K,HCK,H04,HC4"
+		16+1,   0, 4+16, // Pulse1, Pitch+0, Volume:12/16-1
+		16+1,  12, 4+16, // Pulse1, Pitch-12, Volume:12/16-1
+		16+1,   0, 4,    // Pulse1, Pitch+0, Volume:12/16
+		16+1,  12, 4,    // Pulse1, Pitch-12, Volume:12/16
+		// TimbreGroup2 = Pulse3 "J0K,JCK,J04,JC4"
+		16+3,   0, 4+16, // Pulse3, Pitch+0, Volume:12/16-1
+		16+3,  12, 4+16, // Pulse3, Pitch-12, Volume:12/16-1
+		16+3,   0, 4,    // Pulse3, Pitch+0, Volume:12/16
+		16+3,  12, 4,    // Pulse3, Pitch-12, Volume:12/16
+		// TimbreGroup3 = Pulse7 "N0K,NCK,N04,NC4"
+		16+7,   0, 4+16, // Pulse7, Pitch+0, Volume:12/16-1
+		16+7,  12, 4+16, // Pulse7, Pitch-12, Volume:12/16-1
+		16+7,   0, 4,    // Pulse7, Pitch+0, Volume:12/16
+		16+7,  12, 4,    // Pulse7, Pitch-12, Volume:12/16
 		// TimbreGroup4 = Triangle15 "l0G,lCG,l00,lC0"
 		32+15,  0, 0+16, // Triangle15, Pitch+0, Volume:16/16-1
 		32+15, 12, 0+16, // Triangle15, Pitch-12, Volume:16/16-1
 		32+15,  0, 0,    // Triangle15, Pitch+0, Volume:16/16
 		32+15, 12, 0,    // Triangle15, Pitch-12, Volume:16/16
-		// TimbreGroup5 = Noise1 "H0e,HCe,H08,HC8"
-		16+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
-		16+1,  12, 8+32, // Noise1, Pitch-12, Volume:8/16-2
-		16+1,   0, 8,    // Noise1, Pitch+0, Volume:8/16
-		16+1,  12, 8,    // Noise1, Pitch-12, Volume:8/16
-		// TimbreGroup6 = Noise6 "M0O,MCO,M08,MC8"
-		16+6,   0, 8+32, // Noise6, Pitch+0, Volume:8/16-2
-		16+6,  12, 8+32, // Noise6, Pitch-12, Volume:8/16-2
-		16+6,   0, 8,    // Noise6, Pitch+0, Volume:8/16
-		16+6,  12, 8,    // Noise6, Pitch-12, Volume:8/16
+		// TimbreGroup5 = Noise1 "n0e,nCe,n08,nC8"
+		48+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
+		48+1,  12, 8+32, // Noise1, Pitch-12, Volume:8/16-2
+		48+1,   0, 8,    // Noise1, Pitch+0, Volume:8/16
+		48+1,  12, 8,    // Noise1, Pitch-12, Volume:8/16
+		// TimbreGroup6 = Noise6 "s0O,sCO,s08,sC8"
+		48+6,   0, 8+32, // Noise6, Pitch+0, Volume:8/16-2
+		48+6,  12, 8+32, // Noise6, Pitch-12, Volume:8/16-2
+		48+6,   0, 8,    // Noise6, Pitch+0, Volume:8/16
+		48+6,  12, 8,    // Noise6, Pitch-12, Volume:8/16
 	]; // 4 timbres x 6 groups (8bit original parameter)
 
 	// Timbre groups.
 	const timbres = [
-		picoTextCode("n0K,nCK,n04,nC4"), // Pulse1 //picoTextCode("p0K,pCK,p04,pC4"), // Pulse3
+		picoTextCode("H0K,HCK,H04,HC4"), // Pulse1 //picoTextCode("J0K,JCK,J04,JC4"), // Pulse3
 		picoTextCode("l0G,lCG,l00,lC0"), // Triangle15
-		picoTextCode("H0e,HCe,H08,HC8"), // Noise1
+		picoTextCode("n0e,nCe,n08,nC8"), // Noise1
 	];
 	// Scales.
 	const scales = [
