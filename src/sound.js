@@ -67,26 +67,26 @@ async function picoNoise(pattern=0, length=0.1, pitch=0, volumes=[1], pitches=nu
 // Set timbre pallete.
 //  timbres: [pattern0,pitch0,volume0, pattern1,pitch1,volume1, ~]
 //   patterns: 0~15=Reserved, 16~31=Noise, 32~47=Triangle, 48~63=Pulse
-//    16+0(g)=Noise0,    16+1(h)=Noise1,     16+6(m)=Noise6
-//    32+0(w)=Triangle0, 32+15(L)=Triangle15
-//    48+0(M)=Pulse0,    48+1(N)=Pulse1,     48+3(P)=Pulse3, 48+7(T)=Pulse7
+//    16+0(G)=Noise0,    16+1(H)=Noise1,     16+6(M)=Noise6
+//    32+0(W)=Triangle0, 32+15(l)=Triangle15
+//    48+0(m)=Pulse0,    48+1(n)=Pulse1,     48+3(p)=Pulse3, 48+7(t)=Pulse7
 //   pitches: Pitch modulation(0~48)
 //    0=Pitch+0, 1=Pitch-1, 2=Pitch-2, ~ 12=Pitch-12(-1 octave), ~
 //   volumes: Volume(0=Max~15=Min) + Volume attenuation(0,16,32,48)
 //    0=16/16, 2=14/16, 4=12/16, 6=10/16, 8=8/16, ~
-//    16+0(g)=16/16-1, 16+2(i)=14/16-1, 16+4(k)=12/16-1, 16+6(m)=10/16-1, 16+8(o)=8/16-1, ~
-//    32+0(w)=16/16-2, 32+2(y)=14/16-2, 32+4(A)=12/16-2, 32+6(C)=10/16-2, 32+8(E)=8/16-2, ~
-//    48+0(M)=16/16-3, 48+2(O)=14/16-3, 48+4(Q)=12/16-3, 48+6(S)=10/16-3, 48+8(U)=8/16-3, ~
+//    16+0(G)=16/16-1, 16+2(I)=14/16-1, 16+4(K)=12/16-1, 16+6(M)=10/16-1, 16+8(O)=8/16-1, ~
+//    32+0(W)=16/16-2, 32+2(Y)=14/16-2, 32+4(a)=12/16-2, 32+6(c)=10/16-2, 32+8(e)=8/16-2, ~
+//    48+0(m)=16/16-3, 48+2(o)=14/16-3, 48+4(q)=12/16-3, 48+6(s)=10/16-3, 48+8(u)=8/16-3, ~
 //  scales: Sound scales [pitch0, ~ pitchN-1]
 //   [0,2,3,5,7,8,10, 1,4,6,9,11] = A natural minor scale
 //   (La,Ti,Do,Re,Mi,Fa,So, La+,Do+,Re+,Fa+,So+)
 //  offset: Offset of timbres for melody data.
 //   0 = 11 notes and 1 rest for melody data 0~12
-//   10 = (11 notes and 1 rest)x4 for melody data 10(a)~61(Z)
-//    Timbre0 -> 10-21(abcdefg,hijkl) + Rest=22(m)
-//    Timbre1 -> 23-34(nopqrst,uvwxy) + Rest=35(z)
-//    Timbre2 -> 36-47(ABCDEFG,HIJKL) + Rest=48(M)
-//    Timbre3 -> 49-60(NOPQRST,UVWXY) + Rest=61(Z)
+//   10 = (11 notes and 1 rest)x4 for melody data 10(Z)~61(z)
+//    Timbre0 -> 10-21(ABCDEFG,HIJKL) + Rest=22(M)
+//    Timbre1 -> 23-34(NOPQRST,UVWXY) + Rest=35(Z)
+//    Timbre2 -> 36-47(abcdefg,hijkl) + Rest=48(m)
+//    Timbre3 -> 49-60(nopqrst,uvwxy) + Rest=61(z)
 async function picoTimbre(timbres=null, scales=null, offset=0) {
 	pico.sound.timbre(timbres, scales, offset);
 }

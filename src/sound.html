@@ -82,44 +82,43 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 //*/
 	// Timbres.
 	const timbres24 = [
-		// TimbreGroup0 = Noise6 "m08,mc8,m0o,mco"
-		16+6,   0, 8,    // Noise6, Pitch+0, Volume:8/16
-		16+6,  12, 8,    // Noise6, Pitch-12, Volume:8/16
-		16+6,   0, 8+32, // Noise6, Pitch+0, Volume:8/16-2
-		16+6,  12, 8+32, // Noise6, Pitch-12, Volume:8/16-2
-		// TimbreGroup1 = Noise1 "h08,hc8,h0E,hcE"
-		16+1,   0, 8,    // Noise1, Pitch+0, Volume:8/16
-		16+1,  12, 8,    // Noise1, Pitch-12, Volume:8/16
-		16+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
-		16+1,  12, 8+32, // Noise1, Pitch-12, Volume:8/16-2
-		// TimbreGroup2 = Triangle15 "L00,Lc0,L0g,Lcg"
-		32+15,  0, 0,    // Triangle15, Pitch+0, Volume:16/16
-		32+15, 12, 0,    // Triangle15, Pitch-12, Volume:16/16
-		32+15,  0, 0+16, // Triangle15, Pitch+0, Volume:16/16-1
-		32+15, 12, 0+16, // Triangle15, Pitch-12, Volume:16/16-1
-		// TimbreGroup3 = Pulse1 "N04,Nc4,N0k,Nck"
-		48+1,   0, 4,    // Pulse1, Pitch+0, Volume:12/16
-		48+1,  12, 4,    // Pulse1, Pitch-12, Volume:12/16
+		// TimbreGroup1 = Pulse1 "n0K,nCK,n04,nC4"
 		48+1,   0, 4+16, // Pulse1, Pitch+0, Volume:12/16-1
 		48+1,  12, 4+16, // Pulse1, Pitch-12, Volume:12/16-1
-		// TimbreGroup4 = Pulse3 "P04,Pc4,P0k,Pck"
-		48+3,   0, 4,    // Pulse3, Pitch+0, Volume:12/16
-		48+3,  12, 4,    // Pulse3, Pitch-12, Volume:12/16
+		48+1,   0, 4,    // Pulse1, Pitch+0, Volume:12/16
+		48+1,  12, 4,    // Pulse1, Pitch-12, Volume:12/16
+		// TimbreGroup2 = Pulse3 "p0K,pCK,p04,pC4"
 		48+3,   0, 4+16, // Pulse3, Pitch+0, Volume:12/16-1
 		48+3,  12, 4+16, // Pulse3, Pitch-12, Volume:12/16-1
-		// TimbreGroup5 = Pulse7 "T04,Tc4,T0k,Tck"
-		48+7,   0, 4,    // Pulse7, Pitch+0, Volume:12/16
-		48+7,  12, 4,    // Pulse7, Pitch-12, Volume:12/16
+		48+3,   0, 4,    // Pulse3, Pitch+0, Volume:12/16
+		48+3,  12, 4,    // Pulse3, Pitch-12, Volume:12/16
+		// TimbreGroup3 = Pulse7 "t0K,tCK,t04,tC4"
 		48+7,   0, 4+16, // Pulse7, Pitch+0, Volume:12/16-1
 		48+7,  12, 4+16, // Pulse7, Pitch-12, Volume:12/16-1
+		48+7,   0, 4,    // Pulse7, Pitch+0, Volume:12/16
+		48+7,  12, 4,    // Pulse7, Pitch-12, Volume:12/16
+		// TimbreGroup4 = Triangle15 "l0G,lCG,l00,lC0"
+		32+15,  0, 0+16, // Triangle15, Pitch+0, Volume:16/16-1
+		32+15, 12, 0+16, // Triangle15, Pitch-12, Volume:16/16-1
+		32+15,  0, 0,    // Triangle15, Pitch+0, Volume:16/16
+		32+15, 12, 0,    // Triangle15, Pitch-12, Volume:16/16
+		// TimbreGroup5 = Noise1 "H0e,HCe,H08,HC8"
+		16+1,   0, 8+32, // Noise1, Pitch+0, Volume:8/16-2
+		16+1,  12, 8+32, // Noise1, Pitch-12, Volume:8/16-2
+		16+1,   0, 8,    // Noise1, Pitch+0, Volume:8/16
+		16+1,  12, 8,    // Noise1, Pitch-12, Volume:8/16
+		// TimbreGroup6 = Noise6 "M0O,MCO,M08,MC8"
+		16+6,   0, 8+32, // Noise6, Pitch+0, Volume:8/16-2
+		16+6,  12, 8+32, // Noise6, Pitch-12, Volume:8/16-2
+		16+6,   0, 8,    // Noise6, Pitch+0, Volume:8/16
+		16+6,  12, 8,    // Noise6, Pitch-12, Volume:8/16
 	]; // 4 timbres x 6 groups (8bit original parameter)
 
 	// Timbre groups.
 	const timbres = [
-		picoTextCode("h08,hc8,h0E,hcE"), // Noise1
-		picoTextCode("L00,Lc0,L0g,Lcg"), // Triangle15
-		picoTextCode("N04,Nc4,N0k,Nck"), // Pulse1
-		picoTextCode("P04,Pc4,P0k,Pck"), // Pulse3
+		picoTextCode("n0K,nCK,n04,nC4"), // Pulse1 //picoTextCode("p0K,pCK,p04,pC4"), // Pulse3
+		picoTextCode("l0G,lCG,l00,lC0"), // Triangle15
+		picoTextCode("H0e,HCe,H08,HC8"), // Noise1
 	];
 	// Scales.
 	const scales = [
@@ -132,24 +131,24 @@ document.addEventListener("click", async (evt) => { // Need user input event bef
 
 	// Melodies.
 	const melodies = [
-		picoTextCode("0f0"+
+		picoTextCode("0F0"+
+			"A46A46B46M06,A46A46B46M06"+
+			"A46B46C46B46,A46B43A43F36M06"+
+			"E36D36E36F36,E36E33C33B36M06"+
+			"A46A46B46M06,A46A46B46M06"+
+			"E36F36B43A43F36,E3CM0C"),
+		picoTextCode("0F0"+
+			"A3CB3C,A3CB3C"+
+			"A3CC3C,A3CF2C"+
+			"E2CE2C,E2CB2C"+
+			"A3CB3C,A3CB3C"+
+			"E2CB3C,E2CE2C"),
+		picoTextCode("0F0"+
 			"M06A23,M09A23,M09A23,M09A23,M03"+
 			"M06A23,M09A23,M09A23,M03A23,M09"+
 			"M06E13,M09E13,M09E13,M03E13,M09"+
 			"M06A23,M09A23,M09A23,M09A23,M03"+
 			"M06E13,M09E13,M09E13,M03E13,M09"),
-		picoTextCode("0f0"+
-			"A3cB3c,A3cB3c"+
-			"A3cC3c,A3cF2c"+
-			"E2cE2c,E2cB2c"+
-			"A3cB3c,A3cB3c"+
-			"E2cB3c,E2cE2c"),
-		picoTextCode("0f0"+
-			"A46A46B46M06,A46A46B46M06"+
-			"A46B46C46B46,A46B43A43F36M06"+
-			"E36D36E36F36,E36E33C33B36M06"+
-			"A46A46B46M06,A46A46B46M06"+
-			"E36F36B43A43F36,E3cM0c"),
 	];
 
 	for (let i = 0; i < 1; i++) {
