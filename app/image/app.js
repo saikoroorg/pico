@@ -23,7 +23,8 @@ var depth = 7;//colors.length/3; // Color count.
 const maxcolor = 10; // Color max count.
 const coffset = 9; // Color index offset. (9=BG,10=A, ...)
 const bgchar = "#"; // Bg char.
-var bgcolor = 0; // Bg color -1 if transparent.
+var bgcolor = 0; // Bg color = Transparent color(-1) on preview icon if transparent.
+const bgblack = 5; // Bg color = System black color(5) if transparent.
 var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting.
 var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
 
@@ -533,13 +534,13 @@ async function appMain() {
 					colorholding = 0;
 
 				// Hovering from another color.
-				} else if (colorselecting != 0) {
+				} else if (colorselecting > 0) {
 					console.log("Touching another background.");
 					colorselecting = 0;
-					colorholding = 0;
+					colorholding = -1;
 
 				// Continue touching background.
-				} else {
+				} else if (colorholding >= 0) {
 					console.log("Continue touching background.");// + colorholding);
 					colorholding++;
 
@@ -554,7 +555,7 @@ async function appMain() {
 							colors[k0+0] = colors[k0+1] = colors[k0+2] = 255;
 							colors[k1+0] = colors[k1+1] = colors[k1+2] = 0;
 						}
-						bgcolor = colors[k0+0] == 0 ? -1 : 0;
+						bgcolor = colors[k0+0] == 0 ? 5 : 0;
 						appUpdate(); // Update thumbnail.
 						picoBeep(1.2, 0.1);
 						colortouching = -1;
@@ -564,7 +565,7 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(0, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
+			picoRect(bgcolor<0?bgblack:bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		} else {
 			// Cancel holding coloreditor.
@@ -573,7 +574,7 @@ async function appMain() {
 			}
 
 			// Draw background of coloreditor.
-			picoRect(0, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
+			picoRect(bgcolor<0?bgblack:bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 		}
 
 		// Touching color buttons.
@@ -1130,10 +1131,10 @@ async function appMain() {
 				} else if (colorselecting != i) {
 					console.log("Touching another color.");
 					colorselecting = i;
-					colorholding = 0;
+					colorholding = -1;
 
 				// Continue touching color.
-				} else {
+				} else if (colorholding >= 0) {
 					console.log("Continue touching color.");
 					colorholding++;
 
