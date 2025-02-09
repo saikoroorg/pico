@@ -583,10 +583,10 @@ async function appMain() {
 				} else if (colorselecting != 0) {
 					console.log("Touching another background.");
 					colorselecting = 0;
-					colorholding = 0;
+					colorholding = -1;
 
 				// Continue touching background.
-				} else {
+				} else if (colorholding >= 0) {
 					console.log("Continue touching background.");// + colorholding);
 					colorholding++;
 
@@ -1223,10 +1223,10 @@ async function appMain() {
 				} else if (colorselecting != i) {
 					console.log("Touching another color.");
 					colorselecting = i;
-					colorholding = 0;
+					colorholding = -1;
 
 				// Continue touching color.
-				} else {
+				} else if (colorholding >= 0) {
 					console.log("Continue touching color.");
 					colorholding++;
 
