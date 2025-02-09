@@ -34,7 +34,8 @@ var timbres = [ // Timbres.
 ];
 const toffset = 10; // Timbre index offset. (10=A, ...)
 const tscale = [0,2,3,5,7,8,10, 1,4,6,9,11,]; // Sound scale.
-var bgcolor = 0; // Bg color -1 if transparent.
+var bgcolor = 0; // Bg color = Transparent color(-1) on preview icon if transparent.
+const bgblack = 5; // Bg color = System black color(5) if transparent.
 var animeflag = 0; // Anime editing flag. // 0:pixelediting, 1:animeediting.
 var colorflag = 0; // Color editing flag. // 0:pixelediting, 1:colorediting.
 const maxspeed = 30; // Beat max speed.
@@ -611,7 +612,7 @@ async function appMain() {
 			}
 
 			// Touching.
-			picoRect(0, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
+			picoRect(bgcolor<0?bgblack:bgcolor, colorsposx, colorsposy, bgcolorwidth2, bgcolorheight2);
 
 		} else {
 			// Cancel holding coloreditor.
@@ -620,7 +621,7 @@ async function appMain() {
 			}
 
 			// Draw background of coloreditor.
-			picoRect(0, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
+			picoRect(bgcolor<0?bgblack:bgcolor, colorsposx, colorsposy, bgcolorwidth, bgcolorheight);
 		}
 
 		// Touching color buttons.
