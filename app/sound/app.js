@@ -447,7 +447,7 @@ async function appMain() {
 	let animebutton1x = bganimewidth/2 + animebuttonwidth/2, animebutton1y = animesposy; // Animeeditor plus button position.
 	let animebutton2x = -bganimewidth/2 - animebuttonwidth/2, animebutton2y = animesposy; // Animeeditor minus button position.
 
-	const arrowbutton0char = "$", arrowbutton1char = "&", arrowbutton2char = "%"; // Anime arrow button chars.
+	const arrowbutton0char = "@", arrowbutton1char = "&", arrowbutton2char = "%"; // Anime arrow button chars.
 	const arrowbuttonxchar = "&", arrowbuttonxangle = 90; // Anime testing button char and angle.
 	let arrowbuttoncolor = 0, arrowbuttonscale0 = 1, arrowbuttonscale1 = 0.75; // Anime arrow button color and scales.
 	let /*arrowbuttonwidth = landscape ? 24 : 10,*/ arrowbuttonheight = 10; // Anime arrow button width and height.
@@ -1125,7 +1125,7 @@ async function appMain() {
 					animetouchmoved = 0;
 
 					// Release holding frame.
-					picoChar("$", 0, x, y, 0, arrowscale*arrowbuttonscale1);
+					picoChar(arrowbutton0char, 0, x, y, 0, arrowscale*arrowbuttonscale1);
 
 				// Touching frame.
 				} else if (frametouching >= 0 && picoMotion(x, y, animegrid/2, animegrid/2)) {
@@ -1165,7 +1165,7 @@ async function appMain() {
 					colortouching = -1;
 
 					// Touch holding frame.
-					picoChar("$", 0, x, y, 0, arrowscale*arrowbuttonscale1);
+					picoChar(arrowbutton0char, 0, x, y, 0, arrowscale*arrowbuttonscale1);
 
 				// Not touching but selecting frame.
 				} else if (frameselecting == i) {
